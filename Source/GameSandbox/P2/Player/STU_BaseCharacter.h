@@ -18,7 +18,7 @@ class GAMESANDBOX_API ASTU_BaseCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	ASTU_BaseCharacter();
+	ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -47,6 +47,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
 	bool GetIsRunning() const;
+	UFUNCTION(BlueprintCallable, Category = "Kinder | Movement")
+	float GetMovementDirection()const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
@@ -62,9 +64,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* CrouchAction;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	float MaxRunSpeed = 900.f;
-
 private:
 	void MappingContext() const;
 	void Move(const FInputActionValue& Value);
@@ -73,8 +72,7 @@ private:
 	void StartRun();
 	void StopRun();
 
-	bool  bRunning            = false;
-	float DefaultMaxWalkSpeed = 600.f;
+	bool bRunning = false;
 
 #pragma endregion // Input
 };

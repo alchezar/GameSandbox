@@ -11,6 +11,8 @@ public class GameSandbox : ModuleRules
 		PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG" });
 
 		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore" });
+		
+		// PublicIncludePaths.AddRange(new string[] { "GameSandbox/P2/Component", "GameSandbox/P2/Player"});
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });

@@ -6,8 +6,10 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameSandbox/P2/Component/STU_CharacterMovementComponent.h"
 
-ASTU_BaseCharacter::ASTU_BaseCharacter()
+ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTU_CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 	SetupComponent();
@@ -22,8 +24,6 @@ void ASTU_BaseCharacter::BeginPlay()
 void ASTU_BaseCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("%f"), DefaultMaxWalkSpeed));
 }
 
 #pragma region Component
@@ -38,8 +38,6 @@ void ASTU_BaseCharacter::SetupComponent()
 	CameraComponent->SetupAttachment(SpringArmComponent);
 
 	GetMovementComponent()->GetNavAgentPropertiesRef().bCanCrouch = true;
-
-	DefaultMaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 UCameraComponent* ASTU_BaseCharacter::GetCameraComp() const
@@ -104,14 +102,12 @@ void ASTU_BaseCharacter::Look(const FInputActionValue& Value)
 
 void ASTU_BaseCharacter::StartRun()
 {
-	bRunning                             = true;
-	GetCharacterMovement()->MaxWalkSpeed = MaxRunSpeed;
+	bRunning = true;
 }
 
 void ASTU_BaseCharacter::StopRun()
 {
-	bRunning                             = false;
-	GetCharacterMovement()->MaxWalkSpeed = DefaultMaxWalkSpeed;
+	bRunning = false;
 }
 
 bool ASTU_BaseCharacter::GetIsRunning() const
@@ -122,6 +118,15 @@ bool ASTU_BaseCharacter::GetIsRunning() const
 void ASTU_BaseCharacter::CrouchToggle()
 {
 	GetCharacterMovement()->IsCrouching() ? UnCrouch() : Crouch();
+}
+
+float ASTU_BaseCharacter::GetMovementDirection() const
+{
+	if (GetVelocity().IsZero()) return 0.f;
+	const auto VelocityNormal = GetVelocity().GetSafeNormal();
+	const auto AngleBetween   = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
+	const auto CrossProduct   = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
+	return FMath::RadiansToDegrees(AngleBetween) * FMath::Sign(CrossProduct.Z);
 }
 
 #pragma endregion // Input
