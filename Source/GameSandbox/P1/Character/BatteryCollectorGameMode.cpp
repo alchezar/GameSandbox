@@ -47,10 +47,7 @@ void ABatteryCollectorGameMode::FindAllSpawners()
 
 void ABatteryCollectorGameMode::StartPowerLevelDecay()
 {
-	if (!PlayerCharacter)
-	{
-		return;
-	}
+	if (!PlayerCharacter) return;
 	if (PlayerCharacter->GetCurrentPowerLevel() > PowerToWin)
 	{
 		SetGameState(EPickupGameState::Win);

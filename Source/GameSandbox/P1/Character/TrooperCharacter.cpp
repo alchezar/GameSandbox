@@ -88,37 +88,6 @@ void ATrooperCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void ATrooperCharacter::Jump()
-{
-	Super::Jump();
-}
-
-void ATrooperCharacter::StopJumping()
-{
-	Super::StopJumping();
-	InJump = false;
-}
-
-// Jumping from an idle pose requires some delay to match the animation perfectly
-void ATrooperCharacter::DelayedJump()
-{
-	if (GetCharacterMovement()->GetCurrentAcceleration().Length() > 5.f)
-	{
-		Jump();
-	}
-	else
-	{
-		FTimerHandle Timer;
-		GetWorldTimerManager().SetTimer(OUT Timer, this, &ATrooperCharacter::Jump, JumpDelay);
-	}
-	InJump = true;
-}
-
-bool ATrooperCharacter::GetInJump() const
-{
-	return InJump;
-}
-
 #pragma endregion // Input
 
 #pragma region Component

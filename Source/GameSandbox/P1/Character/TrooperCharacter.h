@@ -52,16 +52,9 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:
-	virtual void Jump() override;
-	virtual void StopJumping() override;
-
 	void MappingContext() const;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-	void DelayedJump();
-
-	UFUNCTION(BlueprintCallable, Category = "Kinder")
-	bool GetInJump() const;
 
 private:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Input", meta = (AllowPrivateAccess = "true"))
@@ -72,10 +65,6 @@ private:
 	UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Input", meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-
-	bool InJump = false;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Jump", meta = (AllowPrivateAccess = "true"))
-	float JumpDelay = 1.f;
 
 #pragma endregion // Input
 };
