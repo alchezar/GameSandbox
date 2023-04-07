@@ -16,6 +16,8 @@ class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
 public:
 	ASTU_BaseWeapon();
 
+	virtual void Fire();
+
 protected:
 	virtual void BeginPlay() override;
 

@@ -15,3 +15,8 @@ void ASTU_BaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 }
+
+void ASTU_BaseWeapon::Fire()
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Orange, FString::Printf(TEXT("PEW")));
+}

@@ -11,7 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameSandbox/P2/Component/STU_CharacterMovementComponent.h"
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
-#include "GameSandbox/P2/Weapon/STU_BaseWeapon.h"
+#include "GameSandbox/P2/Component/STU_WeaponComponent.h"
 
 ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTU_CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -32,8 +32,6 @@ void ASTU_BaseCharacter::BeginPlay()
 	HealthComponent->OnDeath.AddUObject(this, &ASTU_BaseCharacter::OnDeathHandle);
 	HealthComponent->OnHealthChanged.AddUObject(this, &ASTU_BaseCharacter::OnHealthChangedHandle);
 	LandedDelegate.AddDynamic(this, &ASTU_BaseCharacter::LandedHandle);
-
-	SpawnWeapon();
 }
 
 void ASTU_BaseCharacter::Tick(const float DeltaTime)
@@ -48,6 +46,7 @@ void ASTU_BaseCharacter::SetupComponent()
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
 	SpringArmComponent->bUsePawnControlRotation = true;
+	SpringArmComponent->SocketOffset            = FVector(0.0, 60.0, 40.0);
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -55,6 +54,9 @@ void ASTU_BaseCharacter::SetupComponent()
 	HealthComponent     = CreateDefaultSubobject<USTU_HealthComponent>("HealthComponent");
 	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
 	HealthTextComponent->SetupAttachment(GetRootComponent());
+	HealthTextComponent->SetOwnerNoSee(true);
+
+	WeaponComponent = CreateDefaultSubobject<USTU_WeaponComponent>("WeaponComponent");
 }
 
 UCameraComponent* ASTU_BaseCharacter::GetCameraComp() const
@@ -81,6 +83,7 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent);
+	check(WeaponComponent);
 
 	auto* EnhancedInput = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (!EnhancedInput) return;
@@ -89,9 +92,12 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Triggered, this, &ThisClass::StartRun);
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::StopRun);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchToggle);
+	
+	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::Fire);
 }
 
 void ASTU_BaseCharacter::Move(const FInputActionValue& Value)
@@ -153,7 +159,6 @@ float ASTU_BaseCharacter::GetMovementDirection() const
 void ASTU_BaseCharacter::LandedHandle(const FHitResult& Hit)
 {
 	const double FallVelocity = -GetVelocity().Z;
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("%f"), FallVelocity));
 	if (FallVelocity < LandedDamageVelocity.X) return;
 
 	const double FinalDamage = FMath::GetMappedRangeValueClamped(LandedDamageVelocity, LandedDamage, FallVelocity);
@@ -179,16 +184,3 @@ void ASTU_BaseCharacter::OnDeathHandle()
 	}
 }
 #pragma endregion // Health
-
-#pragma region Weapon
-
-void ASTU_BaseCharacter::SpawnWeapon()
-{
-	if(!GetWorld()) return;
-	ASTU_BaseWeapon* Weapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(WeaponClass);
-	if (!Weapon) return;	
-	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-	Weapon->AttachToComponent(GetMesh(), AttachmentRules, "HandWeaponSocket");	
-}
-
-#pragma endregion // Weapon

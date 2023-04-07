@@ -6,9 +6,9 @@
 #include "GameFramework/Character.h"
 #include "STU_BaseCharacter.generated.h"
 
-class ASTU_BaseWeapon;
 class UTextRenderComponent;
 class USTU_HealthComponent;
+class USTU_WeaponComponent;
 class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
@@ -42,6 +42,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	UTextRenderComponent* HealthTextComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
+	USTU_WeaponComponent* WeaponComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	TArray<UAnimMontage*> DeathAnimations;
 
 private:
@@ -72,6 +74,8 @@ protected:
 	UInputAction* RunAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* CrouchAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* FireAction;
 
 private:
 	void MappingContext() const;
@@ -104,14 +108,4 @@ private:
 
 #pragma endregion // Health
 
-#pragma region Weapon
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
-	TSubclassOf<ASTU_BaseWeapon> WeaponClass;
-
-private:
-	void SpawnWeapon();
-
-#pragma endregion // Weapon
 };
