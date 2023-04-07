@@ -1,18 +1,17 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_BaseWeapon.h"
+#include "Components/SkeletalMeshComponent.h"
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponMeshComponent");
+	SetRootComponent(WeaponMesh);
 }
 
 void ASTU_BaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void ASTU_BaseWeapon::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
 }

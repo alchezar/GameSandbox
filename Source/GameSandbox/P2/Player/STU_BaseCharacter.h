@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "STU_BaseCharacter.generated.h"
 
+class ASTU_BaseWeapon;
 class UTextRenderComponent;
 class USTU_HealthComponent;
 class USpringArmComponent;
@@ -102,4 +103,15 @@ private:
 	void OnHealthChangedHandle(float Health);
 
 #pragma endregion // Health
+
+#pragma region Weapon
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	TSubclassOf<ASTU_BaseWeapon> WeaponClass;
+
+private:
+	void SpawnWeapon();
+
+#pragma endregion // Weapon
 };

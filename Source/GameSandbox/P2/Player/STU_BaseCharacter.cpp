@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameSandbox/P2/Component/STU_CharacterMovementComponent.h"
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
+#include "GameSandbox/P2/Weapon/STU_BaseWeapon.h"
 
 ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTU_CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -31,6 +32,8 @@ void ASTU_BaseCharacter::BeginPlay()
 	HealthComponent->OnDeath.AddUObject(this, &ASTU_BaseCharacter::OnDeathHandle);
 	HealthComponent->OnHealthChanged.AddUObject(this, &ASTU_BaseCharacter::OnHealthChangedHandle);
 	LandedDelegate.AddDynamic(this, &ASTU_BaseCharacter::LandedHandle);
+
+	SpawnWeapon();
 }
 
 void ASTU_BaseCharacter::Tick(const float DeltaTime)
@@ -176,3 +179,16 @@ void ASTU_BaseCharacter::OnDeathHandle()
 	}
 }
 #pragma endregion // Health
+
+#pragma region Weapon
+
+void ASTU_BaseCharacter::SpawnWeapon()
+{
+	if(!GetWorld()) return;
+	ASTU_BaseWeapon* Weapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(WeaponClass);
+	if (!Weapon) return;	
+	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+	Weapon->AttachToComponent(GetMesh(), AttachmentRules, "HandWeaponSocket");	
+}
+
+#pragma endregion // Weapon
