@@ -21,11 +21,21 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-#pragma region Component
+	void MakeShot();
 
-protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
 	USkeletalMeshComponent* WeaponMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
+	FName SocketName = "MuzzleSocket";
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
+	float TraceMaxDistance = 5000.f;
 
-#pragma endregion // Component
+private:
+	APlayerController* GetPlayerController() const;
+	FVector            GetMuzzleSocketLocation() const;
+	bool               GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+	bool               GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
+	void               MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
+
+	;
 };

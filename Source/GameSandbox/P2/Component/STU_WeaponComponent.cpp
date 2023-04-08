@@ -19,7 +19,7 @@ void USTU_WeaponComponent::SpawnWeapon()
 {
 	if (!GetWorld()) return;
 
-	const auto* Character = Cast<ACharacter>(GetOwner());
+	auto* Character = Cast<ACharacter>(GetOwner());
 	if (!Character) return;
 
 	CurrentWeapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(WeaponClass);
@@ -27,6 +27,7 @@ void USTU_WeaponComponent::SpawnWeapon()
 
 	const FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	CurrentWeapon->AttachToComponent(Character->GetMesh(), AttachmentRules, WeaponAttachPointName);
+	CurrentWeapon->SetOwner(Character);
 }
 
 void USTU_WeaponComponent::Fire()
