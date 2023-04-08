@@ -24,6 +24,8 @@ void ASTU_BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	MappingContext();
+	SetTeamColor();
+
 	check(HealthComponent);
 	check(HealthTextComponent);
 	check(GetCharacterMovement());
@@ -92,11 +94,11 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInput->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 	EnhancedInput->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInput->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	
+
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Triggered, this, &ThisClass::StartRun);
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::StopRun);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchToggle);
-	
+
 	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::Fire);
 }
 
@@ -184,3 +186,25 @@ void ASTU_BaseCharacter::OnDeathHandle()
 	}
 }
 #pragma endregion // Health
+
+#pragma region Style
+
+void ASTU_BaseCharacter::SetTeamColor()
+{
+	USkeletalMeshComponent* CharacterMesh = GetMesh();
+	if (!CharacterMesh) return;
+
+	UMaterialInstanceDynamic* DynamicMaterial1 = UMaterialInstanceDynamic::Create(CharacterMesh->GetMaterial(0), this);
+	UMaterialInstanceDynamic* DynamicMaterial2 = UMaterialInstanceDynamic::Create(CharacterMesh->GetMaterial(1), this);
+	UMaterialInstanceDynamic* DynamicMaterial3 = UMaterialInstanceDynamic::Create(CharacterMesh->GetMaterial(2), this);
+
+	DynamicMaterial1->SetVectorParameterValue("Color", TeamColor);
+	DynamicMaterial2->SetVectorParameterValue("Color", TeamColor);
+	DynamicMaterial3->SetVectorParameterValue("Color", TeamColor);
+
+	CharacterMesh->SetMaterial(0, DynamicMaterial1);
+	CharacterMesh->SetMaterial(1, DynamicMaterial2);
+	CharacterMesh->SetMaterial(2, DynamicMaterial3);
+}
+
+#pragma endregion // Style

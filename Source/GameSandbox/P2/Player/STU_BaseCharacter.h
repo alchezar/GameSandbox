@@ -108,4 +108,14 @@ private:
 
 #pragma endregion // Health
 
+#pragma region Style
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Style")
+	FLinearColor TeamColor = FLinearColor::White;
+
+private:
+	void SetTeamColor();
+
+#pragma endregion // Style
 };
