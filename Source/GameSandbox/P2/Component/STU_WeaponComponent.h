@@ -16,7 +16,8 @@ class GAMESANDBOX_API USTU_WeaponComponent : public UActorComponent
 public:
 	USTU_WeaponComponent();
 
-	void Fire();
+	void StartFire();
+	void StopFire();
 
 protected:
 	virtual void BeginPlay() override;

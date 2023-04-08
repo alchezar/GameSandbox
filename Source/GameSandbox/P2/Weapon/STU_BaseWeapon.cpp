@@ -3,6 +3,7 @@
 #include "STU_BaseWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
@@ -23,10 +24,13 @@ void ASTU_BaseWeapon::BeginPlay()
 	check(WeaponMesh);
 }
 
-void ASTU_BaseWeapon::Fire()
+void ASTU_BaseWeapon::StartFire()
 {
 	MakeShot();
 }
+
+void ASTU_BaseWeapon::StopFire()
+{}
 
 void ASTU_BaseWeapon::MakeShot()
 {
@@ -44,6 +48,8 @@ void ASTU_BaseWeapon::MakeShot()
 		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), Hit.ImpactPoint, FColor::Red, false, 3.f, 0, 3.f);
 		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 20.f, FColor::Red, false, 3.f);
 		DrawDebugLine(GetWorld(), Hit.ImpactPoint, TraceEnd, FColor::Green, false, 3.f, 0, 3.f);
+
+		MakeDamage(Hit);
 	}
 	else
 	{
@@ -85,6 +91,14 @@ void ASTU_BaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, 
 {
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(GetOwner());
-	
+
 	GetWorld()->LineTraceSingleByChannel(OUT HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+}
+
+void ASTU_BaseWeapon::MakeDamage(const FHitResult& HitResult)
+{
+	AActor* HitActor = HitResult.GetActor();
+	if (!HitActor) return;
+
+	HitActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
 }

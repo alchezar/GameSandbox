@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/TextRenderComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -99,7 +100,8 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::StopRun);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchToggle);
 
-	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::Fire);
+	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::StartFire);
+	EnhancedInput->BindAction(FireAction, ETriggerEvent::Completed, WeaponComponent, &USTU_WeaponComponent::StopFire);
 }
 
 void ASTU_BaseCharacter::Move(const FInputActionValue& Value)
@@ -184,6 +186,7 @@ void ASTU_BaseCharacter::OnDeathHandle()
 	{
 		Controller->ChangeState(NAME_Spectating);
 	}
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 #pragma endregion // Health
 
