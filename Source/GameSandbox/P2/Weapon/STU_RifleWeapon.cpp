@@ -41,13 +41,12 @@ void ASTU_RifleWeapon::MakeShot()
 	{
 		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), Hit.ImpactPoint, FColor::Orange, false, 3.f, 0, 3.f);
 		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 20.f, FColor::Orange, false, 3.f);
-		DrawDebugLine(GetWorld(), Hit.ImpactPoint, TraceEnd, FColor::Green, false, 3.f, 0, 3.f);
 
 		MakeDamage(Hit);
 	}
 	else
 	{
-		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), TraceEnd, FColor::Orange, false, 3.f, 0, 3.f);
+		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), TraceEnd, FColor::Green, false, 3.f, 0, 3.f);
 	}
 }
 

@@ -18,11 +18,16 @@ void ASTU_LauncherWeapon::BeginPlay()
 void ASTU_LauncherWeapon::StartFire()
 {
 	DrawProjectilePath();
+	bAim = true;
 }
 
 void ASTU_LauncherWeapon::StopFire()
 {
-	MakeShot();
+	if (bAim)
+	{
+		MakeShot();
+		bAim = false;
+	}
 }
 
 void ASTU_LauncherWeapon::MakeShot()

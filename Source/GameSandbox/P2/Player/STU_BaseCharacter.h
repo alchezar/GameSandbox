@@ -76,7 +76,8 @@ protected:
 	UInputAction* CrouchAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* FireAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* NextWeaponAction;
 private:
 	void MappingContext() const;
 	void Move(const FInputActionValue& Value);

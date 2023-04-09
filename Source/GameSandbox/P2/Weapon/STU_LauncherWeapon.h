@@ -28,4 +28,6 @@ protected:
 
 private:
 	void DrawProjectilePath();
+
+	bool bAim = false;
 };
