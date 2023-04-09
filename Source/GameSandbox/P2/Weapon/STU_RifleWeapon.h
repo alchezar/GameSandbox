@@ -25,9 +25,11 @@ protected:
 	virtual void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const override;
 	virtual void MakeDamage(const FHitResult& HitResult) override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone", meta = (Units = "deg"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	float DamageAmount = 10.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "deg"))
 	float BulletSpread = 3.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone", meta = (Units = "s"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
 	float TimeBetweenShots = 0.1f;
 
 private:

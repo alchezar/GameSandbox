@@ -84,6 +84,7 @@ private:
 	void CrouchToggle();
 	void StartRun();
 	void StopRun();
+	void TurningInPlace() const;
 
 	bool bRunning = false;
 

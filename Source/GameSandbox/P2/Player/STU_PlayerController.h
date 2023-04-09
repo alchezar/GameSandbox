@@ -10,5 +10,4 @@ UCLASS()
 class GAMESANDBOX_API ASTU_PlayerController : public APlayerController
 {
 	GENERATED_BODY()
-	
 };

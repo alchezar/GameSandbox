@@ -30,14 +30,13 @@ protected:
 	virtual void       MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
 	virtual void       MakeDamage(const FHitResult& HitResult);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	USkeletalMeshComponent* WeaponMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	FName SocketName = "MuzzleSocket";
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone", meta = (Units = "cm"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "cm"))
 	float TraceMaxDistance = 5000.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapone")
-	float DamageAmount = 10.f;
+	
 
 private:
 	FTimerHandle ShotTimer;

@@ -48,8 +48,11 @@ void ASTU_BaseCharacter::SetupComponent()
 {
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArmComponent->SetupAttachment(GetRootComponent());
-	SpringArmComponent->bUsePawnControlRotation = true;
 	SpringArmComponent->SocketOffset            = FVector(0.0, 60.0, 40.0);
+	SpringArmComponent->bUsePawnControlRotation = true;
+
+	bUseControllerRotationYaw                         = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -100,7 +103,7 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::StopRun);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchToggle);
 
-	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::StartFire);
+	EnhancedInput->BindAction(FireAction, ETriggerEvent::Triggered, WeaponComponent, &USTU_WeaponComponent::StartFire);
 	EnhancedInput->BindAction(FireAction, ETriggerEvent::Completed, WeaponComponent, &USTU_WeaponComponent::StopFire);
 }
 
@@ -125,6 +128,8 @@ void ASTU_BaseCharacter::Look(const FInputActionValue& Value)
 
 	AddControllerYawInput(LookVector.X);
 	AddControllerPitchInput(LookVector.Y);
+
+	TurningInPlace();
 }
 
 void ASTU_BaseCharacter::StartRun()
@@ -154,6 +159,24 @@ float ASTU_BaseCharacter::GetMovementDirection() const
 	const auto AngleBetween   = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
 	const auto CrossProduct   = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
 	return FMath::RadiansToDegrees(AngleBetween) * FMath::Sign(CrossProduct.Z);
+}
+
+void ASTU_BaseCharacter::TurningInPlace() const
+{
+	const double RotatorDelta = FMath::FindDeltaAngleDegrees(GetActorRotation().Yaw, GetControlRotation().Yaw);
+	const bool   bMove        = GetVelocity().Size() > 0.0;
+
+	// Billet for adding an in-place turning animation blueprint depending on the left or right turn
+	if (bMove || !bMove && (RotatorDelta > 100.0 || RotatorDelta < -100.0))
+	{
+		GetCharacterMovement()->bUseControllerDesiredRotation = true;
+		GetCharacterMovement()->bOrientRotationToMovement     = false;
+	}
+	else if (FMath::Abs(RotatorDelta) < 10.0)
+	{
+		GetCharacterMovement()->bUseControllerDesiredRotation = false;
+		GetCharacterMovement()->bOrientRotationToMovement     = true;
+	}
 }
 
 #pragma endregion // Input

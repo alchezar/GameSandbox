@@ -3,12 +3,9 @@
 #include "STU_BaseWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Components/SkeletalMeshComponent.h"
-#include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-
-#define OUT
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {
@@ -96,9 +93,4 @@ void ASTU_BaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, 
 }
 
 void ASTU_BaseWeapon::MakeDamage(const FHitResult& HitResult)
-{
-	AActor* HitActor = HitResult.GetActor();
-	if (!HitActor) return;
-
-	HitActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
-}
+{ }

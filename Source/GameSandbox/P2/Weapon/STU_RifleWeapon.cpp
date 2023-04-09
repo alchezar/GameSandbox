@@ -2,6 +2,7 @@
 
 #include "STU_RifleWeapon.h"
 #include "DrawDebugHelpers.h"
+#include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 
 ASTU_RifleWeapon::ASTU_RifleWeapon()
@@ -69,5 +70,8 @@ void ASTU_RifleWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart,
 
 void ASTU_RifleWeapon::MakeDamage(const FHitResult& HitResult)
 {
-	Super::MakeDamage(HitResult);
+	AActor* HitActor = HitResult.GetActor();
+	if (!HitActor) return;
+
+	HitActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
 }
