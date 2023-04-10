@@ -18,6 +18,8 @@ public:
 
 	virtual void StartFire() override;
 	virtual void StopFire() override;
+	virtual void Aiming() override;
+	virtual void ChangeClip() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,6 +30,4 @@ protected:
 
 private:
 	void DrawProjectilePath();
-
-	bool bAim = false;
 };

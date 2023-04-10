@@ -17,8 +17,8 @@ void ASTU_RifleWeapon::BeginPlay()
 
 void ASTU_RifleWeapon::StartFire()
 {
-	MakeShot();
 	GetWorldTimerManager().SetTimer(ShotTimer, this, &ASTU_RifleWeapon::MakeShot, TimeBetweenShots, true);
+	MakeShot();
 }
 
 void ASTU_RifleWeapon::StopFire()
@@ -28,11 +28,18 @@ void ASTU_RifleWeapon::StopFire()
 
 void ASTU_RifleWeapon::MakeShot()
 {
-	const UWorld* World = GetWorld();
-	if (!World) return;
+	if (!GetWorld() || IsAmmoEmpty())
+	{
+		StopFire();
+		return;
+	}
 
 	FVector TraceStart, TraceEnd;
-	if (!GetTraceData(OUT TraceStart, OUT TraceEnd)) return;
+	if (!GetTraceData(OUT TraceStart, OUT TraceEnd))
+	{
+		StopFire();
+		return;
+	}
 
 	FHitResult Hit;
 	MakeHit(OUT Hit, TraceStart, TraceEnd);
@@ -48,6 +55,7 @@ void ASTU_RifleWeapon::MakeShot()
 	{
 		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), TraceEnd, FColor::Green, false, 3.f, 0, 3.f);
 	}
+	DecreaseAmmo();
 }
 
 bool ASTU_RifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
@@ -73,4 +81,14 @@ void ASTU_RifleWeapon::MakeDamage(const FHitResult& HitResult)
 	if (!HitActor) return;
 
 	HitActor->TakeDamage(DamageAmount, FDamageEvent(), GetPlayerController(), this);
+}
+
+void ASTU_RifleWeapon::DecreaseAmmo()
+{
+	Super::DecreaseAmmo();
+	
+	if (IsClipEmpty() && !IsAmmoEmpty())
+	{
+		StopFire();
+	}
 }

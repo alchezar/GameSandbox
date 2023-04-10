@@ -17,23 +17,28 @@ void ASTU_LauncherWeapon::BeginPlay()
 
 void ASTU_LauncherWeapon::StartFire()
 {
-	DrawProjectilePath();
-	bAim = true;
+	MakeShot();
 }
 
 void ASTU_LauncherWeapon::StopFire()
 {
-	if (bAim)
-	{
-		MakeShot();
-		bAim = false;
-	}
+}
+
+void ASTU_LauncherWeapon::Aiming()
+{
+	Super::Aiming();
+	
+	DrawProjectilePath();
+}
+
+void ASTU_LauncherWeapon::ChangeClip()
+{
+	Super::ChangeClip();
 }
 
 void ASTU_LauncherWeapon::MakeShot()
 {
-	const UWorld* World = GetWorld();
-	if (!World) return;
+	if (!GetWorld()) return;
 
 	FVector TraceStart, TraceEnd;
 	if (!GetTraceData(OUT TraceStart, OUT TraceEnd)) return;
@@ -53,6 +58,7 @@ void ASTU_LauncherWeapon::MakeShot()
 		SpawnProjectile->SetOwner(GetOwner());
 		SpawnProjectile->FinishSpawning(SpawnTransform);
 	}
+	DecreaseAmmo();
 }
 
 void ASTU_LauncherWeapon::DrawProjectilePath()
@@ -60,15 +66,17 @@ void ASTU_LauncherWeapon::DrawProjectilePath()
 	FVector  ViewLocation;
 	FRotator ViewRotation;
 	if (!GetPlayerViewPoint(OUT ViewLocation, OUT ViewRotation)) return;
-	float ProjectileInitialSpeed = ProjectileClass.GetDefaultObject()->GetMovementComponent()->InitialSpeed;
+
+	ASTU_Projectile* Projectile             = ProjectileClass.GetDefaultObject();
+	float            ProjectileInitialSpeed = Projectile->GetMovementComponent()->InitialSpeed;
 
 	FPredictProjectilePathParams PredictParams;
 	PredictParams.StartLocation       = GetMuzzleSocketLocation();
-	PredictParams.LaunchVelocity      = ViewRotation.Vector() * ProjectileInitialSpeed;
+	PredictParams.LaunchVelocity      = ViewRotation.Vector() * ProjectileInitialSpeed; //WeaponMesh->GetSocketRotation(SocketName).Vector() * ProjectileInitialSpeed;
 	PredictParams.MaxSimTime          = 5.f;
 	PredictParams.bTraceWithCollision = true;
 	PredictParams.bTraceWithChannel   = true;
-	PredictParams.ActorsToIgnore      = {this, GetOwner()};
+	PredictParams.ActorsToIgnore      = {this, GetOwner(), Projectile};
 	PredictParams.TraceChannel        = ECollisionChannel::ECC_Visibility;
 	PredictParams.DrawDebugType       = EDrawDebugTrace::None;
 

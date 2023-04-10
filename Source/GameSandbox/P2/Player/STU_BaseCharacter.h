@@ -45,6 +45,7 @@ protected:
 	USTU_WeaponComponent* WeaponComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	TArray<UAnimMontage*> DeathAnimations;
+	
 
 private:
 	void SetupComponent();
@@ -78,6 +79,10 @@ protected:
 	UInputAction* FireAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* NextWeaponAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* ReloadAction;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* AimAction;
 private:
 	void MappingContext() const;
 	void Move(const FInputActionValue& Value);

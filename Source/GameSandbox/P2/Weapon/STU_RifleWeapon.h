@@ -24,6 +24,7 @@ protected:
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
 	virtual void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const override;
 	virtual void MakeDamage(const FHitResult& HitResult) override;
+	virtual void DecreaseAmmo() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	float DamageAmount = 10.f;

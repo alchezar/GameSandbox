@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameSandbox/P2/STU_CoreTypes.h"
 #include "STU_BaseWeapon.generated.h"
 
+
 class USkeletalMeshComponent;
+
 
 UCLASS()
 class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
@@ -16,8 +19,14 @@ class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
 public:
 	ASTU_BaseWeapon();
 
+	FOnClipEmptySignature OnClipEmpty;
+
 	virtual void StartFire();
 	virtual void StopFire();
+	virtual void Aiming();
+	
+	virtual void ChangeClip();
+	bool CanReload() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -30,15 +39,30 @@ protected:
 	virtual void       MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
 	virtual void       MakeDamage(const FHitResult& HitResult);
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	USkeletalMeshComponent* WeaponMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	FName SocketName = "MuzzleSocket";
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "cm"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "cm"))
 	float TraceMaxDistance = 5000.f;
-	
 
 private:
 	FTimerHandle ShotTimer;
-	;
+	bool bCanAim = true;
+
+#pragma region Ammo
+
+protected:
+	virtual void DecreaseAmmo();
+	bool IsAmmoEmpty() const;
+	bool IsClipEmpty() const;
+	void LogAmmo() const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	FAmmoData DefaultAmmo{15, 10, false};
+
+private:
+	FAmmoData CurrentAmmo;
+
+#pragma endregion // Ammo
 };

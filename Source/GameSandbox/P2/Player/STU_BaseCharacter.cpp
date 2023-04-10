@@ -103,9 +103,11 @@ void ASTU_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	EnhancedInput->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::StopRun);
 	EnhancedInput->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchToggle);
 
-	EnhancedInput->BindAction(FireAction, ETriggerEvent::Triggered, WeaponComponent, &USTU_WeaponComponent::StartFire);
+	EnhancedInput->BindAction(FireAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::StartFire);
 	EnhancedInput->BindAction(FireAction, ETriggerEvent::Completed, WeaponComponent, &USTU_WeaponComponent::StopFire);
 	EnhancedInput->BindAction(NextWeaponAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::NextWeapon);
+	EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::Reload);
+	EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, WeaponComponent, &USTU_WeaponComponent::Aiming);
 }
 
 void ASTU_BaseCharacter::Move(const FInputActionValue& Value)

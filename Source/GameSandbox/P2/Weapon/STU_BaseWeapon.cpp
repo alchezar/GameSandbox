@@ -19,6 +19,7 @@ void ASTU_BaseWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	check(WeaponMesh);
+	CurrentAmmo = DefaultAmmo;
 }
 
 void ASTU_BaseWeapon::StartFire()
@@ -27,12 +28,16 @@ void ASTU_BaseWeapon::StartFire()
 }
 
 void ASTU_BaseWeapon::StopFire()
-{}
+{ }
+
+void ASTU_BaseWeapon::Aiming()
+{
+	if (IsAmmoEmpty() || !bCanAim) return;
+}
 
 void ASTU_BaseWeapon::MakeShot()
 {
-	const UWorld* World = GetWorld();
-	if (!World) return;
+	if (!GetWorld() || IsAmmoEmpty()) return;
 
 	FVector TraceStart, TraceEnd;
 	if (!GetTraceData(OUT TraceStart, OUT TraceEnd)) return;
@@ -52,6 +57,7 @@ void ASTU_BaseWeapon::MakeShot()
 	{
 		DrawDebugLine(GetWorld(), GetMuzzleSocketLocation(), TraceEnd, FColor::Red, false, 3.f, 0, 3.f);
 	}
+	DecreaseAmmo();
 }
 
 APlayerController* ASTU_BaseWeapon::GetPlayerController() const
@@ -94,3 +100,50 @@ void ASTU_BaseWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, 
 
 void ASTU_BaseWeapon::MakeDamage(const FHitResult& HitResult)
 { }
+
+#pragma region Ammo
+
+void ASTU_BaseWeapon::DecreaseAmmo()
+{
+	CurrentAmmo.Bullets--;
+	LogAmmo();
+
+	if (IsClipEmpty() && !IsAmmoEmpty())
+	{
+		OnClipEmpty.Broadcast();
+	}
+}
+
+void ASTU_BaseWeapon::ChangeClip()
+{
+	if (!CurrentAmmo.bInfinite && CurrentAmmo.Clips > 0)
+	{
+		CurrentAmmo.Clips--;
+	}
+	CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, FString::Printf(TEXT("Changed clip")));
+}
+
+bool ASTU_BaseWeapon::CanReload() const
+{
+	return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
+}
+
+bool ASTU_BaseWeapon::IsAmmoEmpty() const
+{
+	return !CurrentAmmo.bInfinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
+}
+
+bool ASTU_BaseWeapon::IsClipEmpty() const
+{
+	return CurrentAmmo.Bullets == 0;
+}
+
+void ASTU_BaseWeapon::LogAmmo() const
+{
+	FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " | ";
+	AmmoInfo += CurrentAmmo.bInfinite ? "Infinite" : "Clips: " + FString::FromInt(CurrentAmmo.Clips);
+	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Turquoise, FString::Printf(TEXT("%s"), *AmmoInfo));
+}
+
+#pragma endregion // Ammo
