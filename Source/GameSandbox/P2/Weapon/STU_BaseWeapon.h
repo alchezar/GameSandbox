@@ -7,9 +7,7 @@
 #include "GameSandbox/P2/STU_CoreTypes.h"
 #include "STU_BaseWeapon.generated.h"
 
-
 class USkeletalMeshComponent;
-
 
 UCLASS()
 class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
@@ -24,9 +22,10 @@ public:
 	virtual void StartFire();
 	virtual void StopFire();
 	virtual void Aiming();
-	
+
 	virtual void ChangeClip();
-	bool CanReload() const;
+	virtual bool CanAim() const;
+	bool         CanReload() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -48,18 +47,24 @@ protected:
 
 private:
 	FTimerHandle ShotTimer;
-	bool bCanAim = true;
+	bool         bCanAim = true;
 
 #pragma region Ammo
 
+public:
+	FWeaponUIData GetUIData() const;
+	FAmmoData     GetAmmoData() const;
+
 protected:
 	virtual void DecreaseAmmo();
-	bool IsAmmoEmpty() const;
-	bool IsClipEmpty() const;
-	void LogAmmo() const;
+	bool         IsAmmoEmpty() const;
+	bool         IsClipEmpty() const;
+	void         LogAmmo() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	FAmmoData DefaultAmmo{15, 10, false};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	FWeaponUIData UIData;
 
 private:
 	FAmmoData CurrentAmmo;

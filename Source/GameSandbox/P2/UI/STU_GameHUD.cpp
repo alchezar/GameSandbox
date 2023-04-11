@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_GameHUD.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/Canvas.h"
 
 ASTU_GameHUD::ASTU_GameHUD()
@@ -11,7 +12,18 @@ ASTU_GameHUD::ASTU_GameHUD()
 void ASTU_GameHUD::DrawHUD()
 {
 	Super::DrawHUD();
-	DrawCrossHair();
+	// DrawCrossHair();
+}
+
+void ASTU_GameHUD::BeginPlay()
+{
+	Super::BeginPlay();
+
+	const auto PlayerHUDWidget = CreateWidget<UUserWidget>(GetWorld(), PlayerHUDWidgetClass);
+	if (PlayerHUDWidget)
+	{
+		PlayerHUDWidget->AddToViewport();
+	}
 }
 
 void ASTU_GameHUD::DrawCrossHair()

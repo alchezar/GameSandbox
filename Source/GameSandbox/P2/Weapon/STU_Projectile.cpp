@@ -1,9 +1,9 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_Projectile.h"
+#include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 
 ASTU_Projectile::ASTU_Projectile()
@@ -51,7 +51,7 @@ void ASTU_Projectile::OnProjectileHit(UPrimitiveComponent* HitComponent,
 	                                    GetActorLocation(),
 	                                    DamageRadius,
 	                                    UDamageType::StaticClass(),
-	                                    {GetOwner()},
+	                                    {/*GetOwner()*/},
 	                                    this,
 	                                    GetController(),
 	                                    bFullDamage);

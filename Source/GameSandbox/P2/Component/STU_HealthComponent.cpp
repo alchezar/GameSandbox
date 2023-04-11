@@ -3,8 +3,6 @@
 #include "STU_HealthComponent.h"
 #include "GameFramework/Actor.h"
 
-#define OUT
-
 USTU_HealthComponent::USTU_HealthComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
@@ -13,6 +11,8 @@ USTU_HealthComponent::USTU_HealthComponent()
 void USTU_HealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	check(MaxHealth > 0);
+
 	SetHealth(MaxHealth);
 
 	AActor* Owner = GetOwner();
@@ -45,6 +45,11 @@ void USTU_HealthComponent::OnTakeAnyDamageHandle(AActor* DamagedActor, const flo
 bool USTU_HealthComponent::IsDead() const
 {
 	return FMath::IsNearlyZero(Health);
+}
+
+float USTU_HealthComponent::GetHealthPercent() const
+{
+	return Health / MaxHealth;
 }
 
 void USTU_HealthComponent::SetHealth(float NewHealth)

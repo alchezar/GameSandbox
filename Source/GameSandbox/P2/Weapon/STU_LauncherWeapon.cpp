@@ -26,7 +26,7 @@ void ASTU_LauncherWeapon::StopFire()
 
 void ASTU_LauncherWeapon::Aiming()
 {
-	Super::Aiming();
+	if (IsAmmoEmpty() || !CanAim()) return;
 	
 	DrawProjectilePath();
 }
@@ -38,7 +38,7 @@ void ASTU_LauncherWeapon::ChangeClip()
 
 void ASTU_LauncherWeapon::MakeShot()
 {
-	if (!GetWorld()) return;
+	if (!GetWorld() || IsAmmoEmpty()) return;
 
 	FVector TraceStart, TraceEnd;
 	if (!GetTraceData(OUT TraceStart, OUT TraceEnd)) return;

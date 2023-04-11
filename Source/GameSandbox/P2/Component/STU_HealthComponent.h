@@ -20,6 +20,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Health")
 	bool IsDead() const;
+	UFUNCTION(BlueprintCallable, Category = "Kinder | Health")
+	float GetHealthPercent() const;
 
 	float GetHealth() const;
 

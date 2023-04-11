@@ -9,15 +9,13 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
 // Weapon
 DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature)
 
-class ASTU_BaseWeapon;
-
 USTRUCT(BlueprintType)
 struct FWeaponData
 {
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Weapon")
-	TSubclassOf<ASTU_BaseWeapon> WeaponClass;
+	TSubclassOf<class ASTU_BaseWeapon> WeaponClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Weapon")
 	UAnimMontage* ReloadAnimation = nullptr;
 };
@@ -33,4 +31,15 @@ struct FAmmoData
 	int32 Clips = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Ammo")
 	bool bInfinite = false;
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponUIData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
+	UTexture2D* MainIcon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
+	UTexture2D* CrossHairIcon;
 };

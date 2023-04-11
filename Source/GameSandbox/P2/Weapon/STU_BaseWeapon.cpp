@@ -32,7 +32,7 @@ void ASTU_BaseWeapon::StopFire()
 
 void ASTU_BaseWeapon::Aiming()
 {
-	if (IsAmmoEmpty() || !bCanAim) return;
+	if (IsAmmoEmpty() || !CanAim()) return;
 }
 
 void ASTU_BaseWeapon::MakeShot()
@@ -121,7 +121,11 @@ void ASTU_BaseWeapon::ChangeClip()
 		CurrentAmmo.Clips--;
 	}
 	CurrentAmmo.Bullets = DefaultAmmo.Bullets;
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Emerald, FString::Printf(TEXT("Changed clip")));
+}
+
+bool ASTU_BaseWeapon::CanAim() const
+{
+	return bCanAim;
 }
 
 bool ASTU_BaseWeapon::CanReload() const
@@ -143,7 +147,16 @@ void ASTU_BaseWeapon::LogAmmo() const
 {
 	FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " | ";
 	AmmoInfo += CurrentAmmo.bInfinite ? "Infinite" : "Clips: " + FString::FromInt(CurrentAmmo.Clips);
-	GEngine->AddOnScreenDebugMessage(-1, 1.f, FColor::Turquoise, FString::Printf(TEXT("%s"), *AmmoInfo));
+}
+
+FWeaponUIData ASTU_BaseWeapon::GetUIData() const
+{
+	return UIData;
+}
+
+FAmmoData ASTU_BaseWeapon::GetAmmoData() const
+{
+	return CurrentAmmo;
 }
 
 #pragma endregion // Ammo

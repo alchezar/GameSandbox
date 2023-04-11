@@ -32,6 +32,8 @@ public:
 	void Aiming();
 	void NextWeapon();
 	void Reload();
+	bool GetWeaponUIData(FWeaponUIData& UIData) const;
+	bool GetWeaponAmmoData(FAmmoData& AmmoData) const;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")

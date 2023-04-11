@@ -3,8 +3,8 @@
 #include "STU_WeaponComponent.h"
 #include "GameFramework/Character.h"
 #include "GameSandbox/P2/Animation/STU_AnimNotify_EquipFinished.h"
-#include "GameSandbox/P2/Animation/STU_AnimNotify_WeaponChanged.h"
 #include "GameSandbox/P2/Animation/STU_AnimNotify_ReloadFinished.h"
+#include "GameSandbox/P2/Animation/STU_AnimNotify_WeaponChanged.h"
 #include "GameSandbox/P2/Weapon/STU_BaseWeapon.h"
 
 USTU_WeaponComponent::USTU_WeaponComponent()
@@ -64,12 +64,14 @@ void USTU_WeaponComponent::StartFire()
 void USTU_WeaponComponent::StopFire()
 {
 	if (!CurrentWeapon) return;
-	
+
 	CurrentWeapon->StopFire();
 }
 
 void USTU_WeaponComponent::Aiming()
 {
+	if (bWeaponChanging || bWeaponReloading) return;
+
 	CurrentWeapon->Aiming();
 }
 
@@ -111,7 +113,8 @@ void USTU_WeaponComponent::NextWeapon()
 
 	CurrentWeaponIndex = (CurrentWeaponIndex + 1) % Weapons.Num();
 	PlayAnimMontage(EquipAnimation);
-	bWeaponChanging = true;
+	bWeaponChanging  = true;
+	bWeaponReloading = false;
 	// On the middle of animation will be called OnChangedFinished from notify delegate
 	// On the end of animation will be called OnEquipFinished from notify delegate
 }
@@ -154,6 +157,26 @@ void USTU_WeaponComponent::ChangeClip()
 	CurrentWeapon->ChangeClip();
 	PlayAnimMontage(CurrentReloadAnimation);
 	bWeaponReloading = true;
+}
+
+bool USTU_WeaponComponent::GetWeaponUIData(FWeaponUIData& UIData) const
+{
+	if (CurrentWeapon)
+	{
+		UIData = CurrentWeapon->GetUIData();
+		return true;
+	}
+	return false;
+}
+
+bool USTU_WeaponComponent::GetWeaponAmmoData(FAmmoData& AmmoData) const
+{
+	if (CurrentWeapon)
+	{
+		AmmoData = CurrentWeapon->GetAmmoData();
+		return true;
+	}
+	return false;
 }
 
 #pragma endregion // Weapon
@@ -209,7 +232,6 @@ void USTU_WeaponComponent::OnEquipFinished(USkeletalMeshComponent* MeshComp)
 	if (!Character || Character->GetMesh() != MeshComp) return;
 
 	bWeaponChanging = false;
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Equiq finished")));
 }
 
 void USTU_WeaponComponent::OnChangedFinished(USkeletalMeshComponent* MeshComp)
@@ -218,7 +240,6 @@ void USTU_WeaponComponent::OnChangedFinished(USkeletalMeshComponent* MeshComp)
 	if (!Character || Character->GetMesh() != MeshComp) return;
 
 	EquipWeapon(CurrentWeaponIndex);
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Equiq changed")));
 }
 
 void USTU_WeaponComponent::OnReloadFinished(USkeletalMeshComponent* MeshComp)
@@ -227,7 +248,6 @@ void USTU_WeaponComponent::OnReloadFinished(USkeletalMeshComponent* MeshComp)
 	if (!Character || Character->GetMesh() != MeshComp) return;
 
 	bWeaponReloading = false;
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Equiq reloaded: %d"), CurrentWeaponIndex));
 }
 
 #pragma endregion // Animation

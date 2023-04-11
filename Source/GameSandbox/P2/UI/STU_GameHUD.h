@@ -15,6 +15,12 @@ public:
 	ASTU_GameHUD();
 	virtual void DrawHUD() override;
 
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kider | UI")
+	TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
+
 private:
 	void DrawCrossHair();
 };

@@ -17,7 +17,7 @@ void ASTU_DevDamageActor::BeginPlay()
 	Super::BeginPlay();
 }
 
-void ASTU_DevDamageActor::Tick(float DeltaTime)
+void ASTU_DevDamageActor::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	DrawDebugSphere(GetWorld(), GetActorLocation(), Radius, Segments, SphereColor);
