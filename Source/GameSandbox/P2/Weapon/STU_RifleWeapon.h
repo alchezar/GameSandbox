@@ -32,6 +32,8 @@ protected:
 	float BulletSpread = 3.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
 	float TimeBetweenShots = 0.1f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	float HeadshotMultiplier = 10.f;
 
 private:
 	FTimerHandle ShotTimer;

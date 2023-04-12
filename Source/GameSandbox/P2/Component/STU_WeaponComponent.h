@@ -34,6 +34,7 @@ public:
 	void Reload();
 	bool GetWeaponUIData(FWeaponUIData& UIData) const;
 	bool GetWeaponAmmoData(FAmmoData& AmmoData) const;
+	bool TryToAddAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType, int32 Clips);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
@@ -53,7 +54,7 @@ private:
 	bool CanFire() const;
 	bool CanReload() const;
 
-	void OnEmptyClip();
+	void OnClipEmpty(ASTU_BaseWeapon* EmptyWeapon);
 	void ChangeClip();
 
 	UPROPERTY()

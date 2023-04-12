@@ -41,12 +41,12 @@ void USTU_WeaponComponent::SpawnWeapons()
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
 	if (!Character || !GetWorld()) return;
 
-	for (auto OneWeaponData : WeaponData)
+	for (auto [WeaponClass, ReloadAnimation] : WeaponData)
 	{
-		ASTU_BaseWeapon* Weapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(OneWeaponData.WeaponClass);
+		ASTU_BaseWeapon* Weapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(WeaponClass);
 		if (!Weapon) continue;
 
-		Weapon->OnClipEmpty.AddUObject(this, &USTU_WeaponComponent::OnEmptyClip);
+		Weapon->OnClipEmpty.AddUObject(this, &USTU_WeaponComponent::OnClipEmpty);
 		Weapon->SetOwner(Character);
 		Weapons.Add(Weapon);
 
@@ -144,9 +144,25 @@ void USTU_WeaponComponent::Reload()
 	ChangeClip();
 }
 
-void USTU_WeaponComponent::OnEmptyClip()
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+void USTU_WeaponComponent::OnClipEmpty(ASTU_BaseWeapon* EmptyWeapon)
 {
-	ChangeClip();
+	if (!EmptyWeapon) return;
+	
+	if (CurrentWeapon == EmptyWeapon)
+	{
+		ChangeClip();
+	}
+	else
+	{
+		for (const auto Weapon : Weapons)
+		{
+			if (Weapon == EmptyWeapon)
+			{
+				Weapon->ChangeClip();
+			}
+		}
+	}
 }
 
 void USTU_WeaponComponent::ChangeClip()
@@ -175,6 +191,18 @@ bool USTU_WeaponComponent::GetWeaponAmmoData(FAmmoData& AmmoData) const
 	{
 		AmmoData = CurrentWeapon->GetAmmoData();
 		return true;
+	}
+	return false;
+}
+
+bool USTU_WeaponComponent::TryToAddAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType, int32 Clips)
+{
+	for (const auto Weapon : Weapons)
+	{
+		if (Weapon && Weapon->IsA(WeaponType))
+		{
+			return Weapon->TryToAddAmmo(Clips);
+		}
 	}
 	return false;
 }

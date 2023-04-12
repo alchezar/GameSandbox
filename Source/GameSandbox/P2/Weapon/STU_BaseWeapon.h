@@ -54,11 +54,13 @@ private:
 public:
 	FWeaponUIData GetUIData() const;
 	FAmmoData     GetAmmoData() const;
+	bool          TryToAddAmmo(int32 Clips);
 
 protected:
 	virtual void DecreaseAmmo();
-	bool         IsAmmoEmpty() const;
 	bool         IsClipEmpty() const;
+	bool         IsAmmoEmpty() const;
+	bool         IsAmmoFull() const;
 	void         LogAmmo() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")

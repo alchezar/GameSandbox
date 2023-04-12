@@ -110,7 +110,7 @@ void ASTU_BaseWeapon::DecreaseAmmo()
 
 	if (IsClipEmpty() && !IsAmmoEmpty())
 	{
-		OnClipEmpty.Broadcast();
+		OnClipEmpty.Broadcast(this);
 	}
 }
 
@@ -133,16 +133,6 @@ bool ASTU_BaseWeapon::CanReload() const
 	return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
 }
 
-bool ASTU_BaseWeapon::IsAmmoEmpty() const
-{
-	return !CurrentAmmo.bInfinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
-}
-
-bool ASTU_BaseWeapon::IsClipEmpty() const
-{
-	return CurrentAmmo.Bullets == 0;
-}
-
 void ASTU_BaseWeapon::LogAmmo() const
 {
 	FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " | ";
@@ -157,6 +147,50 @@ FWeaponUIData ASTU_BaseWeapon::GetUIData() const
 FAmmoData ASTU_BaseWeapon::GetAmmoData() const
 {
 	return CurrentAmmo;
+}
+
+bool ASTU_BaseWeapon::IsClipEmpty() const
+{
+	return CurrentAmmo.Bullets == 0;
+}
+
+bool ASTU_BaseWeapon::IsAmmoEmpty() const
+{
+	return !CurrentAmmo.bInfinite && CurrentAmmo.Clips == 0 && IsClipEmpty();
+}
+
+bool ASTU_BaseWeapon::IsAmmoFull() const
+{
+	return CurrentAmmo.Clips == DefaultAmmo.Clips && CurrentAmmo.Bullets == DefaultAmmo.Bullets;
+}
+
+bool ASTU_BaseWeapon::TryToAddAmmo(const int32 Clips)
+{
+	if (CurrentAmmo.bInfinite || IsAmmoFull() || Clips <= 0) return false;
+	
+	if (IsAmmoEmpty())
+	{
+		CurrentAmmo.Clips = FMath::Clamp(Clips, 0, DefaultAmmo.Clips + 1);
+		OnClipEmpty.Broadcast(this);
+	}
+	else if (CurrentAmmo.Clips < DefaultAmmo.Clips)
+	{
+		const auto NextClipsAmount = CurrentAmmo.Clips + Clips;
+		if (DefaultAmmo.Clips - NextClipsAmount >= 0)
+		{
+			CurrentAmmo.Clips = NextClipsAmount;
+		}
+		else
+		{
+			CurrentAmmo.Clips = DefaultAmmo.Clips;
+			CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+		}
+	}
+	else
+	{
+		CurrentAmmo.Bullets = DefaultAmmo.Bullets;
+	}
+	return true;
 }
 
 #pragma endregion // Ammo

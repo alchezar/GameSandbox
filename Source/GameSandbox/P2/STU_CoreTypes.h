@@ -2,12 +2,14 @@
 
 #include "STU_CoreTypes.generated.h"
 
+class ASTU_BaseWeapon;
+
 // Health
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
 DECLARE_MULTICAST_DELEGATE_OneParam(FOnHealthChangedSignature, float);
 
 // Weapon
-DECLARE_MULTICAST_DELEGATE(FOnClipEmptySignature)
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnClipEmptySignature, ASTU_BaseWeapon*)
 
 USTRUCT(BlueprintType)
 struct FWeaponData
@@ -15,7 +17,7 @@ struct FWeaponData
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Weapon")
-	TSubclassOf<class ASTU_BaseWeapon> WeaponClass;
+	TSubclassOf<ASTU_BaseWeapon> WeaponClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Weapon")
 	UAnimMontage* ReloadAnimation = nullptr;
 };

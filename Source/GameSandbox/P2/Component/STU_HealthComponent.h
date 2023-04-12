@@ -24,6 +24,8 @@ public:
 	float GetHealthPercent() const;
 
 	float GetHealth() const;
+	bool  TryToAddHealth(float PickedHealth);
+	bool IsHealthFull() const;
 
 protected:
 	virtual void BeginPlay() override;
