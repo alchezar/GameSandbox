@@ -4,6 +4,7 @@
 #include "DrawDebugHelpers.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 ASTU_Projectile::ASTU_Projectile()
@@ -18,6 +19,8 @@ ASTU_Projectile::ASTU_Projectile()
 
 	MovementComponent               = CreateDefaultSubobject<UProjectileMovementComponent>("MovementComponent");
 	MovementComponent->InitialSpeed = 2000.f;
+
+	WeaponFXComponent = CreateDefaultSubobject<USTU_WeaponFXComponent>("WeaponFXComponent");
 }
 
 void ASTU_Projectile::BeginPlay()
@@ -25,10 +28,12 @@ void ASTU_Projectile::BeginPlay()
 	Super::BeginPlay();
 	check(CollisionComponent);
 	check(MovementComponent);
+	check(WeaponFXComponent);
 
 	MovementComponent->Velocity = ShotDirection * MovementComponent->InitialSpeed;
 	CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ASTU_Projectile::OnProjectileHit);
+	CollisionComponent->bReturnMaterialOnMove = true;
 	SetLifeSpan(LifeTime);
 }
 
@@ -37,25 +42,28 @@ void ASTU_Projectile::SetShotDirection(const FVector& Direction)
 	ShotDirection = Direction;
 }
 
-void ASTU_Projectile::OnProjectileHit(UPrimitiveComponent* HitComponent,
-                                      AActor*              OtherActor,
-                                      UPrimitiveComponent* OtherComp,
-                                      FVector              NormalImpulse,
-                                      const FHitResult&    Hit)
+void ASTU_Projectile::OnProjectileHit(
+	UPrimitiveComponent* HitComponent,
+	AActor*              OtherActor,
+	UPrimitiveComponent* OtherComp,
+	FVector              NormalImpulse,
+	const FHitResult&    Hit)
 {
 	if (!GetWorld()) return;
 
 	MovementComponent->StopMovementImmediately();
-	UGameplayStatics::ApplyRadialDamage(GetWorld(),
-	                                    DamageAmount,
-	                                    GetActorLocation(),
-	                                    DamageRadius,
-	                                    UDamageType::StaticClass(),
-	                                    {/*GetOwner()*/},
-	                                    this,
-	                                    GetController(),
-	                                    bFullDamage);
-	DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 32, FColor::Red, false, LifeTime);
+	UGameplayStatics::ApplyRadialDamage(
+		GetWorld(),
+		DamageAmount,
+		GetActorLocation(),
+		DamageRadius,
+		UDamageType::StaticClass(),
+		{/*GetOwner()*/},
+		this,
+		GetController(),
+		bFullDamage);
+	// DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 32, FColor::Red, false, LifeTime);
+	WeaponFXComponent->PlayImpactFX(Hit);
 
 	Destroy();
 }

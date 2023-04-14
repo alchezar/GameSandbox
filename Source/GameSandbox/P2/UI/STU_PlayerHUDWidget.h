@@ -13,6 +13,8 @@ class GAMESANDBOX_API USTU_PlayerHUDWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
+	virtual bool Initialize() override;
+
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
 	float GetHealthPercent() const;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
@@ -24,7 +26,13 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
 	bool IsPlayerSpectating() const;
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, Category = "Kinder")
+	void OnTakeDamage();
+
 private:
 	template <class T>
 	T* GetOwnerComponent() const;
+
+	void OnHealthChangeHandle(float Health, float HealthDelta);
 };

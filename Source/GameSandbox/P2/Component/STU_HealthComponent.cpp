@@ -1,7 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_HealthComponent.h"
+#include "Camera/CameraShakeBase.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/Controller.h"
+#include "GameFramework/Pawn.h"
 
 USTU_HealthComponent::USTU_HealthComponent()
 {
@@ -28,7 +31,7 @@ float USTU_HealthComponent::GetHealth() const
 bool USTU_HealthComponent::TryToAddHealth(const float PickedHealth)
 {
 	if (IsDead() || IsHealthFull()) return false;
-	
+
 	SetHealth(Health + PickedHealth);
 	return true;
 }
@@ -42,7 +45,7 @@ void USTU_HealthComponent::OnTakeAnyDamageHandle(AActor* DamagedActor, const flo
 {
 	if (Damage <= 0.f || IsDead() || !GetWorld()) return;
 	SetHealth(Health - Damage);
-	OnHealthChanged.Broadcast(Health);
+	OnHealthChanged.Broadcast(Health, -Damage);
 
 	if (IsDead())
 	{
@@ -51,8 +54,9 @@ void USTU_HealthComponent::OnTakeAnyDamageHandle(AActor* DamagedActor, const flo
 	}
 	else if (AutoHeal)
 	{
-		GetWorld()->GetTimerManager().SetTimer(OUT HealTimer, this, &USTU_HealthComponent::Healing, HealUpdateDelay, true, HealStartDelay);
+		GetWorld()->GetTimerManager().SetTimer(OUT HealTimer, this, &ThisClass::Healing, HealUpdateDelay, true, HealStartDelay);
 	}
+	PlayCameraShake();
 }
 
 bool USTU_HealthComponent::IsDead() const
@@ -67,8 +71,11 @@ float USTU_HealthComponent::GetHealthPercent() const
 
 void USTU_HealthComponent::SetHealth(const float NewHealth)
 {
-	Health = FMath::Clamp(NewHealth, 0.f, MaxHealth);
-	OnHealthChanged.Broadcast(Health);
+	const float NextHealth  = FMath::Clamp(NewHealth, 0.f, MaxHealth);
+	const float HealthDelta = NextHealth - Health;
+
+	Health = NextHealth;
+	OnHealthChanged.Broadcast(Health, HealthDelta);
 }
 
 void USTU_HealthComponent::Healing()
@@ -78,4 +85,17 @@ void USTU_HealthComponent::Healing()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(OUT HealTimer);
 	}
+}
+
+void USTU_HealthComponent::PlayCameraShake() const
+{
+	if (IsDead()) return;
+
+	const APawn* Player = Cast<APawn>(GetOwner());
+	if (!Player) return;
+
+	const APlayerController* Controller = Player->GetController<APlayerController>();
+	if (!Controller || !Controller->PlayerCameraManager) return;
+
+	Controller->PlayerCameraManager->StartCameraShake(CameraShake);
 }

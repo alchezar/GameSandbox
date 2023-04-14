@@ -46,7 +46,7 @@ void USTU_WeaponComponent::SpawnWeapons()
 		ASTU_BaseWeapon* Weapon = GetWorld()->SpawnActor<ASTU_BaseWeapon>(WeaponClass);
 		if (!Weapon) continue;
 
-		Weapon->OnClipEmpty.AddUObject(this, &USTU_WeaponComponent::OnClipEmpty);
+		Weapon->OnClipEmpty.AddUObject(this, &ThisClass::OnClipEmpty);
 		Weapon->SetOwner(Character);
 		Weapons.Add(Weapon);
 
@@ -148,7 +148,7 @@ void USTU_WeaponComponent::Reload()
 void USTU_WeaponComponent::OnClipEmpty(ASTU_BaseWeapon* EmptyWeapon)
 {
 	if (!EmptyWeapon) return;
-	
+
 	if (CurrentWeapon == EmptyWeapon)
 	{
 		ChangeClip();
@@ -221,34 +221,35 @@ void USTU_WeaponComponent::PlayAnimMontage(UAnimMontage* Animation)
 
 void USTU_WeaponComponent::InitAnimations()
 {
-	if (!EquipAnimation) return;
-
-	auto NotifyEvents = EquipAnimation->Notifies;
-	for (const auto NotifyEvent : NotifyEvents)
+	if (EquipAnimation)
 	{
-		const auto EquipFinishedNotify = Cast<USTU_AnimNotify_EquipFinished>(NotifyEvent.Notify);
-		if (EquipFinishedNotify)
+		TArray<FAnimNotifyEvent> NotifyEvents = EquipAnimation->Notifies;
+		for (const FAnimNotifyEvent NotifyEvent : NotifyEvents)
 		{
-			EquipFinishedNotify->OnFinishedNotified.AddUObject(this, &USTU_WeaponComponent::OnEquipFinished);
-			break;
-		}
+			const auto EquipFinishedNotify = Cast<USTU_AnimNotify_EquipFinished>(NotifyEvent.Notify);
+			if (EquipFinishedNotify)
+			{
+				EquipFinishedNotify->OnFinishedNotified.AddUObject(this, &ThisClass::OnEquipFinished);
+				break;
+			}
 
-		const auto EquipChangedNotify = Cast<USTU_AnimNotify_WeaponChanged>(NotifyEvent.Notify);
-		if (EquipChangedNotify)
-		{
-			EquipChangedNotify->OnChangedNotified.AddUObject(this, &USTU_WeaponComponent::OnChangedFinished);
+			const auto EquipChangedNotify = Cast<USTU_AnimNotify_WeaponChanged>(NotifyEvent.Notify);
+			if (EquipChangedNotify)
+			{
+				EquipChangedNotify->OnChangedNotified.AddUObject(this, &ThisClass::OnChangedFinished);
+			}
 		}
 	}
-
-	if (!CurrentReloadAnimation) return;
-
-	NotifyEvents = CurrentReloadAnimation->Notifies;
-	for (const auto NotifyEvent : NotifyEvents)
+	if (CurrentReloadAnimation)
 	{
-		const auto EquipReloadedNotify = Cast<USTU_AnimNotify_ReloadFinished>(NotifyEvent.Notify);
-		if (EquipReloadedNotify)
+		TArray<FAnimNotifyEvent> NotifyEvents = CurrentReloadAnimation->Notifies;
+		for (const FAnimNotifyEvent NotifyEvent : NotifyEvents)
 		{
-			EquipReloadedNotify->OnReloadedNotified.AddUObject(this, &USTU_WeaponComponent::OnReloadFinished);
+			const auto EquipReloadedNotify = Cast<USTU_AnimNotify_ReloadFinished>(NotifyEvent.Notify);
+			if (EquipReloadedNotify)
+			{
+				EquipReloadedNotify->OnReloadedNotified.AddUObject(this, &ThisClass::OnReloadFinished);
+			}
 		}
 	}
 }

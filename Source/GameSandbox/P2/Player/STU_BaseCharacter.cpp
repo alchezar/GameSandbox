@@ -31,7 +31,7 @@ void ASTU_BaseCharacter::BeginPlay()
 	check(HealthTextComponent);
 	check(GetCharacterMovement());
 
-	OnHealthChangedHandle(HealthComponent->GetHealth());
+	OnHealthChangedHandle(HealthComponent->GetHealth(), 1.f);
 	HealthComponent->OnDeath.AddUObject(this, &ASTU_BaseCharacter::OnDeathHandle);
 	HealthComponent->OnHealthChanged.AddUObject(this, &ASTU_BaseCharacter::OnHealthChangedHandle);
 	LandedDelegate.AddDynamic(this, &ASTU_BaseCharacter::LandedHandle);
@@ -195,7 +195,7 @@ void ASTU_BaseCharacter::LandedHandle(const FHitResult& Hit)
 	TakeDamage(FinalDamage, FDamageEvent{}, nullptr, nullptr);
 }
 
-void ASTU_BaseCharacter::OnHealthChangedHandle(const float Health)
+void ASTU_BaseCharacter::OnHealthChangedHandle(const float Health, float HealthDelta)
 {
 	HealthTextComponent->SetText(FText::AsNumber(static_cast<int>(Health)));
 }
@@ -214,6 +214,9 @@ void ASTU_BaseCharacter::OnDeathHandle()
 	}
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	WeaponComponent->StopFire();
+
+	// GetMesh()->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	// GetMesh()->SetSimulatePhysics(true);
 }
 #pragma endregion // Health
 

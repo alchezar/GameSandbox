@@ -26,6 +26,6 @@ bool ASTU_AmmoPickup::TryToGivePickup(APawn* PlayerPawn)
 
 	const auto WeaponComponent = Cast<USTU_WeaponComponent>(PlayerPawn->GetComponentByClass(USTU_WeaponComponent::StaticClass()));
 	if (!WeaponComponent) return false;
-	
+
 	return WeaponComponent->TryToAddAmmo(WeaponType, Clips);
 }

@@ -21,13 +21,12 @@ void ASTU_LauncherWeapon::StartFire()
 }
 
 void ASTU_LauncherWeapon::StopFire()
-{
-}
+{}
 
 void ASTU_LauncherWeapon::Aiming()
 {
 	if (IsAmmoEmpty() || !CanAim()) return;
-	
+
 	DrawProjectilePath();
 }
 
@@ -59,6 +58,7 @@ void ASTU_LauncherWeapon::MakeShot()
 		SpawnProjectile->FinishSpawning(SpawnTransform);
 	}
 	DecreaseAmmo();
+	SpawnMuzzleFX();
 }
 
 void ASTU_LauncherWeapon::DrawProjectilePath()
@@ -72,7 +72,7 @@ void ASTU_LauncherWeapon::DrawProjectilePath()
 
 	FPredictProjectilePathParams PredictParams;
 	PredictParams.StartLocation       = GetMuzzleSocketLocation();
-	PredictParams.LaunchVelocity      = ViewRotation.Vector() * ProjectileInitialSpeed; //WeaponMesh->GetSocketRotation(SocketName).Vector() * ProjectileInitialSpeed;
+	PredictParams.LaunchVelocity      = ViewRotation.Vector() * ProjectileInitialSpeed;
 	PredictParams.MaxSimTime          = 5.f;
 	PredictParams.bTraceWithCollision = true;
 	PredictParams.bTraceWithChannel   = true;
@@ -86,13 +86,13 @@ void ASTU_LauncherWeapon::DrawProjectilePath()
 	// TODO: Add spline mesh instead of debug lines
 	if (PredictResult.HitResult.bBlockingHit)
 	{
-		DrawDebugPoint(GetWorld(), PredictResult.HitResult.Location, 20.f, FColor::Red);
+		DrawDebugPoint(GetWorld(), PredictResult.HitResult.Location, 20.f, FColor::Cyan);
 	}
 	for (int32 i = 1; i < PredictResult.PathData.Num(); ++i)
 	{
 		FVector CurrentPointLocation  = PredictResult.PathData[i].Location;
 		FVector PreviousPointLocation = PredictResult.PathData[i - 1].Location;
 
-		DrawDebugLine(GetWorld(), PreviousPointLocation, CurrentPointLocation, FColor::Red, false, -1.f, 0, 3.f);
+		DrawDebugLine(GetWorld(), PreviousPointLocation, CurrentPointLocation, FColor::Cyan, false, -1.f, 0, 3.f);
 	}
 }

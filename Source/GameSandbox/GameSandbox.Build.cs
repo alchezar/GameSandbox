@@ -8,7 +8,16 @@ public class GameSandbox : ModuleRules
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-		PublicDependencyModuleNames.AddRange(new[] { "Core", "CoreUObject", "Engine", "InputCore", "UMG" });
+		PublicDependencyModuleNames.AddRange(new[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"UMG",
+			"Niagara",
+			"PhysicsCore"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore" });
 

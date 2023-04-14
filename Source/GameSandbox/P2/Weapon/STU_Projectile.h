@@ -8,6 +8,7 @@
 
 class UProjectileMovementComponent;
 class USphereComponent;
+class USTU_WeaponFXComponent;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_Projectile : public AActor
@@ -36,6 +37,8 @@ protected:
 	bool bFullDamage = false;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
 	float LifeTime = 5.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon FX")
+	USTU_WeaponFXComponent* WeaponFXComponent;
 
 private:
 	UFUNCTION()

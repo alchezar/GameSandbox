@@ -111,7 +111,7 @@ private:
 	void LandedHandle(const FHitResult& Hit);
 
 	void OnDeathHandle();
-	void OnHealthChangedHandle(float Health);
+	void OnHealthChangedHandle(float Health, float HealthDelta);
 
 #pragma endregion // Health
 

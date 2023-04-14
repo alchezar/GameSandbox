@@ -1,8 +1,20 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_PlayerHUDWidget.h"
+#include "GameSandbox/P2/STU_CoreTypes.h"
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
 #include "GameSandbox/P2/Component/STU_WeaponComponent.h"
+
+bool USTU_PlayerHUDWidget::Initialize()
+{
+	USTU_HealthComponent* HealthComponent = GetOwnerComponent<USTU_HealthComponent>();
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangeHandle);
+	}
+
+	return Super::Initialize();
+}
 
 float USTU_PlayerHUDWidget::GetHealthPercent() const
 {
@@ -39,4 +51,12 @@ T* USTU_PlayerHUDWidget::GetOwnerComponent() const
 {
 	const APawn* Player = GetOwningPlayerPawn();
 	return Player ? Cast<T>(Player->GetComponentByClass(T::StaticClass())) : nullptr;
+}
+
+void USTU_PlayerHUDWidget::OnHealthChangeHandle(float Health, const float HealthDelta)
+{
+	if(HealthDelta < 0.f)
+	{
+		OnTakeDamage();		
+	}
 }

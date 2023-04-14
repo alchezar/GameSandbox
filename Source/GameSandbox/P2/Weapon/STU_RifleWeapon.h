@@ -6,6 +6,10 @@
 #include "STU_BaseWeapon.h"
 #include "STU_RifleWeapon.generated.h"
 
+class USTU_WeaponFXComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
+
 UCLASS()
 class GAMESANDBOX_API ASTU_RifleWeapon : public ASTU_BaseWeapon
 {
@@ -26,15 +30,31 @@ protected:
 	virtual void MakeDamage(const FHitResult& HitResult) override;
 	virtual void DecreaseAmmo() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	float DamageAmount = 10.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "deg"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "deg"))
 	float BulletSpread = 3.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
 	float TimeBetweenShots = 0.1f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	float HeadshotMultiplier = 10.f;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon FX")
+	USTU_WeaponFXComponent* WeaponFXComponent;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
+	UNiagaraSystem* TraceFX;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
+	FName TraceTargetName = "TraceTarget";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
+	float TaleLength = 200.f;
+	
 private:
+	void InitMuzzleFX();
+	void SetMuzzleFXVisibility(bool Visible);
+	void SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd);
+	
+	UPROPERTY()
+	UNiagaraComponent* MuzzleFXComponent;	
 	FTimerHandle ShotTimer;
 };

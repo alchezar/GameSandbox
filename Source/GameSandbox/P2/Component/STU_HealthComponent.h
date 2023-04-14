@@ -25,7 +25,7 @@ public:
 
 	float GetHealth() const;
 	bool  TryToAddHealth(float PickedHealth);
-	bool IsHealthFull() const;
+	bool  IsHealthFull() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -41,12 +41,15 @@ protected:
 	float HealStartDelay = 3.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Heal", meta = (EditCondition = "AutoHeal"))
 	float HealAmount = 1.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | VFX")
+	TSubclassOf<UCameraShakeBase> CameraShake;
 
 private:
 	UFUNCTION()
 	void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 	void SetHealth(float NewHealth);
 	void Healing();
+	void PlayCameraShake() const;
 
 	float        Health = 0.f;
 	FTimerHandle HealTimer;

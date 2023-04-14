@@ -8,6 +8,8 @@
 #include "STU_BaseWeapon.generated.h"
 
 class USkeletalMeshComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
@@ -17,26 +19,31 @@ class GAMESANDBOX_API ASTU_BaseWeapon : public AActor
 public:
 	ASTU_BaseWeapon();
 
+protected:
+	virtual void BeginPlay() override;
+
+#pragma region Shoot
+
+public:
 	FOnClipEmptySignature OnClipEmpty;
 
 	virtual void StartFire();
 	virtual void StopFire();
 	virtual void Aiming();
-
-	virtual void ChangeClip();
 	virtual bool CanAim() const;
-	bool         CanReload() const;
+
+	bool CanReload() const;
 
 protected:
-	virtual void BeginPlay() override;
+	virtual void MakeShot();
+	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+	virtual void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
+	virtual void MakeDamage(const FHitResult& HitResult);
 
-	virtual void       MakeShot();
 	APlayerController* GetPlayerController() const;
 	FVector            GetMuzzleSocketLocation() const;
-	virtual bool       GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
-	bool               GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
-	virtual void       MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
-	virtual void       MakeDamage(const FHitResult& HitResult);
+
+	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	USkeletalMeshComponent* WeaponMesh;
@@ -44,24 +51,29 @@ protected:
 	FName SocketName = "MuzzleSocket";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "cm"))
 	float TraceMaxDistance = 5000.f;
-
+			
 private:
 	FTimerHandle ShotTimer;
 	bool         bCanAim = true;
 
+#pragma endregion // Shoot
+
 #pragma region Ammo
 
 public:
+	virtual void ChangeClip();
+	
 	FWeaponUIData GetUIData() const;
 	FAmmoData     GetAmmoData() const;
 	bool          TryToAddAmmo(int32 Clips);
 
 protected:
 	virtual void DecreaseAmmo();
-	bool         IsClipEmpty() const;
-	bool         IsAmmoEmpty() const;
-	bool         IsAmmoFull() const;
-	void         LogAmmo() const;
+
+	bool IsClipEmpty() const;
+	bool IsAmmoEmpty() const;
+	bool IsAmmoFull() const;
+	void LogAmmo() const;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	FAmmoData DefaultAmmo{15, 10, false};
@@ -72,4 +84,15 @@ private:
 	FAmmoData CurrentAmmo;
 
 #pragma endregion // Ammo
+	
+#pragma region VFX
+
+protected:
+	UNiagaraComponent* SpawnMuzzleFX() const;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
+	UNiagaraSystem* MuzzleFX;
+	
+#pragma endregion // VFX
+
 };
