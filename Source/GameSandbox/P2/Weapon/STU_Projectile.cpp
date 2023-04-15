@@ -42,12 +42,7 @@ void ASTU_Projectile::SetShotDirection(const FVector& Direction)
 	ShotDirection = Direction;
 }
 
-void ASTU_Projectile::OnProjectileHit(
-	UPrimitiveComponent* HitComponent,
-	AActor*              OtherActor,
-	UPrimitiveComponent* OtherComp,
-	FVector              NormalImpulse,
-	const FHitResult&    Hit)
+void ASTU_Projectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!GetWorld()) return;
 
@@ -62,7 +57,6 @@ void ASTU_Projectile::OnProjectileHit(
 		this,
 		GetController(),
 		bFullDamage);
-	// DrawDebugSphere(GetWorld(), GetActorLocation(), DamageRadius, 32, FColor::Red, false, LifeTime);
 	WeaponFXComponent->PlayImpactFX(Hit);
 
 	Destroy();

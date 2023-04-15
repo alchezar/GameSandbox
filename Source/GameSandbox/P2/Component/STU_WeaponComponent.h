@@ -43,7 +43,7 @@ protected:
 	FName HandSocketName = "HandWeaponSocket";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	FName BackSocketName = "ArmorySocket";
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (ClampMin = 0, ClampMax = 1))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (ClampMin = 0, ClampMax = 2))
 	int32 CurrentWeaponIndex = 0;
 
 private:

@@ -50,13 +50,13 @@ void ASTU_RifleWeapon::MakeShot()
 	}
 
 	FVector TraceFXEnd = TraceEnd;
-	
+
 	FHitResult Hit;
 	MakeHit(OUT Hit, TraceStart, TraceEnd);
 
 	if (Hit.bBlockingHit)
 	{
-		TraceFXEnd = Hit.ImpactPoint;		
+		TraceFXEnd = Hit.ImpactPoint;
 		WeaponFXComponent->PlayImpactFX(Hit);
 		MakeDamage(Hit);
 	}
@@ -64,7 +64,7 @@ void ASTU_RifleWeapon::MakeShot()
 	SpawnTraceFX(GetMuzzleSocketLocation(), TraceFXEnd);
 }
 
-bool ASTU_RifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+bool ASTU_RifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 {
 	FVector  ViewLocation;
 	FRotator ViewRotation;
@@ -123,25 +123,9 @@ void ASTU_RifleWeapon::SetMuzzleFXVisibility(const bool Visible)
 
 void ASTU_RifleWeapon::SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd)
 {
-	// TODO: Create bluster bolt effect in bluster weapon class
-	// const FRotator LookAtEndRotation = UKismetMathLibrary::FindLookAtRotation(TraceStart, TraceEnd);
-	// const FRotator LookAtStartRotation = UKismetMathLibrary::FindLookAtRotation(TraceEnd, TraceStart);
-	//
-	// const FVector TaleStart = UKismetMathLibrary::GetForwardVector(LookAtStartRotation) * TaleLength + TraceEnd;
-	// const FVector TaleEnd = UKismetMathLibrary::GetForwardVector(LookAtEndRotation) * TaleLength + TraceStart;
-	//
-	// float DeltaSeconds = GetWorld()->DeltaTimeSeconds;
-	//
-	// FVector LerpStart = FMath::VInterpTo(TraceStart, TaleStart, DeltaSeconds, 0.5f);
-	// FVector LerpEnd = FMath::VInterpTo(TaleEnd, TraceEnd, DeltaSeconds, 0.5f);
-
-	const FVector BoltStart = TraceStart;
-	const FVector BoltEnd = TraceEnd;
-	
-	UNiagaraComponent* TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceFX, BoltStart);
+	UNiagaraComponent* TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceFX, TraceStart);
 	if (TraceFXComponent)
 	{
-		TraceFXComponent->SetVariableVec3(TraceTargetName, BoltEnd);
+		TraceFXComponent->SetVariableVec3(TraceTargetName, TraceEnd);
 	}
-	
 }

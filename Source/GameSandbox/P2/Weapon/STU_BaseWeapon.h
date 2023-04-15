@@ -36,7 +36,7 @@ public:
 
 protected:
 	virtual void MakeShot();
-	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const;
+	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd);
 	virtual void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const;
 	virtual void MakeDamage(const FHitResult& HitResult);
 

@@ -74,7 +74,7 @@ void ASTU_BaseWeapon::MakeShot()
 	DecreaseAmmo();
 }
 
-bool ASTU_BaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+bool ASTU_BaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 {
 	FRotator ViewRotation;
 	if (!GetPlayerViewPoint(OUT TraceStart,OUT ViewRotation)) return false;
