@@ -1,0 +1,128 @@
+// Copyright (C) 2023, IKinder
+
+#include "STU_BlasterWeapon.h"
+#include "DrawDebugHelpers.h"
+#include "NiagaraComponent.h"
+#include "Engine/World.h"
+#include "Projectile/STU_ProjectileBullet.h"
+
+ASTU_BlasterWeapon::ASTU_BlasterWeapon()
+{
+	PrimaryActorTick.bCanEverTick = false;
+
+	// WeaponFXComponent = CreateDefaultSubobject<USTU_WeaponFXComponent>("WeaponFXComponent");
+}
+
+void ASTU_BlasterWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+	// check(WeaponFXComponent);
+}
+
+void ASTU_BlasterWeapon::StartFire()
+{
+	GetWorldTimerManager().SetTimer(ShotTimer, this, &ASTU_BlasterWeapon::MakeShot, TimeBetweenShots, true);
+	MakeShot();
+	InitMuzzleFX();
+}
+
+void ASTU_BlasterWeapon::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(ShotTimer);
+	SetMuzzleFXVisibility(false);
+}
+
+void ASTU_BlasterWeapon::MakeShot()
+{
+	if (!GetWorld() || IsAmmoEmpty())
+	{
+		StopFire();
+		return;
+	}
+
+	FVector TraceStart, TraceEnd;
+	if (!GetTraceData(OUT TraceStart, OUT TraceEnd))
+	{
+		StopFire();
+		return;
+	}
+
+	FHitResult Hit;
+	MakeHit(OUT Hit, TraceStart, TraceEnd);
+
+	const FVector EndPoint  = Hit.bBlockingHit ? Hit.ImpactPoint : Hit.TraceEnd;
+	const FVector Direction = (EndPoint - GetMuzzleSocketLocation()).GetSafeNormal();
+
+	auto SpawnTransform  = FTransform(FRotator::ZeroRotator, GetMuzzleSocketLocation());
+	auto SpawnProjectile = GetWorld()->SpawnActorDeferred<ASTU_ProjectileBullet>(BulletClass, SpawnTransform);
+	if (SpawnProjectile)
+	{
+		SpawnProjectile->SetShotDirection(Direction);
+		SpawnProjectile->SetOwner(this);
+		SpawnProjectile->FinishSpawning(SpawnTransform);
+	}
+	DecreaseAmmo();
+}
+
+bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
+{
+	FVector  ViewLocation;
+	FRotator ViewRotation;
+	if (!GetPlayerViewPoint(OUT ViewLocation,OUT ViewRotation)) return false;
+
+	TraceStart          = ViewLocation;
+	const float HalfRad = FMath::DegreesToRadians(BulletSpread / 2);
+	ShootDirection      = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
+	TraceEnd            = TraceStart + ShootDirection * TraceMaxDistance;
+	return true;
+}
+
+// bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
+// {	
+// 	FVector  ViewLocation;
+// 	FRotator ViewRotation;
+// 	if (!GetPlayerViewPoint(OUT ViewLocation,OUT ViewRotation)) return false;
+// 	TraceStart                   = ViewLocation;
+// 	const auto    HalfRad        = FMath::DegreesToRadians(BulletSpread / 2);
+// 	const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
+// 	TraceEnd                     = TraceStart + ShootDirection * TraceMaxDistance;
+// 	return true;	
+// }
+
+// void ASTU_BlasterWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const
+// {
+// 	Super::MakeHit(HitResult, TraceStart, TraceEnd);
+// }
+
+void ASTU_BlasterWeapon::DecreaseAmmo()
+{
+	Super::DecreaseAmmo();
+
+	if (IsClipEmpty() && !IsAmmoEmpty())
+	{
+		StopFire();
+	}
+}
+
+void ASTU_BlasterWeapon::InitMuzzleFX()
+{
+	if (!MuzzleFXComponent)
+	{
+		MuzzleFXComponent = SpawnMuzzleFX();
+	}
+	SetMuzzleFXVisibility(true);
+}
+
+void ASTU_BlasterWeapon::SetMuzzleFXVisibility(const bool Visible)
+{
+	if (MuzzleFXComponent)
+	{
+		MuzzleFXComponent->SetPaused(!Visible);
+		MuzzleFXComponent->SetVisibility(Visible);
+	}
+}
+
+FVector ASTU_BlasterWeapon::GetShootDirection() const
+{
+	return ShootDirection;
+}
