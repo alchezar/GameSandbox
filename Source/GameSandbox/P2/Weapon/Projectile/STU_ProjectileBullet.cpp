@@ -9,7 +9,6 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 ASTU_ProjectileBullet::ASTU_ProjectileBullet()
 {
@@ -29,6 +28,7 @@ void ASTU_ProjectileBullet::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	/* We need to update Niagara TraceEnd variable every frame otherwise it will be stuck at weapon MuzzleSocket location */
 	UpdateBoltTaleOffset(ForwardVector * BlasterBoltLength);
 }
 
@@ -48,16 +48,13 @@ void ASTU_ProjectileBullet::OnProjectileHit(UPrimitiveComponent* HitComponent, A
 
 void ASTU_ProjectileBullet::SpawnTraceFX()
 {
+	/* Get PlayerController rotation for correct particle spawning */
+	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (!PlayerController) return;
+
 	FVector  PlayerLocation;
 	FRotator PlayerRotation;
-	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
-	// GetOwner <Weapon class> -> GetOwner <ACharacter*> -> PossessedBy -> AController*
-
-	const ASTU_BlasterWeapon* BlasterWeapon = Cast<ASTU_BlasterWeapon>(GetOwner());
-	if (BlasterWeapon)
-	{
-		ForwardVector = BlasterWeapon->GetShootDirection().GetSafeNormal();
-	}
+	PlayerController->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
 
 	TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		TraceFX,
@@ -68,7 +65,13 @@ void ASTU_ProjectileBullet::SpawnTraceFX()
 		EAttachLocation::SnapToTarget,
 		false);
 
-	// Debug Blaster bolt tale location for first frame
+	/* Random cone shooting direction from blaster weapon for correct bolt tale location */
+	const ASTU_BlasterWeapon* BlasterWeapon = Cast<ASTU_BlasterWeapon>(GetOwner());
+	if (!BlasterWeapon) return;
+
+	ForwardVector = BlasterWeapon->GetShootDirection().GetSafeNormal();
+
+	/* Debug Blaster bolt tale location for first frame */
 	UpdateBoltTaleOffset();
 }
 

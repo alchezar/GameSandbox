@@ -29,8 +29,6 @@ protected:
 	virtual void MakeShot() override;
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) override;
 
-	// virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) const override;
-	// virtual void MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const override;
 	virtual void DecreaseAmmo() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
@@ -42,8 +40,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	TSubclassOf<ASTU_ProjectileBullet> BulletClass;
-	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon FX")
-	// USTU_WeaponFXComponent* WeaponFXComponent;
 
 private:
 	void InitMuzzleFX();

@@ -9,14 +9,11 @@
 ASTU_BlasterWeapon::ASTU_BlasterWeapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
-	// WeaponFXComponent = CreateDefaultSubobject<USTU_WeaponFXComponent>("WeaponFXComponent");
 }
 
 void ASTU_BlasterWeapon::BeginPlay()
 {
 	Super::BeginPlay();
-	// check(WeaponFXComponent);
 }
 
 void ASTU_BlasterWeapon::StartFire()
@@ -34,23 +31,17 @@ void ASTU_BlasterWeapon::StopFire()
 
 void ASTU_BlasterWeapon::MakeShot()
 {
-	if (!GetWorld() || IsAmmoEmpty())
-	{
-		StopFire();
-		return;
-	}
-
 	FVector TraceStart, TraceEnd;
-	if (!GetTraceData(OUT TraceStart, OUT TraceEnd))
+	if (IsAmmoEmpty() || !GetTraceData(OUT TraceStart, OUT TraceEnd))
 	{
 		StopFire();
 		return;
 	}
 
-	FHitResult Hit;
-	MakeHit(OUT Hit, TraceStart, TraceEnd);
+	FHitResult HitResult;
+	MakeHit(OUT HitResult, TraceStart, TraceEnd);
 
-	const FVector EndPoint  = Hit.bBlockingHit ? Hit.ImpactPoint : Hit.TraceEnd;
+	const FVector EndPoint  = HitResult.bBlockingHit ? HitResult.ImpactPoint : HitResult.TraceEnd;
 	const FVector Direction = (EndPoint - GetMuzzleSocketLocation()).GetSafeNormal();
 
 	auto SpawnTransform  = FTransform(FRotator::ZeroRotator, GetMuzzleSocketLocation());
@@ -76,23 +67,6 @@ bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 	TraceEnd            = TraceStart + ShootDirection * TraceMaxDistance;
 	return true;
 }
-
-// bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd) const
-// {	
-// 	FVector  ViewLocation;
-// 	FRotator ViewRotation;
-// 	if (!GetPlayerViewPoint(OUT ViewLocation,OUT ViewRotation)) return false;
-// 	TraceStart                   = ViewLocation;
-// 	const auto    HalfRad        = FMath::DegreesToRadians(BulletSpread / 2);
-// 	const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
-// 	TraceEnd                     = TraceStart + ShootDirection * TraceMaxDistance;
-// 	return true;	
-// }
-
-// void ASTU_BlasterWeapon::MakeHit(FHitResult& HitResult, const FVector& TraceStart, const FVector& TraceEnd) const
-// {
-// 	Super::MakeHit(HitResult, TraceStart, TraceEnd);
-// }
 
 void ASTU_BlasterWeapon::DecreaseAmmo()
 {

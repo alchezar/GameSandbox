@@ -2,6 +2,7 @@
 
 #include "STU_ProjectileBase.h"
 #include "DrawDebugHelpers.h"
+#include "STU_BaseWeapon.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
@@ -56,7 +57,15 @@ void ASTU_ProjectileBase::SetShotDirection(const FVector& Direction)
 
 AController* ASTU_ProjectileBase::GetController() const
 {
-	const auto Pawn = Cast<APawn>(GetOwner());
-	return Pawn ? Pawn->GetController() : nullptr;
+	// const auto Pawn = Cast<APawn>(GetOwner());
+	// return Pawn ? Pawn->GetController() : nullptr;
+
+	const ASTU_BaseWeapon* BaseWeapon = Cast<ASTU_BaseWeapon>(GetOwner());
+	if (!BaseWeapon) return nullptr;
+
+	const APawn* Pawn = Cast<APawn>(BaseWeapon->GetOwner());
+	if (!Pawn) return nullptr;
+
+	return Pawn->GetController();
 }
 
