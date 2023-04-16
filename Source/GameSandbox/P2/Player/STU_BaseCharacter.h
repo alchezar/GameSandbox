@@ -45,7 +45,6 @@ protected:
 	USTU_WeaponComponent* WeaponComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	TArray<UAnimMontage*> DeathAnimations;
-	
 
 private:
 	void SetupComponent();
@@ -83,6 +82,7 @@ protected:
 	UInputAction* ReloadAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* AimAction;
+
 private:
 	void MappingContext() const;
 	void Move(const FInputActionValue& Value);
@@ -99,6 +99,8 @@ private:
 #pragma region Health
 
 protected:
+	virtual void OnDeathHandle();
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Damage")
 	float LifeSpanOnDeath = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Damage")
@@ -110,7 +112,6 @@ private:
 	UFUNCTION()
 	void LandedHandle(const FHitResult& Hit);
 
-	void OnDeathHandle();
 	void OnHealthChangedHandle(float Health, float HealthDelta);
 
 #pragma endregion // Health

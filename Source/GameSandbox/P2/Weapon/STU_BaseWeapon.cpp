@@ -7,7 +7,6 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "NiagaraFunctionLibrary.h"
-#include "NiagaraComponent.h"
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {
@@ -47,6 +46,11 @@ bool ASTU_BaseWeapon::CanAim() const
 bool ASTU_BaseWeapon::CanReload() const
 {
 	return CurrentAmmo.Bullets < DefaultAmmo.Bullets && CurrentAmmo.Clips > 0;
+}
+
+FRotator ASTU_BaseWeapon::GetWeaponSocketRotation() const
+{
+	return WeaponMesh->GetSocketRotation(SocketName);
 }
 
 void ASTU_BaseWeapon::MakeShot()
@@ -104,10 +108,22 @@ APlayerController* ASTU_BaseWeapon::GetPlayerController() const
 
 bool ASTU_BaseWeapon::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const
 {
-	const APlayerController* Controller = GetPlayerController();
-	if (!Controller) return false;
+	const auto OurCharacter = Cast<ACharacter>(GetOwner());
+	if (!OurCharacter) return false;
 
-	Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	if (OurCharacter->IsPlayerControlled())
+	{
+		const APlayerController* Controller = GetPlayerController();
+		if (!Controller) return false;
+
+		Controller->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	}
+	else
+	{
+		ViewLocation = GetMuzzleSocketLocation();
+		ViewRotation = GetWeaponSocketRotation(); // WeaponMesh->GetSocketRotation(SocketName);
+	}
+
 	return true;
 }
 

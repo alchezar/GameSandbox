@@ -7,10 +7,8 @@
 #include "GameSandbox/P2/STU_CoreTypes.h"
 #include "STU_WeaponComponent.generated.h"
 
-
 class ASTU_BaseWeapon;
 class UAnimMontage;
-
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API USTU_WeaponComponent : public UActorComponent
@@ -27,16 +25,21 @@ protected:
 #pragma region Weapon
 
 public:
-	void StartFire();
+	virtual void StartFire();
+	virtual void NextWeapon();
+
 	void StopFire();
 	void Aiming();
-	void NextWeapon();
 	void Reload();
 	bool GetWeaponUIData(FWeaponUIData& UIData) const;
 	bool GetWeaponAmmoData(FAmmoData& AmmoData) const;
 	bool TryToAddAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType, int32 Clips);
 
 protected:
+	bool CanFire() const;
+	bool CanEquip() const;
+	void EquipWeapon(int32 Index);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	TArray<FWeaponData> WeaponData;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
@@ -45,22 +48,17 @@ protected:
 	FName BackSocketName = "ArmorySocket";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (ClampMin = 0, ClampMax = 2))
 	int32 CurrentWeaponIndex = 0;
-
-private:
-	void SpawnWeapons();
-	void AttachWeaponToSocket(ASTU_BaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
-	void EquipWeapon(int32 Index);
-
-	bool CanFire() const;
-	bool CanReload() const;
-
-	void OnClipEmpty(ASTU_BaseWeapon* EmptyWeapon);
-	void ChangeClip();
-
 	UPROPERTY()
 	ASTU_BaseWeapon* CurrentWeapon = nullptr;
 	UPROPERTY()
 	TArray<ASTU_BaseWeapon*> Weapons;
+
+private:
+	void SpawnWeapons();
+	void AttachWeaponToSocket(ASTU_BaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName);
+	void OnClipEmpty(ASTU_BaseWeapon* EmptyWeapon);
+	void ChangeClip();
+	bool CanReload() const;
 
 #pragma endregion // Weapon
 
@@ -73,22 +71,23 @@ public:
 	bool IsWeaponReloading() const;
 
 protected:
+	void PlayAnimMontage(UAnimMontage* Animation);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	UAnimMontage* EquipAnimation = nullptr;
 
+	bool bWeaponChanging  = false;
+	bool bWeaponReloading = false;
+
 private:
-	void PlayAnimMontage(UAnimMontage* Animation);
 	void InitAnimations();
-	
+
 	void OnEquipFinished(USkeletalMeshComponent* MeshComp);
 	void OnChangedFinished(USkeletalMeshComponent* MeshComp);
 	void OnReloadFinished(USkeletalMeshComponent* MeshComp);
 
 	UPROPERTY()
 	UAnimMontage* CurrentReloadAnimation = nullptr;
-
-	bool bWeaponChanging = false;
-	bool bWeaponReloading = false;
 
 #pragma endregion // Animation
 };

@@ -32,7 +32,8 @@ public:
 	virtual void Aiming();
 	virtual bool CanAim() const;
 
-	bool CanReload() const;
+	bool     CanReload() const;
+	FRotator GetWeaponSocketRotation() const;
 
 protected:
 	virtual void MakeShot();
@@ -51,7 +52,7 @@ protected:
 	FName SocketName = "MuzzleSocket";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "cm"))
 	float TraceMaxDistance = 5000.f;
-			
+
 private:
 	FTimerHandle ShotTimer;
 	bool         bCanAim = true;
@@ -62,16 +63,16 @@ private:
 
 public:
 	virtual void ChangeClip();
-	
+
 	FWeaponUIData GetUIData() const;
 	FAmmoData     GetAmmoData() const;
 	bool          TryToAddAmmo(int32 Clips);
+	bool          IsAmmoEmpty() const;
 
 protected:
 	virtual void DecreaseAmmo();
 
 	bool IsClipEmpty() const;
-	bool IsAmmoEmpty() const;
 	bool IsAmmoFull() const;
 	void LogAmmo() const;
 
@@ -84,15 +85,14 @@ private:
 	FAmmoData CurrentAmmo;
 
 #pragma endregion // Ammo
-	
+
 #pragma region VFX
 
 protected:
 	UNiagaraComponent* SpawnMuzzleFX() const;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
 	UNiagaraSystem* MuzzleFX;
-	
-#pragma endregion // VFX
 
+#pragma endregion // VFX
 };

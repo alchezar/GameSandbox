@@ -3,6 +3,7 @@
 #include "STU_AIController.h"
 #include "STU_AICharacter.h"
 #include "GameSandbox/P2/Component/STU_AIPerceptionComponent.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 ASTU_AIController::ASTU_AIController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -22,7 +23,7 @@ void ASTU_AIController::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	AActor* AimActor = AIPerceptionComponent->GetClosestEnemy();
+	AActor* AimActor = GetFocusOnActor(); // AIPerceptionComponent->GetClosestEnemy();
 	SetFocus(AimActor);
 }
 
@@ -31,8 +32,14 @@ void ASTU_AIController::OnPossess(APawn* InPawn)
 	Super::OnPossess(InPawn);
 
 	const ASTU_AICharacter* AICharacter = Cast<ASTU_AICharacter>(InPawn);
-	if (AICharacter) 
+	if (AICharacter)
 	{
 		RunBehaviorTree(AICharacter->BehaviorTreeAsset);
 	}
+}
+
+AActor* ASTU_AIController::GetFocusOnActor()
+{
+	if (!GetBlackboardComponent()) return nullptr;
+	return Cast<AActor>(GetBlackboardComponent()->GetValueAsObject(FocusOnKeyName));
 }

@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "STU_BaseCharacter.h"
+#include "Player/STU_BaseCharacter.h"
 #include "STU_AICharacter.generated.h"
 
 class UBehaviorTree;
@@ -24,6 +24,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void OnDeathHandle() override;
+
 
 public:
 };

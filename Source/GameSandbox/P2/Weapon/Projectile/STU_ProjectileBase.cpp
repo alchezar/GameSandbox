@@ -2,7 +2,7 @@
 
 #include "STU_ProjectileBase.h"
 #include "DrawDebugHelpers.h"
-#include "STU_BaseWeapon.h"
+#include "Weapon/STU_BaseWeapon.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"

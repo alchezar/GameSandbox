@@ -2,8 +2,8 @@
 
 #include "STU_ProjectileRocket.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Weapon/Component/STU_WeaponFXComponent.h"
 
 ASTU_ProjectileRocket::ASTU_ProjectileRocket()
 {

@@ -4,10 +4,11 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "STU_BlasterWeapon.h"
+#include "Weapon/STU_BlasterWeapon.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "GameFramework/Character.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
 
 ASTU_ProjectileBullet::ASTU_ProjectileBullet()
@@ -21,6 +22,7 @@ void ASTU_ProjectileBullet::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StartLocation = GetActorLocation();
 	SpawnTraceFX();
 }
 
@@ -28,7 +30,6 @@ void ASTU_ProjectileBullet::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/* We need to update Niagara TraceEnd variable every frame otherwise it will be stuck at weapon MuzzleSocket location */
 	UpdateBoltTaleOffset(ForwardVector * BlasterBoltLength);
 }
 
@@ -48,37 +49,32 @@ void ASTU_ProjectileBullet::OnProjectileHit(UPrimitiveComponent* HitComponent, A
 
 void ASTU_ProjectileBullet::SpawnTraceFX()
 {
-	/* Get PlayerController rotation for correct particle spawning */
-	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
-	if (!PlayerController) return;
-
-	FVector  PlayerLocation;
-	FRotator PlayerRotation;
-	PlayerController->GetPlayerViewPoint(OUT PlayerLocation, OUT PlayerRotation);
+	const ASTU_BlasterWeapon* BlasterWeapon = Cast<ASTU_BlasterWeapon>(GetOwner());
+	if (!BlasterWeapon) return;
 
 	TraceFXComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		TraceFX,
 		CollisionComponent,
 		NAME_None,
 		FVector::ZeroVector,
-		PlayerRotation,
+		BlasterWeapon->GetWeaponSocketRotation(),
 		EAttachLocation::SnapToTarget,
 		false);
 
 	/* Random cone shooting direction from blaster weapon for correct bolt tale location */
-	const ASTU_BlasterWeapon* BlasterWeapon = Cast<ASTU_BlasterWeapon>(GetOwner());
-	if (!BlasterWeapon) return;
-
 	ForwardVector = BlasterWeapon->GetShootDirection().GetSafeNormal();
 
 	/* Debug Blaster bolt tale location for first frame */
 	UpdateBoltTaleOffset();
 }
 
-void ASTU_ProjectileBullet::UpdateBoltTaleOffset(const FVector& TaleOffset) const
+void ASTU_ProjectileBullet::UpdateBoltTaleOffset(FVector TaleOffset) const
 {
-	if (TraceFXComponent)
-	{
-		TraceFXComponent->SetVariableVec3(TraceTargetName, GetActorLocation() + TaleOffset);
-	}
+	if (!TraceFXComponent) return;
+
+	/* Avoid spawning bolt with full tale length at beginning */
+	const bool bFarEnough = FVector::Dist(StartLocation, GetActorLocation()) >= BlasterBoltLength;
+	TaleOffset            = bFarEnough ? TaleOffset : GetActorLocation() - StartLocation;
+
+	TraceFXComponent->SetVariableVec3(TraceTargetName, GetActorLocation() - TaleOffset);
 }

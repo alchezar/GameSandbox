@@ -79,6 +79,7 @@ void ASTU_LauncherWeapon::DrawProjectilePath()
 	PredictParams.ActorsToIgnore      = {this, GetOwner(), Projectile};
 	PredictParams.TraceChannel        = ECollisionChannel::ECC_Visibility;
 	PredictParams.DrawDebugType       = EDrawDebugTrace::None;
+	PredictParams.OverrideGravityZ *= Projectile->GetMovementComponent()->ProjectileGravityScale;
 
 	FPredictProjectilePathResult PredictResult;
 	UGameplayStatics::PredictProjectilePath(GetWorld(), PredictParams, OUT PredictResult);

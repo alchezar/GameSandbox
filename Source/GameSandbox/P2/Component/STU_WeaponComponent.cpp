@@ -134,6 +134,11 @@ bool USTU_WeaponComponent::CanFire() const
 	return CurrentWeapon && !bWeaponChanging && !bWeaponReloading;
 }
 
+bool USTU_WeaponComponent::CanEquip() const
+{
+	return !bWeaponChanging && !bWeaponReloading;
+}
+
 bool USTU_WeaponComponent::CanReload() const
 {
 	return CurrentWeapon && !bWeaponChanging && !bWeaponReloading && CurrentWeapon->CanReload();
