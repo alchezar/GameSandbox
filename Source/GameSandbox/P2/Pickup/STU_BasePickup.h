@@ -17,10 +17,12 @@ public:
 	ASTU_BasePickup();
 	virtual void Tick(float DeltaTime) override;
 
+	bool CouldBeTaken() const;
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Pickup")
 	USphereComponent* SphereComponent;
 	UPROPERTY(EditAnywhere, Category = "Kinder | Pickup", meta = (Units = "s"))
@@ -28,10 +30,11 @@ protected:
 
 private:
 	virtual bool TryToGivePickup(APawn* PlayerPawn);
-	
+
 	void PickupWasTaken();
 	void Respawn();
 	void GenerateRotationYaw();
 
-	double RotationYaw = 1.5;
+	FTimerHandle RespawnTimer;
+	double       RotationYaw = 1.5;
 };

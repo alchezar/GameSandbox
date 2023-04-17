@@ -212,6 +212,18 @@ bool USTU_WeaponComponent::TryToAddAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType,
 	return false;
 }
 
+bool USTU_WeaponComponent::NeedAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType)
+{
+	for (const auto Weapon : Weapons)
+	{
+		if (Weapon && Weapon->IsA(WeaponType))
+		{
+			return Weapon->IsAmmoEmpty();
+		}
+	}
+	return false;
+}
+
 #pragma endregion // Weapon
 
 #pragma  region Animation
