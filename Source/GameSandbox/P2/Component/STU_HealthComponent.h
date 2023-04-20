@@ -26,6 +26,7 @@ public:
 	float GetHealth() const;
 	bool  TryToAddHealth(float PickedHealth);
 	bool  IsHealthFull() const;
+	void  Killed(const AController* KillerController) const;
 
 protected:
 	virtual void BeginPlay() override;

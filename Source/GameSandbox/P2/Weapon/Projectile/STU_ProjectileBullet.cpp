@@ -10,6 +10,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/Character.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
+#include "Player/STU_PlayerState.h"
 
 ASTU_ProjectileBullet::ASTU_ProjectileBullet()
 {
@@ -61,9 +62,9 @@ void ASTU_ProjectileBullet::SpawnTraceFX()
 		EAttachLocation::SnapToTarget,
 		false);
 
+	SetBlasterColor();
 	/* Random cone shooting direction from blaster weapon for correct bolt tale location */
 	ForwardVector = BlasterWeapon->GetShootDirection().GetSafeNormal();
-
 	/* Debug Blaster bolt tale location for first frame */
 	UpdateBoltTaleOffset();
 }
@@ -77,4 +78,27 @@ void ASTU_ProjectileBullet::UpdateBoltTaleOffset(FVector TaleOffset) const
 	TaleOffset            = bFarEnough ? TaleOffset : GetActorLocation() - StartLocation;
 
 	TraceFXComponent->SetVariableVec3(TraceTargetName, GetActorLocation() - TaleOffset);
+}
+
+void ASTU_ProjectileBullet::SetBlasterColor()
+{
+	const ASTU_BlasterWeapon* BlasterWeapon = Cast<ASTU_BlasterWeapon>(GetOwner());
+	if (!BlasterWeapon) return;
+
+	const APawn* Pawn = Cast<APawn>(BlasterWeapon->GetOwner());
+	if (!Pawn) return;
+
+	const AController* Controller = Pawn->GetController();
+	if (!Controller) return;
+
+	const ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Controller->PlayerState);
+	if (!PlayerState)
+	{
+		TraceFXComponent->SetVariableLinearColor(BlasterColorName, FLinearColor(10.f, 0.f, 0.f));
+		return;
+	}
+
+	const FLinearColor BlasterColor = PlayerState->GetBlasterColor();
+
+	TraceFXComponent->SetVariableLinearColor(BlasterColorName, BlasterColor);
 }

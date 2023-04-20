@@ -42,6 +42,7 @@ protected:
 	virtual void MakeDamage(const FHitResult& HitResult);
 
 	APlayerController* GetPlayerController() const;
+	AController* GetController() const;
 	FVector            GetMuzzleSocketLocation() const;
 
 	bool GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const;

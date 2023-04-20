@@ -23,8 +23,7 @@ void ASTU_BaseWeapon::BeginPlay()
 	CurrentAmmo = DefaultAmmo;
 }
 
-#pragma region Shoot
-
+// Shoot
 void ASTU_BaseWeapon::StartFire()
 {
 	MakeShot();
@@ -106,6 +105,12 @@ APlayerController* ASTU_BaseWeapon::GetPlayerController() const
 	return Player->GetController<APlayerController>();
 }
 
+AController* ASTU_BaseWeapon::GetController() const
+{
+	const auto Pawn = Cast<APawn>(GetOwner());
+	return Pawn ? Pawn->GetController() : nullptr;
+}
+
 bool ASTU_BaseWeapon::GetPlayerViewPoint(FVector& ViewLocation, FRotator& ViewRotation) const
 {
 	const auto OurCharacter = Cast<ACharacter>(GetOwner());
@@ -132,10 +137,7 @@ FVector ASTU_BaseWeapon::GetMuzzleSocketLocation() const
 	return WeaponMesh->GetSocketLocation(SocketName);
 }
 
-#pragma endregion // Shoot
-
-#pragma region Ammo
-
+// Ammo
 FWeaponUIData ASTU_BaseWeapon::GetUIData() const
 {
 	return UIData;
@@ -215,10 +217,8 @@ void ASTU_BaseWeapon::LogAmmo() const
 	FString AmmoInfo = "Ammo: " + FString::FromInt(CurrentAmmo.Bullets) + " | ";
 	AmmoInfo += CurrentAmmo.bInfinite ? "Infinite" : "Clips: " + FString::FromInt(CurrentAmmo.Clips);
 }
-#pragma endregion // Ammo
 
-#pragma region VFX
-
+// VFX
 UNiagaraComponent* ASTU_BaseWeapon::SpawnMuzzleFX() const
 {
 	return UNiagaraFunctionLibrary::SpawnSystemAttached(
@@ -231,4 +231,3 @@ UNiagaraComponent* ASTU_BaseWeapon::SpawnMuzzleFX() const
 		true);
 }
 
-#pragma endregion // VFX

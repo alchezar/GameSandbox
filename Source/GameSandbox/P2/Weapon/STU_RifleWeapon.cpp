@@ -90,7 +90,7 @@ void ASTU_RifleWeapon::MakeDamage(const FHitResult& HitResult)
 	const bool  bHeadshot     = HitResult.BoneName == FName("head");
 	const float CurrentDamage = bHeadshot ? DamageAmount * HeadshotMultiplier : DamageAmount;
 
-	HitActor->TakeDamage(CurrentDamage, FDamageEvent(), GetPlayerController(), this);
+	HitActor->TakeDamage(CurrentDamage, FDamageEvent(), GetController(), this);
 }
 
 void ASTU_RifleWeapon::DecreaseAmmo()

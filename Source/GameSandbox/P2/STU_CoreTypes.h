@@ -75,3 +75,28 @@ struct FImpactData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | VFX")
 	FDecalData DecalData;
 };
+
+USTRUCT(BlueprintType)
+struct FGameData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game", meta = (ClampMin = "1", ClampMax = "16"))
+	int32 PlayersNumber = 2;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game", meta = (ClampMin = "1", ClampMax = "8"))
+	int32 RoundsNum = 4;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game", meta = (ClampMin = "8", ClampMax = "256", Units = "s"))
+	int32 RoundTime = 16;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game", meta = (ClampMin = "1", ClampMax = "20", Units = "s"))
+	int32 RespawnTime = 5;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Team")
+	FLinearColor DefaultTeamColor = FLinearColor::White;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Team")
+	TArray<FLinearColor> TeamColors;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Team")
+	FLinearColor DefaultBlasterColor = FLinearColor(10.f, 0.f, 0.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Team")
+	TArray<FLinearColor> BlasterColors;
+};

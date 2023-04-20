@@ -9,8 +9,6 @@
 class UTextRenderComponent;
 class USTU_HealthComponent;
 class USTU_WeaponComponent;
-class USpringArmComponent;
-class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
@@ -23,20 +21,16 @@ class GAMESANDBOX_API ASTU_BaseCharacter : public ACharacter
 public:
 	ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
+	virtual bool GetIsRunning() const;
+	void         SetPlayerColor(const FLinearColor& NewTeamColor);
+	UFUNCTION(BlueprintCallable, Category = "Kinder | Movement")
+	float GetMovementDirection() const;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnDeathHandle();
 
-#pragma region Component
-
-public:
-	UCameraComponent* GetCameraComp() const;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
-	USpringArmComponent* SpringArmComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
-	UCameraComponent* CameraComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	USTU_HealthComponent* HealthComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
@@ -46,61 +40,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	TArray<UAnimMontage*> DeathAnimations;
 
-private:
-	void SetupComponent();
-
-#pragma endregion // Component
-
-#pragma region Input
-
-public:
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
-	bool GetIsRunning() const;
-	UFUNCTION(BlueprintCallable, Category = "Kinder | Movement")
-	float GetMovementDirection() const;
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputMappingContext* DefaultMappingContext;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* JumpAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* MoveAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* LookAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* RunAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* CrouchAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* FireAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* NextWeaponAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* ReloadAction;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
-	UInputAction* AimAction;
-
-private:
-	void MappingContext() const;
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void CrouchToggle();
-	void StartRun();
-	void StopRun();
-	void TurningInPlace() const;
-
-	bool bRunning = false;
-
-#pragma endregion // Input
-
-#pragma region Health
-
-protected:
-	virtual void OnDeathHandle();
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Damage")
 	float LifeSpanOnDeath = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Damage")
@@ -108,22 +47,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Damage")
 	FVector2D LandedDamage = FVector2D(10.f, 100.f);
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Style")
+	FLinearColor TeamColor = FLinearColor::White;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Style")
+	FName MaterialColorName = "Color";
+
 private:
 	UFUNCTION()
 	void LandedHandle(const FHitResult& Hit);
-
 	void OnHealthChangedHandle(float Health, float HealthDelta);
-
-#pragma endregion // Health
-
-#pragma region Style
-
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Style")
-	FLinearColor TeamColor = FLinearColor::White;
-
-private:
-	void SetTeamColor();
-
-#pragma endregion // Style
 };

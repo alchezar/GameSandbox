@@ -7,6 +7,7 @@
 #include "STU_AIController.generated.h"
 
 class USTU_AIPerceptionComponent;
+class USTU_RespawnComponent;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_AIController : public AAIController
@@ -24,6 +25,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	USTU_AIPerceptionComponent* AIPerceptionComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
+	USTU_RespawnComponent* RespawnComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	FName FocusOnKeyName = "EnemyActor";
 		

@@ -15,8 +15,8 @@ void USTU_Service_FindEnemy::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* 
 	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
 	if (Blackboard)
 	{
-		const AAIController* Controller   = OwnerComp.GetAIOwner();
-		const auto*          AIPerception = Controller->FindComponentByClass<USTU_AIPerceptionComponent>();
+		const AAIController*        Controller   = OwnerComp.GetAIOwner();
+		USTU_AIPerceptionComponent* AIPerception = Controller->FindComponentByClass<USTU_AIPerceptionComponent>();
 		if (AIPerception)
 		{
 			Blackboard->SetValueAsObject(EnemyActorKey.SelectedKeyName, AIPerception->GetClosestEnemy());

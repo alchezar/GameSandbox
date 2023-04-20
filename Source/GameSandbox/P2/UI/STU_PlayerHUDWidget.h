@@ -35,4 +35,5 @@ private:
 	T* GetOwnerComponent() const;
 
 	void OnHealthChangeHandle(float Health, float HealthDelta);
+	void OnNewPawnHandle(APawn* NewPawn);
 };

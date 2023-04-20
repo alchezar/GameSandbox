@@ -34,10 +34,13 @@ protected:
 	FName TraceTargetName = "TraceTarget";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
 	double BlasterBoltLength = 400.0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
+	FName BlasterColorName = "BlasterColor";
 
 private:
 	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult) override;
 	void         UpdateBoltTaleOffset(FVector TaleOffset = FVector::ZeroVector) const;
+	void         SetBlasterColor();
 
 	UPROPERTY()
 	UNiagaraComponent* TraceFXComponent;

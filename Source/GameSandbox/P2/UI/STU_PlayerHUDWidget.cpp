@@ -7,13 +7,24 @@
 
 bool USTU_PlayerHUDWidget::Initialize()
 {
-	USTU_HealthComponent* HealthComponent = GetOwnerComponent<USTU_HealthComponent>();
-	if (HealthComponent)
+	if (GetOwningPlayer())
+	{
+		GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &ThisClass::OnNewPawnHandle);
+	}
+	OnNewPawnHandle(GetOwningPlayerPawn());
+	return Super::Initialize();
+}
+
+// ReSharper disable once CppParameterMayBeConstPtrOrRef
+void USTU_PlayerHUDWidget::OnNewPawnHandle(APawn* NewPawn)
+{
+	if (!NewPawn) return;
+	
+	USTU_HealthComponent* HealthComponent = NewPawn->FindComponentByClass<USTU_HealthComponent>(); // GetOwnerComponent<USTU_HealthComponent>();
+	if (HealthComponent && !HealthComponent->OnHealthChanged.IsBoundToObject(this))
 	{
 		HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangeHandle);
 	}
-
-	return Super::Initialize();
 }
 
 float USTU_PlayerHUDWidget::GetHealthPercent() const
@@ -55,8 +66,8 @@ T* USTU_PlayerHUDWidget::GetOwnerComponent() const
 
 void USTU_PlayerHUDWidget::OnHealthChangeHandle(float Health, const float HealthDelta)
 {
-	if(HealthDelta < 0.f)
+	if (HealthDelta < 0.f)
 	{
-		OnTakeDamage();		
+		OnTakeDamage();
 	}
 }

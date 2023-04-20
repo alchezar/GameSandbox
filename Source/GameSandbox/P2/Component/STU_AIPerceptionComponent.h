@@ -15,8 +15,10 @@ public:
 	USTU_AIPerceptionComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	AActor* GetClosestEnemy() const;
+	AActor* GetClosestEnemy();
 
 protected:
 	virtual void BeginPlay() override;
+
+	bool AreEnemies(const AController* Controller1, const AController* Controller2) const;
 };

@@ -12,7 +12,7 @@ ASTU_AICharacter::ASTU_AICharacter(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	AutoPossessAI     = EAutoPossessAI::PlacedInWorldOrSpawned;
+	AutoPossessAI     = EAutoPossessAI::Disabled;
 	AIControllerClass = ASTU_AIController::StaticClass();
 
 	bUseControllerRotationYaw = false;
@@ -46,5 +46,5 @@ void ASTU_AICharacter::OnDeathHandle()
 	if (AIController && AIController->BrainComponent)
 	{
 		AIController->BrainComponent->Cleanup();
-	}	
+	}
 }

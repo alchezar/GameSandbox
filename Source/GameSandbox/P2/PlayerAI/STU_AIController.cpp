@@ -2,8 +2,9 @@
 
 #include "STU_AIController.h"
 #include "STU_AICharacter.h"
-#include "GameSandbox/P2/Component/STU_AIPerceptionComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Component/STU_RespawnComponent.h"
+#include "GameSandbox/P2/Component/STU_AIPerceptionComponent.h"
 
 ASTU_AIController::ASTU_AIController(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -12,6 +13,10 @@ ASTU_AIController::ASTU_AIController(const FObjectInitializer& ObjectInitializer
 
 	AIPerceptionComponent = CreateDefaultSubobject<USTU_AIPerceptionComponent>("AIPerceptionComponent");
 	SetPerceptionComponent(*AIPerceptionComponent);
+
+	RespawnComponent = CreateDefaultSubobject<USTU_RespawnComponent>("RespawnComponent");
+
+	bWantsPlayerState = true;
 }
 
 void ASTU_AIController::BeginPlay()
