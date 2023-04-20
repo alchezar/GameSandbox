@@ -18,6 +18,7 @@ public:
 	ASTU_GameModeBase();
 	virtual void    StartPlay() override;
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	// Getters
 	FGameData GetGameData() const;
 	int32     GetCurrentRound() const;
@@ -36,13 +37,14 @@ protected:
 	FGameData GameData;
 
 private:
-	void         SpawnBots();
+	void SpawnTeams();
+	void SetupTeammate(const AController* Controller, int32& TeamID);
+
 	void         StartRound();
 	void         GameTimerUpdate();
 	void         ResetPlayers();
 	void         ResetOnePlayer(AController* Controller);
-	void         CreateTeamsInfo() const;
-	FLinearColor GetColorByTeamID(const int32 TeamID,  const TArray<FLinearColor>& Colors, const FLinearColor& Default) const;
+	FLinearColor GetColorByTeamID(const int32 TeamID, const TArray<FLinearColor>& Colors, const FLinearColor& Default) const;
 	void         SetPlayerColor(const AController* Controller) const;
 	void         LogPlayerInfo();
 	void         StartRespawn(const AController* RespawnController) const;

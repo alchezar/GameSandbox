@@ -174,9 +174,9 @@ void ASTU_PlayerCharacter::CheckCameraOverlap()
 	const bool bHideMesh = CameraCollisionComponent->IsOverlappingComponent(GetCapsuleComponent());
 	GetMesh()->SetOwnerNoSee(bHideMesh);
 
-	TArray<USceneComponent*> Children;
-	GetMesh()->GetChildrenComponents(true, OUT Children);
-	for (const auto Child : Children)
+	TArray<USceneComponent*> AllChildren;
+	GetMesh()->GetChildrenComponents(true, OUT AllChildren);
+	for (const auto Child : AllChildren)
 	{
 		if (UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Child))
 		{

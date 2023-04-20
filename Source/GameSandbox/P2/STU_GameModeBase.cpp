@@ -9,6 +9,7 @@
 #include "GameSandbox/P2/UI/STU_GameHUD.h"
 #include "Player/STU_BaseCharacter.h"
 #include "Player/STU_PlayerController.h"
+#include "Player/STU_PlayerStart.h"
 #include "Player/STU_PlayerState.h"
 
 constexpr static int32 MinRoundTimeForRespawn = 10;
@@ -24,34 +25,49 @@ ASTU_GameModeBase::ASTU_GameModeBase()
 void ASTU_GameModeBase::StartPlay()
 {
 	Super::StartPlay();
-	SpawnBots();
-	CreateTeamsInfo();
+
+	SpawnTeams();
 
 	CurrentRound = 1;
 	StartRound();
 }
 
-UClass* ASTU_GameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
-{
-	if (InController && InController->IsA<AAIController>())
-	{
-		return AIPawnClass;
-	}
-	return Super::GetDefaultPawnClassForController_Implementation(InController);
-}
-
-void ASTU_GameModeBase::SpawnBots()
+void ASTU_GameModeBase::SpawnTeams()
 {
 	if (!GetWorld()) return;
+	int32 TeamID = 1;
 
+	// Player
+	for (const auto Player : TActorRange<ASTU_PlayerController>(GetWorld()))
+	{
+		SetupTeammate(Player, TeamID);
+		SetPlayerColor(Player);
+	}
+
+	// Bots
 	for (int32 i = 0; i < GameData.PlayersNumber - 1; ++i)
 	{
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		AAIController* AiController = GetWorld()->SpawnActor<AAIController>(AIControllerClass, SpawnInfo);
+
+		SetupTeammate(AiController, TeamID);
 		RestartPlayer(AiController);
+		SetPlayerColor(AiController);
 	}
+}
+
+void ASTU_GameModeBase::SetupTeammate(const AController* Controller, int32& TeamID)
+{
+	ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Controller->PlayerState);
+	if (!PlayerState) return;
+
+	PlayerState->SetTeamID(TeamID);
+	PlayerState->SetTeamColor(GetColorByTeamID(TeamID, GameData.TeamColors, GameData.DefaultTeamColor));
+	// SetPlayerColor(Controller);
+	PlayerState->SetBlasterColor(GetColorByTeamID(TeamID, GameData.BlasterColors, GameData.DefaultBlasterColor));
+	TeamID = TeamID == 1 ? 2 : 1;
 }
 
 void ASTU_GameModeBase::StartRound()
@@ -96,28 +112,6 @@ void ASTU_GameModeBase::ResetOnePlayer(AController* Controller)
 	}
 	RestartPlayer(Controller);
 	SetPlayerColor(Controller);
-}
-
-void ASTU_GameModeBase::CreateTeamsInfo() const
-{
-	if (!GetWorld()) return;
-
-	int32 TeamID = 1;
-	for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
-	{
-		const AController* Controller = It->Get();
-		if (!Controller) continue;
-
-		ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Controller->PlayerState);
-		if (!PlayerState) continue;
-
-		PlayerState->SetTeamID(TeamID);
-		PlayerState->SetTeamColor(GetColorByTeamID(TeamID, GameData.TeamColors, GameData.DefaultTeamColor));
-		SetPlayerColor(Controller);
-		PlayerState->SetBlasterColor(GetColorByTeamID(TeamID, GameData.BlasterColors, GameData.DefaultBlasterColor));
-
-		TeamID = TeamID == 1 ? 2 : 1;
-	}
 }
 
 FLinearColor ASTU_GameModeBase::GetColorByTeamID(const int32 TeamID, const TArray<FLinearColor>& Colors, const FLinearColor& Default) const
@@ -262,4 +256,36 @@ void ASTU_GameModeBase::GameOver()
 			}
 		}
 	}
+}
+
+UClass* ASTU_GameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
+{
+	if (InController && InController->IsA<AAIController>())
+	{
+		return AIPawnClass;
+	}
+	return Super::GetDefaultPawnClassForController_Implementation(InController);
+}
+
+AActor* ASTU_GameModeBase::ChoosePlayerStart_Implementation(AController* Player)
+{
+	TArray<ASTU_PlayerStart*> StartActors;
+	for (TActorIterator<ASTU_PlayerStart> It(GetWorld(), ASTU_PlayerStart::StaticClass()); It; ++It)
+	{
+		ASTU_PlayerStart* Actor = *It;
+		StartActors.Add(Actor);
+	}
+
+	for (const auto StartActor : StartActors)
+	{
+		if (const ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Player->PlayerState))
+		{
+			const int32 TeamID = PlayerState->GetTeamID(); // debug
+			if (StartActor->TeamID == TeamID)
+			{
+				return StartActor;
+			}
+		}
+	}
+	return Super::ChoosePlayerStart_Implementation(Player);
 }

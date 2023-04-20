@@ -33,7 +33,7 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	int32        TeamID = 0;
+	int32        TeamID = 1;
 	FLinearColor TeamColor;
 	FLinearColor BlasterColor;
 	int32        KillsNum  = 0;
