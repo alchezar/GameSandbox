@@ -2,10 +2,10 @@
 
 #include "STU_ProjectileBase.h"
 #include "DrawDebugHelpers.h"
-#include "Weapon/STU_BaseWeapon.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
+#include "Weapon/STU_BaseWeapon.h"
 
 ASTU_ProjectileBase::ASTU_ProjectileBase()
 {

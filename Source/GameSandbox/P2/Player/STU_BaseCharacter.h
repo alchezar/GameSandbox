@@ -23,18 +23,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
 	virtual bool GetIsRunning() const;
-	void         SetPlayerColor(const FLinearColor& NewTeamColor);
+	void SetPlayerColor(const FLinearColor& NewTeamColor);
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Movement")
 	float GetMovementDirection() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnDeathHandle();
+	virtual void OnHealthChangedHandle(float Health, float HealthDelta);
+
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	USTU_HealthComponent* HealthComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
-	UTextRenderComponent* HealthTextComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	USTU_WeaponComponent* WeaponComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
@@ -55,5 +55,4 @@ protected:
 private:
 	UFUNCTION()
 	void LandedHandle(const FHitResult& Hit);
-	void OnHealthChangedHandle(float Health, float HealthDelta);
 };

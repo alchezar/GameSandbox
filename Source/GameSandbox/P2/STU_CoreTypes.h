@@ -100,3 +100,29 @@ struct FGameData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Team")
 	TArray<FLinearColor> BlasterColors;
 };
+
+UENUM(BlueprintType)
+enum class ESTU_MatchState: uint8
+{
+	WaitingToStart,
+	InProgress,
+	Pause,
+	GameOver
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnMatchStateChangeSignature, ESTU_MatchState);
+
+USTRUCT(BlueprintType)
+struct FLevelData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game")
+	FName LevelName = NAME_None;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game")
+	FName LevelDisplayName = NAME_None;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Game")
+	UTexture2D* LevelThump;
+};
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FOnLevelSelectedSignature, const FLevelData&);

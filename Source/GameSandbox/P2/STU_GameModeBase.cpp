@@ -3,6 +3,7 @@
 #include "STU_GameModeBase.h"
 #include "AIController.h"
 #include "EngineUtils.h"
+#include "STU_GameInstance.h"
 #include "Component/STU_HealthComponent.h"
 #include "Component/STU_RespawnComponent.h"
 #include "Component/STU_WeaponComponent.h"
@@ -27,9 +28,9 @@ void ASTU_GameModeBase::StartPlay()
 	Super::StartPlay();
 
 	SpawnTeams();
-
 	CurrentRound = 1;
 	StartRound();
+	SetMatchState(ESTU_MatchState::InProgress);
 }
 
 void ASTU_GameModeBase::SpawnTeams()
@@ -65,8 +66,8 @@ void ASTU_GameModeBase::SetupTeammate(const AController* Controller, int32& Team
 
 	PlayerState->SetTeamID(TeamID);
 	PlayerState->SetTeamColor(GetColorByTeamID(TeamID, GameData.TeamColors, GameData.DefaultTeamColor));
-	// SetPlayerColor(Controller);
 	PlayerState->SetBlasterColor(GetColorByTeamID(TeamID, GameData.BlasterColors, GameData.DefaultBlasterColor));
+	PlayerState->SetPlayerName(Controller->IsPlayerController() ? "Player" : "Bot");
 	TeamID = TeamID == 1 ? 2 : 1;
 }
 
@@ -180,9 +181,9 @@ void ASTU_GameModeBase::LogPlayerInfo()
 	for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		const AController* Controller = It->Get();
-		if (!Controller) return;
+		if (!Controller) continue;
 		ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Controller->PlayerState);
-		if (!PlayerState) return;
+		if (!PlayerState) continue;;
 
 		if (PlayerState->GetTeamID() == 1)
 		{
@@ -192,9 +193,9 @@ void ASTU_GameModeBase::LogPlayerInfo()
 	for (auto It = GetWorld()->GetControllerIterator(); It; ++It)
 	{
 		const AController* Controller = It->Get();
-		if (!Controller) return;
+		if (!Controller) continue;;
 		ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Controller->PlayerState);
-		if (!PlayerState) return;
+		if (!PlayerState) continue;;
 
 		if (PlayerState->GetTeamID() == 2)
 		{
@@ -238,24 +239,24 @@ void ASTU_GameModeBase::RespawnRequest(AController* RespawnController)
 
 void ASTU_GameModeBase::GameOver()
 {
-	LogPlayerInfo();
+	// LogPlayerInfo();
 
 	for (APawn* Pawn : TActorRange<APawn>(GetWorld()))
 	{
-		if (Pawn)
-		{
-			Pawn->TurnOff();
-			Pawn->DisableInput(nullptr);
+		if (!Pawn) continue;
 
-			if (const ASTU_BaseCharacter* BaseCharacter = Cast<ASTU_BaseCharacter>(Pawn))
+		Pawn->TurnOff();
+		Pawn->DisableInput(nullptr);
+
+		if (const ASTU_BaseCharacter* Character = Cast<ASTU_BaseCharacter>(Pawn))
+		{
+			if (USTU_WeaponComponent* WeaponComponent = Character->FindComponentByClass<USTU_WeaponComponent>())
 			{
-				if (USTU_WeaponComponent* WeaponComponent = BaseCharacter->FindComponentByClass<USTU_WeaponComponent>())
-				{
-					WeaponComponent->StopFire();
-				}
+				WeaponComponent->StopFire();
 			}
 		}
 	}
+	SetMatchState(ESTU_MatchState::GameOver);
 }
 
 UClass* ASTU_GameModeBase::GetDefaultPawnClassForController_Implementation(AController* InController)
@@ -277,7 +278,7 @@ AActor* ASTU_GameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 	}
 
 	for (const auto StartActor : StartActors)
-	{
+	{	
 		if (const ASTU_PlayerState* PlayerState = Cast<ASTU_PlayerState>(Player->PlayerState))
 		{
 			const int32 TeamID = PlayerState->GetTeamID(); // debug
@@ -288,4 +289,34 @@ AActor* ASTU_GameModeBase::ChoosePlayerStart_Implementation(AController* Player)
 		}
 	}
 	return Super::ChoosePlayerStart_Implementation(Player);
+}
+
+void ASTU_GameModeBase::SetMatchState(const ESTU_MatchState NewMatchState)
+{
+	if (MatchState == NewMatchState) return;
+
+	MatchState = NewMatchState;
+	OnMatchStateChange.Broadcast(NewMatchState);
+}
+
+bool ASTU_GameModeBase::SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate)
+{
+	SetMatchState(ESTU_MatchState::Pause);
+
+	const bool bSuperPause = Super::SetPause(PC, CanUnpauseDelegate);
+	if (bSuperPause)
+	{
+		SetMatchState(ESTU_MatchState::Pause);
+	}
+	return bSuperPause;
+}
+
+bool ASTU_GameModeBase::ClearPause()
+{
+	const bool bPauseCleared = Super::ClearPause();
+	if (bPauseCleared)
+	{
+		SetMatchState(ESTU_MatchState::InProgress);
+	}
+	return bPauseCleared;
 }

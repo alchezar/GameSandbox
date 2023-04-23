@@ -1,14 +1,14 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_PlayerCharacter.h"
-#include "Component/STU_CharacterMovementComponent.h"
-#include "GameFramework/SpringArmComponent.h"
-#include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Camera/CameraComponent.h"
+#include "Component/STU_CharacterMovementComponent.h"
 #include "Component/STU_WeaponComponent.h"
-#include "Components/SphereComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 
 ASTU_PlayerCharacter::ASTU_PlayerCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)

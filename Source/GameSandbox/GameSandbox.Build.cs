@@ -26,6 +26,8 @@ public class GameSandbox : ModuleRules
 
 		PublicIncludePaths.AddRange(new[]
 		{
+			"GameSandbox",
+			"GameSandbox/P1",
 			"GameSandbox/P2",
 		});
 

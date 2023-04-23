@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "STU_BaseWidget.h"
 #include "GameSandbox/P2/STU_CoreTypes.h"
 #include "STU_PlayerHUDWidget.generated.h"
 
+class UProgressBar;
+
 UCLASS()
-class GAMESANDBOX_API USTU_PlayerHUDWidget : public UUserWidget
+class GAMESANDBOX_API USTU_PlayerHUDWidget : public USTU_BaseWidget
 {
 	GENERATED_BODY()
 
 public:
-	virtual bool Initialize() override;
-
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
 	float GetHealthPercent() const;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
@@ -25,10 +25,27 @@ public:
 	bool IsPlayerAlive() const;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
 	bool IsPlayerSpectating() const;
+	UFUNCTION(BlueprintCallable, Category = "Kinder | UI")
+	FString FormatBullet(int32 BulletNum);
 
 protected:
+	virtual void NativeOnInitialized() override;
+
 	UFUNCTION(BlueprintImplementableEvent, Category = "Kinder")
 	void OnTakeDamage();
+
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* HealthProgressBar;
+	UPROPERTY(meta = (BindWidgetAnim), Transient)
+	UWidgetAnimation* DamageAnimation;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | HealthBar", meta = (Units = "%"))
+	float VisibilityThreshold = 0.8f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | HealthBar", meta = (Units = "%"))
+	float ColorThreshold = 0.3f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | HealthBar")
+	FLinearColor GoodColor = FLinearColor(0.0f, 0.5f, 0.2f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | HealthBar")
+	FLinearColor BadColor = FLinearColor(1.f, 0.1f, 0.1f);
 
 private:
 	template <class T>
@@ -36,4 +53,5 @@ private:
 
 	void OnHealthChangeHandle(float Health, float HealthDelta);
 	void OnNewPawnHandle(APawn* NewPawn);
+	void UpdateHealthBar();
 };

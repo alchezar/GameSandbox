@@ -1,18 +1,20 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_PlayerHUDWidget.h"
+#include "Components/ProgressBar.h"
 #include "GameSandbox/P2/STU_CoreTypes.h"
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
 #include "GameSandbox/P2/Component/STU_WeaponComponent.h"
 
-bool USTU_PlayerHUDWidget::Initialize()
+void  USTU_PlayerHUDWidget::NativeOnInitialized()
 {
+	Super::NativeOnInitialized();
+	
 	if (GetOwningPlayer())
 	{
 		GetOwningPlayer()->GetOnNewPawnNotifier().AddUObject(this, &ThisClass::OnNewPawnHandle);
 	}
 	OnNewPawnHandle(GetOwningPlayerPawn());
-	return Super::Initialize();
 }
 
 // ReSharper disable once CppParameterMayBeConstPtrOrRef
@@ -25,6 +27,7 @@ void USTU_PlayerHUDWidget::OnNewPawnHandle(APawn* NewPawn)
 	{
 		HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangeHandle);
 	}
+	UpdateHealthBar();
 }
 
 float USTU_PlayerHUDWidget::GetHealthPercent() const
@@ -57,6 +60,21 @@ bool USTU_PlayerHUDWidget::IsPlayerSpectating() const
 	return Controller && Controller->GetStateName() == NAME_Spectating;
 }
 
+FString USTU_PlayerHUDWidget::FormatBullet(const int32 BulletNum)
+{
+	constexpr int32 MaxLen = 3;
+	constexpr TCHAR PrefixSymbol = '0';
+
+	FString BulletString = FString::FromInt(BulletNum);
+	const auto SymbolsToAdd = MaxLen - BulletString.Len();
+
+	if (SymbolsToAdd > 0)
+	{
+		BulletString = FString::ChrN(SymbolsToAdd, PrefixSymbol).Append(BulletString);
+	}
+	return BulletString;
+}
+
 template <class T>
 T* USTU_PlayerHUDWidget::GetOwnerComponent() const
 {
@@ -68,6 +86,20 @@ void USTU_PlayerHUDWidget::OnHealthChangeHandle(float Health, const float Health
 {
 	if (HealthDelta < 0.f)
 	{
-		OnTakeDamage();
+		// OnTakeDamage();
+		if (!IsAnimationPlaying(DamageAnimation))
+		{
+			PlayAnimation(DamageAnimation);
+		}
+		
+	}
+	UpdateHealthBar();
+}
+
+void USTU_PlayerHUDWidget::UpdateHealthBar()
+{
+	if (HealthProgressBar)
+	{
+		HealthProgressBar->SetFillColorAndOpacity(GetHealthPercent() > ColorThreshold ? GoodColor : BadColor);
 	}
 }

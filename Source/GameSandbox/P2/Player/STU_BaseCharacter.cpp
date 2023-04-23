@@ -2,7 +2,6 @@
 
 #include "STU_BaseCharacter.h"
 #include "Components/CapsuleComponent.h"
-#include "Components/TextRenderComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
@@ -19,9 +18,6 @@ ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializ
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
 	HealthComponent     = CreateDefaultSubobject<USTU_HealthComponent>("HealthComponent");
-	HealthTextComponent = CreateDefaultSubobject<UTextRenderComponent>("HealthTextComponent");
-	HealthTextComponent->SetupAttachment(GetRootComponent());
-	HealthTextComponent->SetOwnerNoSee(true);
 
 	WeaponComponent = CreateDefaultSubobject<USTU_WeaponComponent>("WeaponComponent");
 }
@@ -59,7 +55,7 @@ void ASTU_BaseCharacter::LandedHandle(const FHitResult& Hit)
 
 void ASTU_BaseCharacter::OnHealthChangedHandle(const float Health, float HealthDelta)
 {
-	HealthTextComponent->SetText(FText::AsNumber(static_cast<int>(Health)));
+	
 }
 
 void ASTU_BaseCharacter::OnDeathHandle()

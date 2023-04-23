@@ -3,8 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STU_CoreTypes.h"
 #include "GameFramework/HUD.h"
 #include "STU_GameHUD.generated.h"
+
+class USTU_BaseWidget;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_GameHUD : public AHUD
@@ -18,9 +21,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kider | UI")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
 	TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
+	TSubclassOf<UUserWidget> PauseWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
+	TSubclassOf<UUserWidget> GameOverWidgetClass;
+	
 private:
 	void DrawCrossHair();
+	void OnMatchStateChangedHandle(ESTU_MatchState NewState);
+
+	UPROPERTY()
+	TMap<ESTU_MatchState, USTU_BaseWidget*> GameWidgets;
+	UPROPERTY()
+	USTU_BaseWidget* CurrentWidget = nullptr;
 };

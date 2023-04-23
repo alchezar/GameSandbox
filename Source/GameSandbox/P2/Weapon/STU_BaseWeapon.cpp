@@ -2,11 +2,11 @@
 
 #include "STU_BaseWeapon.h"
 #include "DrawDebugHelpers.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-#include "NiagaraFunctionLibrary.h"
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {

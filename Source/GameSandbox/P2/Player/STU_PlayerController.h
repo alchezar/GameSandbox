@@ -3,9 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "STU_CoreTypes.h"
 #include "GameFramework/PlayerController.h"
 #include "STU_PlayerController.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
 class USTU_RespawnComponent;
 
 UCLASS()
@@ -17,8 +20,18 @@ public:
 	ASTU_PlayerController();
 
 protected:
+	virtual void BeginPlay() override;
+	virtual void SetupInputComponent() override;
 	// virtual void OnPossess(APawn* InPawn) override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	USTU_RespawnComponent* RespawnComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputMappingContext* DefaultMappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* PauseAction;
+	
+private:
+	void OnPausedGame();
+	void OnMatchStateChanged(ESTU_MatchState State);
 };

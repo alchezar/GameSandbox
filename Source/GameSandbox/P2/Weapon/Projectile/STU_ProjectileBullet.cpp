@@ -4,13 +4,12 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
-#include "Weapon/STU_BlasterWeapon.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "GameFramework/Character.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
 #include "Player/STU_PlayerState.h"
+#include "Weapon/STU_BlasterWeapon.h"
 
 ASTU_ProjectileBullet::ASTU_ProjectileBullet()
 {
