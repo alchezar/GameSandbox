@@ -89,13 +89,9 @@ void ASTU_RifleWeapon::MakeDamage(const FHitResult& HitResult)
 	AActor* HitActor = HitResult.GetActor();
 	if (!HitActor) return;
 
-	//TODO: head bone name hardcode isn`t great idea 😅 it will be better to make an array
-	const bool bHeadshot      = HitResult.BoneName == FName("head");
-	const float CurrentDamage = bHeadshot ? DamageAmount * HeadshotMultiplier : DamageAmount;
-
 	FPointDamageEvent DamageEvent;
 	DamageEvent.HitInfo = HitResult;
-	HitActor->TakeDamage(CurrentDamage, DamageEvent, GetController(), this);
+	HitActor->TakeDamage(DamageAmount, DamageEvent, GetController(), this);
 }
 
 void ASTU_RifleWeapon::DecreaseAmmo()

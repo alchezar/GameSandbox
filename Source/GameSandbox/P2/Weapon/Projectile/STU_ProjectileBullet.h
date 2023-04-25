@@ -22,9 +22,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Bullet")
-	float HeadshotMultiplier = 10.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Bullet")
 	float GravityScale = 0.f;
 

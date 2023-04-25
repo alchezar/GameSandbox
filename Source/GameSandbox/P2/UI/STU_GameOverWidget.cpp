@@ -75,7 +75,7 @@ FText USTU_GameOverWidget::TextFromInt(const int32 Num)
 
 void USTU_GameOverWidget::OnResetLevel()
 {
-	// FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
-	FString LevelName = GetWorld()->GetMapName();
+	FString LevelName = UGameplayStatics::GetCurrentLevelName(this);
+	// FString LevelName = GetWorld()->GetMapName();
 	UGameplayStatics::OpenLevel(this, FName(LevelName));
 }

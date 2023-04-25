@@ -6,6 +6,7 @@
 #include "Perception/AISenseConfig_Sight.h"
 #include "Perception/AISense_Sight.h"
 #include "Player/STU_PlayerState.h"
+#include "Perception/AISense_Damage.h"
 
 USTU_AIPerceptionComponent::USTU_AIPerceptionComponent()
 {
@@ -30,7 +31,11 @@ AActor* USTU_AIPerceptionComponent::GetClosestEnemy()
 
 	TArray<AActor*> PerceiveActors;
 	GetCurrentlyPerceivedActors(UAISense_Sight::StaticClass(), OUT PerceiveActors);
-	if (PerceiveActors.IsEmpty()) return nullptr;
+	if (PerceiveActors.IsEmpty())
+	{
+		GetCurrentlyPerceivedActors(UAISense_Damage::StaticClass(), OUT PerceiveActors);
+		if (PerceiveActors.IsEmpty()) return nullptr;
+	}
 
 	const AController* Controller = Cast<AController>(GetOwner());
 	if (!Controller) return nullptr;

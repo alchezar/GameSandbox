@@ -306,6 +306,7 @@ bool ASTU_GameModeBase::SetPause(APlayerController* PC, FCanUnpause CanUnpauseDe
 	const bool bSuperPause = Super::SetPause(PC, CanUnpauseDelegate);
 	if (bSuperPause)
 	{
+		StopAllFire();
 		SetMatchState(ESTU_MatchState::Pause);
 	}
 	return bSuperPause;
@@ -319,4 +320,16 @@ bool ASTU_GameModeBase::ClearPause()
 		SetMatchState(ESTU_MatchState::InProgress);
 	}
 	return bPauseCleared;
+}
+
+void ASTU_GameModeBase::StopAllFire()
+{
+	for(const auto Pawn : TActorRange<APawn>(GetWorld()))
+	{
+		USTU_WeaponComponent* WeaponComponent = Pawn->FindComponentByClass<USTU_WeaponComponent>();
+		if (!WeaponComponent) continue;
+
+		WeaponComponent->StopFire();
+		WeaponComponent->ToggleAim(false);
+	}
 }

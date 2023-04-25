@@ -45,6 +45,7 @@ private:
 	void StartRespawn(const AController* RespawnController) const;
 	void GameOver();
 	void SetMatchState(ESTU_MatchState NewMatchState);
+	void StopAllFire();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")

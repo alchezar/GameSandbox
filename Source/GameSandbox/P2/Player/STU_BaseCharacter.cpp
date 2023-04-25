@@ -2,7 +2,6 @@
 
 #include "STU_BaseCharacter.h"
 
-#include "STU_PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -12,7 +11,6 @@
 #include "GameSandbox/P2/Component/STU_WeaponComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Sound/SoundCue.h"
-#include "Weapon/STU_BlasterWeapon.h"
 
 ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTU_CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -22,8 +20,7 @@ ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializ
 	bUseControllerRotationYaw                         = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 
-	HealthComponent     = CreateDefaultSubobject<USTU_HealthComponent>("HealthComponent");
-
+	HealthComponent = CreateDefaultSubobject<USTU_HealthComponent>("HealthComponent");
 	WeaponComponent = CreateDefaultSubobject<USTU_WeaponComponent>("WeaponComponent");
 }
 
@@ -59,9 +56,7 @@ void ASTU_BaseCharacter::LandedHandle(const FHitResult& Hit)
 }
 
 void ASTU_BaseCharacter::OnHealthChangedHandle(const float Health, float HealthDelta)
-{
-	
-}
+{ }
 
 void ASTU_BaseCharacter::OnDeathHandle()
 {
@@ -102,4 +97,19 @@ float ASTU_BaseCharacter::GetMovementDirection() const
 	const auto AngleBetween   = FMath::Acos(FVector::DotProduct(GetActorForwardVector(), VelocityNormal));
 	const auto CrossProduct   = FVector::CrossProduct(GetActorForwardVector(), VelocityNormal);
 	return FMath::RadiansToDegrees(AngleBetween) * FMath::Sign(CrossProduct.Z);
+}
+
+void ASTU_BaseCharacter::TurnOff()
+{
+	WeaponComponent->StopFire();
+	WeaponComponent->ToggleAim(false);
+	Super::TurnOff();	
+}
+
+void ASTU_BaseCharacter::Reset()
+{
+	WeaponComponent->StopFire();
+	WeaponComponent->ToggleAim(false);
+	Super::Reset();
+	
 }
