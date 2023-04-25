@@ -21,7 +21,7 @@ public:
 
 	virtual void StartFire() override;
 	virtual void StopFire() override;
-
+	virtual void ToggleAim(const bool bAim) override;
 	FVector GetShootDirection() const;
 
 protected:
@@ -37,7 +37,8 @@ protected:
 	float BulletSpread = 3.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "s"))
 	float TimeBetweenShots = 0.1f;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "deg"))
+	float ZoomFOV = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	TSubclassOf<ASTU_ProjectileBullet> BulletClass;
 
@@ -47,6 +48,8 @@ private:
 
 	UPROPERTY()
 	UNiagaraComponent* MuzzleFXComponent;
-	FTimerHandle       ShotTimer;
-	FVector            ShootDirection;
+	FTimerHandle ShotTimer;
+	FVector ShootDirection;
+	float DefaultBulletSpread = 0.f;
+	float DefaultCameraFOV = 90.f;
 };

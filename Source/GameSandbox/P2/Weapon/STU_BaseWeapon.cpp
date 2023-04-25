@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {
@@ -30,14 +32,17 @@ void ASTU_BaseWeapon::StartFire()
 }
 
 void ASTU_BaseWeapon::StopFire()
-{ }
+{}
 
 void ASTU_BaseWeapon::Aiming()
 {
-	if (IsAmmoEmpty() || !CanAim()) return;
+	if (IsAmmoEmpty() || !GetCanAim()) return;
 }
 
-bool ASTU_BaseWeapon::CanAim() const
+void ASTU_BaseWeapon::ToggleAim(const bool bAim)
+{}
+
+bool ASTU_BaseWeapon::GetCanAim() const
 {
 	return bCanAim;
 }
@@ -50,6 +55,11 @@ bool ASTU_BaseWeapon::CanReload() const
 FRotator ASTU_BaseWeapon::GetWeaponSocketRotation() const
 {
 	return WeaponMesh->GetSocketRotation(SocketName);
+}
+
+void ASTU_BaseWeapon::SetCanAim(const bool bAim)
+{
+	bCanAim = bAim;
 }
 
 void ASTU_BaseWeapon::MakeShot()
@@ -230,4 +240,3 @@ UNiagaraComponent* ASTU_BaseWeapon::SpawnMuzzleFX() const
 		EAttachLocation::SnapToTarget,
 		true);
 }
-

@@ -1,6 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "STU_BaseCharacter.h"
+
+#include "STU_PlayerController.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -8,6 +10,9 @@
 #include "GameSandbox/P2/Component/STU_CharacterMovementComponent.h"
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
 #include "GameSandbox/P2/Component/STU_WeaponComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
+#include "Weapon/STU_BlasterWeapon.h"
 
 ASTU_BaseCharacter::ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<USTU_CharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
@@ -68,6 +73,9 @@ void ASTU_BaseCharacter::OnDeathHandle()
 
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 	WeaponComponent->StopFire();
+	WeaponComponent->ToggleAim(false);
+
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), DeathSound, GetActorLocation());
 
 	/* After every death check if there is even one player left in the team   */
 	// Cast<ASTU_GameModeBase>(GetWorld()->GetAuthGameMode())->StopRoundWhenAllTeamDead();

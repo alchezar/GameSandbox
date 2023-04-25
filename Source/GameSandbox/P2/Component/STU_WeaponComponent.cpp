@@ -34,12 +34,11 @@ void USTU_WeaponComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	Super::EndPlay(EndPlayReason);
 }
 
-#pragma region Weapon
-
+// Weapon
 void USTU_WeaponComponent::SpawnWeapons()
 {
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
-	if (!Character || !GetWorld()) return;
+	if (!Character) return;
 
 	for (auto [WeaponClass, ReloadAnimation] : WeaponData)
 	{
@@ -75,6 +74,14 @@ void USTU_WeaponComponent::Aiming()
 	CurrentWeapon->Aiming();
 }
 
+void USTU_WeaponComponent::ToggleAim(const bool bAim)
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->ToggleAim(bAim);
+	}
+}
+
 void USTU_WeaponComponent::AttachWeaponToSocket(ASTU_BaseWeapon* Weapon, USceneComponent* SceneComponent, const FName& SocketName)
 {
 	if (!Weapon || !SceneComponent) return;
@@ -93,40 +100,52 @@ void USTU_WeaponComponent::EquipWeapon(const int32 Index)
 	if (CurrentWeapon)
 	{
 		CurrentWeapon->StopFire();
+		CurrentWeapon->ToggleAim(false);
 		AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), BackSocketName);
 	}
 
-	CurrentWeapon = Weapons[Index];
-	// CurrentReloadAnimation = WeaponData[Index].ReloadAnimation;
-	const auto CurrentWeaponData = WeaponData.FindByPredicate([&](const FWeaponData Data)
-	{
-		return Data.WeaponClass == CurrentWeapon->GetClass();
-	});
-	CurrentReloadAnimation = CurrentWeaponData ? CurrentWeaponData->ReloadAnimation : nullptr;
+	CurrentWeapon          = Weapons[Index];
+	CurrentReloadAnimation = WeaponData[Index].ReloadAnimation;
+
+	// const FWeaponData* CurrentWeaponData = WeaponData.FindByPredicate([&](const FWeaponData Data)
+	// {
+	// 	return Data.WeaponClass == CurrentWeapon->GetClass();
+	// });
+	// CurrentReloadAnimation = CurrentWeaponData ? CurrentWeaponData->ReloadAnimation : nullptr;
 
 	AttachWeaponToSocket(CurrentWeapon, Character->GetMesh(), HandSocketName);
 }
 
 void USTU_WeaponComponent::NextWeapon()
 {
-	if (IsWeaponChanging()) return;
+	if (GetIsWeaponChanging()) return;
 
 	CurrentWeaponIndex = (CurrentWeaponIndex + 1) % Weapons.Num();
 	PlayAnimMontage(EquipAnimation);
-	bWeaponChanging  = true;
-	bWeaponReloading = false;
-	// On the middle of animation will be called OnChangedFinished from notify delegate
-	// On the end of animation will be called OnEquipFinished from notify delegate
+	SetIsWeaponChanging(true);
+	SetIsWeaponReloading(false);
+	/* On the middle of animation will be called OnChangedFinished from notify delegate
+	 * On the end of animation will be called OnEquipFinished from notify delegate*/
 }
 
-bool USTU_WeaponComponent::IsWeaponChanging() const
+bool USTU_WeaponComponent::GetIsWeaponChanging() const
 {
 	return bWeaponChanging;
 }
 
-bool USTU_WeaponComponent::IsWeaponReloading() const
+bool USTU_WeaponComponent::GetIsWeaponReloading() const
 {
 	return bWeaponReloading;
+}
+
+void USTU_WeaponComponent::SetIsWeaponChanging(const bool bChanging)
+{
+	bWeaponChanging = bChanging;
+}
+
+void USTU_WeaponComponent::SetIsWeaponReloading(const bool bReloading)
+{
+	bWeaponReloading = bReloading;
 }
 
 bool USTU_WeaponComponent::CanFire() const
@@ -177,7 +196,7 @@ void USTU_WeaponComponent::ChangeClip()
 	CurrentWeapon->StopFire();
 	CurrentWeapon->ChangeClip();
 	PlayAnimMontage(CurrentReloadAnimation);
-	bWeaponReloading = true;
+	SetIsWeaponReloading(true);
 }
 
 bool USTU_WeaponComponent::GetWeaponUIData(FWeaponUIData& UIData) const
@@ -224,10 +243,7 @@ bool USTU_WeaponComponent::NeedAmmo(TSubclassOf<ASTU_BaseWeapon> WeaponType)
 	return false;
 }
 
-#pragma endregion // Weapon
-
-#pragma  region Animation
-
+// Animation
 void USTU_WeaponComponent::PlayAnimMontage(UAnimMontage* Animation)
 {
 	ACharacter* Character = Cast<ACharacter>(GetOwner());
@@ -236,37 +252,40 @@ void USTU_WeaponComponent::PlayAnimMontage(UAnimMontage* Animation)
 	Character->PlayAnimMontage(Animation);
 }
 
-void USTU_WeaponComponent::InitAnimations()
+template <typename T>
+T* USTU_WeaponComponent::FindNotifyByClass(UAnimSequenceBase* Animation)
 {
-	if (EquipAnimation)
-	{
-		TArray<FAnimNotifyEvent> NotifyEvents = EquipAnimation->Notifies;
-		for (const FAnimNotifyEvent NotifyEvent : NotifyEvents)
-		{
-			const auto EquipFinishedNotify = Cast<USTU_AnimNotify_EquipFinished>(NotifyEvent.Notify);
-			if (EquipFinishedNotify)
-			{
-				EquipFinishedNotify->OnFinishedNotified.AddUObject(this, &ThisClass::OnEquipFinished);
-				break;
-			}
+	if (!Animation) return nullptr;
 
-			const auto EquipChangedNotify = Cast<USTU_AnimNotify_WeaponChanged>(NotifyEvent.Notify);
-			if (EquipChangedNotify)
-			{
-				EquipChangedNotify->OnChangedNotified.AddUObject(this, &ThisClass::OnChangedFinished);
-			}
+	const TArray<FAnimNotifyEvent> NotifyEvents = Animation->Notifies;
+	for (auto NotifyEvent : NotifyEvents)
+	{
+		if (auto AnimNotify = Cast<T>(NotifyEvent.Notify))
+		{
+			return AnimNotify;
 		}
 	}
-	if (CurrentReloadAnimation)
+	return nullptr;
+}
+
+void USTU_WeaponComponent::InitAnimations()
+{
+	// Looking for multiple notifies in one animation, same for all weapons
+	if (const auto EquipFinishedNotify = FindNotifyByClass<USTU_AnimNotify_EquipFinished>(EquipAnimation))
 	{
-		TArray<FAnimNotifyEvent> NotifyEvents = CurrentReloadAnimation->Notifies;
-		for (const FAnimNotifyEvent NotifyEvent : NotifyEvents)
+		EquipFinishedNotify->OnFinishedNotified.AddUObject(this, &ThisClass::OnEquipFinished);
+	}
+	if (const auto EquipChangedNotify = FindNotifyByClass<USTU_AnimNotify_WeaponChanged>(EquipAnimation))
+	{
+		EquipChangedNotify->OnChangedNotified.AddUObject(this, &ThisClass::OnChangedFinished);
+	}
+
+	// Looking the notify in animations, unique to each weapon
+	for (auto [WeaponClass, ReloadAnimation] : WeaponData)
+	{
+		if (const auto EquipReloadedNotify = FindNotifyByClass<USTU_AnimNotify_ReloadFinished>(ReloadAnimation))
 		{
-			const auto EquipReloadedNotify = Cast<USTU_AnimNotify_ReloadFinished>(NotifyEvent.Notify);
-			if (EquipReloadedNotify)
-			{
-				EquipReloadedNotify->OnReloadedNotified.AddUObject(this, &ThisClass::OnReloadFinished);
-			}
+			EquipReloadedNotify->OnReloadedNotified.AddUObject(this, &ThisClass::OnReloadFinished);
 		}
 	}
 }
@@ -277,7 +296,7 @@ void USTU_WeaponComponent::OnEquipFinished(USkeletalMeshComponent* MeshComp)
 	const ACharacter* Character = Cast<ACharacter>(GetOwner());
 	if (!Character || Character->GetMesh() != MeshComp) return;
 
-	bWeaponChanging = false;
+	SetIsWeaponChanging(false);
 }
 
 void USTU_WeaponComponent::OnChangedFinished(USkeletalMeshComponent* MeshComp)
@@ -293,7 +312,5 @@ void USTU_WeaponComponent::OnReloadFinished(USkeletalMeshComponent* MeshComp)
 	const ACharacter* Character = Cast<ACharacter>(GetOwner());
 	if (!Character || Character->GetMesh() != MeshComp) return;
 
-	bWeaponReloading = false;
+	SetIsWeaponReloading(false);
 }
-
-#pragma endregion // Animation

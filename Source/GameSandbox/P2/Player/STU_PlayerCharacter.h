@@ -9,6 +9,9 @@
 class USpringArmComponent;
 class UCameraComponent;
 class USphereComponent;
+class UInputMappingContext;
+class UInputAction;
+struct FInputActionValue;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_PlayerCharacter : public ASTU_BaseCharacter
@@ -20,13 +23,27 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual bool GetIsRunning() const override;
-
 	UCameraComponent* GetCameraComp() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnDeathHandle() override;
 
+private:
+	UFUNCTION()
+	void OnCameraCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void OnCameraCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	void CheckCameraOverlap();	
+	void MappingContext() const;
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void CrouchToggle();
+	void StartRun();
+	void StopRun();
+	void TurningInPlace() const;
+	
+protected:
 	// Components
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	USpringArmComponent* SpringArmComponent;
@@ -59,19 +76,5 @@ protected:
 #pragma endregion // Input
 
 private:
-	UFUNCTION()
-	void OnCameraCollisionBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
-	UFUNCTION()
-	void OnCameraCollisionEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	void CheckCameraOverlap();
-	
-	void MappingContext() const;
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void CrouchToggle();
-	void StartRun();
-	void StopRun();
-	void TurningInPlace() const;
-
 	bool bRunning = false;
 };

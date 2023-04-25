@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "STU_BasePickup.generated.h"
 
+class USoundCue;
 class USphereComponent;
 
 UCLASS()
@@ -27,6 +28,8 @@ protected:
 	USphereComponent* SphereComponent;
 	UPROPERTY(EditAnywhere, Category = "Kinder | Pickup", meta = (Units = "s"))
 	float RespawnTime = 5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
+	USoundCue* PickupSound;
 
 private:
 	virtual bool TryToGivePickup(APawn* PlayerPawn);

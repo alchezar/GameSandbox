@@ -4,6 +4,7 @@
 #include "STU_Projectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 ASTU_LauncherWeapon::ASTU_LauncherWeapon()
 {
@@ -25,7 +26,7 @@ void ASTU_LauncherWeapon::StopFire()
 
 void ASTU_LauncherWeapon::Aiming()
 {
-	if (IsAmmoEmpty() || !CanAim()) return;
+	if (IsAmmoEmpty() || !GetCanAim()) return;
 
 	DrawProjectilePath();
 }
@@ -37,7 +38,12 @@ void ASTU_LauncherWeapon::ChangeClip()
 
 void ASTU_LauncherWeapon::MakeShot()
 {
-	if (!GetWorld() || IsAmmoEmpty()) return;
+	if (!GetWorld()) return;
+	if (IsAmmoEmpty())
+	{
+		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), NoAmmoSound, GetMuzzleSocketLocation());
+		return;
+	}
 
 	FVector TraceStart, TraceEnd;
 	if (!GetTraceData(OUT TraceStart, OUT TraceEnd)) return;
@@ -59,6 +65,8 @@ void ASTU_LauncherWeapon::MakeShot()
 	}
 	DecreaseAmmo();
 	SpawnMuzzleFX();
+
+	UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, SocketName);
 }
 
 void ASTU_LauncherWeapon::DrawProjectilePath()

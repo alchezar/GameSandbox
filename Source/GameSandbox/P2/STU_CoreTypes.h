@@ -3,6 +3,8 @@
 #include "STU_CoreTypes.generated.h"
 
 class ASTU_BaseWeapon;
+class USoundCue;
+class UNiagaraSystem;
 
 // Health
 DECLARE_MULTICAST_DELEGATE(FOnDeathSignature);
@@ -48,8 +50,6 @@ struct FWeaponUIData
 
 // VFX
 
-class UNiagaraSystem;
-
 USTRUCT(BlueprintType)
 struct FDecalData
 {
@@ -74,6 +74,8 @@ struct FImpactData
 	UNiagaraSystem* NiagaraEffect;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | VFX")
 	FDecalData DecalData;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | VFX")
+	USoundCue* Sound;	
 };
 
 USTRUCT(BlueprintType)

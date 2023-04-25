@@ -15,7 +15,7 @@ class GAMESANDBOX_API USTU_HealthComponent : public UActorComponent
 public:
 	USTU_HealthComponent();
 
-	FOnDeathSignature         OnDeath;
+	FOnDeathSignature OnDeath;
 	FOnHealthChangedSignature OnHealthChanged;
 
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Health")
@@ -24,9 +24,9 @@ public:
 	float GetHealthPercent() const;
 
 	float GetHealth() const;
-	bool  TryToAddHealth(float PickedHealth);
-	bool  IsHealthFull() const;
-	void  Killed(const AController* KillerController) const;
+	bool TryToAddHealth(float PickedHealth);
+	bool IsHealthFull() const;
+	void Killed(const AController* KillerController) const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -48,10 +48,13 @@ protected:
 private:
 	UFUNCTION()
 	void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	void OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser);
+	void OnTakeRadialDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, FVector Origin, FHitResult HitInfo, AController* InstigatedBy, AActor* DamageCauser);;
+
 	void SetHealth(float NewHealth);
 	void Healing();
 	void PlayCameraShake() const;
 
-	float        Health = 0.f;
+	float Health = 0.f;
 	FTimerHandle HealTimer;
 };

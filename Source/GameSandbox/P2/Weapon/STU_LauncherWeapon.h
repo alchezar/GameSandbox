@@ -27,7 +27,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	TSubclassOf<ASTU_Projectile> ProjectileClass;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
+	USoundCue* NoAmmoSound;
+	
 private:
 	void DrawProjectilePath();
 };

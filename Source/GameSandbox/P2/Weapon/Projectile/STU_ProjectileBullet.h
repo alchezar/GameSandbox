@@ -39,12 +39,12 @@ protected:
 
 private:
 	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult) override;
-	void         UpdateBoltTaleOffset(FVector TaleOffset = FVector::ZeroVector) const;
-	void         SetBlasterColor();
+	void UpdateBoltTaleOffset(FVector TaleOffset = FVector::ZeroVector) const;
+	void SetBlasterColor();
 
 	UPROPERTY()
 	UNiagaraComponent* TraceFXComponent;
-	FVector            ForwardVector;
+	FVector ForwardVector;
 
 	FVector StartLocation;
 };

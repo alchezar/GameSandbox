@@ -25,27 +25,16 @@ public:
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	virtual bool SetPause(APlayerController* PC, FCanUnpause CanUnpauseDelegate) override;
 	virtual bool ClearPause() override;
-	// Getters
 	FGameData GetGameData() const;
 	int32 GetCurrentRound() const;
 	int32 GetRoundCountDown() const;
-	//
 	void StopRoundWhenAllTeamDead();
 	void Killed(const AController* KillerController, const AController* VictimController);
 	void RespawnRequest(AController* RespawnController);
 
-protected:
-	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
-	TSubclassOf<AAIController> AIControllerClass;
-	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
-	TSubclassOf<APawn> AIPawnClass;
-	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
-	FGameData GameData;
-
 private:
 	void SpawnTeams();
 	void SetupTeammate(const AController* Controller, int32& TeamID);
-
 	void StartRound();
 	void GameTimerUpdate();
 	void ResetPlayers();
@@ -57,6 +46,15 @@ private:
 	void GameOver();
 	void SetMatchState(ESTU_MatchState NewMatchState);
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
+	TSubclassOf<AAIController> AIControllerClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
+	TSubclassOf<APawn> AIPawnClass;
+	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Game")
+	FGameData GameData;
+
+private:
 	int32 CurrentRound   = 1;
 	int32 RoundCountDown = 0;
 	FTimerHandle GameRoundHandle;

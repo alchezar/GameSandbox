@@ -6,12 +6,9 @@
 #include "GameFramework/Character.h"
 #include "STU_BaseCharacter.generated.h"
 
-class UTextRenderComponent;
 class USTU_HealthComponent;
 class USTU_WeaponComponent;
-class UInputMappingContext;
-class UInputAction;
-struct FInputActionValue;
+class USoundCue;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_BaseCharacter : public ACharacter
@@ -32,7 +29,11 @@ protected:
 	virtual void OnDeathHandle();
 	virtual void OnHealthChangedHandle(float Health, float HealthDelta);
 
+private:
+	UFUNCTION()
+	void LandedHandle(const FHitResult& Hit);
 
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
 	USTU_HealthComponent* HealthComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Components")
@@ -52,7 +53,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Style")
 	FName MaterialColorName = "Color";
 
-private:
-	UFUNCTION()
-	void LandedHandle(const FHitResult& Hit);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
+	USoundCue* DeathSound;
 };

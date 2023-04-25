@@ -21,7 +21,9 @@ void USTU_HealthComponent::BeginPlay()
 
 	AActor* Owner = GetOwner();
 	if (!Owner) return;
-	Owner->OnTakeAnyDamage.AddDynamic(this, &USTU_HealthComponent::OnTakeAnyDamageHandle);
+	Owner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnTakeAnyDamageHandle);
+	Owner->OnTakePointDamage.AddDynamic(this, &ThisClass::OnTakePointDamage);
+	Owner->OnTakeRadialDamage.AddDynamic(this, &ThisClass::OnTakeRadialDamage);
 }
 
 float USTU_HealthComponent::GetHealth() const
@@ -60,6 +62,12 @@ void USTU_HealthComponent::OnTakeAnyDamageHandle(AActor* DamagedActor, const flo
 	}
 	PlayCameraShake();
 }
+
+void USTU_HealthComponent::OnTakePointDamage(AActor* DamagedActor, float Damage, AController* InstigatedBy, FVector HitLocation, UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const UDamageType* DamageType, AActor* DamageCauser)
+{ }
+
+void USTU_HealthComponent::OnTakeRadialDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, FVector Origin, FHitResult HitInfo, AController* InstigatedBy, AActor* DamageCauser)
+{ }
 
 bool USTU_HealthComponent::IsDead() const
 {
@@ -109,7 +117,7 @@ void USTU_HealthComponent::Killed(const AController* KillerController) const
 	ASTU_GameModeBase* GameMode = Cast<ASTU_GameModeBase>(GetWorld()->GetAuthGameMode());
 	if (!GameMode) return;
 
-	const APawn*       Player           = Cast<APawn>(GetOwner());
+	const APawn* Player                 = Cast<APawn>(GetOwner());
 	const AController* VictimController = Player ? Player->GetController() : nullptr;
 
 	GameMode->Killed(KillerController, VictimController);

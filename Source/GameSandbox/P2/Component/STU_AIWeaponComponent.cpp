@@ -48,8 +48,8 @@ void USTU_AIWeaponComponent::NextWeapon()
 		CurrentWeaponIndex = NextIndex;
 
 		PlayAnimMontage(EquipAnimation);
-		bWeaponChanging  = true;
-		bWeaponReloading = false;
+		SetIsWeaponChanging(true);
+		SetIsWeaponReloading(false);
 		// EquipWeapon(CurrentWeaponIndex);
 	}
 }

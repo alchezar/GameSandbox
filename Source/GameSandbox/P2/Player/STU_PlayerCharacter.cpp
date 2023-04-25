@@ -78,6 +78,10 @@ void ASTU_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	EnhancedInput->BindAction(NextWeaponAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::NextWeapon);
 	EnhancedInput->BindAction(ReloadAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::Reload);
 	EnhancedInput->BindAction(AimAction, ETriggerEvent::Triggered, WeaponComponent, &USTU_WeaponComponent::Aiming);
+	EnhancedInput->BindAction<USTU_WeaponComponent, bool>
+							 (AimAction, ETriggerEvent::Started, WeaponComponent, &USTU_WeaponComponent::ToggleAim, true);
+	EnhancedInput->BindAction<USTU_WeaponComponent, bool>
+							 (AimAction, ETriggerEvent::Completed, WeaponComponent, &USTU_WeaponComponent::ToggleAim, false);
 }
 
 void ASTU_PlayerCharacter::Move(const FInputActionValue& Value)
@@ -85,8 +89,8 @@ void ASTU_PlayerCharacter::Move(const FInputActionValue& Value)
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	if (!Controller) return;
 
-	FRotator      Rotation = FRotator(0.0, GetControlRotation().Yaw, 0.0);
-	const FVector Forward  = Rotation.Vector();
+	FRotator Rotation     = FRotator(0.0, GetControlRotation().Yaw, 0.0);
+	const FVector Forward = Rotation.Vector();
 	AddMovementInput(Forward, MovementVector.Y);
 
 	Rotation.Roll       = GetControlRotation().Roll;
@@ -128,7 +132,7 @@ void ASTU_PlayerCharacter::CrouchToggle()
 void ASTU_PlayerCharacter::TurningInPlace() const
 {
 	const double RotatorDelta = FMath::FindDeltaAngleDegrees(GetActorRotation().Yaw, GetControlRotation().Yaw);
-	const bool   bMove        = GetVelocity().Size() > 0.0;
+	const bool bMove          = GetVelocity().Size() > 0.0;
 
 	// Billet for adding an in-place turning animation blueprint depending on the left or right turn
 	if (bMove || !bMove && (RotatorDelta > 100.0 || RotatorDelta < -100.0))

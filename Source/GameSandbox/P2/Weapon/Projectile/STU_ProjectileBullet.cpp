@@ -39,10 +39,12 @@ void ASTU_ProjectileBullet::OnProjectileHit(UPrimitiveComponent* HitComponent, A
 	if (!HitActor) return;
 
 	//TODO: head bone name hardcode isn`t great idea 😅 it will be better to make an array
-	const bool  bHeadshot     = HitResult.BoneName == FName("head");
+	const bool bHeadshot      = HitResult.BoneName == FName("head");
 	const float CurrentDamage = bHeadshot ? DamageAmount * HeadshotMultiplier : DamageAmount;
 
-	HitActor->TakeDamage(CurrentDamage, FDamageEvent(), GetController(), this);
+	FPointDamageEvent DamageEvent;
+	DamageEvent.HitInfo = HitResult;
+	HitActor->TakeDamage(CurrentDamage, DamageEvent, GetController(), this);
 	WeaponFXComponent->PlayImpactFX(HitResult);
 	Destroy();
 }

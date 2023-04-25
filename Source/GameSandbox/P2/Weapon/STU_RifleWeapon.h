@@ -9,6 +9,7 @@
 class USTU_WeaponFXComponent;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UAudioComponent;
 
 UCLASS()
 class GAMESANDBOX_API ASTU_RifleWeapon : public ASTU_BaseWeapon
@@ -50,11 +51,13 @@ protected:
 	float TaleLength = 200.f;
 	
 private:
-	void InitMuzzleFX();
-	void SetMuzzleFXVisibility(bool Visible);
+	void InitFX();
+	void SetFXActive(bool IsActive);
 	void SpawnTraceFX(const FVector& TraceStart, const FVector& TraceEnd);
 	
 	UPROPERTY()
 	UNiagaraComponent* MuzzleFXComponent;	
 	FTimerHandle ShotTimer;
+	UPROPERTY()
+	UAudioComponent* FireAudioComponent;
 };

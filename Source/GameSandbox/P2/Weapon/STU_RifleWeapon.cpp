@@ -4,9 +4,12 @@
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/AudioComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Engine/World.h"
 #include "GameSandbox/P2/Weapon/Component/STU_WeaponFXComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Sound/SoundCue.h"
 
 ASTU_RifleWeapon::ASTU_RifleWeapon()
 {
@@ -25,13 +28,13 @@ void ASTU_RifleWeapon::StartFire()
 {
 	GetWorldTimerManager().SetTimer(ShotTimer, this, &ASTU_RifleWeapon::MakeShot, TimeBetweenShots, true);
 	MakeShot();
-	InitMuzzleFX();
+	InitFX();
 }
 
 void ASTU_RifleWeapon::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimer);
-	SetMuzzleFXVisibility(false);
+	SetFXActive(false);
 }
 
 void ASTU_RifleWeapon::MakeShot()
@@ -66,11 +69,11 @@ void ASTU_RifleWeapon::MakeShot()
 
 bool ASTU_RifleWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 {
-	FVector  ViewLocation;
+	FVector ViewLocation;
 	FRotator ViewRotation;
 	if (!GetPlayerViewPoint(OUT ViewLocation,OUT ViewRotation)) return false;
 	TraceStart                   = ViewLocation;
-	const auto    HalfRad        = FMath::DegreesToRadians(BulletSpread / 2);
+	const auto HalfRad           = FMath::DegreesToRadians(BulletSpread / 2);
 	const FVector ShootDirection = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
 	TraceEnd                     = TraceStart + ShootDirection * TraceMaxDistance;
 	return true;
@@ -87,10 +90,12 @@ void ASTU_RifleWeapon::MakeDamage(const FHitResult& HitResult)
 	if (!HitActor) return;
 
 	//TODO: head bone name hardcode isn`t great idea 😅 it will be better to make an array
-	const bool  bHeadshot     = HitResult.BoneName == FName("head");
+	const bool bHeadshot      = HitResult.BoneName == FName("head");
 	const float CurrentDamage = bHeadshot ? DamageAmount * HeadshotMultiplier : DamageAmount;
 
-	HitActor->TakeDamage(CurrentDamage, FDamageEvent(), GetController(), this);
+	FPointDamageEvent DamageEvent;
+	DamageEvent.HitInfo = HitResult;
+	HitActor->TakeDamage(CurrentDamage, DamageEvent, GetController(), this);
 }
 
 void ASTU_RifleWeapon::DecreaseAmmo()
@@ -103,21 +108,29 @@ void ASTU_RifleWeapon::DecreaseAmmo()
 	}
 }
 
-void ASTU_RifleWeapon::InitMuzzleFX()
+void ASTU_RifleWeapon::InitFX()
 {
 	if (!MuzzleFXComponent)
 	{
 		MuzzleFXComponent = SpawnMuzzleFX();
 	}
-	SetMuzzleFXVisibility(true);
+	if (!FireAudioComponent)
+	{
+		FireAudioComponent = UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, SocketName);
+	}
+	SetFXActive(true);
 }
 
-void ASTU_RifleWeapon::SetMuzzleFXVisibility(const bool Visible)
+void ASTU_RifleWeapon::SetFXActive(const bool IsActive)
 {
 	if (MuzzleFXComponent)
 	{
-		MuzzleFXComponent->SetPaused(!Visible);
-		MuzzleFXComponent->SetVisibility(Visible);
+		MuzzleFXComponent->SetPaused(!IsActive);
+		MuzzleFXComponent->SetVisibility(IsActive);
+	}
+	if (FireAudioComponent)
+	{
+		IsActive ? FireAudioComponent->Play() : FireAudioComponent->Stop();
 	}
 }
 

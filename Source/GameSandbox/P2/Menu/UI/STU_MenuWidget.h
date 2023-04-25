@@ -11,6 +11,7 @@ class UButton;
 class UHorizontalBox;
 class USTU_GameInstance;
 class USTU_Menu_LevelItem;
+class USoundCue;
 
 UCLASS()
 class GAMESANDBOX_API USTU_MenuWidget : public USTU_BaseWidget
@@ -31,6 +32,8 @@ protected:
 	TSubclassOf<USTU_Menu_LevelItem> LevelItemWidgetClass;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* HideAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
+	USoundCue* StartGameSound;
 		
 private:
 	UFUNCTION()

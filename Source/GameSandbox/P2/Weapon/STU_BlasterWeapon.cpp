@@ -4,7 +4,9 @@
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
 #include "Engine/World.h"
+#include "Kismet/GameplayStatics.h"
 #include "Projectile/STU_ProjectileBullet.h"
+#include "Sound/SoundCue.h"
 
 ASTU_BlasterWeapon::ASTU_BlasterWeapon()
 {
@@ -14,6 +16,7 @@ ASTU_BlasterWeapon::ASTU_BlasterWeapon()
 void ASTU_BlasterWeapon::BeginPlay()
 {
 	Super::BeginPlay();
+	DefaultBulletSpread = BulletSpread;
 }
 
 void ASTU_BlasterWeapon::StartFire()
@@ -27,6 +30,19 @@ void ASTU_BlasterWeapon::StopFire()
 {
 	GetWorldTimerManager().ClearTimer(ShotTimer);
 	SetMuzzleFXVisibility(false);
+}
+
+void ASTU_BlasterWeapon::ToggleAim(const bool bAim)
+{
+	const APlayerController* Controller = Cast<APlayerController>(GetController());
+	if (!Controller || !Controller->PlayerCameraManager) return;
+
+	if (bAim)
+	{
+		DefaultCameraFOV = Controller->PlayerCameraManager->GetFOVAngle();
+	}
+	Controller->PlayerCameraManager->SetFOV(bAim ? ZoomFOV : DefaultCameraFOV);
+	BulletSpread = bAim ? BulletSpread / 2 : DefaultBulletSpread;
 }
 
 void ASTU_BlasterWeapon::MakeShot()
@@ -53,11 +69,12 @@ void ASTU_BlasterWeapon::MakeShot()
 		SpawnProjectile->FinishSpawning(SpawnTransform);
 	}
 	DecreaseAmmo();
+	UGameplayStatics::SpawnSoundAttached(FireSound, WeaponMesh, SocketName);
 }
 
 bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 {
-	FVector  ViewLocation;
+	FVector ViewLocation;
 	FRotator ViewRotation;
 	if (!GetPlayerViewPoint(OUT ViewLocation,OUT ViewRotation)) return false;
 

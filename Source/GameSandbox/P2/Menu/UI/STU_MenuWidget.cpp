@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Menu/UI/STU_Menu_LevelItem.h"
+#include "Sound/SoundCue.h"
 
 void USTU_MenuWidget::NativeOnInitialized()
 {
@@ -25,7 +26,8 @@ void USTU_MenuWidget::NativeOnInitialized()
 
 void USTU_MenuWidget::OnGameStart()
 {
-	PlayAnimation(HideAnimation);	
+	PlayAnimation(HideAnimation);
+	UGameplayStatics::PlaySound2D(GetWorld(), StartGameSound);
 }
 
 void USTU_MenuWidget::OnAnimationFinished_Implementation(const UWidgetAnimation* Animation)

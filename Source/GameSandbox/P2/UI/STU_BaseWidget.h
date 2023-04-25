@@ -6,7 +6,11 @@
 #include "Blueprint/UserWidget.h"
 #include "STU_BaseWidget.generated.h"
 
-UCLASS()
+class USoundCue;
+
+UCLASS
+
+()
 class GAMESANDBOX_API USTU_BaseWidget : public UUserWidget
 {
 	GENERATED_BODY()
@@ -17,4 +21,6 @@ public:
 protected:
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* ShowAnimation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
+	USoundCue* OpenSound;
 };
