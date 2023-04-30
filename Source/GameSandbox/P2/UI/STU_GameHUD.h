@@ -21,17 +21,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	void DrawCrossHair();
+	void OnMatchStateChangedHandle(ESTU_MatchState NewState);
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
 	TSubclassOf<UUserWidget> PlayerHUDWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
 	TSubclassOf<UUserWidget> PauseWidgetClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
 	TSubclassOf<UUserWidget> GameOverWidgetClass;
-	
-private:
-	void DrawCrossHair();
-	void OnMatchStateChangedHandle(ESTU_MatchState NewState);
 
+private:
 	UPROPERTY()
 	TMap<ESTU_MatchState, USTU_BaseWidget*> GameWidgets;
 	UPROPERTY()

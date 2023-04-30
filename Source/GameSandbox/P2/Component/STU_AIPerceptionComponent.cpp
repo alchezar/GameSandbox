@@ -4,9 +4,9 @@
 #include "GameSandbox/P2/Component/STU_HealthComponent.h"
 #include "Perception/AISenseConfig.h"
 #include "Perception/AISenseConfig_Sight.h"
+#include "Perception/AISense_Damage.h"
 #include "Perception/AISense_Sight.h"
 #include "Player/STU_PlayerState.h"
-#include "Perception/AISense_Damage.h"
 
 USTU_AIPerceptionComponent::USTU_AIPerceptionComponent()
 {

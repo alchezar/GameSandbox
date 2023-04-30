@@ -21,7 +21,18 @@ class GAMESANDBOX_API USTU_MenuWidget : public USTU_BaseWidget
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void OnAnimationFinished_Implementation(const UWidgetAnimation* Animation) override;
-	
+
+private:
+	UFUNCTION()
+	void OnGameStart();
+	UFUNCTION()
+	void OnGameQuit();
+	void InitLevelItems();
+	void OnLevelSelected(const FLevelData& Data);
+	UFUNCTION()
+	USTU_GameInstance* GetCurrentGameInstance() const;
+
+protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* StartGameButton;
 	UPROPERTY(meta = (BindWidget))
@@ -34,17 +45,8 @@ protected:
 	UWidgetAnimation* HideAnimation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
 	USoundCue* StartGameSound;
-		
-private:
-	UFUNCTION()
-	void OnGameStart();
-	UFUNCTION()
-	void OnGameQuit();
-	void InitLevelItems();
-	void OnLevelSelected(const FLevelData& Data);
-	UFUNCTION()
-	USTU_GameInstance* GetCurrentGameInstance() const;
 
+private:
 	UPROPERTY()
-	TArray<USTU_Menu_LevelItem*> LevelItemWidgets; 
+	TArray<USTU_Menu_LevelItem*> LevelItemWidgets;
 };

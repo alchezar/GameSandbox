@@ -17,13 +17,19 @@ class GAMESANDBOX_API ASTU_BasePickup : public AActor
 public:
 	ASTU_BasePickup();
 	virtual void Tick(float DeltaTime) override;
-
 	bool CouldBeTaken() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
+private:
+	virtual bool TryToGivePickup(APawn* PlayerPawn);
+	void PickupWasTaken();
+	void Respawn();
+	void GenerateRotationYaw();
+
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Pickup")
 	USphereComponent* SphereComponent;
 	UPROPERTY(EditAnywhere, Category = "Kinder | Pickup", meta = (Units = "s"))
@@ -32,12 +38,6 @@ protected:
 	USoundCue* PickupSound;
 
 private:
-	virtual bool TryToGivePickup(APawn* PlayerPawn);
-
-	void PickupWasTaken();
-	void Respawn();
-	void GenerateRotationYaw();
-
 	FTimerHandle RespawnTimer;
-	double       RotationYaw = 1.5;
+	double RotationYaw = 1.5;
 };

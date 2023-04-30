@@ -15,11 +15,10 @@ class GAMESANDBOX_API USTU_HealthComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:
-	USTU_HealthComponent();
-
 	FOnDeathSignature OnDeath;
 	FOnHealthChangedSignature OnHealthChanged;
 
+	USTU_HealthComponent();
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Health")
 	bool IsDead() const;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Health")

@@ -13,11 +13,8 @@ class GAMESANDBOX_API USTU_CharacterMovementComponent : public UCharacterMovemen
 
 public:
 	USTU_CharacterMovementComponent();
-
 	virtual float GetMaxSpeed() const override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Speed", meta = (ClampMin = "1.5", ClampMax = "3.0"))
 	float RunModifier = 2.f;
-
-protected:
 };

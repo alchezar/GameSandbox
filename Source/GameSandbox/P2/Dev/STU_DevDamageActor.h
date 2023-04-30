@@ -21,7 +21,6 @@ protected:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	USceneComponent* SceneComponent;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	float Radius = 200.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")

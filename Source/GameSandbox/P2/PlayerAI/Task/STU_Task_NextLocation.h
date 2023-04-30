@@ -20,7 +20,6 @@ protected:
 	float Radius = 1000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | AI")
 	FBlackboardKeySelector AimLocationKey;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | AI")
 	bool bSelfCenter = true;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | AI", meta = (EditCondition = "!bSelfCenter"))

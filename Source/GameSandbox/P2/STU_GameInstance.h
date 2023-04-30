@@ -16,13 +16,11 @@ public:
 	FLevelData GetStartupLevel() const;
 	FName GetMainLevelName() const;
 	TArray<FLevelData> GetLevelsData() const;
-
 	void SetStartupLevel(const FLevelData& Data);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Game")
 	TArray<FLevelData> LevelsData;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Game")
 	FName MainLevelName = NAME_None;
 

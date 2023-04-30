@@ -30,10 +30,18 @@ public:
 
 protected:
 	virtual void NativeOnInitialized() override;
-
 	UFUNCTION(BlueprintImplementableEvent, Category = "Kinder")
 	void OnTakeDamage();
 
+private:
+	template <class T>
+	T* GetOwnerComponent() const;
+
+	void OnHealthChangeHandle(float Health, float HealthDelta);
+	void OnNewPawnHandle(APawn* NewPawn);
+	void UpdateHealthBar();
+
+protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* HealthProgressBar;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
@@ -46,12 +54,4 @@ protected:
 	FLinearColor GoodColor = FLinearColor(0.0f, 0.5f, 0.2f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | HealthBar")
 	FLinearColor BadColor = FLinearColor(1.f, 0.1f, 0.1f);
-
-private:
-	template <class T>
-	T* GetOwnerComponent() const;
-
-	void OnHealthChangeHandle(float Health, float HealthDelta);
-	void OnNewPawnHandle(APawn* NewPawn);
-	void UpdateHealthBar();
 };

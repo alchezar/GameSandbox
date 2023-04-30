@@ -20,12 +20,21 @@ public:
 	FOnLevelSelectedSignature OnLevelSelected;
 
 	FLevelData GetLevelData() const;
-	void       SetLevelData(const FLevelData& Data);
-	void SetSelected (bool bSelected);
+	void SetLevelData(const FLevelData& Data);
+	void SetSelected(bool bSelected);
 
 protected:
 	virtual void NativeOnInitialized() override;
 
+private:
+	UFUNCTION()
+	void OnLevelItemClicked();
+	UFUNCTION()
+	void OnLevelItemHovered();
+	UFUNCTION()
+	void OnLevelItemUnHovered();
+
+protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* LevelSelectButton;
 	UPROPERTY(meta = (BindWidget))
@@ -36,12 +45,5 @@ protected:
 	UImage* FrameImage;
 
 private:
-	UFUNCTION()
-	void OnLevelItemClicked();
-	UFUNCTION()
-	void OnLevelItemHovered();
-	UFUNCTION()
-	void OnLevelItemUnHovered();
-
 	FLevelData LevelData;
 };

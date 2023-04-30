@@ -15,7 +15,6 @@ class GAMESANDBOX_API ASTU_LauncherWeapon : public ASTU_BaseWeapon
 
 public:
 	ASTU_LauncherWeapon();
-
 	virtual void StartFire() override;
 	virtual void StopFire() override;
 	virtual void Aiming() override;
@@ -25,11 +24,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void MakeShot() override;
 
+private:
+	void DrawProjectilePath();
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	TSubclassOf<ASTU_Projectile> ProjectileClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Sound")
 	USoundCue* NoAmmoSound;
-	
-private:
-	void DrawProjectilePath();
 };

@@ -18,10 +18,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Pickup", meta = (ClampMin = "1.0", ClampMax = "100.0"))
-	float HealAmount = 50.f;
-
 private:
 	virtual bool TryToGivePickup(APawn* PlayerPawn) override;
 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Pickup", meta = (ClampMin = "1.0", ClampMax = "100.0"))
+	float HealAmount = 50.f;
 };

@@ -16,20 +16,20 @@ class GAMESANDBOX_API ASTU_AIController : public AAIController
 
 public:
 	ASTU_AIController(const FObjectInitializer& ObjectInitializer);
-	
 	virtual void Tick(float DeltaTime) override;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* InPawn) override;
 
+private:
+	AActor* GetFocusOnActor();
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	USTU_AIPerceptionComponent* AIPerceptionComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	USTU_RespawnComponent* RespawnComponent;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	FName FocusOnKeyName = "EnemyActor";
-		
-private:
-	AActor* GetFocusOnActor();
 };

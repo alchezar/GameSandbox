@@ -17,22 +17,25 @@ class GAMESANDBOX_API ASTU_ProjectileBase : public AActor
 
 public:
 	ASTU_ProjectileBase();
-
 	UProjectileMovementComponent* GetMovementComponent();
-	float                         GetLifeTime() const;
-	void                          SetShotDirection(const FVector& Direction);
+	float GetLifeTime() const;
+	void SetShotDirection(const FVector& Direction);
 
 protected:
 	virtual void BeginPlay() override;
 	AController* GetController() const;
 
+private:
+	UFUNCTION()
+	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult);
+
+protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Projectile | Components")
 	USphereComponent* CollisionComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Projectile | Components")
 	UProjectileMovementComponent* MovementComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Projectile | VFX")
 	USTU_WeaponFXComponent* WeaponFXComponent;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Projectile")
 	float DamageAmount = 50.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Projectile", meta = (Units = "cm"))
@@ -43,8 +46,5 @@ protected:
 	float LifeTime = 5.f;
 
 private:
-	UFUNCTION()
-	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult);
-
 	FVector ShotDirection = FVector(1.0, 0.0, 0.0);
 };

@@ -13,7 +13,6 @@ class GAMESANDBOX_API USTU_RespawnComponent : public UActorComponent
 
 public:
 	USTU_RespawnComponent();
-
 	void Respawn(int32 RespawnTime);
 	int32 GetRespawnCountDown() const;
 	bool IsRespawnInProgress() const;

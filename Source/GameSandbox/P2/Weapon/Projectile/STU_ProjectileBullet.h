@@ -17,15 +17,19 @@ class GAMESANDBOX_API ASTU_ProjectileBullet : public ASTU_ProjectileBase
 public:
 	ASTU_ProjectileBullet();
 	virtual void Tick(float DeltaTime) override;
-
 	void SpawnTraceFX();
 
 protected:
 	virtual void BeginPlay() override;
-	
+
+private:
+	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult) override;
+	void UpdateBoltTaleOffset(FVector TaleOffset = FVector::ZeroVector) const;
+	void SetBlasterColor();
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Bullet")
 	float GravityScale = 0.f;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
 	UNiagaraSystem* TraceFX;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace FX")
@@ -36,13 +40,8 @@ protected:
 	FName BlasterColorName = "BlasterColor";
 
 private:
-	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& HitResult) override;
-	void UpdateBoltTaleOffset(FVector TaleOffset = FVector::ZeroVector) const;
-	void SetBlasterColor();
-
 	UPROPERTY()
 	UNiagaraComponent* TraceFXComponent;
 	FVector ForwardVector;
-
 	FVector StartLocation;
 };

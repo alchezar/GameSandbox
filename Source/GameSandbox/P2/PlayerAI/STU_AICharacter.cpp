@@ -52,7 +52,7 @@ void ASTU_AICharacter::OnHealthChangedHandle(float Health, float HealthDelta)
 {
 	Super::OnHealthChangedHandle(Health, HealthDelta);
 
-	USTU_HealthBarWidget* HealthBarWidget = Cast<USTU_HealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
+	const USTU_HealthBarWidget* HealthBarWidget = Cast<USTU_HealthBarWidget>(HealthWidgetComponent->GetUserWidgetObject());
 	if (!HealthBarWidget) return;
 
 	HealthBarWidget->SetHealthPercent(HealthComponent->GetHealthPercent());

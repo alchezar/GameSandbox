@@ -18,10 +18,10 @@ class GAMESANDBOX_API ASTU_BaseCharacter : public ACharacter
 public:
 	ASTU_BaseCharacter(const FObjectInitializer& ObjectInitializer);
 	virtual void Tick(float DeltaTime) override;
-	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
-	virtual bool GetIsRunning() const;
 	virtual void TurnOff() override;
 	virtual void Reset() override;
+	UFUNCTION(BlueprintCallable, Category = "Kinder | Input")
+	virtual bool GetIsRunning() const;
 	void SetPlayerColor(const FLinearColor& NewTeamColor);
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Movement")
 	float GetMovementDirection() const;

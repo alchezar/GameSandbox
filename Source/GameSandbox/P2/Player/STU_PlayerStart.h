@@ -12,7 +12,6 @@ class GAMESANDBOX_API ASTU_PlayerStart : public APlayerStart
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this actor's properties
 	ASTU_PlayerStart(const FObjectInitializer& ObjectInitializer);
 
 	/*~ To take more control over PlayerStart selection, you can override the
@@ -22,6 +21,5 @@ public:
 	int32 TeamID = 0;
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 };

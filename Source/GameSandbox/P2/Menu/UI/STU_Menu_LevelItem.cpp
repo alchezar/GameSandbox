@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "Menu/UI/STU_Menu_LevelItem.h"
-#include "Components/Image.h"
 #include "Components/Button.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
 
 void USTU_Menu_LevelItem::NativeOnInitialized()

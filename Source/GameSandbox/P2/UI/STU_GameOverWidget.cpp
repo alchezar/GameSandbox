@@ -2,11 +2,11 @@
 
 #include "STU_GameOverWidget.h"
 #include "STU_GameModeBase.h"
+#include "Components/Button.h"
 #include "Components/VerticalBox.h"
+#include "Kismet/GameplayStatics.h"
 #include "Player/STU_PlayerState.h"
 #include "UI/STU_PlayerStatRowWidget.h"
-#include "Components/Button.h"
-#include "Kismet/GameplayStatics.h"
 
 void USTU_GameOverWidget::NativeOnInitialized()
 {

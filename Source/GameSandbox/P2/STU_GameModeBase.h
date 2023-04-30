@@ -16,10 +16,9 @@ class GAMESANDBOX_API ASTU_GameModeBase : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	ASTU_GameModeBase();
-
 	FOnMatchStateChangeSignature OnMatchStateChange;
-
+	
+	ASTU_GameModeBase();
 	virtual void StartPlay() override;
 	virtual UClass* GetDefaultPawnClassForController_Implementation(AController* InController) override;
 	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;

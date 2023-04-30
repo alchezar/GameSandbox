@@ -18,7 +18,6 @@ class GAMESANDBOX_API ASTU_BlasterWeapon : public ASTU_BaseWeapon
 
 public:
 	ASTU_BlasterWeapon();
-
 	virtual void StartFire() override;
 	virtual void StopFire() override;
 	virtual void ToggleAim(const bool bAim) override;
@@ -28,9 +27,13 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void MakeShot() override;
 	virtual bool GetTraceData(FVector& TraceStart, FVector& TraceEnd) override;
-
 	virtual void DecreaseAmmo() override;
 
+private:
+	void InitMuzzleFX();
+	void SetMuzzleFXVisibility(bool Visible);
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon")
 	float DamageAmount = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Weapon", meta = (Units = "deg"))
@@ -43,13 +46,10 @@ protected:
 	TSubclassOf<ASTU_ProjectileBullet> BulletClass;
 
 private:
-	void InitMuzzleFX();
-	void SetMuzzleFXVisibility(bool Visible);
-
 	UPROPERTY()
 	UNiagaraComponent* MuzzleFXComponent;
 	FTimerHandle ShotTimer;
 	FVector ShootDirection;
 	float DefaultBulletSpread = 0.f;
-	float DefaultCameraFOV = 90.f;
+	float DefaultCameraFOV    = 90.f;
 };

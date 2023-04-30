@@ -18,12 +18,12 @@ class GAMESANDBOX_API USTU_WeaponFXComponent : public UActorComponent
 public:
 	USTU_WeaponFXComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	void PlayImpactFX(const FHitResult& Hit);
 
 protected:
 	virtual void BeginPlay() override;
 
+protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Impact FX")
 	FImpactData DefaultImpactData;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Impact FX")

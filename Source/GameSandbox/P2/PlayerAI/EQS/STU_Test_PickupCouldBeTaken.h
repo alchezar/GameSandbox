@@ -13,6 +13,5 @@ class GAMESANDBOX_API USTU_Test_PickupCouldBeTaken : public UEnvQueryTest
 
 public:
 	USTU_Test_PickupCouldBeTaken(const FObjectInitializer& ObjectInitializer);
-
 	virtual void RunTest(FEnvQueryInstance& QueryInstance) const override;
 };

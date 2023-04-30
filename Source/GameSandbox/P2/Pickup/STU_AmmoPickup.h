@@ -20,11 +20,12 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	virtual bool TryToGivePickup(APawn* PlayerPawn) override;
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Pickup", meta = (ClampMin = "1.0", ClampMax = "10.0"))
 	int32 Clips;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Pickup")
 	TSubclassOf<ASTU_BaseWeapon> WeaponType;
-
-private:
-	virtual bool TryToGivePickup(APawn* PlayerPawn) override;
 };

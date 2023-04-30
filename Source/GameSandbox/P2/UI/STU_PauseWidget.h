@@ -16,10 +16,11 @@ class GAMESANDBOX_API USTU_PauseWidget : public USTU_BaseWidget
 protected:
 	virtual void NativeOnInitialized() override;
 
-	UPROPERTY(meta = (BindWidget))
-	UButton* ClearPauseButton;
-
 private:
 	UFUNCTION()
 	void OnClearPause();
+
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UButton* ClearPauseButton;
 };

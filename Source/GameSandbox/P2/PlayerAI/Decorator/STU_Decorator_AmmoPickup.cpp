@@ -3,7 +3,6 @@
 #include "STU_Decorator_AmmoPickup.h"
 #include "AIController.h"
 #include "Component/STU_WeaponComponent.h"
-#include "Weapon/STU_BaseWeapon.h"
 
 USTU_Decorator_AmmoPickup::USTU_Decorator_AmmoPickup()
 {

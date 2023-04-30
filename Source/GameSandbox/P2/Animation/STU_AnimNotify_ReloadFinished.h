@@ -14,7 +14,7 @@ class GAMESANDBOX_API USTU_AnimNotify_ReloadFinished : public UAnimNotify
 	GENERATED_BODY()
 
 public:
-	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-
 	FOnReloadedNotifiedSignature OnReloadedNotified;
+
+	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 };

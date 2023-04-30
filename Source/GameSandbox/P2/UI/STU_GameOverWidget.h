@@ -19,6 +19,14 @@ class GAMESANDBOX_API USTU_GameOverWidget : public USTU_BaseWidget
 protected:
 	virtual void NativeOnInitialized() override;
 
+private:
+	void OnMatchStateChanged(ESTU_MatchState State);
+	void UpdatePlayerStat();
+	UFUNCTION()
+	void OnResetLevel();
+	static FText TextFromInt(int32 Num);
+
+protected:
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* PlayerStatBox;
 	UPROPERTY(meta = (BindWidget))
@@ -27,12 +35,4 @@ protected:
 	UButton* ResetLevelButton;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | UI")
 	TSubclassOf<UUserWidget> PlayerStatRowWidgetClass;
-
-private:
-	void OnMatchStateChanged(ESTU_MatchState State);
-	void UpdatePlayerStat();
-	UFUNCTION()
-	void OnResetLevel();
-
-	static FText TextFromInt(int32 Num);
 };

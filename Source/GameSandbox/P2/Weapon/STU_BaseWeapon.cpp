@@ -7,8 +7,6 @@
 #include "Engine/World.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
-#include "Kismet/GameplayStatics.h"
-#include "Sound/SoundCue.h"
 
 ASTU_BaseWeapon::ASTU_BaseWeapon()
 {

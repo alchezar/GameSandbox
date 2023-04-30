@@ -3,12 +3,9 @@
 #include "STU_HealthComponent.h"
 #include "STU_GameModeBase.h"
 #include "Camera/CameraShakeBase.h"
-// #include "GameFramework/Actor.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/Controller.h"
 #include "Perception/AISense_Damage.h"
-// #include "GameFramework/Pawn.h"
-// #include "PhysicalMaterials/PhysicalMaterial.h"
 
 USTU_HealthComponent::USTU_HealthComponent()
 {
