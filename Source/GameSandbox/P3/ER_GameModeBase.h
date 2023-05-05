@@ -16,9 +16,9 @@ class GAMESANDBOX_API AER_GameModeBase : public AGameModeBase
 public:
 	AER_GameModeBase();
 	virtual void Tick(float DeltaTime) override;
-
 	void CreateInitialFloorTiles();
-	AER_FloorTile* AddFloorTile();
+	AER_FloorTile* AddFloorTile(const bool bSpawnObstacles);
+	void RestartLevel();
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,7 +28,17 @@ public:
 	TSubclassOf<AER_FloorTile> FloorTileClass;
 	UPROPERTY(EditAnywhere, Category = "Kinder | Config")
 	int32 InitialFloorTilesNum = 10;
-	
+
 	FTransform NextSpawnPointLocation;
-	TArray<float> LaneSwitchValues; 
+	TArray<float> LaneSwitchValues;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Game")
+	float RespawnTime = 2.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Game")
+	FName LevelName = "EndlessRunner";
+
+private:
+	FTimerHandle RestartTimer;
+
 };

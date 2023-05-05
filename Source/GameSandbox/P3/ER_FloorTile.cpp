@@ -3,6 +3,7 @@
 #include "ER_FloorTile.h"
 #include "ER_Character.h"
 #include "ER_GameModeBase.h"
+#include "ER_Obstacle.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -58,7 +59,7 @@ void AER_FloorTile::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCompone
 {
 	if (!OtherActor || !Cast<AER_Character>(OtherActor)) return;
 
-	RunGameMode->AddFloorTile();
+	RunGameMode->AddFloorTile(true);
 
 	FTimerHandle DestroyTimer;
 	GetWorld()->GetTimerManager().SetTimer(OUT DestroyTimer, this, &ThisClass::DestroyFloorTile, DestroyDelay);
@@ -66,6 +67,10 @@ void AER_FloorTile::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCompone
 
 void AER_FloorTile::DestroyFloorTile()
 {
+	for (const auto Obstacle : Obstacles)
+	{
+		Obstacle->Destroy();
+	}	
 	Destroy();
 }
 
@@ -83,4 +88,38 @@ TArray<float> AER_FloorTile::GetLaneShiftValues() const
 	LaneShiftValues.Add(RightLane->GetComponentLocation().Y);
 
 	return LaneShiftValues;
+}
+
+void AER_FloorTile::SpawnObstacles()
+{
+	const TArray<float> LaneShiftValues = GetLaneShiftValues();
+	if (LaneShiftValues.IsEmpty()) return;
+
+	for (int i = 0; i < LaneShiftValues.Num(); ++i)
+	{
+		SpawnOneObstacle(LaneShiftValues[i]);
+	}
+}
+
+void AER_FloorTile::SpawnOneObstacle(const float LaneLocation)
+{
+	const int32 RandomProbability = FMath::RandRange(0, ObstacleClasses.Num() - 1);
+
+	const TSubclassOf<AER_Obstacle> ObstacleClass = ObstacleClasses[RandomProbability];
+	if (!ObstacleClass) return;
+
+	FVector SpawnLocation           = CenterLane->GetComponentLocation();
+	SpawnLocation.Y                 = LaneLocation;
+	const FTransform SpawnTransform = FTransform(FRotator::ZeroRotator, SpawnLocation);
+
+	AER_Obstacle* Obstacle = GetWorld()->SpawnActorDeferred<AER_Obstacle>(ObstacleClass, SpawnTransform);
+	if (!Obstacle) return;
+	if (FMath::FRand() > Obstacle->GetSpawnProbability())
+	{
+		Obstacle->Destroy();
+		return;
+	}
+	Obstacle->SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Obstacle->FinishSpawning(SpawnTransform);
+	Obstacles.Add(Obstacle);
 }

@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_Character.h"
-#include "ER_GameModeBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ER_GameModeBase.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AER_Character::AER_Character()
 {
@@ -25,6 +26,8 @@ AER_Character::AER_Character()
 void AER_Character::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	bDead = false;
 
 	if (const auto PlayerController = Cast<APlayerController>(Controller))
 	{
@@ -34,7 +37,8 @@ void AER_Character::BeginPlay()
 		}
 	}
 
-	if (const auto GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode());
+	if (GameMode)
 	{
 		LaneSwitchValues = GameMode->LaneSwitchValues;
 	}
@@ -62,6 +66,8 @@ void AER_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void AER_Character::MoveForward()
 {
+	if (bDead) return;
+	
 	FRotator ControlRotation = FRotator::ZeroRotator;
 	ControlRotation.Yaw      = GetControlRotation().Yaw;
 	AddMovementInput(ControlRotation.Vector());
@@ -109,10 +115,25 @@ void AER_Character::SmoothlyChangeLane(int& LaneIndex)
 
 		if (FMath::Abs(CurrentLanePosition - Target) < 1.f)
 		{
+			if (!GetWorld()) return;
+			
 			GetWorldTimerManager().ClearTimer(OUT SlideTimer);
 			Location.Y = Target;
 			GetRootComponent()->SetRelativeLocation(FVector(Location));
 		}
 	});
 	GetWorldTimerManager().SetTimer(OUT SlideTimer, SlideDelegate, GetWorld()->DeltaTimeSeconds, true);
+}
+
+void AER_Character::Death()
+{
+	if (!GetWorld() || !ExplosionParticle || !ExplosionSound) return;
+
+	bDead = true;
+
+	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), FRotator::ZeroRotator, FVector(3.f));
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
+
+	GetMesh()->SetVisibility(false);
+	GameMode->RestartLevel();
 }

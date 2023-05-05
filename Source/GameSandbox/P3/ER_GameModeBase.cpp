@@ -2,6 +2,7 @@
 
 #include "ER_GameModeBase.h"
 #include "ER_FloorTile.h"
+#include "Kismet/GameplayStatics.h"
 
 AER_GameModeBase::AER_GameModeBase()
 {
@@ -23,24 +24,41 @@ void AER_GameModeBase::Tick(const float DeltaTime)
 void AER_GameModeBase::CreateInitialFloorTiles()
 {
 	
-	if (const AER_FloorTile* Tile = AddFloorTile())
+	if (const AER_FloorTile* Tile = AddFloorTile(false))
 	{
 		LaneSwitchValues = Tile->GetLaneShiftValues();
 	}	
 	
 	for (int i = 1; i < InitialFloorTilesNum; ++i)
 	{
-		AddFloorTile();
+		// Don`t spawn obstacles on first three tiles
+		AddFloorTile(i > 2);
 	}
 }
 
-AER_FloorTile* AER_GameModeBase::AddFloorTile()
+AER_FloorTile* AER_GameModeBase::AddFloorTile(const bool bSpawnObstacles)
 {
 	if (!GetWorld()) return nullptr;
 
 	AER_FloorTile* FloorTile = GetWorld()->SpawnActor<AER_FloorTile>(FloorTileClass, NextSpawnPointLocation);
 	if (!FloorTile) return nullptr;
 
+	if (bSpawnObstacles)
+	{
+		FloorTile->SpawnObstacles();
+	}
+
 	NextSpawnPointLocation = FloorTile->GetAttachPoint();
 	return FloorTile;
+}
+
+void AER_GameModeBase::RestartLevel()
+{
+	FTimerDelegate RestartDelegate;
+	RestartDelegate.BindLambda([&]()
+	{
+		GetWorldTimerManager().ClearTimer(RestartTimer);
+		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
+	});
+	GetWorldTimerManager().SetTimer(RestartTimer, RestartDelegate, RespawnTime, false);
 }

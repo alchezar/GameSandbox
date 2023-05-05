@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ER_FloorTile.generated.h"
 
+class AER_Obstacle;
 class UArrowComponent;
 class UBoxComponent;
 class AER_GameModeBase;
@@ -20,6 +21,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	const FTransform& GetAttachPoint() const;
 	TArray<float> GetLaneShiftValues() const;
+	void SpawnObstacles();
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,6 +31,7 @@ protected:
 	
 private:
 	void SetupComponents();
+	void SpawnOneObstacle(const float LaneLocation);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -36,19 +39,27 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
 	UStaticMeshComponent* FloorMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
-	UArrowComponent* AttachPoint;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
-	UArrowComponent* CenterLane;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
-	UArrowComponent* LeftLane;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
-	UArrowComponent* RightLane;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
 	UBoxComponent* FloorTriggerBox;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Component")
+	TArray<TSubclassOf<AER_Obstacle>> ObstacleClasses;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
+	UArrowComponent* AttachPoint;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
+	UArrowComponent* CenterLane;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
+	UArrowComponent* LeftLane;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
+	UArrowComponent* RightLane;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
 	float DestroyDelay = 2.f;
+	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
+	// float SpawnProbability = 0.5f;
 
 private:
 	UPROPERTY()
 	AER_GameModeBase* RunGameMode;
+	TArray<AER_Obstacle*> Obstacles;
 };

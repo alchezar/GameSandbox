@@ -10,6 +10,9 @@ class USpringArmComponent;
 class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
+class UParticleSystem;
+class USoundBase;
+class AER_GameModeBase;
 
 UCLASS()
 class GAMESANDBOX_API AER_Character : public ACharacter
@@ -20,6 +23,7 @@ public:
 	AER_Character();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	void Death();
 
 protected:
 	virtual void BeginPlay() override;
@@ -54,9 +58,18 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
 	float ChangeLineSpeed = 10.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
+	UParticleSystem* ExplosionParticle;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
+	USoundBase* ExplosionSound;
+
 private:
+	UPROPERTY()
+	AER_GameModeBase* GameMode;
+
 	FTimerHandle SlideTimer;
 	int CurrentLaneIndex      = 1;
 	float CurrentLanePosition = 0.f;
 	TArray<float> LaneSwitchValues;
+	bool bDead = false;
 };
