@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_Character.h"
+#include "ER_GameModeBase.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -31,6 +32,11 @@ void AER_Character::BeginPlay()
 		{
 			Subsystem->AddMappingContext(MappingContext, 0);
 		}
+	}
+
+	if (const auto GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode()))
+	{
+		LaneSwitchValues = GameMode->LaneSwitchValues;
 	}
 }
 
@@ -63,12 +69,12 @@ void AER_Character::MoveForward()
 
 void AER_Character::MoveLeft()
 {
-	SmoothSlide(-1);
+	SmoothlyChangeLane(--CurrentLaneIndex);
 }
 
 void AER_Character::MoveRight()
 {
-	SmoothSlide(1);
+	SmoothlyChangeLane(++CurrentLaneIndex);
 }
 
 void AER_Character::MoveDown()
@@ -87,25 +93,26 @@ void AER_Character::Jump()
 	GetWorldTimerManager().SetTimer(OUT JumpTimer, JumpDelegate, JumpTime, false);
 }
 
-void AER_Character::SmoothSlide(int32 SideDirection)
+void AER_Character::SmoothlyChangeLane(int& LaneIndex)
 {
-	SideDirection = FMath::Clamp(SideDirection, -1, 1);
-	TargetOffset  = FMath::Clamp(TargetOffset + Distance * SideDirection, -Distance, Distance);
+	LaneIndex = FMath::Clamp(LaneIndex, 0, LaneSwitchValues.Num() - 1);
 
 	FTimerDelegate SlideDelegate;
-	SlideDelegate.BindLambda([&]()
+	SlideDelegate.BindLambda([=]()
 	{
+		const float Target  = LaneSwitchValues[LaneIndex];
+		CurrentLanePosition = FMath::FInterpTo(CurrentLanePosition, Target, GetWorld()->DeltaTimeSeconds, ChangeLineSpeed);
+
 		FVector Location = GetRootComponent()->GetRelativeLocation();
-		CurrentOffset    = FMath::FInterpTo(CurrentOffset, TargetOffset, GetWorld()->DeltaTimeSeconds, 10.f);
-		Location.Y       = CurrentOffset;
+		Location.Y       = CurrentLanePosition;
 		GetRootComponent()->SetRelativeLocation(FVector(Location));
 
-		if (FMath::Abs(CurrentOffset - TargetOffset) < 1.f)
+		if (FMath::Abs(CurrentLanePosition - Target) < 1.f)
 		{
-			GetWorldTimerManager().ClearTimer(SlideTimer);
-			Location.Y = TargetOffset;
+			GetWorldTimerManager().ClearTimer(OUT SlideTimer);
+			Location.Y = Target;
 			GetRootComponent()->SetRelativeLocation(FVector(Location));
 		}
 	});
-	GetWorldTimerManager().SetTimer(SlideTimer, SlideDelegate, GetWorld()->DeltaTimeSeconds, true);
+	GetWorldTimerManager().SetTimer(OUT SlideTimer, SlideDelegate, GetWorld()->DeltaTimeSeconds, true);
 }

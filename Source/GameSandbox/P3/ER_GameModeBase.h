@@ -18,7 +18,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	void CreateInitialFloorTiles();
-	void AddFloorTile();
+	AER_FloorTile* AddFloorTile();
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,6 +28,7 @@ public:
 	TSubclassOf<AER_FloorTile> FloorTileClass;
 	UPROPERTY(EditAnywhere, Category = "Kinder | Config")
 	int32 InitialFloorTilesNum = 10;
-	UPROPERTY(VisibleInstanceOnly, Category = "Kinder | Runtime")
+	
 	FTransform NextSpawnPointLocation;
+	TArray<float> LaneSwitchValues; 
 };

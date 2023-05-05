@@ -30,7 +30,7 @@ protected:
 	void MoveDown();
 
 private:
-	void SmoothSlide(int32 SideDirection);
+	void SmoothlyChangeLane(int& LaneIndex);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -51,10 +51,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move", meta = (Units = "s"))
 	float JumpTime = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
+	float ChangeLineSpeed = 10.f;
 
 private:
 	FTimerHandle SlideTimer;
-	float Distance = 325;
-	float TargetOffset = 0.f;
-	float CurrentOffset = 0.f;
+	int CurrentLaneIndex      = 1;
+	float CurrentLanePosition = 0.f;
+	TArray<float> LaneSwitchValues;
 };

@@ -28,26 +28,6 @@ void AER_FloorTile::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AER_FloorTile::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (!OtherActor || !Cast<AER_Character>(OtherActor)) return;
-
-	RunGameMode->AddFloorTile();
-
-	FTimerHandle DestroyTimer;
-	GetWorld()->GetTimerManager().SetTimer(DestroyTimer, this, &ThisClass::DestroyFloorTile, DestroyDelay);
-}
-
-void AER_FloorTile::DestroyFloorTile()
-{
-	Destroy();
-}
-
-const FTransform& AER_FloorTile::GetAttachPoint() const
-{
-	return AttachPoint->GetComponentTransform();
-}
-
 void AER_FloorTile::SetupComponents()
 {
 	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneComponent");
@@ -72,4 +52,35 @@ void AER_FloorTile::SetupComponents()
 	FloorTriggerBox->SetupAttachment(GetRootComponent());
 	FloorTriggerBox->SetBoxExtent(FVector(32.f, 500.f, 200.f));
 	FloorTriggerBox->SetCollisionProfileName("OverlapOnlyPawn");
+}
+
+void AER_FloorTile::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!OtherActor || !Cast<AER_Character>(OtherActor)) return;
+
+	RunGameMode->AddFloorTile();
+
+	FTimerHandle DestroyTimer;
+	GetWorld()->GetTimerManager().SetTimer(OUT DestroyTimer, this, &ThisClass::DestroyFloorTile, DestroyDelay);
+}
+
+void AER_FloorTile::DestroyFloorTile()
+{
+	Destroy();
+}
+
+const FTransform& AER_FloorTile::GetAttachPoint() const
+{
+	return AttachPoint->GetComponentTransform();
+}
+
+TArray<float> AER_FloorTile::GetLaneShiftValues() const
+{
+	TArray<float> LaneShiftValues;
+
+	LaneShiftValues.Add(LeftLane->GetComponentLocation().Y);
+	LaneShiftValues.Add(CenterLane->GetComponentLocation().Y);
+	LaneShiftValues.Add(RightLane->GetComponentLocation().Y);
+
+	return LaneShiftValues;
 }

@@ -19,6 +19,7 @@ public:
 	AER_FloorTile();
 	virtual void Tick(float DeltaTime) override;
 	const FTransform& GetAttachPoint() const;
+	TArray<float> GetLaneShiftValues() const;
 
 protected:
 	virtual void BeginPlay() override;

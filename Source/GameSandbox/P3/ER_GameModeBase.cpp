@@ -22,18 +22,25 @@ void AER_GameModeBase::Tick(const float DeltaTime)
 
 void AER_GameModeBase::CreateInitialFloorTiles()
 {
-	for (int i = 0; i < InitialFloorTilesNum; ++i)
+	
+	if (const AER_FloorTile* Tile = AddFloorTile())
+	{
+		LaneSwitchValues = Tile->GetLaneShiftValues();
+	}	
+	
+	for (int i = 1; i < InitialFloorTilesNum; ++i)
 	{
 		AddFloorTile();
 	}
 }
 
-void AER_GameModeBase::AddFloorTile()
+AER_FloorTile* AER_GameModeBase::AddFloorTile()
 {
-	if (!GetWorld()) return;
+	if (!GetWorld()) return nullptr;
 
-	const AER_FloorTile* FloorTile = GetWorld()->SpawnActor<AER_FloorTile>(FloorTileClass, NextSpawnPointLocation);
-	if (!FloorTile) return;
+	AER_FloorTile* FloorTile = GetWorld()->SpawnActor<AER_FloorTile>(FloorTileClass, NextSpawnPointLocation);
+	if (!FloorTile) return nullptr;
 
 	NextSpawnPointLocation = FloorTile->GetAttachPoint();
+	return FloorTile;
 }
