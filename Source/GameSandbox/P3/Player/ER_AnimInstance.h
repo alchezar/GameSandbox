@@ -17,7 +17,7 @@ class GAMESANDBOX_API UER_AnimInstance : public UAnimInstance
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-	
+
 public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Kinder | Movement")
 	float Speed = 0.f;

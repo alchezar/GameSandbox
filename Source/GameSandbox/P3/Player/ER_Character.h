@@ -23,9 +23,12 @@ public:
 	AER_Character();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	void AddCoin();
+	
 	void Death();
 	bool IsDead() const;
-	void AddCoin();
+	void NextLife();
+	void Resurrect();
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,7 +40,7 @@ protected:
 
 private:
 	void SmoothlyChangeLane();
-	void StandUp(float HalfHeight);
+	void StandUp();
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -64,7 +67,7 @@ protected:
 	float ChangeLineSpeed = 10.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
 	float MoveDownImpulse = -1000.f;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
 	UParticleSystem* ExplosionParticle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
@@ -75,9 +78,13 @@ private:
 	AER_GameModeBase* GameMode;
 
 	FTimerHandle SlideTimer;
+	FTimerHandle RunSlideTimer;
+
+	bool bDead = false;
+	TArray<FVector> LaneMidLocations;
 	int CurrentLaneIndex      = 1;
 	float CurrentLanePosition = 0.f;
-	TArray<FVector> LaneMidLocations;
-	bool bDead = false;
-	const FVector Impulse = FVector(0.f, 0.f, MoveDownImpulse);
+	float DefaultHalfHeight   = 0.f;
+	const FVector Impulse     = FVector(0.f, 0.f, MoveDownImpulse);
+	FVector PlayerStartLocation;
 };

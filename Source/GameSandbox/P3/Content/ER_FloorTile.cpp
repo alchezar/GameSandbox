@@ -1,13 +1,13 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_FloorTile.h"
-#include "ER_Character.h"
 #include "ER_CoinItem.h"
-#include "ER_GameModeBase.h"
 #include "ER_Obstacle.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/ER_Character.h"
+#include "Player/ER_GameModeBase.h"
 
 AER_FloorTile::AER_FloorTile()
 {
@@ -70,14 +70,13 @@ void AER_FloorTile::DestroyFloorTile()
 {
 	for (const auto Coin : Coins)
 	{
-		// if (!Coin) continue;
 		Coin->Destroy();
 	}
 	for (const auto Obstacle : Obstacles)
 	{
-		// if (!Obstacle) continue;
 		Obstacle->Destroy();
 	}
+	RunGameMode->RemoveFloorTile(this);
 	Destroy();
 }
 

@@ -23,12 +23,12 @@ public:
 	const FTransform& GetAttachPoint() const;
 	TArray<FVector> GetLaneMidLocations() const;
 	void SpawnItems();
+	void DestroyFloorTile();
 
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	void DestroyFloorTile();
 
 private:
 	void SetupComponents();

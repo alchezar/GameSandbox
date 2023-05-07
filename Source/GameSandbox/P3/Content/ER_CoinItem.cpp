@@ -1,10 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_CoinItem.h"
-#include "ER_Character.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/ER_Character.h"
 
 AER_CoinItem::AER_CoinItem()
 {

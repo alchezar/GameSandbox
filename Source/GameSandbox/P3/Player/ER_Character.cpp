@@ -44,8 +44,11 @@ void AER_Character::BeginPlay()
 	{
 		LaneMidLocations = GameMode->GetLaneMidLocations();
 	}
-	CurrentLaneIndex      = 1;
+
+	CurrentLaneIndex    = 1;
 	CurrentLanePosition = 0.f;
+	DefaultHalfHeight   = GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	PlayerStartLocation = GetActorLocation();
 }
 
 void AER_Character::Tick(const float DeltaTime)
@@ -96,24 +99,27 @@ void AER_Character::MoveDown()
 	{
 		GetCharacterMovement()->AddImpulse(Impulse, true);
 	}
-	// Slide	
+	// Check if already sliding
+	if (GetWorldTimerManager().IsTimerActive(RunSlideTimer))
+	{
+		GetWorldTimerManager().ClearTimer(RunSlideTimer);
+		StandUp();
+	}
+
+	// Slide
 	PlayAnimMontage(SlideAnimation);
-	const float DefaultHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
 	const float NewHalfHeight = DefaultHalfHeight / 2;
 	GetCapsuleComponent()->SetCapsuleHalfHeight(NewHalfHeight);
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -NewHalfHeight));
 	CameraArm->SocketOffset = FVector(0.f, 0.f, 100.f + NewHalfHeight);
 
-	FTimerHandle RunSlideTimer;
-	FTimerDelegate SlideDelegate;
-	SlideDelegate.BindUObject(this, &ThisClass::StandUp, DefaultHalfHeight);
-	GetWorldTimerManager().SetTimer(RunSlideTimer, SlideDelegate, 1.f, false);
+	GetWorldTimerManager().SetTimer(RunSlideTimer, this, &ThisClass::StandUp, 0.7f);
 }
 
-void AER_Character::StandUp(const float HalfHeight)
+void AER_Character::StandUp()
 {
-	GetCapsuleComponent()->SetCapsuleHalfHeight(HalfHeight);
-	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -HalfHeight));
+	GetCapsuleComponent()->SetCapsuleHalfHeight(DefaultHalfHeight);
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -DefaultHalfHeight));
 	CameraArm->SocketOffset = FVector(0.f, 0.f, 100.f);
 	// TODO: Find how to fix little camera jitter after stand up
 }
@@ -164,7 +170,15 @@ void AER_Character::Death()
 	GetWorldTimerManager().ClearTimer(SlideTimer);
 
 	GetMesh()->SetVisibility(false);
-	GameMode->RestartLevel();
+	GameMode->DecreaseLives();
+	
+	FTimerHandle DeathTimer;
+	GetWorldTimerManager().SetTimer(DeathTimer, this, &ThisClass::NextLife, 2.f);
+}
+
+void AER_Character::NextLife()
+{
+	GameMode->StartFromBegin(this);
 }
 
 bool AER_Character::IsDead() const
@@ -175,4 +189,12 @@ bool AER_Character::IsDead() const
 void AER_Character::AddCoin()
 {
 	GameMode->AddCoin();
+}
+
+void AER_Character::Resurrect()
+{
+	bDead = false;
+	SetActorLocation(PlayerStartLocation);
+	GetMesh()->SetVisibility(true);
+	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
 }

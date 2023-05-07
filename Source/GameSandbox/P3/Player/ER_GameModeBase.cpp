@@ -1,10 +1,12 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_GameModeBase.h"
-#include "ER_FloorTile.h"
-#include "ER_GameHud.h"
 #include "Blueprint/UserWidget.h"
+#include "Content/ER_FloorTile.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/ER_GameHud.h"
+#include "EngineUtils.h"
+#include "ER_Character.h"
 
 AER_GameModeBase::AER_GameModeBase()
 {
@@ -16,11 +18,14 @@ void AER_GameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
+	LivesCount                                                             = MaxLives;
+
 	GameHud = Cast<UER_GameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
 	GameHud->AddToViewport();
 	GameHud->InitializeHud(this);
-	
+	GameHud->SetLivesCount(LivesCount);
+
 	CreateInitialFloorTiles();
 }
 
@@ -31,12 +36,11 @@ void AER_GameModeBase::Tick(const float DeltaTime)
 
 void AER_GameModeBase::CreateInitialFloorTiles()
 {
-	
 	if (const AER_FloorTile* Tile = AddFloorTile(false))
 	{
 		LaneMidLocations = Tile->GetLaneMidLocations();
-	}	
-	
+	}
+
 	for (int i = 1; i < InitialFloorTilesNum; ++i)
 	{
 		// Don`t spawn obstacles on first three tiles
@@ -51,6 +55,7 @@ AER_FloorTile* AER_GameModeBase::AddFloorTile(const bool bSpawnObstacles)
 	AER_FloorTile* FloorTile = GetWorld()->SpawnActor<AER_FloorTile>(FloorTileClass, NextSpawnPointLocation);
 	if (!FloorTile) return nullptr;
 
+	FloorTiles.Add(FloorTile);
 	if (bSpawnObstacles)
 	{
 		FloorTile->SpawnItems();
@@ -72,11 +77,58 @@ void AER_GameModeBase::RestartLevel()
 }
 
 void AER_GameModeBase::AddCoin()
-{	
+{
 	OnCoinsCountChanged.Broadcast(++TotalCoins);
 }
 
 TArray<FVector> AER_GameModeBase::GetLaneMidLocations()
 {
-	return LaneMidLocations; 
+	return LaneMidLocations;
+}
+
+FName AER_GameModeBase::GetLevelName() const
+{
+	return LevelName;
+}
+
+void AER_GameModeBase::StartFromBegin(AER_Character* DiedCharacter)
+{
+	if (LivesCount <= 0)
+	{
+		// Game over
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Game Over")));
+		return;
+	}
+
+	/* Avoid using ForEachLoop, half of the array will be ignored:
+	 * When item[0] will be deleted - item[1] goes to index [0].
+	 * So at the next loop index [1] will be with old item[2]. */
+	while (!FloorTiles.IsEmpty())
+	{
+		FloorTiles.Last()->DestroyFloorTile();
+	}
+
+	// Spawn new tiles from start
+	NextSpawnPointLocation = FTransform();
+	CreateInitialFloorTiles();
+
+	// Respawn player at start position
+	DiedCharacter->Resurrect();
+}
+
+void AER_GameModeBase::RemoveFloorTile(AER_FloorTile* Tile)
+{
+	FloorTiles.Remove(Tile);
+}
+
+void AER_GameModeBase::DecreaseLives()
+{
+	LivesCount = FMath::Clamp(--LivesCount, 0, MaxLives);
+	OnLivesCountChanged.Broadcast(LivesCount);
+}
+
+void AER_GameModeBase::IncreaseLives()
+{
+	++LivesCount;
+	OnLivesCountChanged.Broadcast(LivesCount);
 }

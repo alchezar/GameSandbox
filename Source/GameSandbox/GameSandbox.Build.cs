@@ -29,6 +29,7 @@ public class GameSandbox : ModuleRules
 			"GameSandbox",
 			"GameSandbox/P1",
 			"GameSandbox/P2",
+			"GameSandbox/P3"
 		});
 
 		// Uncomment if you are using Slate UI

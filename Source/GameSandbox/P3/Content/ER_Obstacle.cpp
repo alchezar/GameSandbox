@@ -1,9 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_Obstacle.h"
-
-#include "ER_Character.h"
 #include "Components/BoxComponent.h"
+#include "Player/ER_Character.h"
 
 AER_Obstacle::AER_Obstacle()
 {
