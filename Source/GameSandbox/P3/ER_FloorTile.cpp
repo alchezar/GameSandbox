@@ -2,6 +2,7 @@
 
 #include "ER_FloorTile.h"
 #include "ER_Character.h"
+#include "ER_CoinItem.h"
 #include "ER_GameModeBase.h"
 #include "ER_Obstacle.h"
 #include "Components/ArrowComponent.h"
@@ -67,10 +68,16 @@ void AER_FloorTile::OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedCompone
 
 void AER_FloorTile::DestroyFloorTile()
 {
+	for (const auto Coin : Coins)
+	{
+		// if (!Coin) continue;
+		Coin->Destroy();
+	}
 	for (const auto Obstacle : Obstacles)
 	{
+		// if (!Obstacle) continue;
 		Obstacle->Destroy();
-	}	
+	}
 	Destroy();
 }
 
@@ -79,47 +86,94 @@ const FTransform& AER_FloorTile::GetAttachPoint() const
 	return AttachPoint->GetComponentTransform();
 }
 
-TArray<float> AER_FloorTile::GetLaneShiftValues() const
+TArray<FVector> AER_FloorTile::GetLaneMidLocations() const
 {
-	TArray<float> LaneShiftValues;
+	TArray<FVector> LaneShiftValues;
 
-	LaneShiftValues.Add(LeftLane->GetComponentLocation().Y);
-	LaneShiftValues.Add(CenterLane->GetComponentLocation().Y);
-	LaneShiftValues.Add(RightLane->GetComponentLocation().Y);
+	LaneShiftValues.Add(LeftLane->GetComponentLocation());
+	LaneShiftValues.Add(CenterLane->GetComponentLocation());
+	LaneShiftValues.Add(RightLane->GetComponentLocation());
 
 	return LaneShiftValues;
 }
 
-void AER_FloorTile::SpawnObstacles()
+void AER_FloorTile::SpawnItems()
 {
-	const TArray<float> LaneShiftValues = GetLaneShiftValues();
-	if (LaneShiftValues.IsEmpty()) return;
+	const TArray<FVector> LaneMidLocations = GetLaneMidLocations();
+	if (LaneMidLocations.IsEmpty()) return;
 
-	for (int i = 0; i < LaneShiftValues.Num(); ++i)
+	int32 LargeObstacles = 0;
+
+	for (int i = 0; i < LaneMidLocations.Num(); ++i)
 	{
-		SpawnOneObstacle(LaneShiftValues[i]);
+		// Don`t spawn coins above large obstacle
+		bool bLarge = false;
+		SpawnObstacle(LaneMidLocations[i],OUT LargeObstacles,OUT bLarge);
+		SpawnCoins(LaneMidLocations[i], bLarge);
+		SpawnSideCoins(LaneMidLocations[i]);
 	}
 }
 
-void AER_FloorTile::SpawnOneObstacle(const float LaneLocation)
+void AER_FloorTile::SpawnObstacle(const FVector& LaneMidLocation, int& LargeNum, bool& bLarge)
 {
-	const int32 RandomProbability = FMath::RandRange(0, ObstacleClasses.Num() - 1);
+	const int32 ObstacleRandomIndex = FMath::RandRange(0, ObstacleClasses.Num() - 1);
 
-	const TSubclassOf<AER_Obstacle> ObstacleClass = ObstacleClasses[RandomProbability];
+	// Prevent spawning all big obstacles in one row
+	const bool bCandidate = LargeObstacleIndexes.Contains(ObstacleRandomIndex);
+	if (bCandidate && ++LargeNum > 2) return;
+
+	// Choose obstacle and spawn it
+	const TSubclassOf<AER_Obstacle> ObstacleClass = ObstacleClasses[ObstacleRandomIndex];
 	if (!ObstacleClass) return;
 
-	FVector SpawnLocation           = CenterLane->GetComponentLocation();
-	SpawnLocation.Y                 = LaneLocation;
+	const FVector SpawnLocation     = LaneMidLocation;
 	const FTransform SpawnTransform = FTransform(FRotator::ZeroRotator, SpawnLocation);
 
-	AER_Obstacle* Obstacle = GetWorld()->SpawnActorDeferred<AER_Obstacle>(ObstacleClass, SpawnTransform);
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	AER_Obstacle* Obstacle = GetWorld()->SpawnActor<AER_Obstacle>(ObstacleClass, SpawnTransform, SpawnParameters);
 	if (!Obstacle) return;
-	if (FMath::FRand() > Obstacle->GetSpawnProbability())
+
+	if (FMath::FRand() <= Obstacle->GetSpawnProbability())
 	{
-		Obstacle->Destroy();
+		Obstacles.Add(Obstacle);
+		bLarge = bCandidate;
 		return;
 	}
-	Obstacle->SpawnCollisionHandlingMethod = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	Obstacle->FinishSpawning(SpawnTransform);
-	Obstacles.Add(Obstacle);
+	Obstacle->Destroy();
+}
+
+void AER_FloorTile::SpawnCoins(const FVector& LaneMidLocation, const bool bLarge)
+{
+	if (bLarge) return;
+
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	if (AER_CoinItem* Coin = GetWorld()->SpawnActor<AER_CoinItem>(CoinClass, LaneMidLocation, FRotator::ZeroRotator, SpawnParameters))
+	{
+		CoinsSpawnProbability = Coin->GetSpawnProbability();
+		(FMath::FRand() <= CoinsSpawnProbability) ? Coins.Add(Coin) : Coin->Destroy();
+	}
+}
+
+void AER_FloorTile::SpawnSideCoins(const FVector& LaneMidLocation)
+{
+	FVector SpawnLocation = LaneMidLocation;
+
+	// Additional coins before and after center
+	const double Interval = FloorMesh->Bounds.GetBox().GetSize().X * 0.33;
+	for (int i = 1; i <= 2; ++i)
+	{
+		const float Side = (i == 1) ? 1.f : -1.f;
+		if (FMath::FRand() <= CoinsSpawnProbability)
+		{
+			// If move back 1 interval, it will be same location as LaneMidLocation, so multiply interval by 2(i)
+			SpawnLocation.X += Side * Interval * i;
+			FActorSpawnParameters SpawnParameters;
+			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+			AER_CoinItem* SideCoin = GetWorld()->SpawnActor<AER_CoinItem>(CoinClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
+			Coins.Add(SideCoin);
+		}
+	}
 }

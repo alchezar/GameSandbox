@@ -5,6 +5,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "ER_GameModeBase.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -26,7 +28,7 @@ AER_Character::AER_Character()
 void AER_Character::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	bDead = false;
 
 	if (const auto PlayerController = Cast<APlayerController>(Controller))
@@ -40,8 +42,10 @@ void AER_Character::BeginPlay()
 	GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode());
 	if (GameMode)
 	{
-		LaneSwitchValues = GameMode->LaneSwitchValues;
+		LaneMidLocations = GameMode->GetLaneMidLocations();
 	}
+	CurrentLaneIndex      = 1;
+	CurrentLanePosition = 0.f;
 }
 
 void AER_Character::Tick(const float DeltaTime)
@@ -67,7 +71,6 @@ void AER_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 void AER_Character::MoveForward()
 {
 	if (bDead) return;
-	
 	FRotator ControlRotation = FRotator::ZeroRotator;
 	ControlRotation.Yaw      = GetControlRotation().Yaw;
 	AddMovementInput(ControlRotation.Vector());
@@ -75,16 +78,45 @@ void AER_Character::MoveForward()
 
 void AER_Character::MoveLeft()
 {
-	SmoothlyChangeLane(--CurrentLaneIndex);
+	if (bDead) return;
+	CurrentLaneIndex = FMath::Clamp(--CurrentLaneIndex, 0, LaneMidLocations.Num() - 1);
+	GetWorldTimerManager().SetTimer(SlideTimer, this, &ThisClass::SmoothlyChangeLane, GetWorld()->DeltaTimeSeconds, true);
 }
 
 void AER_Character::MoveRight()
 {
-	SmoothlyChangeLane(++CurrentLaneIndex);
+	if (bDead) return;
+	CurrentLaneIndex = FMath::Clamp(++CurrentLaneIndex, 0, LaneMidLocations.Num() - 1);
+	GetWorldTimerManager().SetTimer(SlideTimer, this, &ThisClass::SmoothlyChangeLane, GetWorld()->DeltaTimeSeconds, true);
 }
 
 void AER_Character::MoveDown()
-{ }
+{
+	if (GetCharacterMovement()->IsFalling())
+	{
+		GetCharacterMovement()->AddImpulse(Impulse, true);
+	}
+	// Slide	
+	PlayAnimMontage(SlideAnimation);
+	const float DefaultHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	const float NewHalfHeight = DefaultHalfHeight / 2;
+	GetCapsuleComponent()->SetCapsuleHalfHeight(NewHalfHeight);
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -NewHalfHeight));
+	CameraArm->SocketOffset = FVector(0.f, 0.f, 100.f + NewHalfHeight);
+
+	FTimerHandle RunSlideTimer;
+	FTimerDelegate SlideDelegate;
+	SlideDelegate.BindUObject(this, &ThisClass::StandUp, DefaultHalfHeight);
+	GetWorldTimerManager().SetTimer(RunSlideTimer, SlideDelegate, 1.f, false);
+}
+
+void AER_Character::StandUp(const float HalfHeight)
+{
+	GetCapsuleComponent()->SetCapsuleHalfHeight(HalfHeight);
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -HalfHeight));
+	CameraArm->SocketOffset = FVector(0.f, 0.f, 100.f);
+	// TODO: Find how to fix little camera jitter after stand up
+}
 
 void AER_Character::Jump()
 {
@@ -94,35 +126,29 @@ void AER_Character::Jump()
 	FTimerDelegate JumpDelegate;
 	JumpDelegate.BindLambda([&]()
 	{
+		GetCharacterMovement()->AddImpulse(Impulse, true);
 		StopJumping();
 	});
 	GetWorldTimerManager().SetTimer(OUT JumpTimer, JumpDelegate, JumpTime, false);
 }
 
-void AER_Character::SmoothlyChangeLane(int& LaneIndex)
+void AER_Character::SmoothlyChangeLane()
 {
-	LaneIndex = FMath::Clamp(LaneIndex, 0, LaneSwitchValues.Num() - 1);
+	const float Target  = LaneMidLocations[CurrentLaneIndex].Y;
+	CurrentLanePosition = FMath::FInterpTo(CurrentLanePosition, Target, GetWorld()->DeltaTimeSeconds, ChangeLineSpeed);
 
-	FTimerDelegate SlideDelegate;
-	SlideDelegate.BindLambda([=]()
+	FVector Location = GetRootComponent()->GetRelativeLocation();
+	Location.Y       = CurrentLanePosition;
+	GetRootComponent()->SetRelativeLocation(FVector(Location));
+
+	if (FMath::Abs(CurrentLanePosition - Target) < 1.f)
 	{
-		const float Target  = LaneSwitchValues[LaneIndex];
-		CurrentLanePosition = FMath::FInterpTo(CurrentLanePosition, Target, GetWorld()->DeltaTimeSeconds, ChangeLineSpeed);
+		if (!GetWorld()) return;
 
-		FVector Location = GetRootComponent()->GetRelativeLocation();
-		Location.Y       = CurrentLanePosition;
+		GetWorldTimerManager().ClearTimer(SlideTimer);
+		Location.Y = Target;
 		GetRootComponent()->SetRelativeLocation(FVector(Location));
-
-		if (FMath::Abs(CurrentLanePosition - Target) < 1.f)
-		{
-			if (!GetWorld()) return;
-			
-			GetWorldTimerManager().ClearTimer(OUT SlideTimer);
-			Location.Y = Target;
-			GetRootComponent()->SetRelativeLocation(FVector(Location));
-		}
-	});
-	GetWorldTimerManager().SetTimer(OUT SlideTimer, SlideDelegate, GetWorld()->DeltaTimeSeconds, true);
+	}
 }
 
 void AER_Character::Death()
@@ -130,10 +156,23 @@ void AER_Character::Death()
 	if (!GetWorld() || !ExplosionParticle || !ExplosionSound) return;
 
 	bDead = true;
+	GetCharacterMovement()->DisableMovement();
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), FRotator::ZeroRotator, FVector(3.f));
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
 
+	GetWorldTimerManager().ClearTimer(SlideTimer);
+
 	GetMesh()->SetVisibility(false);
 	GameMode->RestartLevel();
+}
+
+bool AER_Character::IsDead() const
+{
+	return bDead;
+}
+
+void AER_Character::AddCoin()
+{
+	GameMode->AddCoin();
 }

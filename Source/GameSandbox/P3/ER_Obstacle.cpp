@@ -22,20 +22,19 @@ void AER_Obstacle::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// StaticMesh->OnComponentHit.AddDynamic(this, &ThisClass::OnObstacleHit);
 	KillTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnObstacleOverlap);
 }
 
 void AER_Obstacle::OnObstacleOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
-	if (const auto Character = Cast<AER_Character>(OtherActor))
+	const auto Character = Cast<AER_Character>(OtherActor);
+	if (Character && !Character->IsDead())
 	{
 		Character->Death();
 	}
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("%s"), *OtherActor->GetActorNameOrLabel()));
 }
 
-float AER_Obstacle::GetSpawnProbability() const
+float AER_Obstacle::GetSpawnProbability()
 {
 	return SpawnProbability;
 }

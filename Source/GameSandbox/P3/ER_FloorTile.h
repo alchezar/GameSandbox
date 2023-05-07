@@ -6,10 +6,11 @@
 #include "GameFramework/Actor.h"
 #include "ER_FloorTile.generated.h"
 
+class AER_CoinItem;
+class AER_GameModeBase;
 class AER_Obstacle;
 class UArrowComponent;
 class UBoxComponent;
-class AER_GameModeBase;
 
 UCLASS()
 class GAMESANDBOX_API AER_FloorTile : public AActor
@@ -20,18 +21,20 @@ public:
 	AER_FloorTile();
 	virtual void Tick(float DeltaTime) override;
 	const FTransform& GetAttachPoint() const;
-	TArray<float> GetLaneShiftValues() const;
-	void SpawnObstacles();
+	TArray<FVector> GetLaneMidLocations() const;
+	void SpawnItems();
 
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	void OnTriggerBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	void DestroyFloorTile();
-	
+
 private:
 	void SetupComponents();
-	void SpawnOneObstacle(const float LaneLocation);
+	void SpawnObstacle(const FVector& LaneMidLocation, int& LargeNum, bool& bLarge);
+	void SpawnCoins(const FVector& LaneMidLocation, const bool bLarge);
+	void SpawnSideCoins(const FVector& LaneMidLocation);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -40,9 +43,15 @@ protected:
 	UStaticMeshComponent* FloorMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
 	UBoxComponent* FloorTriggerBox;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Component")
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
 	TArray<TSubclassOf<AER_Obstacle>> ObstacleClasses;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
+	TArray<int32> LargeObstacleIndexes;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
+	TSubclassOf<AER_CoinItem> CoinClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
+	float DestroyDelay = 2.f;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
 	UArrowComponent* AttachPoint;
@@ -51,15 +60,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
 	UArrowComponent* LeftLane;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
-	UArrowComponent* RightLane;
-	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	float DestroyDelay = 2.f;
-	// UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	// float SpawnProbability = 0.5f;
+	UArrowComponent* RightLane;	
 
 private:
 	UPROPERTY()
 	AER_GameModeBase* RunGameMode;
 	TArray<AER_Obstacle*> Obstacles;
+	TArray<AER_CoinItem*> Coins;
+	float CoinsSpawnProbability = 1.f;
 };

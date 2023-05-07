@@ -24,6 +24,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	void Death();
+	bool IsDead() const;
+	void AddCoin();
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,7 +36,8 @@ protected:
 	void MoveDown();
 
 private:
-	void SmoothlyChangeLane(int& LaneIndex);
+	void SmoothlyChangeLane();
+	void StandUp(float HalfHeight);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -53,11 +56,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Kinder | Input")
 	UInputAction* ActionJump;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
+	UAnimMontage* SlideAnimation;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move", meta = (Units = "s"))
 	float JumpTime = 1.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
 	float ChangeLineSpeed = 10.f;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Move")
+	float MoveDownImpulse = -1000.f;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
 	UParticleSystem* ExplosionParticle;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
@@ -70,6 +77,7 @@ private:
 	FTimerHandle SlideTimer;
 	int CurrentLaneIndex      = 1;
 	float CurrentLanePosition = 0.f;
-	TArray<float> LaneSwitchValues;
+	TArray<FVector> LaneMidLocations;
 	bool bDead = false;
+	const FVector Impulse = FVector(0.f, 0.f, MoveDownImpulse);
 };

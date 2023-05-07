@@ -15,7 +15,7 @@ class GAMESANDBOX_API AER_Obstacle : public AActor
 
 public:
 	AER_Obstacle();
-	float GetSpawnProbability() const;
+	float GetSpawnProbability();
 
 protected:
 	virtual void BeginPlay() override;
