@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_GameModeBase.h"
-#include "ER_Character.h"
 #include "Blueprint/UserWidget.h"
 #include "Content/ER_FloorTile.h"
 #include "Kismet/GameplayStatics.h"
+#include "Player/ER_Character.h"
 #include "UI/ER_GameHud.h"
+#include "UI/ER_GameOver.h"
 
 AER_GameModeBase::AER_GameModeBase()
 {
@@ -74,17 +75,26 @@ TArray<FVector> AER_GameModeBase::GetLaneMidLocations()
 	return LaneMidLocations;
 }
 
-FName AER_GameModeBase::GetLevelName() const
+FName AER_GameModeBase::GetGameLevelName() const
 {
-	return LevelName;
+	return LevelNames.Game;
+}
+
+FName AER_GameModeBase::GetMainLevelName() const
+{
+	return LevelNames.Start;
 }
 
 void AER_GameModeBase::StartFromBegin(AER_Character* DiedCharacter)
 {
 	if (LivesCount <= 0)
 	{
-		//TODO: Game over
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Game Over")));
+		UER_GameOver* GameOver = Cast<UER_GameOver>(CreateWidget(GetWorld(), GameOverClass));
+		if (!GameOver) return;
+
+		Score = Score ? Score * 100 + TotalCoins : TotalCoins;
+		GameOver->ShowFinalScore(Score);
+		GameOver->AddToViewport();
 		return;
 	}
 
@@ -107,6 +117,14 @@ void AER_GameModeBase::StartFromBegin(AER_Character* DiedCharacter)
 void AER_GameModeBase::AddCoin()
 {
 	OnCoinsCountChanged.Broadcast(++TotalCoins);
+
+	if (TotalCoins >= LifePrice)
+	{
+		++Score;
+		TotalCoins -= LifePrice;
+		OnCoinsCountChanged.Broadcast(TotalCoins);
+		IncreaseLives();
+	}
 }
 
 void AER_GameModeBase::DecreaseLives()

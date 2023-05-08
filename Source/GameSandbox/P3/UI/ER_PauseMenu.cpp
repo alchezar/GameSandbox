@@ -2,19 +2,20 @@
 
 #include "ER_PauseMenu.h"
 #include "Components/Button.h"
+#include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetSystemLibrary.h"
-#include "Player/ER_GameModeBase.h"
 
 void UER_PauseMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (!RestartBtn || !ExitBtn || !ContinueBtn) return;
+	if (!ContinueBtn || !MainBtn) return;
 
 	ContinueBtn->OnClicked.AddDynamic(this, &ThisClass::OnContinueClicked);
-	RestartBtn->OnClicked.AddDynamic(this, &ThisClass::OnRestartClicked);
-	ExitBtn->OnClicked.AddDynamic(this, &ThisClass::OnExitClicked);
+	MainBtn->OnClicked.AddDynamic(this, &ThisClass::OnMainClicked);
+
+	GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode());
+	check(GameMode);
 }
 
 void UER_PauseMenu::OnContinueClicked()
@@ -24,17 +25,8 @@ void UER_PauseMenu::OnContinueClicked()
 	RemoveFromParent();
 }
 
-void UER_PauseMenu::OnRestartClicked()
+void UER_PauseMenu::OnMainClicked()
 {
-	const AER_GameModeBase* GameMode = Cast<AER_GameModeBase>(GetWorld()->GetAuthGameMode());
-	if (!GameMode) return;
-
-	UGameplayStatics::OpenLevel(GetWorld(), GameMode->GetLevelName());
+	UGameplayStatics::OpenLevel(GetWorld(), GameMode->GetMainLevelName());
 	RemoveFromParent();
-}
-
-void UER_PauseMenu::OnExitClicked()
-{
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(GetWorld(), 0);
-	UKismetSystemLibrary::QuitGame(GetWorld(), PlayerController, EQuitPreference::Quit, true);
 }

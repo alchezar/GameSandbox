@@ -5,9 +5,9 @@
 #include "ER_Obstacle.h"
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/ER_Character.h"
-#include "Player/ER_GameModeBase.h"
 
 AER_FloorTile::AER_FloorTile()
 {

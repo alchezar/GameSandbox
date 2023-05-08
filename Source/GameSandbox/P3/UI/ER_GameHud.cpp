@@ -4,8 +4,8 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
-#include "Player/ER_GameModeBase.h"
 
 void UER_GameHud::NativeConstruct()
 {
