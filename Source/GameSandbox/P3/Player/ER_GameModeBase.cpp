@@ -1,12 +1,11 @@
 // Copyright (C) 2023, IKinder
 
 #include "ER_GameModeBase.h"
+#include "ER_Character.h"
 #include "Blueprint/UserWidget.h"
 #include "Content/ER_FloorTile.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ER_GameHud.h"
-#include "EngineUtils.h"
-#include "ER_Character.h"
 
 AER_GameModeBase::AER_GameModeBase()
 {
@@ -18,7 +17,6 @@ void AER_GameModeBase::BeginPlay()
 	Super::BeginPlay();
 
 	UGameplayStatics::GetPlayerController(GetWorld(), 0)->bShowMouseCursor = true;
-	LivesCount                                                             = MaxLives;
 
 	GameHud = Cast<UER_GameHud>(CreateWidget(GetWorld(), GameHudClass));
 	check(GameHud);
@@ -27,6 +25,7 @@ void AER_GameModeBase::BeginPlay()
 	GameHud->SetLivesCount(LivesCount);
 
 	CreateInitialFloorTiles();
+	LivesCount = MaxLives;
 }
 
 void AER_GameModeBase::Tick(const float DeltaTime)
@@ -65,20 +64,9 @@ AER_FloorTile* AER_GameModeBase::AddFloorTile(const bool bSpawnObstacles)
 	return FloorTile;
 }
 
-void AER_GameModeBase::RestartLevel()
+void AER_GameModeBase::RemoveFloorTile(AER_FloorTile* Tile)
 {
-	FTimerDelegate RestartDelegate;
-	RestartDelegate.BindLambda([&]()
-	{
-		GetWorldTimerManager().ClearTimer(RestartTimer);
-		UGameplayStatics::OpenLevel(GetWorld(), LevelName);
-	});
-	GetWorldTimerManager().SetTimer(RestartTimer, RestartDelegate, RespawnTime, false);
-}
-
-void AER_GameModeBase::AddCoin()
-{
-	OnCoinsCountChanged.Broadcast(++TotalCoins);
+	FloorTiles.Remove(Tile);
 }
 
 TArray<FVector> AER_GameModeBase::GetLaneMidLocations()
@@ -95,7 +83,7 @@ void AER_GameModeBase::StartFromBegin(AER_Character* DiedCharacter)
 {
 	if (LivesCount <= 0)
 	{
-		// Game over
+		//TODO: Game over
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, FString::Printf(TEXT("Game Over")));
 		return;
 	}
@@ -116,9 +104,9 @@ void AER_GameModeBase::StartFromBegin(AER_Character* DiedCharacter)
 	DiedCharacter->Resurrect();
 }
 
-void AER_GameModeBase::RemoveFloorTile(AER_FloorTile* Tile)
+void AER_GameModeBase::AddCoin()
 {
-	FloorTiles.Remove(Tile);
+	OnCoinsCountChanged.Broadcast(++TotalCoins);
 }
 
 void AER_GameModeBase::DecreaseLives()
@@ -131,4 +119,14 @@ void AER_GameModeBase::IncreaseLives()
 {
 	++LivesCount;
 	OnLivesCountChanged.Broadcast(LivesCount);
+}
+
+TArray<FObstacle> AER_GameModeBase::GetObstacles() const
+{
+	return Obstacles;
+}
+
+FCollect AER_GameModeBase::GetCoin() const
+{
+	return Coin;
 }

@@ -23,8 +23,9 @@ public:
 	AER_Character();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
 	void AddCoin();
-	
+
 	void Death();
 	bool IsDead() const;
 	void NextLife();
@@ -33,6 +34,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Jump() override;
+
 	void MoveForward();
 	void MoveLeft();
 	void MoveRight();
@@ -80,11 +82,12 @@ private:
 	FTimerHandle SlideTimer;
 	FTimerHandle RunSlideTimer;
 
-	bool bDead = false;
 	TArray<FVector> LaneMidLocations;
-	int CurrentLaneIndex      = 1;
-	float CurrentLanePosition = 0.f;
-	float DefaultHalfHeight   = 0.f;
-	const FVector Impulse     = FVector(0.f, 0.f, MoveDownImpulse);
+
+	bool    bDead               = false;
+	int     CurrentLaneIndex    = 1;
+	float   CurrentLanePosition = 0.f;
+	float   DefaultHalfHeight   = 0.f;
+	FVector Impulse             = FVector(0.f, 0.f, MoveDownImpulse);
 	FVector PlayerStartLocation;
 };

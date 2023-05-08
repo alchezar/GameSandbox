@@ -30,7 +30,6 @@ void AER_Character::BeginPlay()
 	Super::BeginPlay();
 
 	bDead = false;
-
 	if (const auto PlayerController = Cast<APlayerController>(Controller))
 	{
 		if (const auto Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
@@ -128,7 +127,7 @@ void AER_Character::Jump()
 {
 	Super::Jump();
 
-	FTimerHandle JumpTimer;
+	FTimerHandle   JumpTimer;
 	FTimerDelegate JumpDelegate;
 	JumpDelegate.BindLambda([&]()
 	{
@@ -171,7 +170,7 @@ void AER_Character::Death()
 
 	GetMesh()->SetVisibility(false);
 	GameMode->DecreaseLives();
-	
+
 	FTimerHandle DeathTimer;
 	GetWorldTimerManager().SetTimer(DeathTimer, this, &ThisClass::NextLife, 2.f);
 }

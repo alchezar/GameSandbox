@@ -19,7 +19,7 @@ AER_CoinItem::AER_CoinItem()
 	CoinMesh->SetupAttachment(SphereCollider);
 	CoinMesh->SetCollisionProfileName("OverlapOnlyPawn");
 
-	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>("RotatingMovement");
+	RotatingMovement               = CreateDefaultSubobject<URotatingMovementComponent>("RotatingMovement");
 	RotatingMovement->RotationRate = FRotator(0.f, 180.f, 0.f);
 }
 
@@ -27,10 +27,10 @@ void AER_CoinItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnColliderBeginOverlap);	
+	SphereCollider->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnColliderBeginOverlap);
 }
 
-void AER_CoinItem::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
+void AER_CoinItem::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (AER_Character* Character = Cast<AER_Character>(OtherActor))
 	{
@@ -38,9 +38,4 @@ void AER_CoinItem::OnColliderBeginOverlap(UPrimitiveComponent* OverlappedCompone
 		Character->AddCoin();
 		CoinMesh->SetVisibility(false);
 	}
-}
-
-float AER_CoinItem::GetSpawnProbability()
-{
-	return SpawnProbability;
 }

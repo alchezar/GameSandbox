@@ -39,10 +39,10 @@ void UER_GameHud::SetLivesCount(const int32 NewCount)
 void UER_GameHud::OnPauseClicked()
 {
 	if (!PauseWidgetClass) return;
-	
+
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	if (UUserWidget* PauseWidget = CreateWidget(GetWorld(), PauseWidgetClass))
 	{
-		PauseWidget->AddToViewport();		
+		PauseWidget->AddToViewport();
 	}
 }

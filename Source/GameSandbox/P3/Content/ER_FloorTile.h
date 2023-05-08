@@ -20,8 +20,10 @@ class GAMESANDBOX_API AER_FloorTile : public AActor
 public:
 	AER_FloorTile();
 	virtual void Tick(float DeltaTime) override;
+
 	const FTransform& GetAttachPoint() const;
-	TArray<FVector> GetLaneMidLocations() const;
+	TArray<FVector>   GetLaneMidLocations() const;
+
 	void SpawnItems();
 	void DestroyFloorTile();
 
@@ -33,7 +35,7 @@ protected:
 private:
 	void SetupComponents();
 	void SpawnObstacle(const FVector& LaneMidLocation, int& LargeNum, bool& bLarge);
-	void SpawnCoins(const FVector& LaneMidLocation, const bool bLarge);
+	void SpawnCoin(const FVector& LaneMidLocation, const bool bLarge);
 	void SpawnSideCoins(const FVector& LaneMidLocation);
 
 protected:
@@ -44,15 +46,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
 	UBoxComponent* FloorTriggerBox;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	TArray<TSubclassOf<AER_Obstacle>> ObstacleClasses;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	TArray<int32> LargeObstacleIndexes;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	TSubclassOf<AER_CoinItem> CoinClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	float DestroyDelay = 2.f;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
 	UArrowComponent* AttachPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
@@ -60,12 +53,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
 	UArrowComponent* LeftLane;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Point")
-	UArrowComponent* RightLane;	
+	UArrowComponent* RightLane;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
+	float DestroyDelay = 2.f;
 
 private:
 	UPROPERTY()
-	AER_GameModeBase* RunGameMode;
+	AER_GameModeBase*     RunGameMode;
 	TArray<AER_Obstacle*> Obstacles;
 	TArray<AER_CoinItem*> Coins;
-	float CoinsSpawnProbability = 1.f;
 };

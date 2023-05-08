@@ -16,14 +16,13 @@ class GAMESANDBOX_API AER_CoinItem : public AActor
 
 public:
 	AER_CoinItem();
-	float GetSpawnProbability();
-	
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	UFUNCTION()
-	void OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	void OnColliderBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
@@ -34,9 +33,7 @@ protected:
 	UStaticMeshComponent* CoinMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Component")
 	URotatingMovementComponent* RotatingMovement;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Effect")
 	USoundBase* OverlapSound;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Spawn")
-	float SpawnProbability = 0.5f;
 };

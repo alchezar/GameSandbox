@@ -108,71 +108,70 @@ void AER_FloorTile::SpawnItems()
 		// Don`t spawn coins above large obstacle
 		bool bLarge = false;
 		SpawnObstacle(LaneMidLocations[i],OUT LargeObstacles,OUT bLarge);
-		SpawnCoins(LaneMidLocations[i], bLarge);
+		SpawnCoin(LaneMidLocations[i], bLarge);
 		SpawnSideCoins(LaneMidLocations[i]);
 	}
 }
 
 void AER_FloorTile::SpawnObstacle(const FVector& LaneMidLocation, int& LargeNum, bool& bLarge)
 {
-	const int32 ObstacleRandomIndex = FMath::RandRange(0, ObstacleClasses.Num() - 1);
+	TArray<FObstacle> DefaultObstacles = RunGameMode->GetObstacles();
+	const int32       Index            = FMath::RandRange(0, DefaultObstacles.Num() - 1);
 
 	// Prevent spawning all big obstacles in one row
-	const bool bCandidate = LargeObstacleIndexes.Contains(ObstacleRandomIndex);
-	if (bCandidate && ++LargeNum > 2) return;
+	if (++LargeNum > 2 && DefaultObstacles[Index].bLarge) return;
 
 	// Choose obstacle and spawn it
-	const TSubclassOf<AER_Obstacle> ObstacleClass = ObstacleClasses[ObstacleRandomIndex];
+	const TSubclassOf<AER_Obstacle> ObstacleClass = DefaultObstacles[Index].Class;
 	if (!ObstacleClass) return;
 
-	const FVector SpawnLocation     = LaneMidLocation;
-	const FTransform SpawnTransform = FTransform(FRotator::ZeroRotator, SpawnLocation);
-
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-
-	AER_Obstacle* Obstacle = GetWorld()->SpawnActor<AER_Obstacle>(ObstacleClass, SpawnTransform, SpawnParameters);
-	if (!Obstacle) return;
-
-	if (FMath::FRand() <= Obstacle->GetSpawnProbability())
+	if (FMath::FRand() <= DefaultObstacles[Index].Probability)
 	{
-		Obstacles.Add(Obstacle);
-		bLarge = bCandidate;
-		return;
+		const FVector         SpawnLocation  = LaneMidLocation;
+		const FTransform      SpawnTransform = FTransform(FRotator::ZeroRotator, SpawnLocation);
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		if (AER_Obstacle* Obstacle = GetWorld()->SpawnActor<AER_Obstacle>(ObstacleClass, SpawnTransform, SpawnParameters))
+		{
+			Obstacles.Add(Obstacle);
+			bLarge = DefaultObstacles[Index].bLarge;
+		}
 	}
-	Obstacle->Destroy();
 }
 
-void AER_FloorTile::SpawnCoins(const FVector& LaneMidLocation, const bool bLarge)
+void AER_FloorTile::SpawnCoin(const FVector& LaneMidLocation, const bool bLarge)
 {
 	if (bLarge) return;
 
-	FActorSpawnParameters SpawnParameters;
-	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-	if (AER_CoinItem* Coin = GetWorld()->SpawnActor<AER_CoinItem>(CoinClass, LaneMidLocation, FRotator::ZeroRotator, SpawnParameters))
+	const auto [Class, Probability] = RunGameMode->GetCoin();
+	if (FMath::FRand() <= Probability)
 	{
-		CoinsSpawnProbability = Coin->GetSpawnProbability();
-		(FMath::FRand() <= CoinsSpawnProbability) ? Coins.Add(Coin) : Coin->Destroy();
+		FActorSpawnParameters SpawnParameters;
+		SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+		if (AER_CoinItem* Coin = GetWorld()->SpawnActor<AER_CoinItem>(Class, LaneMidLocation, FRotator::ZeroRotator, SpawnParameters))
+		{
+			Coins.Add(Coin);
+		}
 	}
 }
 
 void AER_FloorTile::SpawnSideCoins(const FVector& LaneMidLocation)
 {
-	FVector SpawnLocation = LaneMidLocation;
+	FVector    SpawnLocation        = LaneMidLocation;
+	const auto [Class, Probability] = RunGameMode->GetCoin();
 
 	// Additional coins before and after center
 	const double Interval = FloorMesh->Bounds.GetBox().GetSize().X * 0.33;
 	for (int i = 1; i <= 2; ++i)
 	{
 		const float Side = (i == 1) ? 1.f : -1.f;
-		if (FMath::FRand() <= CoinsSpawnProbability)
+		if (FMath::FRand() <= Probability)
 		{
 			// If move back 1 interval, it will be same location as LaneMidLocation, so multiply interval by 2(i)
 			SpawnLocation.X += Side * Interval * i;
-			FActorSpawnParameters SpawnParameters;
-			SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-			AER_CoinItem* SideCoin = GetWorld()->SpawnActor<AER_CoinItem>(CoinClass, SpawnLocation, FRotator::ZeroRotator, SpawnParameters);
-			Coins.Add(SideCoin);
+			SpawnCoin(SpawnLocation, false);
 		}
 	}
 }

@@ -31,5 +31,4 @@ protected:
 	UButton* RestartBtn;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
 	UButton* ExitBtn;
-		
 };
