@@ -1,9 +1,34 @@
+# git ls-files --others --exclude-from=.git/info/exclude
+# Lines that start with '#' are comments.
+# For a project mostly in C, the following would be a good set of
+# exclude patterns (uncomment them if you want to use them):
+# *.[oa]
+# *~
+
 /Binaries/
 /Binaries/Win64/
 /Saved/
 /Intermediate/
 /Platforms/HoloLens/Config/
 /Plugins/Developer/RiderLink/
+/Content/Characters/
 /Content/StarterContent/
-/Content/Characters/Mannequins/
+/GameSandbox.uproject.DotSettings.user
 *BuiltData.uasset
+
+# P2 Shoot Them Up
+/Content/Project/P2/Font/
+/Content/Project/P2/Level/
+/Content/Project/P2/Mesh/
+/Content/Project/P2/Sound/
+/Content/Project/P2/VFX/
+
+# P3 Endless Runner
+/Content/Project/P3/Animation/
+/Content/Project/P3/Audio/
+/Content/Project/P3/Icon/
+/Content/Project/P3/Input/
+/Content/Project/P3/Level/
+/Content/Project/P3/Mannequin/
+/Content/Project/P3/Mesh/
+/Content/Project/P3/Particle/
