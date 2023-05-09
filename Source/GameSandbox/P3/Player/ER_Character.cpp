@@ -161,14 +161,16 @@ void AER_Character::Death()
 	if (!GetWorld() || !ExplosionParticle || !ExplosionSound) return;
 
 	bDead = true;
-	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->DisableMovement();	
+	GetCharacterMovement()->MovementState.bCanJump = false;
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
 
 	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), ExplosionParticle, GetActorLocation(), FRotator::ZeroRotator, FVector(3.f));
 	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), ExplosionSound, GetActorLocation());
 
 	GetWorldTimerManager().ClearTimer(SlideTimer);
 
-	GetMesh()->SetVisibility(false);
 	GameMode->DecreaseLives();
 
 	FTimerHandle DeathTimer;
@@ -193,7 +195,12 @@ void AER_Character::AddCoin()
 void AER_Character::Resurrect()
 {
 	bDead = false;
+	
+	GetMesh()->SetSimulatePhysics(false);
+	GetMesh()->SetCollisionProfileName("CharacterMesh");
+	GetMesh()->SetRelativeLocationAndRotation(FVector(0.f, 0.f, -DefaultHalfHeight), FRotator(0.f, -90.f, 0.f));
+	GetMesh()->AttachToComponent(GetCapsuleComponent(), FAttachmentTransformRules::KeepRelativeTransform);
 	SetActorLocation(PlayerStartLocation);
-	GetMesh()->SetVisibility(true);
+	GetCharacterMovement()->MovementState.bCanJump = true;	
 	GetCharacterMovement()->MovementMode = EMovementMode::MOVE_Walking;
 }
