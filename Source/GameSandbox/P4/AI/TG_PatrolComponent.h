@@ -21,6 +21,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+private:
+
 protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "Kinder | AI")
 	TArray<ATargetPoint*> PatrolPoints;
