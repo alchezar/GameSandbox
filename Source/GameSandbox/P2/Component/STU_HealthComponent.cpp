@@ -53,8 +53,8 @@ void USTU_HealthComponent::OnTakePointDamage(AActor* DamagedActor, float Damage,
 	ApplyDamage(FinalDamage, InstigatedBy);
 }
 
-void USTU_HealthComponent::OnTakeRadialDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, FVector Origin, FHitResult HitInfo, AController* InstigatedBy, AActor* DamageCauser)
-{
+void USTU_HealthComponent::OnTakeRadialDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, FVector Origin, const FHitResult& HitInfo, AController* InstigatedBy, AActor* DamageCauser)
+{	
 	ApplyDamage(Damage, InstigatedBy);
 }
 
