@@ -2,9 +2,9 @@
 
 #include "TG_Task_ChooseNextWaypoint.h"
 #include "AIController.h"
-#include "TG_PatrolComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Engine/TargetPoint.h"
+#include "P4/AI/TG_PatrolComponent.h"
 
 EBTNodeResult::Type UTG_Task_ChooseNextWaypoint::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
