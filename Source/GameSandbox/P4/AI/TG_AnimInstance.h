@@ -20,6 +20,7 @@ public:
 
 protected:
 	float GetMovementDirectionAngle() const;
+	void OnFiringHandle(const bool bFire);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder")

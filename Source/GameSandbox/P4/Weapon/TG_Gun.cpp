@@ -1,0 +1,71 @@
+// Copyright (C) 2023, IKinder
+
+#include "TG_Gun.h"
+#include "TG_Projectile.h"
+#include "Animation/AnimInstance.h"
+#include "Kismet/GameplayStatics.h"
+
+
+ATG_Gun::ATG_Gun()
+{
+	PrimaryActorTick.bCanEverTick = true;
+
+	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>("FP_Gun");
+	// FP_Gun->SetOnlyOwnerSee(true);
+	FP_Gun->bCastDynamicShadow = false;
+	FP_Gun->CastShadow = false;
+
+	FP_Muzzle = CreateDefaultSubobject<USceneComponent>("MuzzleLocation");
+	FP_Muzzle->SetupAttachment(FP_Gun);
+	FP_Muzzle->SetRelativeLocation(FVector(0.f, 60.f, 9.3f));
+}
+
+void ATG_Gun::BeginPlay()
+{
+	Super::BeginPlay();	
+}
+
+void ATG_Gun::Tick(const float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+}
+
+void ATG_Gun::StartFire()
+{
+	GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
+	OnFire();
+	OnFiring.Broadcast(true);
+}
+
+void ATG_Gun::StopFire()
+{
+	GetWorldTimerManager().ClearTimer(FireTimer);
+	OnFiring.Broadcast(false);
+}
+
+void ATG_Gun::SetAnimInstance(UAnimInstance* NewAnimInstance)
+{
+	AnimInstance = NewAnimInstance;
+}
+
+void ATG_Gun::OnFire()
+{
+	if (ProjectileClass)
+	{
+		const FRotator SpawnRotator = FP_Muzzle->GetComponentRotation();
+		const FVector  SpawnLocation = FP_Muzzle->GetComponentLocation();
+
+		UWorld* World = GetWorld();
+		if (!World) return;
+
+		World->SpawnActor<ATG_Projectile>(ProjectileClass, SpawnLocation, SpawnRotator);
+	}
+	if (FireSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
+	}
+	if (FireAnimation)
+	{		
+		AnimInstance->Montage_Play(FireAnimation);	
+	}
+}
