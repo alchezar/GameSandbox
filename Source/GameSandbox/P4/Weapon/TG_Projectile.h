@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "TG_Projectile.generated.h"
 
+class ATG_Gun;
 class USphereComponent;
 class UProjectileMovementComponent;
 
@@ -23,9 +24,15 @@ public:
 	USphereComponent*             GetCollisionComp() const;
 	UProjectileMovementComponent* GetProjectileMovement() const;
 
+	void SetProjectileOwner(ATG_Gun* NewProjectileOwner);
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Projectile")
 	USphereComponent* CollisionComp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Kinder | Movement")
 	UProjectileMovementComponent* ProjectileMovement;
+
+private:
+	UPROPERTY()
+	ATG_Gun* ProjectileOwner;
 };

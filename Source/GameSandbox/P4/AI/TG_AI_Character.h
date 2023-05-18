@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
+#include "P4/Player/TG_BaseCharacter.h"
 #include "TG_AI_Character.generated.h"
 
 class ATargetPoint;
 
 UCLASS()
-class GAMESANDBOX_API ATG_AI_Character : public ACharacter
+class GAMESANDBOX_API ATG_AI_Character : public ATG_BaseCharacter
 {
 	GENERATED_BODY()
 

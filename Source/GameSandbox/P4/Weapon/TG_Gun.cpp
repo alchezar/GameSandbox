@@ -4,7 +4,8 @@
 #include "TG_Projectile.h"
 #include "Animation/AnimInstance.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "P4/AnimNotify/TG_AN_Fire.h"
+#include "P4/Player/TG_BaseCharacter.h"
 
 ATG_Gun::ATG_Gun()
 {
@@ -22,7 +23,8 @@ ATG_Gun::ATG_Gun()
 
 void ATG_Gun::BeginPlay()
 {
-	Super::BeginPlay();	
+	Super::BeginPlay();
+	InitAnimation();
 }
 
 void ATG_Gun::Tick(const float DeltaTime)
@@ -32,14 +34,14 @@ void ATG_Gun::Tick(const float DeltaTime)
 
 void ATG_Gun::StartFire()
 {
-	GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
-	OnFire();
+	// GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
+	// OnFire();
 	OnFiring.Broadcast(true);
 }
 
 void ATG_Gun::StopFire()
 {
-	GetWorldTimerManager().ClearTimer(FireTimer);
+	// GetWorldTimerManager().ClearTimer(FireTimer);
 	OnFiring.Broadcast(false);
 }
 
@@ -55,17 +57,47 @@ void ATG_Gun::OnFire()
 		const FRotator SpawnRotator = FP_Muzzle->GetComponentRotation();
 		const FVector  SpawnLocation = FP_Muzzle->GetComponentLocation();
 
-		UWorld* World = GetWorld();
-		if (!World) return;
+		ATG_Projectile* Projectile = GetWorld()->SpawnActor<ATG_Projectile>(ProjectileClass, SpawnLocation, SpawnRotator);
+		if (!Projectile) return;
 
-		World->SpawnActor<ATG_Projectile>(ProjectileClass, SpawnLocation, SpawnRotator);
+		Projectile->SetProjectileOwner(this);
 	}
 	if (FireSound)
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
-	if (FireAnimation)
-	{		
-		AnimInstance->Montage_Play(FireAnimation);	
+}
+
+void ATG_Gun::SetWeaponOwner(ATG_BaseCharacter* TheOwner)
+{
+	WeaponOwner = TheOwner;
+}
+
+void ATG_Gun::InitAnimation()
+{
+	for (const auto Animation : OwnerFireAnimations)
+	{
+		if (!Animation) continue;
+
+		const TArray<FAnimNotifyEvent> NotifyEvents = Animation->Notifies;
+		for (auto NotifyEvent : NotifyEvents)
+		{
+			const auto AnimNotify = Cast<UTG_AN_Fire>(NotifyEvent.Notify);
+			if (!AnimNotify) continue;
+
+			AnimNotify->OnGunFired.AddUObject(this, &ThisClass::OnFireAnimStarted);
+		}
 	}
+}
+
+void ATG_Gun::OnFireAnimStarted(USkeletalMeshComponent* MeshComp)
+{
+	if (!WeaponOwner || WeaponOwner->GetMesh() != MeshComp) return;
+
+	OnFire();
+}
+
+float ATG_Gun::GetWeaponDamage() const
+{
+	return Damage;
 }

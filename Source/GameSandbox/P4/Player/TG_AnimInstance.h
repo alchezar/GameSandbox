@@ -33,6 +33,10 @@ protected:
 	bool bInAir = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder")
 	bool bShooting = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder")
+	bool bAiming = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder")
+	bool bDead = false;
 
 private:
 	UPROPERTY()

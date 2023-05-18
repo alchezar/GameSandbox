@@ -6,6 +6,7 @@
 #include "../Weapon/TG_Gun.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 ATG_FirstPersonCharacter::ATG_FirstPersonCharacter()
 {
@@ -28,24 +29,19 @@ void ATG_FirstPersonCharacter::BeginPlay()
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
-	}	
+	}
 	if (WeaponClass)
 	{
-		CurrentWeapon = GetWorld()->SpawnActor<ATG_Gun>(WeaponClass);
-		if (!CurrentWeapon) return;
-		CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), HandSocketName);
-		CurrentWeapon->SetActorRelativeLocation(FVector(-2.f, -12.f, -1.f));
-		CurrentWeapon->SetActorRelativeRotation(FRotator(-20.f, 0.f, 0.f));
-		CurrentWeapon->SetAnimInstance(GetMesh()->GetAnimInstance());
-
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::StartFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::StopFire);
 	}
+
 	if (FP_CameraComponent)
 	{
 		FP_CameraComponent->AttachToComponent(GetMesh(), FAttachmentTransformRules::KeepWorldTransform, HeadSocketName);
-		FP_CameraComponent->SetRelativeLocation(FVector(0.f, 0.f, 0.f)); 
+		FP_CameraComponent->SetRelativeLocation(CameraOffset);
 	}
+	MaxWalkSpeed = GetCharacterMovement()->GetMaxSpeed();
 }
 
 void ATG_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -64,9 +60,15 @@ void ATG_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	/* Looking */
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	// /* Firing */
-	// EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, CurrentWeapon, &ATG_Gun::StartFire);
-	// EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Canceled, CurrentWeapon, &ATG_Gun::StopFire);
+	/* Firing */
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::StartFire);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::StopFire);
+	/* Aiming */
+	EnhancedInputComponent->BindAction<Super, bool>(AimAction, ETriggerEvent::Started, this, &Super::SetIsAiming, true);
+	EnhancedInputComponent->BindAction<Super, bool>(AimAction, ETriggerEvent::Completed, this, &Super::SetIsAiming, false);
+	/* Running */
+	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Started, this, &ThisClass::Run, true);
+	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Completed, this, &ThisClass::Run, false);
 }
 
 void ATG_FirstPersonCharacter::Move(const FInputActionValue& Value)
@@ -91,6 +93,11 @@ void ATG_FirstPersonCharacter::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
+void ATG_FirstPersonCharacter::Run(const bool bRun)
+{
+	GetCharacterMovement()->MaxWalkSpeed = bRun ? MaxWalkSpeed * 2 : MaxWalkSpeed;
+}
+
 void ATG_FirstPersonCharacter::SetHasRifle(const bool bNewHasRifle)
 {
 	bHasRifle = bNewHasRifle;
@@ -104,9 +111,4 @@ bool ATG_FirstPersonCharacter::GetHasRifle() const
 UCameraComponent* ATG_FirstPersonCharacter::GetFirstPersonCameraComponent() const
 {
 	return FP_CameraComponent;
-}
-
-ATG_Gun* ATG_FirstPersonCharacter::GetCurrentWeapon() const
-{
-	return CurrentWeapon;
 }

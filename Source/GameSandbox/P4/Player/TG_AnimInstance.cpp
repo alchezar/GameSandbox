@@ -23,12 +23,14 @@ void UTG_AnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 	AimRotation = (Pawn->GetBaseAimRotation() - Pawn->GetActorRotation());
 	AimRotation.Normalize();	
 	
-	if (const auto* PersonCharacter = Cast<ATG_FirstPersonCharacter>(Pawn))
-	{
-		ATG_Gun* Gun = PersonCharacter->GetCurrentWeapon();
-		if (!Gun) return;
-		
-		Gun->OnFiring.AddUObject(this, &ThisClass::OnFiringHandle);
+	if (const auto BaseCharacter = Cast<ATG_BaseCharacter>(Pawn))
+	{		
+		if (ATG_Gun* Gun = BaseCharacter->GetCurrentWeapon())
+		{
+			Gun->OnFiring.AddUObject(this, &ThisClass::OnFiringHandle);
+		}
+		bAiming = BaseCharacter->GetIsAiming();
+		bDead = BaseCharacter->GetIsDead();
 	}
 }
 
