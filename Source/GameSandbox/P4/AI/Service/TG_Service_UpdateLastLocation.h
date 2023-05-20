@@ -21,4 +21,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
 	FBlackboardKeySelector ActorKey;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
-	FBlackboardKeySelector LastSeenLocationKey;};
+	FBlackboardKeySelector LastSeenLocationKey;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
+	FName FriendTag = "Bot";
+};

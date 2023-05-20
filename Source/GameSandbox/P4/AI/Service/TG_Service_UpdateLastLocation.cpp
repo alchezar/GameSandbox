@@ -14,11 +14,15 @@ void UTG_Service_UpdateLastLocation::TickNode(UBehaviorTreeComponent& OwnerComp,
 	const AAIController*  Controller = OwnerComp.GetAIOwner();
 	if (!Blackboard || !Controller) return;
 
-	if (const AActor* Focus = Cast<AActor>(Blackboard->GetValueAsObject(ActorKey.SelectedKeyName)))
+	const AActor* Focus = Cast<AActor>(Blackboard->GetValueAsObject(ActorKey.SelectedKeyName));
+	if (!Focus || Focus->ActorHasTag(FriendTag))
 	{
-		const FVector LastLocation = Focus->GetActorLocation();
-		Blackboard->SetValueAsVector(LastSeenLocationKey.SelectedKeyName, LastLocation);
+		Blackboard->ClearValue(LastSeenLocationKey.SelectedKeyName);
+		return;
 	}
+	
+	const FVector LastLocation = Focus->GetActorLocation();
+	Blackboard->SetValueAsVector(LastSeenLocationKey.SelectedKeyName, LastLocation);
 
 	Super::TickNode(OwnerComp, NodeMemory, DeltaSeconds);
 }

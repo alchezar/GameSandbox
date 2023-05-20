@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "P4/AnimNotify/TG_AN_Fire.h"
 #include "P4/Player/TG_BaseCharacter.h"
+// #include "Perception/AISense_Hearing.h"
 
 ATG_Gun::ATG_Gun()
 {
@@ -66,6 +67,7 @@ void ATG_Gun::OnFire()
 	{
 		UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
 	}
+	// UAISense_Hearing::ReportNoiseEvent(GetWorld(), WeaponOwner->GetActorLocation());
 }
 
 void ATG_Gun::SetWeaponOwner(ATG_BaseCharacter* TheOwner)
