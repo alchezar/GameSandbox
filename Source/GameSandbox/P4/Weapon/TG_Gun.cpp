@@ -25,7 +25,7 @@ ATG_Gun::ATG_Gun()
 void ATG_Gun::BeginPlay()
 {
 	Super::BeginPlay();
-	InitAnimation();
+	// InitAnimation();
 }
 
 void ATG_Gun::Tick(const float DeltaTime)
@@ -33,16 +33,16 @@ void ATG_Gun::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void ATG_Gun::StartFire()
+void ATG_Gun::PullTrigger()
 {
-	// GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
-	// OnFire();
-	OnFiring.Broadcast(true);
+	GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
+	OnFire();
+	// OnFiring.Broadcast(true);
 }
 
-void ATG_Gun::StopFire()
+void ATG_Gun::ReleaseTrigger()
 {
-	// GetWorldTimerManager().ClearTimer(FireTimer);
+	GetWorldTimerManager().ClearTimer(FireTimer);
 	OnFiring.Broadcast(false);
 }
 
@@ -53,6 +53,10 @@ void ATG_Gun::SetAnimInstance(UAnimInstance* NewAnimInstance)
 
 void ATG_Gun::OnFire()
 {
+	/* Restart fire animation after each shot */
+	OnFiring.Broadcast(false);
+	OnFiring.Broadcast(true);
+	
 	if (ProjectileClass)
 	{
 		const FRotator SpawnRotator = FP_Muzzle->GetComponentRotation();
@@ -92,6 +96,7 @@ void ATG_Gun::InitAnimation()
 	}
 }
 
+// ReSharper disable CppParameterMayBeConstPtrOrRef
 void ATG_Gun::OnFireAnimStarted(USkeletalMeshComponent* MeshComp)
 {
 	if (!WeaponOwner || WeaponOwner->GetMesh() != MeshComp) return;

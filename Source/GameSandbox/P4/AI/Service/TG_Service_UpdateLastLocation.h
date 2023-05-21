@@ -6,6 +6,8 @@
 #include "BehaviorTree/BTService.h"
 #include "TG_Service_UpdateLastLocation.generated.h"
 
+class ATG_BaseCharacter;
+
 UCLASS()
 class GAMESANDBOX_API UTG_Service_UpdateLastLocation : public UBTService
 {
@@ -19,9 +21,7 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
-	FBlackboardKeySelector ActorKey;
+	FBlackboardKeySelector TargetKey;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
 	FBlackboardKeySelector LastSeenLocationKey;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder")
-	FName FriendTag = "Bot";
 };

@@ -85,7 +85,7 @@ void ATG_BaseCharacter::CharacterDying()
 	GetCharacterMovement()->DisableMovement();
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->StopFire();
+		CurrentWeapon->ReleaseTrigger();
 	}	
 	//TODO: Ragdoll simulation ? 
 	SetLifeSpan(5.f);

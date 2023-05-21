@@ -32,8 +32,8 @@ void ATG_FirstPersonCharacter::BeginPlay()
 	}
 	if (WeaponClass)
 	{
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::StartFire);
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::StopFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::PullTrigger);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::ReleaseTrigger);
 	}
 
 	if (FP_CameraComponent)
@@ -61,8 +61,8 @@ void ATG_FirstPersonCharacter::SetupPlayerInputComponent(UInputComponent* Player
 	/* Looking */
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	/* Firing */
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::StartFire);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::StopFire);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, CurrentWeapon, &ATG_Gun::PullTrigger);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, CurrentWeapon, &ATG_Gun::ReleaseTrigger);
 	/* Aiming */
 	EnhancedInputComponent->BindAction<Super, bool>(AimAction, ETriggerEvent::Started, this, &Super::SetIsAiming, true);
 	EnhancedInputComponent->BindAction<Super, bool>(AimAction, ETriggerEvent::Completed, this, &Super::SetIsAiming, false);

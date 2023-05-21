@@ -19,15 +19,12 @@ EBTNodeResult::Type UTG_Task_Shoot::ExecuteTask(UBehaviorTreeComponent& OwnerCom
 
 	APawn* Pawn = Controller->GetPawn();
 	if (!Pawn) return EBTNodeResult::Failed;
-	ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(Pawn);
+	const ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(Pawn);
 	if (!Character) return EBTNodeResult::Failed;
-
-	Character->SetIsAiming(true);
-
 	ATG_Gun* Weapon = Character->GetCurrentWeapon();
 	if (!Weapon) return EBTNodeResult::Failed;
 
-	Weapon->StartFire();
+	Weapon->PullTrigger();
 
 	return EBTNodeResult::InProgress;
 }
@@ -42,15 +39,12 @@ EBTNodeResult::Type UTG_Task_Shoot::AbortTask(UBehaviorTreeComponent& OwnerComp,
 
 	APawn* Pawn = Controller->GetPawn();
 	if (!Pawn) return EBTNodeResult::Failed;
-	ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(Pawn);
+	const ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(Pawn);
 	if (!Character) return EBTNodeResult::Failed;
-
-	Character->SetIsAiming(false);
-
 	ATG_Gun* Weapon = Character->GetCurrentWeapon();
 	if (!Weapon) return EBTNodeResult::Failed;
 
-	Weapon->StopFire();
+	Weapon->ReleaseTrigger();
 	
 	return EBTNodeResult::Aborted;
 }

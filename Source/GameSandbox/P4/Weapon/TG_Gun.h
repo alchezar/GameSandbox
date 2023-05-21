@@ -22,9 +22,9 @@ public:
 	ATG_Gun();
 	virtual void Tick(float DeltaTime) override;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Weapon")
-	void StartFire();
+	void PullTrigger();
 	UFUNCTION(BlueprintCallable, Category = "Kinder | Weapon")
-	void StopFire();
+	void ReleaseTrigger();
 
 	float GetWeaponDamage() const;
 	void  SetAnimInstance(UAnimInstance* NewAnimInstance);
@@ -55,11 +55,11 @@ protected:
 	USoundBase* FireSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Gameplay")
 	float Damage = 10.f;
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Gameplay")
-	// float TimeBetweenShoots = 0.1f; 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Gameplay")
+	float TimeBetweenShoots = 0.1f; 
 
 private:
-	// FTimerHandle FireTimer;
+	FTimerHandle FireTimer;
 
 	UPROPERTY()
 	UAnimInstance* AnimInstance;
