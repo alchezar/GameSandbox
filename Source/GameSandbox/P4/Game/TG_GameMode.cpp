@@ -1,17 +1,22 @@
 // Copyright (C) 2023, IKinder
 
 #include "TG_GameMode.h"
-#include "TG_TerrainTile.h"
 #include "EngineUtils.h"
+#include "TG_ActorPool.h"
+#include "TG_TerrainTile.h"
+#include "NavMesh/NavMeshBoundsVolume.h"
 
 ATG_GameMode::ATG_GameMode()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	ActorPool = CreateDefaultSubobject<UTG_ActorPool>("ActorPool");
 }
 
 void ATG_GameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	PopulateBoundsVolumePool();
 	AddInitialTiles();
 }
 
@@ -40,6 +45,7 @@ void ATG_GameMode::AddInitialTiles()
 void ATG_GameMode::AddNextTile()
 {
 	const auto TerrainTile = GetWorld()->SpawnActor<ATG_TerrainTile>(TerrainTileClass, NextSpawnLocation, FRotator::ZeroRotator);
+	TerrainTile->SetActorPool(ActorPool);
 	NextSpawnLocation = TerrainTile->GetAttachPoint();
 
 	// Some sort of linked list of tiles
@@ -57,7 +63,7 @@ void ATG_GameMode::RemovePreviousTile()
 {
 	if (CurrentTile <= 1) return;
 
-	SpawnedTiles[CurrentTile - 2]->Destroy();
+	SpawnedTiles[CurrentTile - 2]->DestroyTile();
 	SpawnedTiles[CurrentTile - 2] = nullptr;
 }
 
@@ -72,3 +78,19 @@ void ATG_GameMode::UpdateActiveTiles()
 	UpdateCurrentTileIndex();
 	RemovePreviousTile();
 }
+
+void ATG_GameMode::PopulateBoundsVolumePool()
+{
+	auto VolumeIterator = TActorIterator<ANavMeshBoundsVolume>(GetWorld());
+	while (VolumeIterator)
+	{
+		// AddToPool(*VolumeIterator);
+		ActorPool->Add(*VolumeIterator);
+		++VolumeIterator;
+	}
+}
+
+// void ATG_GameMode::AddToPool(ANavMeshBoundsVolume* VolumeToAdd)
+// {
+// 	ActorPool->Add(VolumeToAdd);
+// }

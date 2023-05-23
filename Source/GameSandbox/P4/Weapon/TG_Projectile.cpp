@@ -2,13 +2,14 @@
 
 #include "TG_Projectile.h"
 #include "Components/SphereComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "P4/Player/TG_BaseCharacter.h"
-#include "P4/Weapon/TG_Gun.h"
 #include "Engine/DamageEvents.h"
+#include "GameFramework/ProjectileMovementComponent.h"
+#include "P4/Weapon/TG_Gun.h"
 
 ATG_Projectile::ATG_Projectile()
 {
+	PrimaryActorTick.bCanEverTick = true;
+	
 	CollisionComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(5.0f);
 	// CollisionComp->BodyInstance.SetCollisionProfileName("Projectile");
@@ -25,27 +26,39 @@ ATG_Projectile::ATG_Projectile()
 	ProjectileMovement->InitialSpeed = 3000.f;
 	ProjectileMovement->MaxSpeed = 3000.f;
 	ProjectileMovement->bRotationFollowsVelocity = true;
+	ProjectileMovement->ProjectileGravityScale = 0.1f;
 
 	InitialLifeSpan = 3.0f;
 }
 
-void ATG_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ATG_Projectile::Tick(const float DeltaSeconds)
 {
-	// if (OtherActor && OtherComp && OtherActor != this && OtherComp->IsSimulatingPhysics())
-	// {
-	// 	OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
-	// }
+	Super::Tick(DeltaSeconds);
+}
+
+void ATG_Projectile::BeginPlay()
+{
+	Super::BeginPlay();
+}
+
+void ATG_Projectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{	
+	/*if (OtherActor && OtherComp && OtherActor != this && OtherComp->IsSimulatingPhysics())
+	{
+		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+	}
+	if (ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(OtherActor))
+	{		
+		Character->ReceiveDamage(ProjectileOwner->GetWeaponDamage());
+	}*/
+
+	// TODO: Don`t shoot yourself
 	if (AActor* HitActor = Hit.GetActor())
 	{
 		FPointDamageEvent DamageEvent;
 		DamageEvent.HitInfo = Hit;
 		HitActor->TakeDamage(ProjectileOwner->GetWeaponDamage(), DamageEvent, nullptr, this);
 	}
-	// if (ATG_BaseCharacter* Character = Cast<ATG_BaseCharacter>(OtherActor))
-	// {		
-	// 	Character->ReceiveDamage(ProjectileOwner->GetWeaponDamage());
-	// }
-	
 	Destroy();
 }
 

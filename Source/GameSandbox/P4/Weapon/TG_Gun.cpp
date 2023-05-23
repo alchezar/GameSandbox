@@ -56,7 +56,7 @@ void ATG_Gun::OnFire()
 	/* Restart fire animation after each shot */
 	OnFiring.Broadcast(false);
 	OnFiring.Broadcast(true);
-	
+
 	if (ProjectileClass)
 	{
 		const FRotator SpawnRotator = FP_Muzzle->GetComponentRotation();
@@ -64,7 +64,7 @@ void ATG_Gun::OnFire()
 
 		ATG_Projectile* Projectile = GetWorld()->SpawnActor<ATG_Projectile>(ProjectileClass, SpawnLocation, SpawnRotator);
 		if (!Projectile) return;
-
+		
 		Projectile->SetProjectileOwner(this);
 	}
 	if (FireSound)
