@@ -6,6 +6,9 @@
 #include "TG_BaseCharacter.h"
 #include "TG_FirstPersonCharacter.generated.h"
 
+class UPostProcessComponent;
+class UBoxComponent;
+class ATG_GameMode;
 class ATG_Gun;
 class UInputAction;
 class UInputComponent;
@@ -17,6 +20,8 @@ class USoundBase;
 class UInputMappingContext;
 struct FInputActionValue;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FTGOnHealthChangedSignature, float);
+
 UCLASS(config=Game)
 class ATG_FirstPersonCharacter : public ATG_BaseCharacter
 {
@@ -24,27 +29,42 @@ class ATG_FirstPersonCharacter : public ATG_BaseCharacter
 
 public:
 	ATG_FirstPersonCharacter();
-	UCameraComponent*       GetFirstPersonCameraComponent() const;
+	virtual void Tick(float DeltaSeconds) override;
+	virtual void PossessedBy(AController* NewController) override;
+	UCameraComponent* GetFirstPersonCameraComponent() const;
 
 	// ATG_Gun* GetCurrentWeapon() const;
 	bool GetHasRifle() const;
 	void SetHasRifle(const bool bNewHasRifle);
+	virtual void ReceiveDamage(const float Damage) override;
+	virtual void SetHealth(const float NewHealth) override;
+
+	float GetCurrentHealth() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void CharacterDying() override;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Run(const bool bRun);
 
+private:
+	void ApplyDamageEffect();
+	void PlayDamageEffect();
+
 public:
+	FTGOnHealthChangedSignature OnHealthChanged;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Weapon)
 	bool bHasRifle;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Camera")
 	UCameraComponent* FP_CameraComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Camera")
+	UArrowComponent* DeathCameraPosition;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Attach")
 	FName HeadSocketName = "GoPro";
@@ -66,8 +86,15 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Kinder | Input")
 	UInputAction* RunAction;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder |Post")
+	UBoxComponent* EffectVolume;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder |Post")
+	UPostProcessComponent* DamagePostProcess;
+
 private:
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
 	float MaxWalkSpeed = 0.f;
+	float Alpha = 0.f;
+	FTimerHandle DamageTimer;
 };

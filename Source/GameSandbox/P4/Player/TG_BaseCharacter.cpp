@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "TG_BaseCharacter.h"
-#include "../Weapon/TG_Gun.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P4/Weapon/TG_Gun.h"
 
 ATG_BaseCharacter::ATG_BaseCharacter()
 {
@@ -26,6 +26,7 @@ void ATG_BaseCharacter::BeginPlay()
 		CurrentWeapon->SetWeaponOwner(this);
 	}
 	bDead = false;
+	Health = MaxHealth;
 }
 
 void ATG_BaseCharacter::Tick(const float DeltaTime)
@@ -76,6 +77,21 @@ void ATG_BaseCharacter::ReceiveDamage(const float Damage)
 		Health = 0;
 		CharacterDying();
 	}
+}
+
+float ATG_BaseCharacter::GetHealth() const
+{
+	return Health;
+}
+
+float ATG_BaseCharacter::GetMaxHealth() const
+{
+	return MaxHealth;
+}
+
+void ATG_BaseCharacter::SetHealth(const float NewHealth)
+{
+	Health = NewHealth;
 }
 
 void ATG_BaseCharacter::CharacterDying()

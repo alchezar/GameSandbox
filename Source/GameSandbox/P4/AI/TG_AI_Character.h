@@ -19,4 +19,5 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void CharacterDying() override;
 };

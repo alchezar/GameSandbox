@@ -7,8 +7,8 @@
 #include "TG_GameMode.h"
 #include "Components/ArrowComponent.h"
 #include "Components/StaticMeshComponent.h"
-#include "Player/TG_FirstPersonCharacter.h"
 #include "NavMesh/NavMeshBoundsVolume.h"
+#include "Player/TG_FirstPersonCharacter.h"
 
 ATG_TerrainTile::ATG_TerrainTile()
 {
@@ -33,21 +33,21 @@ ATG_TerrainTile::ATG_TerrainTile()
 void ATG_TerrainTile::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (!bAlwaysUnlock)
-	{
-		Lock();
-	}
+	
 	LockWall->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnLockOverlapped);
 	GameMode = Cast<ATG_GameMode>(GetWorld()->GetAuthGameMode());
 
 	PlaceCovers();
-	PlaceTroopers(true);
+	if (!bAlwaysUnlock)
+	{
+		Lock();
+		PlaceTroopers(true);
+	}
 }
 
 void ATG_TerrainTile::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	if (ActorPool)
+	if (ActorPool && NavMeshVolume)
 	{
 		ActorPool->Return(NavMeshVolume);
 	}
@@ -81,6 +81,11 @@ void ATG_TerrainTile::OnLockOverlapped(UPrimitiveComponent* OverlappedComponent,
 	if (OtherActor->IsA(ATG_FirstPersonCharacter::StaticClass()))
 	{
 		Lock();
+		if (ATG_FirstPersonCharacter* Character = Cast<ATG_FirstPersonCharacter>(OtherActor))
+		{
+			Character->SetHealth(Character->GetMaxHealth());
+		}
+		
 		if (GameMode)
 		{
 			GameMode->UpdateActiveTiles();

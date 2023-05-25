@@ -24,15 +24,18 @@ public:
 	bool GetIsDead () const;
 	UFUNCTION(BlueprintCallable, Category = "Kinder | AI")
 	void SetIsAiming(const bool bNewAim);
-
 	UFUNCTION()
 	void OnTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-	void ReceiveDamage(const float Damage);
+	virtual void ReceiveDamage(const float Damage);
+	virtual void SetHealth(const float NewHealth);
+	float GetHealth() const;
+	float GetMaxHealth() const;
+
 	
 
 protected:
 	virtual void BeginPlay() override;
-	void CharacterDying();
+	virtual void CharacterDying();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Kinder | Mesh")
@@ -46,7 +49,11 @@ protected:
 	bool bAim = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
-	float Health = 100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
 	bool bDead = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
+	float MaxHealth = 100.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
+	float Health = 0.f;
+
+private:
 };

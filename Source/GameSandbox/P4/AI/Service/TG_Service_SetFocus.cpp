@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "TG_Service_SetFocus.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 UTG_Service_SetFocus::UTG_Service_SetFocus()
 {

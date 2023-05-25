@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "TG_Decorator_WithinRange.h"
-#include "BehaviorTree/BlackboardComponent.h"
 #include "AIController.h"
+#include "BehaviorTree/BlackboardComponent.h"
 
 bool UTG_Decorator_WithinRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {

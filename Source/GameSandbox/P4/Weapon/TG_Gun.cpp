@@ -35,6 +35,8 @@ void ATG_Gun::Tick(const float DeltaTime)
 
 void ATG_Gun::PullTrigger()
 {
+	if (!WeaponOwner || WeaponOwner->GetIsDead()) return;
+	
 	GetWorldTimerManager().SetTimer(FireTimer, this, &ThisClass::OnFire, TimeBetweenShoots, true);
 	OnFire();
 	// OnFiring.Broadcast(true);

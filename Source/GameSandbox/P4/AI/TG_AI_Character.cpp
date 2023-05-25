@@ -12,6 +12,12 @@ void ATG_AI_Character::BeginPlay()
 	Super::BeginPlay();
 }
 
+void ATG_AI_Character::CharacterDying()
+{
+	Super::CharacterDying();
+	GetController()->UnPossess();	
+}
+
 void ATG_AI_Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
