@@ -8,6 +8,7 @@
 
 class ALS_LightSaber;
 class UAnimMontage;
+class USkeletalMeshComponent;
 
 UCLASS()
 class GAMESANDBOX_API ALS_BaseCharacter : public ACharacter
@@ -30,6 +31,10 @@ protected:
 
 private:
 	void SpawnWeapon();
+	void InitAnimationNotifyStates();
+
+	void OnAttackBeginHandle(USkeletalMeshComponent* MeshComp);
+	void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Saber")
@@ -53,4 +58,5 @@ private:
 	UPROPERTY()
 	ALS_LightSaber* CurrentSaber;
 	bool bDoubleJump = false;
+	int32 AttackIndex = 0;
 };

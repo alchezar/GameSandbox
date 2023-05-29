@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "LS_BaseCharacter.h"
-
 #include "GameFramework/PawnMovementComponent.h"
+#include "P5/AnimNotify/LS_NotifyWindowAttack.h"
 #include "P5/Weapon/LS_LightSaber.h"
 
 ALS_BaseCharacter::ALS_BaseCharacter()
@@ -14,6 +14,7 @@ void ALS_BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnWeapon();
+	InitAnimationNotifyStates();
 	Health = MaxHealth;
 }
 
@@ -35,7 +36,7 @@ bool ALS_BaseCharacter::GetIsDead()
 void ALS_BaseCharacter::SpawnWeapon()
 {
 	if (!LightSaberClass) return;
-	
+
 	CurrentSaber = GetWorld()->SpawnActor<ALS_LightSaber>(LightSaberClass);
 	if (!CurrentSaber) return;
 
@@ -48,21 +49,18 @@ void ALS_BaseCharacter::SpawnWeapon()
 
 void ALS_BaseCharacter::Attack()
 {
-	// if (AttackMontageArray.IsEmpty() || !AttackMontageArray[0]) return;
-	//
-	// // TODO: disable attaching
-	// bAttacking = true;
-	//
-	// const int32 RandomAttackIndex = FMath::RandRange(0, AttackMontageArray.Num() - 1) ;
-	// PlayAnimMontage(AttackMontageArray[RandomAttackIndex]);
+	if (AttackMontageArray.IsEmpty() || !AttackMontageArray[0] || bAttacking) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, FString::Printf(TEXT("Attack!")));
+	bAttacking = true;
+
+	// const int32 RandomAttackIndex = FMath::RandRange(0, AttackMontageArray.Num() - 1);
+	PlayAnimMontage(AttackMontageArray[AttackIndex++ % AttackMontageArray.Num()]);
 }
 
 void ALS_BaseCharacter::Jump()
-{	
+{
 	Super::Jump();
-	
+
 	if (GetMovementComponent()->IsFalling() && !bDoubleJump)
 	{
 		bDoubleJump = true;
@@ -79,4 +77,39 @@ void ALS_BaseCharacter::Landed(const FHitResult& Hit)
 bool ALS_BaseCharacter::GetIsDoubleJump() const
 {
 	return bDoubleJump;
+}
+
+void ALS_BaseCharacter::InitAnimationNotifyStates()
+{
+	for (const auto AttackMontage : AttackMontageArray)
+	{
+		if (!AttackMontage) return;
+
+		TArray<FAnimNotifyEvent> AnimNotifyEvents = AttackMontage->Notifies;
+		for (auto NotifyEvent : AnimNotifyEvents)
+		{
+			if (const auto WindowAttack = Cast<ULS_NotifyWindowAttack>(NotifyEvent.NotifyStateClass))
+			{
+				WindowAttack->LSOnAttackBegin.AddUObject(this, &ThisClass::OnAttackBeginHandle);
+				WindowAttack->LSOnAttackEnd.AddUObject(this, &ThisClass::OnAttackEndHandle);
+			}
+		}
+	}
+}
+
+void ALS_BaseCharacter::OnAttackBeginHandle(USkeletalMeshComponent* MeshComp)
+{
+	if (MeshComp == GetMesh())
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, FString::Printf(TEXT("Start")));
+	}
+}
+
+void ALS_BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
+{
+	if (MeshComp == GetMesh())
+	{
+		bAttacking = false;
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, FString::Printf(TEXT("End")));
+	}
 }

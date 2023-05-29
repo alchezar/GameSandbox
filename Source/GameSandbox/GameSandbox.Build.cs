@@ -22,7 +22,7 @@ public class GameSandbox : ModuleRules
 			"NavigationSystem"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore" });
+		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore", "AnimGraphRuntime" });
 
 		PublicIncludePaths.AddRange(new[]
 		{
