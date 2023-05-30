@@ -21,6 +21,7 @@ void ALS_BaseCharacter::BeginPlay()
 void ALS_BaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("Combo count : %d"), CompoCount));
 }
 
 void ALS_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -54,7 +55,15 @@ void ALS_BaseCharacter::Attack()
 	bAttacking = true;
 
 	// const int32 RandomAttackIndex = FMath::RandRange(0, AttackMontageArray.Num() - 1);
-	PlayAnimMontage(AttackMontageArray[AttackIndex++ % AttackMontageArray.Num()]);
+	const float MontageLength = PlayAnimMontage(AttackMontageArray[CompoCount++ % AttackMontageArray.Num()]);
+
+	GetWorldTimerManager().ClearTimer(AttackTimer);
+	FTimerDelegate AttackDelegate;
+	AttackDelegate.BindLambda([&]()
+	{
+		CompoCount = 0;
+	});
+	GetWorldTimerManager().SetTimer(AttackTimer, AttackDelegate, 1.f, false, MontageLength);
 }
 
 void ALS_BaseCharacter::Jump()
@@ -101,7 +110,10 @@ void ALS_BaseCharacter::OnAttackBeginHandle(USkeletalMeshComponent* MeshComp)
 {
 	if (MeshComp == GetMesh())
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, FString::Printf(TEXT("Start")));
+		if (CurrentSaber->GetIsTurnedOn())
+		{
+			CurrentSaber->EnableRibbon();
+		}
 	}
 }
 
@@ -110,11 +122,11 @@ void ALS_BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 	if (MeshComp == GetMesh())
 	{
 		bAttacking = false;
-		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, FString::Printf(TEXT("End")));
+		CurrentSaber->DisableRibbon();
 	}
 }
 
-ALS_LightSaber* ALS_BaseCharacter::GetCurrentSaber() const 
+ALS_LightSaber* ALS_BaseCharacter::GetCurrentSaber() const
 {
 	return CurrentSaber;
 }

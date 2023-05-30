@@ -1,6 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "LS_LightSaber.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/PointLightComponent.h"
 
 ALS_LightSaber::ALS_LightSaber()
@@ -12,7 +14,7 @@ ALS_LightSaber::ALS_LightSaber()
 void ALS_LightSaber::BeginPlay()
 {
 	Super::BeginPlay();
-	// SetSaberColor(Color);	
+	// SetSaberColor(Color);
 }
 
 void ALS_LightSaber::Tick(float DeltaTime)
@@ -21,7 +23,7 @@ void ALS_LightSaber::Tick(float DeltaTime)
 }
 
 void ALS_LightSaber::SetupMesh()
-{	
+{
 	Saber = CreateDefaultSubobject<UStaticMeshComponent>("Saber");
 	SetRootComponent(Saber);
 	Saber->SetCollisionProfileName("NoCollision");
@@ -29,6 +31,8 @@ void ALS_LightSaber::SetupMesh()
 	Beam = CreateDefaultSubobject<UStaticMeshComponent>("Beam");
 	Beam->SetupAttachment(GetRootComponent());
 	Beam->SetCollisionProfileName("NoCollision");
+	Beam->bCastStaticShadow = false;
+	Beam->bCastDynamicShadow = false;
 
 	SaberLight = CreateDefaultSubobject<UPointLightComponent>("SaberLight");
 	SaberLight->SetupAttachment(Beam);
@@ -43,7 +47,7 @@ void ALS_LightSaber::SetupMesh()
 void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
 {
 	if (!Beam || !SaberLight) return;
-	
+
 	SaberColorMaterial = Beam->CreateAndSetMaterialInstanceDynamic(0);
 	if (!SaberColorMaterial) return;
 
@@ -54,10 +58,10 @@ void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
 void ALS_LightSaber::TurnBeamOn()
 {
 	if (bTurnedOn) return;
-	
+
 	bTurnedOn = true;
 	Beam->SetVisibility(true);
-	
+
 	FTimerDelegate TurnOnDelegate;
 	TurnOnDelegate.BindUObject(this, &ThisClass::TurnBeamGradual, true);
 	GetWorldTimerManager().SetTimer(BeamLightTimer, TurnOnDelegate, GetWorld()->GetDeltaSeconds(), true);
@@ -69,7 +73,7 @@ void ALS_LightSaber::TurnBeamOff()
 
 	bTurnedOn = false;
 	SaberLight->SetVisibility(false);
-	
+
 	FTimerDelegate TurnOffDelegate;
 	TurnOffDelegate.BindUObject(this, &ThisClass::TurnBeamGradual, false);
 	GetWorldTimerManager().SetTimer(BeamLightTimer, TurnOffDelegate, GetWorld()->GetDeltaSeconds(), true);
@@ -80,7 +84,7 @@ void ALS_LightSaber::TurnBeamGradual(bool bEnabling)
 	const float TargetZScale = bEnabling ? 1.f : 0.f;
 	const float ScaleDirection = bEnabling ? 1.f : -1.f;
 	const bool bDone = Beam->GetRelativeScale3D().Z == TargetZScale;
-	
+
 	CurrentZScale = FMath::Clamp((CurrentZScale + TurningStep * ScaleDirection), 0.f, 1.f);
 	Beam->SetRelativeScale3D(FVector(1.f, 1.f, CurrentZScale));
 	SaberLight->SetIntensity(FMath::Clamp(SaberLight->Intensity + ScaleDirection * TurningStep * BeamGlowIntensity, 0.f, BeamGlowIntensity));
@@ -97,4 +101,31 @@ void ALS_LightSaber::TurnBeamGradual(bool bEnabling)
 		GetWorldTimerManager().ClearTimer(BeamLightTimer);
 		return;
 	}
+}
+
+void ALS_LightSaber::EnableRibbon() 
+{
+	if (RibbonComponent)
+	{
+		RibbonComponent->Activate();
+		return;
+	}
+	/* Create niagara on the first try */
+	RibbonComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		RibbonEffect, GetRootComponent(), NAME_None, FVector(0.f, 0.f, 61.f), FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+	if (!RibbonComponent) return;
+	
+	RibbonComponent->SetVariableLinearColor(RibbonColorName, Color);
+}
+
+void ALS_LightSaber::DisableRibbon()
+{
+	if (!RibbonComponent) return;
+
+	RibbonComponent->Deactivate();
+}
+
+bool ALS_LightSaber::GetIsTurnedOn() const
+{
+	return bTurnedOn;
 }

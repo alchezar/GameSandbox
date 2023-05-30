@@ -25,12 +25,14 @@ void ULS_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		bDead = Character->GetIsDead();
 		bDoubleJump = Character->GetIsDoubleJump();
+		bMoving =  Speed > 10;
 	}
 	if (const auto Player = Cast<ALS_PlayerCharacter>(Pawn))
 	{
 		bTurnLeft = Player->GetTurnLeft();
 		bTurnRight = Player->GetTurnRight();
 	}
+	SetRootMotionMode(bMoving ? ERootMotionMode::IgnoreRootMotion : ERootMotionMode::RootMotionFromMontagesOnly);
 }
 
 float ULS_AnimInstance::GetMovementDirectionAngle()

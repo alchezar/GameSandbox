@@ -60,5 +60,6 @@ private:
 	UPROPERTY()
 	ALS_LightSaber* CurrentSaber;
 	bool bDoubleJump = false;
-	int32 AttackIndex = 0;
+	int32 CompoCount = 0;
+	FTimerHandle AttackTimer;
 };
