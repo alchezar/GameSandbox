@@ -23,8 +23,10 @@ public:
 
 	virtual void Jump() override;
 	bool GetIsDead();
-	bool GetIsDoubleJump() const;
+	bool GetIsDoubleJump() const;	
 	void Attack();
+
+	ALS_LightSaber* GetCurrentSaber() const ;
 
 protected:
 	virtual void BeginPlay() override;

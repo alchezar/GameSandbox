@@ -17,6 +17,8 @@ public:
 	ALS_LightSaber();
 	virtual void Tick(float DeltaTime) override;
 
+	void TurnBeamOn();
+	void TurnBeamOff();
 	void SetSaberColor(FLinearColor NewColor);
 
 protected:
@@ -24,22 +26,30 @@ protected:
 
 private:
 	void SetupMesh();
+	void TurnBeamGradual(bool bEnabling);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
 	UStaticMeshComponent* Saber;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
 	UStaticMeshComponent* Beam;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
+	UPointLightComponent* SaberLight;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Light")
 	FName ColorParameterName = "Color";	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Light")
 	FLinearColor Color = FLinearColor(0.5f, 0.f, 1.f, 1.f);
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Light")
-	UPointLightComponent* SaberLight;	
+	float BeamGlowIntensity = 1500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Light")
+	float TurningStep = 0.1f;
 	
 private:
 	UPROPERTY()
 	UMaterialInstanceDynamic* SaberColorMaterial;
+	bool bTurnedOn = true;
+	FTimerHandle BeamLightTimer;
+	float CurrentZScale = 1.f;
 	
 };

@@ -27,6 +27,10 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+	virtual void Landed(const FHitResult& Hit) override;
 
 	void Move(const FInputActionValue& InputValue);
 	void Look(const FInputActionValue& InputValue);

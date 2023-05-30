@@ -34,7 +34,7 @@ void ALS_LightSaber::SetupMesh()
 	SaberLight->SetupAttachment(Beam);
 	SaberLight->SetRelativeLocation(FVector(0.f, 0.f, 65.f));
 	SaberLight->SetAttenuationRadius(100.f);
-	SaberLight->SetIntensity(1500.f);
+	SaberLight->SetIntensity(BeamGlowIntensity);
 	SaberLight->SetSourceRadius(5.f);
 	SaberLight->SetSourceLength(80.f);
 	SaberLight->bCastShadowsFromCinematicObjectsOnly = true;
@@ -49,4 +49,52 @@ void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
 
 	SaberColorMaterial->SetVectorParameterValue(ColorParameterName, NewColor);
 	SaberLight->SetLightColor(NewColor);
+}
+
+void ALS_LightSaber::TurnBeamOn()
+{
+	if (bTurnedOn) return;
+	
+	bTurnedOn = true;
+	Beam->SetVisibility(true);
+	
+	FTimerDelegate TurnOnDelegate;
+	TurnOnDelegate.BindUObject(this, &ThisClass::TurnBeamGradual, true);
+	GetWorldTimerManager().SetTimer(BeamLightTimer, TurnOnDelegate, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void ALS_LightSaber::TurnBeamOff()
+{
+	if (!bTurnedOn) return;
+
+	bTurnedOn = false;
+	SaberLight->SetVisibility(false);
+	
+	FTimerDelegate TurnOffDelegate;
+	TurnOffDelegate.BindUObject(this, &ThisClass::TurnBeamGradual, false);
+	GetWorldTimerManager().SetTimer(BeamLightTimer, TurnOffDelegate, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void ALS_LightSaber::TurnBeamGradual(bool bEnabling)
+{
+	const float TargetZScale = bEnabling ? 1.f : 0.f;
+	const float ScaleDirection = bEnabling ? 1.f : -1.f;
+	const bool bDone = Beam->GetRelativeScale3D().Z == TargetZScale;
+	
+	CurrentZScale = FMath::Clamp((CurrentZScale + TurningStep * ScaleDirection), 0.f, 1.f);
+	Beam->SetRelativeScale3D(FVector(1.f, 1.f, CurrentZScale));
+	SaberLight->SetIntensity(FMath::Clamp(SaberLight->Intensity + ScaleDirection * TurningStep * BeamGlowIntensity, 0.f, BeamGlowIntensity));
+
+	if (bEnabling && bDone)
+	{
+		SaberLight->SetVisibility(true);
+		GetWorldTimerManager().ClearTimer(BeamLightTimer);
+		return;
+	}
+	if (!bEnabling && bDone)
+	{
+		Beam->SetVisibility(false);
+		GetWorldTimerManager().ClearTimer(BeamLightTimer);
+		return;
+	}
 }

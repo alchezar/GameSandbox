@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P5/Weapon/LS_LightSaber.h"
 
 ALS_PlayerCharacter::ALS_PlayerCharacter()
 {
@@ -50,8 +51,8 @@ void ALS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ThisClass::StopJumping);
 
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &Super::Attack);
 
@@ -79,9 +80,27 @@ void ALS_PlayerCharacter::Look(const FInputActionValue& InputValue)
 	TurnInPlace();
 }
 
+void ALS_PlayerCharacter::Jump()
+{
+	Super::Jump();
+	GetCurrentSaber()->TurnBeamOff();
+}
+
+void ALS_PlayerCharacter::StopJumping()
+{
+	Super::StopJumping();
+}
+
+void ALS_PlayerCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	GetCurrentSaber()->TurnBeamOn();
+}
+
 void ALS_PlayerCharacter::Run(const bool bRun)
 {
 	GetCharacterMovement()->MaxWalkSpeed = bRun ? MaxWalkSpeed * 2 : MaxWalkSpeed;
+	// bRun ? GetCurrentSaber()->TurnBeamOff() : GetCurrentSaber()->TurnBeamOn();
 }
 
 void ALS_PlayerCharacter::TurnInPlace()

@@ -113,3 +113,8 @@ void ALS_BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Yellow, FString::Printf(TEXT("End")));
 	}
 }
+
+ALS_LightSaber* ALS_BaseCharacter::GetCurrentSaber() const 
+{
+	return CurrentSaber;
+}
