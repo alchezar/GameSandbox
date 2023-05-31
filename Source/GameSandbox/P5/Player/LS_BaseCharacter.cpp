@@ -2,6 +2,8 @@
 
 #include "LS_BaseCharacter.h"
 #include "GameFramework/PawnMovementComponent.h"
+#include "P5/AnimNotify/LS_NotifySaberActivation.h"
+#include "P5/AnimNotify/LS_NotifySaberVisibility.h"
 #include "P5/AnimNotify/LS_NotifyWindowAttack.h"
 #include "P5/Weapon/LS_LightSaber.h"
 
@@ -14,6 +16,7 @@ void ALS_BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnWeapon();
+	SetTeamColor();
 	InitAnimationNotifyStates();
 	Health = MaxHealth;
 }
@@ -29,11 +32,6 @@ void ALS_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-bool ALS_BaseCharacter::GetIsDead()
-{
-	return FMath::IsNearlyZero(Health);
-}
-
 void ALS_BaseCharacter::SpawnWeapon()
 {
 	if (!LightSaberClass) return;
@@ -43,20 +41,31 @@ void ALS_BaseCharacter::SpawnWeapon()
 
 	CurrentSaber->SetOwner(this);
 	CurrentSaber->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
-	CurrentSaber->SetSaberColor(SaberColor);
+	CurrentSaber->SetSaberColor(TeamColor);
 	CurrentSaber->SetActorRelativeLocation(FVector(0.f, 2.f, 0.f));
 	CurrentSaber->SetActorRelativeRotation(FRotator(25.f, 0.f, 10.f));
 }
 
+void ALS_BaseCharacter::SetTeamColor()
+{
+	UMaterialInstanceDynamic* DynamicBodyMaterial1 = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	UMaterialInstanceDynamic* DynamicBodyMaterial2 = GetMesh()->CreateAndSetMaterialInstanceDynamic(2);
+	UMaterialInstanceDynamic* DynamicBodyMaterial3 = GetMesh()->CreateAndSetMaterialInstanceDynamic(3);
+
+	if (!DynamicBodyMaterial1 || !DynamicBodyMaterial2 || !DynamicBodyMaterial3) return;
+
+	DynamicBodyMaterial1->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+	DynamicBodyMaterial2->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+	DynamicBodyMaterial3->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+}
+
 void ALS_BaseCharacter::Attack()
 {
-	if (AttackMontageArray.IsEmpty() || !AttackMontageArray[0] || bAttacking) return;
+	if (!bTaken || AttackMontageArray.IsEmpty() || !AttackMontageArray[0] || bAttacking) return;
 
 	bAttacking = true;
-
-	// const int32 RandomAttackIndex = FMath::RandRange(0, AttackMontageArray.Num() - 1);
 	const float MontageLength = PlayAnimMontage(AttackMontageArray[CompoCount++ % AttackMontageArray.Num()]);
-
+	/* Wait till animation end */
 	GetWorldTimerManager().ClearTimer(AttackTimer);
 	FTimerDelegate AttackDelegate;
 	AttackDelegate.BindLambda([&]()
@@ -77,15 +86,16 @@ void ALS_BaseCharacter::Jump()
 	}
 }
 
+void ALS_BaseCharacter::TakeWeapon()
+{
+	PlayAnimMontage(TakeMontageArray[bTaken ? 1 : 0]);
+	bTaken = !bTaken;
+}
+
 void ALS_BaseCharacter::Landed(const FHitResult& Hit)
 {
 	bDoubleJump = false;
 	Super::Landed(Hit);
-}
-
-bool ALS_BaseCharacter::GetIsDoubleJump() const
-{
-	return bDoubleJump;
 }
 
 void ALS_BaseCharacter::InitAnimationNotifyStates()
@@ -104,26 +114,70 @@ void ALS_BaseCharacter::InitAnimationNotifyStates()
 			}
 		}
 	}
+	for (const auto TakeMontage : TakeMontageArray)
+	{
+		if (!TakeMontage) return;
+
+		TArray<FAnimNotifyEvent> AnimNotifyEvents = TakeMontage->Notifies;
+		for (auto NotifyEvent : AnimNotifyEvents)
+		{
+			if (const auto SaberActivation = Cast<ULS_NotifySaberActivation>(NotifyEvent.Notify))
+			{
+				SaberActivation->LSOnSaberActivation.AddUObject(this, &ThisClass::OnSaberActivationHandle);
+			}
+			if (const auto SaberVisibility = Cast<ULS_NotifySaberVisibility>(NotifyEvent.Notify))
+			{
+				SaberVisibility->LSOnSaberVisibility.AddUObject(this, &ThisClass::OnSaberVisibilityHandle);
+			}
+		}
+	}
 }
 
 void ALS_BaseCharacter::OnAttackBeginHandle(USkeletalMeshComponent* MeshComp)
 {
-	if (MeshComp == GetMesh())
+	if (MeshComp != GetMesh()) return;
+
+	if (CurrentSaber->GetIsTurnedOn())
 	{
-		if (CurrentSaber->GetIsTurnedOn())
-		{
-			CurrentSaber->EnableRibbon();
-		}
+		CurrentSaber->EnableRibbon();
 	}
 }
 
 void ALS_BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
-	if (MeshComp == GetMesh())
-	{
-		bAttacking = false;
-		CurrentSaber->DisableRibbon();
-	}
+	if (MeshComp != GetMesh()) return;
+
+	bAttacking = false;
+	CurrentSaber->DisableRibbon();
+}
+
+void ALS_BaseCharacter::OnSaberActivationHandle(USkeletalMeshComponent* MeshComp)
+{
+	if (MeshComp != GetMesh()) return;
+
+	bTaken ? GetCurrentSaber()->TurnBeamOn() : GetCurrentSaber()->TurnBeamOff();
+}
+
+void ALS_BaseCharacter::OnSaberVisibilityHandle(USkeletalMeshComponent* MeshComp)
+{
+	if (MeshComp != GetMesh()) return;
+
+	CurrentSaber->SetActorHiddenInGame(!bTaken);
+}
+
+bool ALS_BaseCharacter::GetIsDead()
+{
+	return FMath::IsNearlyZero(Health);
+}
+
+bool ALS_BaseCharacter::GetIsDoubleJump() const
+{
+	return bDoubleJump;
+}
+
+bool ALS_BaseCharacter::GetIsWeaponTaken() const
+{
+	return bTaken;
 }
 
 ALS_LightSaber* ALS_BaseCharacter::GetCurrentSaber() const

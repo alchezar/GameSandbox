@@ -51,13 +51,15 @@ void ALS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
-	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ThisClass::StopJumping);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &Super::Attack);
 
 	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Started, this, &ThisClass::Run, true);
 	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Completed, this, &ThisClass::Run, false);
+
+	EnhancedInputComponent->BindAction(TakeWeaponAction, ETriggerEvent::Started, this, &Super::TakeWeapon);
 }
 
 void ALS_PlayerCharacter::Move(const FInputActionValue& InputValue)
@@ -83,7 +85,7 @@ void ALS_PlayerCharacter::Look(const FInputActionValue& InputValue)
 void ALS_PlayerCharacter::Jump()
 {
 	Super::Jump();
-	GetCurrentSaber()->TurnBeamOff();
+	// GetCurrentSaber()->TurnBeamOff();
 }
 
 void ALS_PlayerCharacter::StopJumping()

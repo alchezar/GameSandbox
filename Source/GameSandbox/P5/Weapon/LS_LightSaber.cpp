@@ -48,11 +48,12 @@ void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
 {
 	if (!Beam || !SaberLight) return;
 
+	Color = NewColor;
 	SaberColorMaterial = Beam->CreateAndSetMaterialInstanceDynamic(0);
 	if (!SaberColorMaterial) return;
 
-	SaberColorMaterial->SetVectorParameterValue(ColorParameterName, NewColor);
-	SaberLight->SetLightColor(NewColor);
+	SaberColorMaterial->SetVectorParameterValue(ColorParameterName, Color);
+	SaberLight->SetLightColor(Color);
 }
 
 void ALS_LightSaber::TurnBeamOn()

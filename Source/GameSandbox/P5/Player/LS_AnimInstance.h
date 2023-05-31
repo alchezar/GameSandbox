@@ -38,6 +38,8 @@ protected:
 	bool bTurnRight = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kidner")
 	bool bMoving = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kidner")
+	bool bLightSaberTurnedOn = false;
 
 private:
 	UPROPERTY()

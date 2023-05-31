@@ -20,46 +20,57 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Landed(const FHitResult& Hit) override;
-
 	virtual void Jump() override;
+	
 	bool GetIsDead();
-	bool GetIsDoubleJump() const;	
+	bool GetIsDoubleJump() const;
+	bool GetIsWeaponTaken() const;
+	ALS_LightSaber* GetCurrentSaber() const;
+	
 	void Attack();
-
-	ALS_LightSaber* GetCurrentSaber() const ;
+	void TakeWeapon();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
 	void SpawnWeapon();
+	void SetTeamColor();
 	void InitAnimationNotifyStates();
 
 	void OnAttackBeginHandle(USkeletalMeshComponent* MeshComp);
 	void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
+	void OnSaberActivationHandle(USkeletalMeshComponent* MeshComp);
+	void OnSaberVisibilityHandle(USkeletalMeshComponent* MeshComp);
 
 protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FName TeamColorParameterName = "PaintColor";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FLinearColor TeamColor = FLinearColor(0.5f, 0.f, 1.f, 1.f);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Saber")
 	TSubclassOf<ALS_LightSaber> LightSaberClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Saber")
 	FName SocketName = "GripPoint";
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Saber")
-	FLinearColor SaberColor = FLinearColor(0.5f, 0.f, 1.f, 1.f);
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Saber")
+	bool bAttacking = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
 	float MaxHealth = 100.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
 	float Health = 0.f;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Attack")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
 	TArray<UAnimMontage*> AttackMontageArray;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "Kinder | Health")
-	bool bAttacking = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage", meta = (ToolTip = "0: Get, 1: Put"))
+	TArray<UAnimMontage*> TakeMontageArray;
 
 private:
 	UPROPERTY()
 	ALS_LightSaber* CurrentSaber;
 	bool bDoubleJump = false;
+	bool bTaken = true;
 	int32 CompoCount = 0;
 	FTimerHandle AttackTimer;
 };

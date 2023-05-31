@@ -60,7 +60,9 @@ protected:
 	UInputAction* AttackAction;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* RunAction;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* TakeWeaponAction;
+	
 private:
 	float MaxWalkSpeed = 0.f;
 	bool bTurnLeft = false;
