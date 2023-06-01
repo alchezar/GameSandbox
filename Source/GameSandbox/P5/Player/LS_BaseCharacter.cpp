@@ -88,7 +88,7 @@ void ALS_BaseCharacter::Jump()
 
 void ALS_BaseCharacter::TakeWeapon()
 {
-	PlayAnimMontage(TakeMontageArray[bTaken ? 1 : 0]);
+	PlayAnimMontage(bTaken ? TakeLightSaber.Put : TakeLightSaber.Get);
 	bTaken = !bTaken;
 }
 
@@ -114,6 +114,10 @@ void ALS_BaseCharacter::InitAnimationNotifyStates()
 			}
 		}
 	}
+
+	TArray<UAnimMontage*> TakeMontageArray;
+	TakeMontageArray.Add(TakeLightSaber.Get);
+	TakeMontageArray.Add(TakeLightSaber.Put);
 	for (const auto TakeMontage : TakeMontageArray)
 	{
 		if (!TakeMontage) return;

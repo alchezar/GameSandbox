@@ -4,6 +4,9 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/PointLightComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Components/DecalComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 ALS_LightSaber::ALS_LightSaber()
 {
@@ -20,6 +23,7 @@ void ALS_LightSaber::BeginPlay()
 void ALS_LightSaber::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	LineTrace();
 }
 
 void ALS_LightSaber::SetupMesh()
@@ -104,6 +108,42 @@ void ALS_LightSaber::TurnBeamGradual(bool bEnabling)
 	}
 }
 
+void ALS_LightSaber::LineTrace()
+{
+	const FVector Start = Beam->GetSocketLocation(BaseSocketName);
+	const FVector End = Beam->GetSocketLocation(TipSocketName);
+	
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
+
+	if (HitResult.bBlockingHit)
+	{
+		UNiagaraComponent* SplashComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(
+			GetWorld(), Contact.Effect, HitResult.Location, HitResult.Normal.Rotation());
+		if (!SplashComponent) return;
+
+		SplashComponent->SetVariableLinearColor(Contact.ColorName, Color);
+	}
+
+	UDecalComponent* PlasmaComponent = UGameplayStatics::SpawnDecalAtLocation(
+		GetWorld(), Plasma.Material, FVector(Plasma.Size), HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
+	if (!PlasmaComponent) return;
+
+	PlasmaComponent->SetFadeOut(5.f, 1.f, false);
+	UMaterialInstanceDynamic* DynamicPlasma = PlasmaComponent->CreateDynamicMaterialInstance();
+	if (!DynamicPlasma) return;
+
+	DynamicPlasma->SetVectorParameterValue(Plasma.ColorName, Color);
+
+	// DrawDebugPoint(GetWorld(), HitResult.Location, 10.f, FColor::Red, true);
+	//
+	// if (LastHitLocation != HitResult.Location && FVector::Dist(LastHitLocation, HitResult.Location) < 200.f)
+	// {
+	// 	DrawDebugLine(GetWorld(), LastHitLocation, HitResult.Location, FColor::Red, true);
+	// }
+	// LastHitLocation = HitResult.Location;
+}
+
 void ALS_LightSaber::EnableRibbon() 
 {
 	if (RibbonComponent)
@@ -113,10 +153,10 @@ void ALS_LightSaber::EnableRibbon()
 	}
 	/* Create niagara on the first try */
 	RibbonComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
-		RibbonEffect, GetRootComponent(), NAME_None, FVector(0.f, 0.f, 61.f), FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
+		Ribbon.Effect, GetRootComponent(), NAME_None, FVector(0.f, 0.f, 61.f), FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
 	if (!RibbonComponent) return;
 	
-	RibbonComponent->SetVariableLinearColor(RibbonColorName, Color);
+	RibbonComponent->SetVariableLinearColor(Ribbon.ColorName, Color);
 }
 
 void ALS_LightSaber::DisableRibbon()

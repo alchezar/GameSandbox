@@ -10,6 +10,17 @@ class ALS_LightSaber;
 class UAnimMontage;
 class USkeletalMeshComponent;
 
+USTRUCT(BlueprintType)
+struct FTakeLightSaber
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
+	UAnimMontage* Get;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
+	UAnimMontage* Put;
+};
+
 UCLASS()
 class GAMESANDBOX_API ALS_BaseCharacter : public ACharacter
 {
@@ -63,9 +74,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
 	TArray<UAnimMontage*> AttackMontageArray;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage", meta = (ToolTip = "0: Get, 1: Put"))
-	TArray<UAnimMontage*> TakeMontageArray;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
+	FTakeLightSaber TakeLightSaber;
+	
 private:
 	UPROPERTY()
 	ALS_LightSaber* CurrentSaber;

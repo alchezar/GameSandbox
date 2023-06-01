@@ -9,6 +9,32 @@
 class UPointLightComponent;
 class UNiagaraSystem;
 class UNiagaraComponent;
+class UMaterialInterface;
+
+USTRUCT(BlueprintType)
+struct FLSNiagaraEffect
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UNiagaraSystem* Effect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	FName ColorName = "RibbonColor";	
+};
+
+USTRUCT(BlueprintType)
+struct FLSDecalEffect
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UMaterialInterface* Material;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	float Size = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	FName ColorName = "Color";
+};
 
 UCLASS()
 class GAMESANDBOX_API ALS_LightSaber : public AActor
@@ -33,6 +59,7 @@ protected:
 private:
 	void SetupMesh();
 	void TurnBeamGradual(bool bEnabling);
+	void LineTrace();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
@@ -52,9 +79,16 @@ protected:
 	float TurningStep = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
-	UNiagaraSystem* RibbonEffect;
+	FLSNiagaraEffect Ribbon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
-	FName RibbonColorName = "RibbonColor";
+	FLSNiagaraEffect Contact;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	FLSDecalEffect Plasma;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace")
+	FName BaseSocketName = "BaseSocket";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Trace")
+	FName TipSocketName = "TipSocket";
 	
 private:
 	UPROPERTY()
@@ -64,4 +98,5 @@ private:
 	bool bTurnedOn = true;
 	FTimerHandle BeamLightTimer;
 	float CurrentZScale = 1.f;
+	FVector LastHitLocation;
 };
