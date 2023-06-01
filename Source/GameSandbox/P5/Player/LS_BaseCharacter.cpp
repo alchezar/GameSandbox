@@ -39,7 +39,7 @@ void ALS_BaseCharacter::SpawnWeapon()
 	CurrentSaber = GetWorld()->SpawnActor<ALS_LightSaber>(LightSaberClass);
 	if (!CurrentSaber) return;
 
-	CurrentSaber->SetOwner(this);
+	CurrentSaber->SetSaberOwner(this);
 	CurrentSaber->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 	CurrentSaber->SetSaberColor(TeamColor);
 	CurrentSaber->SetActorRelativeLocation(FVector(0.f, 2.f, 0.f));
@@ -167,6 +167,11 @@ void ALS_BaseCharacter::OnSaberVisibilityHandle(USkeletalMeshComponent* MeshComp
 	if (MeshComp != GetMesh()) return;
 
 	CurrentSaber->SetActorHiddenInGame(!bTaken);
+}
+
+bool ALS_BaseCharacter::GetIsAttacking() const
+{
+	return bAttacking;
 }
 
 bool ALS_BaseCharacter::GetIsDead()

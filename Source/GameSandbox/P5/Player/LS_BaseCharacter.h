@@ -32,7 +32,8 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void Jump() override;
-	
+
+	bool GetIsAttacking() const;
 	bool GetIsDead();
 	bool GetIsDoubleJump() const;
 	bool GetIsWeaponTaken() const;

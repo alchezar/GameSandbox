@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LS_LightSaber.generated.h"
 
+class ALS_BaseCharacter;
 class UPointLightComponent;
 class UNiagaraSystem;
 class UNiagaraComponent;
@@ -44,6 +45,9 @@ class GAMESANDBOX_API ALS_LightSaber : public AActor
 public:
 	ALS_LightSaber();
 	virtual void Tick(float DeltaTime) override;
+	
+	bool GetIsTurnedOn() const;
+	void SetSaberOwner(AActor* CurrentOwner);
 
 	void TurnBeamOn();
 	void TurnBeamOff();
@@ -51,7 +55,6 @@ public:
 	void EnableRibbon();
 	void DisableRibbon();
 
-	bool GetIsTurnedOn() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,6 +63,9 @@ private:
 	void SetupMesh();
 	void TurnBeamGradual(bool bEnabling);
 	void LineTrace();
+	void SplashEffect(const FHitResult& HitResult);
+	void PlasmaDecal(const FHitResult& HitResult);
+	void SliceProcedural(const FHitResult& HitResult);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
@@ -95,8 +101,10 @@ private:
 	UMaterialInstanceDynamic* SaberColorMaterial;
 	UPROPERTY()
 	UNiagaraComponent* RibbonComponent;
+	UPROPERTY()
+	ALS_BaseCharacter* OwnerCharacter;
 	bool bTurnedOn = true;
 	FTimerHandle BeamLightTimer;
+	FTimerHandle SliceTimer;
 	float CurrentZScale = 1.f;
-	FVector LastHitLocation;
 };

@@ -19,7 +19,8 @@ public class GameSandbox : ModuleRules
 			"PhysicsCore",
 			"AIModule",
 			"GameplayTasks",
-			"NavigationSystem"
+			"NavigationSystem",
+			"ProceduralMeshComponent"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore", "AnimGraphRuntime" });
