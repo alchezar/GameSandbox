@@ -24,7 +24,6 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
-	// void CreateMesh();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
@@ -33,8 +32,6 @@ protected:
 	UStaticMeshComponent* ReferenceComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
 	UProceduralMeshComponent* SlicableComp;
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Component")
-	// FVector BoxExtents = FVector(100.f, 100.f, 100.f);
 
 private:
 };

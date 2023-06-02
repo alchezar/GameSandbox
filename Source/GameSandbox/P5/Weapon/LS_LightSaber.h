@@ -11,6 +11,7 @@ class UPointLightComponent;
 class UNiagaraSystem;
 class UNiagaraComponent;
 class UMaterialInterface;
+class UCapsuleComponent;
 
 USTRUCT(BlueprintType)
 struct FLSNiagaraEffect
@@ -54,11 +55,16 @@ public:
 	void SetSaberColor(FLinearColor NewColor);	
 	void EnableRibbon();
 	void DisableRibbon();
-
-
+	
 protected:
 	virtual void BeginPlay() override;
-
+	UFUNCTION()
+	void OnBladeHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnBladeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void OnBladeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
 private:
 	void SetupMesh();
 	void TurnBeamGradual(bool bEnabling);
@@ -74,6 +80,8 @@ protected:
 	UStaticMeshComponent* Beam;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
 	UPointLightComponent* SaberLight;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Mesh")
+	UCapsuleComponent* Blade;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Light")
 	FName ColorParameterName = "Color";

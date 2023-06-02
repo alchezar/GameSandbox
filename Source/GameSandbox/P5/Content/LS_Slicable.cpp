@@ -25,7 +25,6 @@ ALS_Slicable::ALS_Slicable()
 	SlicableComp->bUseComplexAsSimpleCollision = false;
 	SlicableComp->SetSimulatePhysics(true);
 
-	// CreateMesh();
 	UKismetProceduralMeshLibrary::CopyProceduralMeshFromStaticMeshComponent(ReferenceComp, 0, SlicableComp, true);
 }
 
@@ -44,34 +43,35 @@ UProceduralMeshComponent* ALS_Slicable::GetSlicableComp() const
 	return SlicableComp;
 }
 
-// void ALS_Slicable::CreateMesh()
-// {
-// 	TArray<FVector> Vertices;
-// 	TArray<int32> Triangles;
-// 	TArray<FVector> Normals;
-// 	TArray<FVector2D> UVs;
-// 	TArray<FProcMeshTangent> Tangents;
-// 	const TArray<FColor> VertexColors;
-//
-// 	UKismetProceduralMeshLibrary::GenerateBoxMesh(BoxExtents, Vertices, Triangles, Normals, UVs, Tangents);
-// 	SlicableComp->CreateMeshSection(0, Vertices, Triangles, Normals, UVs, VertexColors, Tangents, true);
-// }
-
 void ALS_Slicable::Slice(const FVector& PlanePosition, const FVector& PlaneNormal, UMaterialInterface* CapMaterial)
 {
 	UProceduralMeshComponent* SlicedComp;
 	UKismetProceduralMeshLibrary::SliceProceduralMesh(
 		SlicableComp, PlanePosition, PlaneNormal, true, SlicedComp, EProcMeshSliceCapOption::CreateNewSectionForCap, CapMaterial);
 	if (!SlicedComp) return;
-	
-	SlicedComp->SetSimulatePhysics(true);
-	SlicedComp->AddImpulse(FVector(300.f), NAME_None, true);
 
+	SlicedComp->AddRelativeLocation(FVector(0.f, 0.f, 5.f));
+	SlicedComp->SetSimulatePhysics(true);
+	// SlicedComp->AddImpulse(FVector(300.f), NAME_None, true);
+	SlicedComp->SetAllPhysicsLinearVelocity(FVector(300.f));
+	
 	TArray<FVector> Vertices;
 	TArray<int32> Triangles;
 	TArray<FVector> Normals;
 	TArray<FVector2D> UVs;
 	TArray<FProcMeshTangent> Tangents;
+	
 	UKismetProceduralMeshLibrary::GetSectionFromProceduralMesh(SlicedComp, 0, Vertices, Triangles, Normals, UVs, Tangents);
 	SlicedComp->AddCollisionConvexMesh(Vertices);
+	SlicedComp->SetCollisionProfileName("BlockAll");
+
+	Vertices.Empty();
+	Triangles.Empty();
+	Normals.Empty();
+	UVs.Empty();
+	Tangents.Empty();
+	
+	UKismetProceduralMeshLibrary::GetSectionFromProceduralMesh(SlicableComp, 0, Vertices, Triangles, Normals, UVs, Tangents);
+	SlicableComp->AddCollisionConvexMesh(Vertices);
+	SlicableComp->SetCollisionProfileName("BlockAll");
 }

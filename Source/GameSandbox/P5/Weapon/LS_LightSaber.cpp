@@ -4,6 +4,7 @@
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,7 +40,7 @@ void ALS_LightSaber::SetupMesh()
 	Beam->SetCollisionProfileName("NoCollision");
 	Beam->bCastStaticShadow = false;
 	Beam->bCastDynamicShadow = false;
-
+	
 	SaberLight = CreateDefaultSubobject<UPointLightComponent>("SaberLight");
 	SaberLight->SetupAttachment(Beam);
 	SaberLight->SetRelativeLocation(FVector(0.f, 0.f, 60.f));
@@ -48,6 +49,16 @@ void ALS_LightSaber::SetupMesh()
 	SaberLight->SetSourceRadius(5.f);
 	SaberLight->SetSourceLength(80.f);
 	SaberLight->bCastShadowsFromCinematicObjectsOnly = true;
+
+	Blade = CreateDefaultSubobject<UCapsuleComponent>("CutTrigger");
+	Blade->SetupAttachment(GetRootComponent());
+	Blade->SetCollisionProfileName("OverlapAll");
+	Blade->SetRelativeLocation(FVector(0.f, 0.f, 65.f));
+	Blade->SetCapsuleRadius(5.f);
+	Blade->SetNotifyRigidBodyCollision(true); // Simulation Generates Hit Events
+	Blade->OnComponentHit.AddDynamic(this, &ThisClass::OnBladeHit);
+	Blade->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBladeBeginOverlap);
+	Blade->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnBladeEndOverlap);
 }
 
 void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
@@ -147,8 +158,8 @@ void ALS_LightSaber::LineTrace()
 	const FVector Start = Beam->GetSocketLocation(BaseSocketName);
 	const FVector End = Beam->GetSocketLocation(TipSocketName);
 	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_WorldDynamic);
-	if (!HitResult.bBlockingHit) return;
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
+	if (!HitResult.bBlockingHit || HitResult.GetActor() == OwnerCharacter) return;
 
 	SplashEffect(HitResult);
 	PlasmaDecal(HitResult);
@@ -188,4 +199,21 @@ void ALS_LightSaber::SliceProcedural(const FHitResult& HitResult)
 
 	const FVector CutNormal = Beam->GetRightVector();
 	SlicableActor->Slice(HitResult.Location, CutNormal, SaberColorMaterial);
+}
+
+void ALS_LightSaber::OnBladeHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("hit")));
+}
+
+void ALS_LightSaber::OnBladeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("start")));
+
+}
+
+void ALS_LightSaber::OnBladeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("end")));
+
 }

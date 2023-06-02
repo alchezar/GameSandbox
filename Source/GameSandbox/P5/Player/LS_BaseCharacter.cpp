@@ -24,7 +24,6 @@ void ALS_BaseCharacter::BeginPlay()
 void ALS_BaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Green, FString::Printf(TEXT("Combo count : %d"), CompoCount));
 }
 
 void ALS_BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
