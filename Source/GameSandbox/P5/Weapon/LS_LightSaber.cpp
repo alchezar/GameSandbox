@@ -21,6 +21,10 @@ void ALS_LightSaber::BeginPlay()
 {
 	Super::BeginPlay();
 	// SetSaberColor(Color);
+	check(Blade);
+	Blade->OnComponentHit.AddDynamic(this, &ThisClass::OnBladeHit);
+	Blade->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBladeBeginOverlap);
+	Blade->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnBladeEndOverlap);
 }
 
 void ALS_LightSaber::Tick(float DeltaTime)
@@ -40,7 +44,7 @@ void ALS_LightSaber::SetupMesh()
 	Beam->SetCollisionProfileName("NoCollision");
 	Beam->bCastStaticShadow = false;
 	Beam->bCastDynamicShadow = false;
-	
+
 	SaberLight = CreateDefaultSubobject<UPointLightComponent>("SaberLight");
 	SaberLight->SetupAttachment(Beam);
 	SaberLight->SetRelativeLocation(FVector(0.f, 0.f, 60.f));
@@ -56,9 +60,6 @@ void ALS_LightSaber::SetupMesh()
 	Blade->SetRelativeLocation(FVector(0.f, 0.f, 65.f));
 	Blade->SetCapsuleRadius(5.f);
 	Blade->SetNotifyRigidBodyCollision(true); // Simulation Generates Hit Events
-	Blade->OnComponentHit.AddDynamic(this, &ThisClass::OnBladeHit);
-	Blade->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBladeBeginOverlap);
-	Blade->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnBladeEndOverlap);
 }
 
 void ALS_LightSaber::SetSaberColor(const FLinearColor NewColor)
@@ -159,9 +160,13 @@ void ALS_LightSaber::LineTrace()
 	const FVector End = Beam->GetSocketLocation(TipSocketName);
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility);
-	if (!HitResult.bBlockingHit || HitResult.GetActor() == OwnerCharacter) return;
-
+	if (!HitResult.bBlockingHit || HitResult.GetActor() == OwnerCharacter)
+	{
+		if (!PlasmaContacts.IsEmpty()) PlasmaContacts.Empty();
+		return;
+	}
 	SplashEffect(HitResult);
+	GenerateMoreDecalPoints(HitResult);
 	PlasmaDecal(HitResult);
 
 	if (OwnerCharacter && OwnerCharacter->GetIsAttacking())
@@ -179,17 +184,37 @@ void ALS_LightSaber::SplashEffect(const FHitResult& HitResult)
 	SplashComponent->SetVariableLinearColor(Contact.ColorName, Color);
 }
 
+void ALS_LightSaber::GenerateMoreDecalPoints(const FHitResult& HitResult)
+{
+	PlasmaContacts.Add(FLSPlasmaSpawn(HitResult));
+	if (PlasmaContacts.Num() < 2) return;
+
+	const FVector StartPoint = PlasmaContacts[0].Location;
+	const FVector EndPoint = PlasmaContacts[1].Location;
+	const int32 Distance = (EndPoint - StartPoint).Length();
+
+	for (int i = 0; i < Distance; ++i)
+	{
+		AllPlasmaDecalLocations.Add(FMath::VInterpTo(StartPoint, EndPoint, i, 1.f / Distance));
+	}	
+	PlasmaContacts.RemoveAt(0);
+}
+
 void ALS_LightSaber::PlasmaDecal(const FHitResult& HitResult)
 {
-	UDecalComponent* PlasmaComponent = UGameplayStatics::SpawnDecalAtLocation(
-		GetWorld(), Plasma.Material, FVector(Plasma.Size), HitResult.ImpactPoint, HitResult.ImpactNormal.Rotation());
-	if (!PlasmaComponent) return;
+	for (const auto Location : AllPlasmaDecalLocations)
+	{
+		UDecalComponent* PlasmaComponent = UGameplayStatics::SpawnDecalAtLocation(
+			GetWorld(), Plasma.Material, FVector(Plasma.Size), Location, HitResult.ImpactNormal.Rotation());
+		if (!PlasmaComponent) return;
 
-	PlasmaComponent->SetFadeOut(5.f, 1.f, false);
-	UMaterialInstanceDynamic* DynamicPlasma = PlasmaComponent->CreateDynamicMaterialInstance();
-	if (!DynamicPlasma) return;
+		PlasmaComponent->SetFadeOut(5.f, 1.f, false);
+		UMaterialInstanceDynamic* DynamicPlasma = PlasmaComponent->CreateDynamicMaterialInstance();
+		if (!DynamicPlasma) return;
 
-	DynamicPlasma->SetVectorParameterValue(Plasma.ColorName, Color);
+		DynamicPlasma->SetVectorParameterValue(Plasma.ColorName, Color);
+	}
+	AllPlasmaDecalLocations.Empty();
 }
 
 void ALS_LightSaber::SliceProcedural(const FHitResult& HitResult)
@@ -208,12 +233,15 @@ void ALS_LightSaber::OnBladeHit(UPrimitiveComponent* HitComponent, AActor* Other
 
 void ALS_LightSaber::OnBladeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("start")));
+	if (OtherActor == OwnerCharacter) return;
 
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("start")));
+	// PlasmaContacts.Add(FLSPlasmaSpawn(SweepResult));
 }
 
 void ALS_LightSaber::OnBladeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("end")));
+	if (OtherActor == OwnerCharacter) return;
 
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("end")));
 }

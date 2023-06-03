@@ -38,6 +38,27 @@ struct FLSDecalEffect
 	FName ColorName = "Color";
 };
 
+USTRUCT(BlueprintType)
+struct FLSPlasmaSpawn
+{
+	GENERATED_BODY()
+
+	FVector Location;
+	FRotator Rotation;
+
+	FLSPlasmaSpawn()
+	{
+		Location = FVector::ZeroVector;
+		Rotation = FRotator::ZeroRotator;
+	}
+
+	explicit FLSPlasmaSpawn(const FHitResult& HitResult)
+	{
+		Location = HitResult.ImpactPoint;
+		Rotation = HitResult.ImpactNormal.Rotation();
+	}
+};
+
 UCLASS()
 class GAMESANDBOX_API ALS_LightSaber : public AActor
 {
@@ -71,6 +92,7 @@ private:
 	void LineTrace();
 	void SplashEffect(const FHitResult& HitResult);
 	void PlasmaDecal(const FHitResult& HitResult);
+	void GenerateMoreDecalPoints(const FHitResult& HitResult);
 	void SliceProcedural(const FHitResult& HitResult);
 
 protected:
@@ -115,4 +137,6 @@ private:
 	FTimerHandle BeamLightTimer;
 	FTimerHandle SliceTimer;
 	float CurrentZScale = 1.f;
+	TArray<FLSPlasmaSpawn> PlasmaContacts;
+	TArray<FVector> AllPlasmaDecalLocations;
 };
