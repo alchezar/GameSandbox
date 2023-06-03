@@ -192,3 +192,17 @@ ALS_LightSaber* ALS_BaseCharacter::GetCurrentSaber() const
 {
 	return CurrentSaber;
 }
+
+void ALS_BaseCharacter::StartMoving()
+{
+	if (!MoveMontageArray[0]) return;
+
+	PlayAnimMontage(MoveMontageArray[0]);
+}
+
+void ALS_BaseCharacter::StopMoving()
+{
+	if (!MoveMontageArray[1]) return;
+
+	PlayAnimMontage(MoveMontageArray[1]);
+}

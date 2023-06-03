@@ -51,6 +51,9 @@ void ALS_PlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInput
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Started, this, &Super::StartMoving);	
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &Super::StopMoving);	
+	
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 

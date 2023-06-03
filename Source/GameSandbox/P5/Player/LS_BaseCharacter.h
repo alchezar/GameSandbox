@@ -42,6 +42,9 @@ public:
 	void Attack();
 	void TakeWeapon();
 
+	void StartMoving();
+	void StopMoving();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -77,6 +80,8 @@ protected:
 	TArray<UAnimMontage*> AttackMontageArray;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
 	FTakeLightSaber TakeLightSaber;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
+	TArray<UAnimMontage*> MoveMontageArray;
 	
 private:
 	UPROPERTY()

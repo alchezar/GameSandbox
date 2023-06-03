@@ -11,15 +11,17 @@ void ULS_AnimInstance::NativeInitializeAnimation()
 	if (!Pawn) return;
 
 	MovementComponent = Pawn->GetMovementComponent();
+	// SetRootMotionMode(ERootMotionMode::RootMotionFromEverything);
 }
 
 void ULS_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	if (!Pawn || !MovementComponent) return;
 
-	FVector Velocity = Pawn->GetVelocity();
-	Velocity.Z = 0;
-	Speed = Velocity.Size();
+	// FVector Velocity = Pawn->GetVelocity();
+	// Velocity.Z = 0;
+	// Speed = Velocity.Size();
+	Speed = Pawn->GetVelocity().Size();
 	Direction = GetMovementDirectionAngle() != 0 ? GetMovementDirectionAngle() : Direction;
 	bJump = MovementComponent->IsFalling();
 
@@ -27,7 +29,7 @@ void ULS_AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		bDead = Character->GetIsDead();
 		bDoubleJump = Character->GetIsDoubleJump();
-		bMoving =  Speed > 10;
+		bMoving =  Speed > 0.f;
 		bLightSaberTurnedOn = Character->GetIsWeaponTaken();
 	}
 	if (const auto Player = Cast<ALS_PlayerCharacter>(Pawn))

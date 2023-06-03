@@ -235,13 +235,12 @@ void ALS_LightSaber::OnBladeBeginOverlap(UPrimitiveComponent* OverlappedComponen
 {
 	if (OtherActor == OwnerCharacter) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("start")));
-	// PlasmaContacts.Add(FLSPlasmaSpawn(SweepResult));
+	// GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("start")));
 }
 
 void ALS_LightSaber::OnBladeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (OtherActor == OwnerCharacter) return;
 
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("end")));
+	// GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("end")));
 }
