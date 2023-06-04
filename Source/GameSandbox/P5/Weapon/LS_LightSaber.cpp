@@ -156,6 +156,8 @@ void ALS_LightSaber::SetSaberOwner(AActor* CurrentOwner)
 
 void ALS_LightSaber::LineTrace()
 {
+	if (!bTurnedOn) return;
+
 	const FVector Start = Beam->GetSocketLocation(BaseSocketName);
 	const FVector End = Beam->GetSocketLocation(TipSocketName);
 	FHitResult HitResult;
@@ -189,14 +191,12 @@ void ALS_LightSaber::GenerateMoreDecalPoints(const FHitResult& HitResult)
 	PlasmaContacts.Add(FLSPlasmaSpawn(HitResult));
 	if (PlasmaContacts.Num() < 2) return;
 
-	const FVector StartPoint = PlasmaContacts[0].Location;
-	const FVector EndPoint = PlasmaContacts[1].Location;
-	const int32 Distance = (EndPoint - StartPoint).Length();
-
+	const int32 Distance = (PlasmaContacts[1].Location - PlasmaContacts[0].Location).Size();
 	for (int i = 0; i < Distance; ++i)
 	{
-		AllPlasmaDecalLocations.Add(FMath::VInterpTo(StartPoint, EndPoint, i, 1.f / Distance));
-	}	
+		AllPlasmaDecalLocations.Add(
+			FMath::VInterpTo(PlasmaContacts[0].Location, PlasmaContacts[1].Location, i, 1.f / Distance));
+	}
 	PlasmaContacts.RemoveAt(0);
 }
 
