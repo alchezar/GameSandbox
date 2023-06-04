@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ARCharacter.generated.h"
 
+class AARMagicProjectile;
 struct FInputActionValue;
 class UInputAction;
 class UInputMappingContext;
@@ -27,9 +28,11 @@ protected:
 
 	void Move(const FInputActionValue& InputValue);
 	void Look(const FInputActionValue& InputValue);
+	void Fire();
+	void SetTeamColor() const;
 
 private:
-	void AddMappingContext();
+	void AddMappingContext() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
@@ -46,5 +49,18 @@ protected:
 	UInputAction* LookAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* JumpAction;
-#pragma endregion // Input
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* FireAction;
+	#pragma endregion // Input
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Effect")
+	TSubclassOf<AActor> ProjectileClass;
+	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FName TeamColorParameterName = "PaintColor";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FLinearColor TeamColor = FLinearColor(1.f, 1.f, 0.f, 1.f);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Body")
+	FName HandSocketName = "GripPoint";
 };
