@@ -20,7 +20,7 @@ AARMagicProjectile::AARMagicProjectile()
 	MovementComp->InitialSpeed = 1000.f;
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->bInitialVelocityInLocalSpace = true;
-	MovementComp->ProjectileGravityScale = 0.f;	
+	MovementComp->ProjectileGravityScale = 0.f;
 }
 
 void AARMagicProjectile::BeginPlay()
@@ -31,4 +31,21 @@ void AARMagicProjectile::BeginPlay()
 void AARMagicProjectile::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AARMagicProjectile::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	SphereComp->OnComponentHit.AddDynamic(this, &ThisClass::OnProjectileHit);
+}
+
+void AARMagicProjectile::AddActorToIgnore(AActor* Actor)
+{
+	SphereComp->IgnoreActorWhenMoving(Actor, true);
+}
+
+void AARMagicProjectile::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	const FString DebugString = FString::Printf(TEXT("Hit location: %s"), *(Hit.ImpactPoint.ToString()));
+	DrawDebugString(GetWorld(), Hit.ImpactPoint, DebugString, nullptr, FColor::Green, 5.f);
 }

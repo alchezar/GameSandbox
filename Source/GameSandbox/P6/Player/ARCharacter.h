@@ -6,12 +6,14 @@
 #include "GameFramework/Character.h"
 #include "ARCharacter.generated.h"
 
-class AARMagicProjectile;
 struct FInputActionValue;
+class UARInteractionComponent;
+class AARMagicProjectile;
 class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
+class UAnimMontage;
 
 UCLASS()
 class GAMESANDBOX_API AARCharacter : public ACharacter
@@ -33,12 +35,16 @@ protected:
 
 private:
 	void AddMappingContext() const;
+	void ConstructComponents();
+	void PrimaryInteract();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
 	USpringArmComponent* SpringArmComp;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
 	UCameraComponent* CameraComp;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
+	UARInteractionComponent* InteractionComponent;
 
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
@@ -51,11 +57,12 @@ protected:
 	UInputAction* JumpAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* FireAction;
-	#pragma endregion // Input
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* InteractAction;
+#pragma endregion // Input
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Effect")
 	TSubclassOf<AActor> ProjectileClass;
-	
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
 	FName TeamColorParameterName = "PaintColor";
@@ -63,4 +70,9 @@ protected:
 	FLinearColor TeamColor = FLinearColor(1.f, 1.f, 0.f, 1.f);
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Body")
 	FName HandSocketName = "GripPoint";
+
+#pragma region Montage
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
+	UAnimMontage* AttackMontage;
+#pragma endregion // Montage
 };
