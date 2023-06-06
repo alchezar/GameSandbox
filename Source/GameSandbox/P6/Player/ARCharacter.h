@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ARCharacter.generated.h"
 
+class UARAttributesComponent;
 struct FInputActionValue;
 class UARInteractionComponent;
 class AARMagicProjectile;
@@ -14,6 +15,7 @@ class UInputMappingContext;
 class UCameraComponent;
 class USpringArmComponent;
 class UAnimMontage;
+class UUserWidget;
 
 UCLASS()
 class GAMESANDBOX_API AARCharacter : public ACharacter
@@ -24,6 +26,8 @@ public:
 	AARCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UARAttributesComponent* GetAttributesComp() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,6 +41,7 @@ private:
 	void AddMappingContext() const;
 	void ConstructComponents();
 	void PrimaryInteract();
+	void AddWidget();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
@@ -44,8 +49,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
 	UCameraComponent* CameraComp;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
-	UARInteractionComponent* InteractionComponent;
-
+	UARInteractionComponent* InteractionComp;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
+	UARAttributesComponent* AttributeComp;	
+	
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputMappingContext* DefaultMappingContext;
@@ -75,4 +82,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Montage")
 	UAnimMontage* AttackMontage;
 #pragma endregion // Montage
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Interface")
+	TSubclassOf<UUserWidget> HUDClass;
+
+private:
+	UPROPERTY()
+	UUserWidget* HUD;
 };

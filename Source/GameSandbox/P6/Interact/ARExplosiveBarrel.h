@@ -25,9 +25,11 @@ protected:
 	void OnBarrelHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	UStaticMeshComponent* MeshComp;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	URadialForceComponent* ForceComp;
-	
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
+	float Damage = 40.f;
 };

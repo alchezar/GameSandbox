@@ -2,6 +2,7 @@
 
 #include "ARExplosiveBarrel.h"
 #include "PhysicsEngine/RadialForceComponent.h"
+#include "P6/Component/ARAttributesComponent.h"
 
 AARExplosiveBarrel::AARExplosiveBarrel()
 {
@@ -40,5 +41,10 @@ void AARExplosiveBarrel::PostInitializeComponents()
 void AARExplosiveBarrel::OnBarrelHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	ForceComp->FireImpulse();
+
+	UARAttributesComponent* AttributesComponent = OtherActor->FindComponentByClass<UARAttributesComponent>();
+	if (!AttributesComponent) return;
+
+	AttributesComponent->TryChangeHealth(-Damage);
 }
 
