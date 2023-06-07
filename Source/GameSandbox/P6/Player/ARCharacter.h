@@ -9,7 +9,7 @@
 class UARAttributesComponent;
 struct FInputActionValue;
 class UARInteractionComponent;
-class AARMagicProjectile;
+class AARProjectileMagic;
 class UInputAction;
 class UInputMappingContext;
 class UCameraComponent;
@@ -42,6 +42,7 @@ private:
 	void ConstructComponents();
 	void PrimaryInteract();
 	void AddWidget();
+	void SpawnProjectile(const bool bHoming,const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")
@@ -70,6 +71,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Effect")
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Effect")
+	bool bHomingProjectile = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
 	FName TeamColorParameterName = "PaintColor";
