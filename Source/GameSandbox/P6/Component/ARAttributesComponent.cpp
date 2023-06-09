@@ -10,7 +10,7 @@ UARAttributesComponent::UARAttributesComponent()
 void UARAttributesComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Health = DefaultHealth;
+	Health = HealthMax;
 }
 
 void UARAttributesComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -20,9 +20,13 @@ void UARAttributesComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 bool UARAttributesComponent::TryChangeHealth(const float Delta)
 {
-	Health += Delta;
+	Health = FMath::Clamp(Health + Delta, 0.f, HealthMax);
 
 	AROnHealthChanged.Broadcast(nullptr, this, Health, Delta);
 	return true;
 }
 
+bool UARAttributesComponent::GetIsAlive() const
+{
+	return Health > 0.f;
+}

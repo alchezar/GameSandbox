@@ -24,6 +24,7 @@ class GAMESANDBOX_API AARCharacter : public ACharacter
 
 public:
 	AARCharacter();
+	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -43,6 +44,7 @@ private:
 	void PrimaryInteract();
 	void AddWidget();
 	void SpawnProjectile(const bool bHoming,const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult);
+	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")

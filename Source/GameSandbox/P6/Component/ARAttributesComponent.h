@@ -18,6 +18,8 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	bool TryChangeHealth(const float Delta);
+	bool GetIsAlive() const;
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -28,7 +30,7 @@ public:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Health")
-	float DefaultHealth = 100.f;
+	float HealthMax = 100.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Health")
 	float Health;
 

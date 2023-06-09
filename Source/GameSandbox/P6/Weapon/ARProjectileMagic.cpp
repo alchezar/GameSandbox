@@ -22,10 +22,10 @@ void AARProjectileMagic::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!Target) return;		
+	if (!Target) return;
 	const float CurrentDistance = FVector::Dist(GetActorLocation(), Target->GetActorLocation());
 	if (FMath::IsNearlyZero(CurrentDistance)) return;
-	
+
 	MovementComp->HomingAccelerationMagnitude = 100.f / CurrentDistance * 100000;
 	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Cyan, FString::Printf(TEXT("%f"), MovementComp->HomingAccelerationMagnitude));
 }
@@ -45,7 +45,7 @@ void AARProjectileMagic::SetTarget(AActor* TheTarget)
 
 void AARProjectileMagic::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	const FString DebugString = FString::Printf(TEXT("Hit location: %s"), *Hit.ImpactPoint.ToString());
+	// const FString DebugString = FString::Printf(TEXT("Hit location: %s"), *Hit.ImpactPoint.ToString());
 	// DrawDebugString(GetWorld(), Hit.ImpactPoint, DebugString, nullptr, FColor::Green, 5.f);
 	if (Target)
 	{
@@ -67,6 +67,5 @@ void AARProjectileMagic::OnProjectileBeginOverlap(UPrimitiveComponent* Overlappe
 
 void AARProjectileMagic::Explode()
 {
-	
 	Super::Explode();
 }

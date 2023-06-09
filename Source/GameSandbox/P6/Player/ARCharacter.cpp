@@ -18,10 +18,18 @@ AARCharacter::AARCharacter()
 	ConstructComponents();
 }
 
+void AARCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	AttributeComp->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
+}
+
 void AARCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	check(InteractionComp);
+	check(AttributeComp);
 
 	AddMappingContext();
 	SetTeamColor();
@@ -118,17 +126,20 @@ void AARCharacter::Fire()
 	}
 
 	const FVector Start = CameraComp->GetComponentLocation();
-	const FVector End = Start + GetControlRotation().Vector() * 10000.f;
+	const FVector End = Start + GetControlRotation().Vector() * FVector(10000.f);
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
 
-	FTimerDelegate AttackDelegate;
-	AttackDelegate.BindLambda([=]()
-	{
-		SpawnProjectile(bHomingProjectile, ProjectileClass, HitResult);
-	});
+	// FTimerDelegate AttackDelegate;
+	// AttackDelegate.BindLambda([=]()
+	// {
+	// 	SpawnProjectile(bHomingProjectile, ProjectileClass, HitResult);
+	// });
 	FTimerHandle AttackTimer;
-	GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 1.f, false, 0.2f);
+	GetWorld()->GetTimerManager().SetTimer(AttackTimer, [=]()
+	{
+		this->SpawnProjectile(bHomingProjectile, ProjectileClass, HitResult);
+	}, 1.f, false, 0.2f);
 }
 
 void AARCharacter::SpawnProjectile(const bool bHoming, const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult)
@@ -147,7 +158,7 @@ void AARCharacter::SpawnProjectile(const bool bHoming, const TSubclassOf<AActor>
 		AActor* SpawnedProjectile = GetWorld()->SpawnActor<AActor>(ClassToSpawn, FTransform(GetActorRotation(), HandLocation), SpawnParams);
 		if (!SpawnedProjectile) return;
 		AARProjectileMagic* SpawnedHomingProjectile = Cast<AARProjectileMagic>(SpawnedProjectile);
-		if(!SpawnedHomingProjectile) return;
+		if (!SpawnedHomingProjectile) return;
 
 		SpawnedHomingProjectile->AddActorToIgnore(this);
 		SpawnedHomingProjectile->SetTarget(Target);
@@ -156,7 +167,7 @@ void AARCharacter::SpawnProjectile(const bool bHoming, const TSubclassOf<AActor>
 
 	const FVector TargetLocation = HitResult.bBlockingHit
 		? HitResult.ImpactPoint
-		: CameraComp->GetComponentLocation() + GetControlRotation().Vector() * 10000.f;
+		: CameraComp->GetComponentLocation() + GetControlRotation().Vector() * FVector(10000.f);
 
 	const FRotator CorrectRotation = FRotationMatrix::MakeFromX(TargetLocation - HandLocation).Rotator();
 	const FTransform SpawnTransform = FTransform(CorrectRotation, HandLocation, FVector(1.f));
@@ -182,4 +193,15 @@ void AARCharacter::AddWidget()
 UARAttributesComponent* AARCharacter::GetAttributesComp() const
 {
 	return AttributeComp;
+}
+
+void AARCharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta)
+{
+	if (FMath::IsNearlyZero(NewHealth) && Delta < 0.f)
+	{
+		APlayerController* PlayerController = Cast<APlayerController>(Controller);
+		if (!PlayerController) return;
+
+		DisableInput(PlayerController);
+	}
 }
