@@ -1,9 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAIController.h"
-
-#include "BehaviorTree/BlackboardComponent.h"
-#include "Kismet/GameplayStatics.h"
+// #include "BehaviorTree/BlackboardComponent.h"
+// #include "Kismet/GameplayStatics.h"
 
 AARAIController::AARAIController()
 {
@@ -13,17 +12,18 @@ AARAIController::AARAIController()
 void AARAIController::BeginPlay()
 {
 	Super::BeginPlay();
+	check(BehaviorTree);
 
 	RunBehaviorTree(BehaviorTree);
 
-	APawn* OurPawn = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!OurPawn) return;
-
-	UBlackboardComponent* BlackboardComp = GetBlackboardComponent();
-	if (!BlackboardComp) return;
-	
-	BlackboardComp->SetValueAsVector("MoveToLocation", OurPawn->GetActorLocation());
-	BlackboardComp->SetValueAsObject("TargetActor", OurPawn);
+	// APawn* OurPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	// if (!OurPawn) return;
+	//
+	// UBlackboardComponent* BlackboardComp = GetBlackboardComponent();
+	// if (!BlackboardComp) return;
+	//
+	// BlackboardComp->SetValueAsVector("MoveToLocation", OurPawn->GetActorLocation());
+	// BlackboardComp->SetValueAsObject("TargetActor", OurPawn);
 }
 
 void AARAIController::Tick(float DeltaTime)
