@@ -18,6 +18,8 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 
+	bool IsAlive() const;
+
 protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()

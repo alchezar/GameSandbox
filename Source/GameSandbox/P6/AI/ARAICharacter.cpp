@@ -10,6 +10,7 @@ AARAICharacter::AARAICharacter()
 	PrimaryActorTick.bCanEverTick = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AARAICharacter::PostInitializeComponents()
@@ -28,6 +29,11 @@ void AARAICharacter::BeginPlay()
 void AARAICharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+bool AARAICharacter::IsAlive() const
+{
+	return true;
 }
 
 void AARAICharacter::OnPawnSeen(APawn* Pawn)

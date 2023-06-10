@@ -19,7 +19,8 @@ public:
 
 	bool TryChangeHealth(const float Delta);
 	bool GetIsAlive() const;
-
+	bool GetIsHealthMax() const;
+	float GetHealthMax() const;
 
 protected:
 	virtual void BeginPlay() override;
