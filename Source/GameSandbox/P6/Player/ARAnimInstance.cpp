@@ -1,8 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAnimInstance.h"
-
-#include "ARCharacter.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 
 void UARAnimInstance::NativeInitializeAnimation()
@@ -11,13 +10,33 @@ void UARAnimInstance::NativeInitializeAnimation()
 	if (!Pawn) return;
 
 	MovementComponent = Pawn->GetMovementComponent();
-	AttributesComponent = Pawn->FindComponentByClass<UARAttributesComponent>();
+	AttributesComponent = UARAttributesComponent::GetAttributes(Pawn);	
 }
 
 void UARAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
-	bAlive = AttributesComponent ? AttributesComponent->GetIsAlive() : false;
+	if (!AttributesComponent) return;
 	
-	// if (AARCharacter* Character = Cast<AARCharacter>(Pawn))
-	// {}
+	bAlive = AttributesComponent ? AttributesComponent->GetIsAlive() : false;
+	bJump = MovementComponent->IsFalling();
+
+	FVector Velocity = Pawn->GetVelocity();
+	Velocity.Z = 0.f;
+	Speed = Velocity.Size();
+	
+	const float DirectionAngle = GetMovementDirectionAngle();
+	Direction = FMath::IsNearlyZero(DirectionAngle) ? Direction : DirectionAngle;	
+}
+
+float UARAnimInstance::GetMovementDirectionAngle()
+{
+	if (Pawn->GetVelocity().IsZero()) return 0.f;
+
+	const FVector MeshDirection   = Pawn->GetActorForwardVector();
+	const FVector MovingDirection = Pawn->GetVelocity().GetSafeNormal();
+
+	const float AngleBetween   = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(MeshDirection, MovingDirection)));
+	const FVector CrossProduct = FVector::CrossProduct(MeshDirection, MovingDirection);
+
+	return AngleBetween * FMath::Sign(CrossProduct.Z);
 }

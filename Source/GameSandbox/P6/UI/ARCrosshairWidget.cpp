@@ -13,16 +13,15 @@ bool UARCrosshairWidget::Initialize()
 void UARCrosshairWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	BindDelegates();
+
 	SetHealthText(100.f);
+	// BindHealthToAliveBody();
 }
 
-void UARCrosshairWidget::BindDelegates()
+void UARCrosshairWidget::BindHealthToAliveBody(const AARCharacter* NewBody)
 {
-	const AARCharacter* Player = Cast<AARCharacter>(GetOwningPlayerPawn());
-	if (!Player) return;
-
-	Player->GetAttributesComp()->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
+	if (!NewBody) return;
+	NewBody->GetAttributesComp()->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
 }
 
 void UARCrosshairWidget::SetHealthText(const float NewHealth)

@@ -6,7 +6,9 @@
 #include "GameFramework/Character.h"
 #include "ARAICharacter.generated.h"
 
+class UARWorldUserWidget;
 class UPawnSensingComponent;
+class UARAttributesComponent;
 
 UCLASS()
 class GAMESANDBOX_API AARAICharacter : public ACharacter
@@ -24,8 +26,21 @@ protected:
 	virtual void BeginPlay() override;
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
+	UFUNCTION()
+	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
+
+private:
+	void SetTargetActor(AActor* NewTarget);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensingComp;
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UARAttributesComponent* AttributesComp;
+	UPROPERTY(EditAnywhere, Category = "C++ | UI")
+	TSubclassOf<UARWorldUserWidget> HealthBarWidgetClass;
+
+private:
+	UPROPERTY()
+	UARWorldUserWidget* HealthBarWidget;
 };

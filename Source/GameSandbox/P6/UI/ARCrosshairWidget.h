@@ -18,18 +18,20 @@ public:
 	virtual bool Initialize() override;
 
 	void SetHealthText(const float NewHealth);
+	void BindHealthToAliveBody(const AARCharacter* NewBody);
+	// void RebindDelegates();
 
 protected:
 	virtual void NativeConstruct() override;
-
-private:
-	void BindDelegates();
-
 	UFUNCTION()
 	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
 
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextBlockHealth;
+
+private:
+	UPROPERTY()
+	AARCharacter* LastPlayer;
 
 };

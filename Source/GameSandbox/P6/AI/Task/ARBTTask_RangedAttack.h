@@ -22,4 +22,6 @@ protected:
 	FName HandSocketName = "GripPoint";
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<AActor> ProjectileClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	float MaxSpread = 3;
 };

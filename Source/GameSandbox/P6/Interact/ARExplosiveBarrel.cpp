@@ -15,8 +15,8 @@ AARExplosiveBarrel::AARExplosiveBarrel()
 	ForceComp = CreateDefaultSubobject<URadialForceComponent>("ForceComponent");
 	ForceComp->SetupAttachment(RootComponent);
 	ForceComp->SetAutoActivate(false);
-	ForceComp->Radius = 750.f;
-	ForceComp->ImpulseStrength = 2500.f;
+	ForceComp->Radius = Radius;
+	ForceComp->ImpulseStrength = Impulse;
 	ForceComp->bImpulseVelChange = true;
 	ForceComp->AddCollisionChannelToAffect(ECC_WorldDynamic);
 }
@@ -42,9 +42,9 @@ void AARExplosiveBarrel::OnBarrelHit(UPrimitiveComponent* HitComponent, AActor* 
 {
 	ForceComp->FireImpulse();
 
-	UARAttributesComponent* AttributesComponent = OtherActor->FindComponentByClass<UARAttributesComponent>();
+	UARAttributesComponent* AttributesComponent = UARAttributesComponent::GetAttributes(OtherActor);
 	if (!AttributesComponent) return;
 
-	AttributesComponent->TryChangeHealth(-Damage);
+	AttributesComponent->TryChangeHealth(this, -Damage);
 }
 

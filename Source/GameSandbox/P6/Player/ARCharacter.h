@@ -29,7 +29,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	UARAttributesComponent* GetAttributesComp() const;
-
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,9 +42,15 @@ private:
 	void AddMappingContext() const;
 	void ConstructComponents();
 	void PrimaryInteract();
-	void AddWidget();
 	void SpawnProjectile(const bool bHoming,const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult);
+	void AddWidget();
+	void RemoveWidget();
+	UFUNCTION()
 	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
+	UFUNCTION()
+	void OnDeadHandle(AActor* DeadActor);
+	UFUNCTION(Exec)
+	void HealSelf(float Amount = 100.f);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Component")

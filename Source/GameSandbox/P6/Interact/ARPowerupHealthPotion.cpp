@@ -26,10 +26,10 @@ void AARPowerupHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 {
 	if (!InstigatorPawn) return;
 
-	UARAttributesComponent* AttributesComponent = InstigatorPawn->FindComponentByClass<UARAttributesComponent>();
+	UARAttributesComponent* AttributesComponent = UARAttributesComponent::GetAttributes(InstigatorPawn);
 	if (!AttributesComponent) return;
 
-	if (AttributesComponent->TryChangeHealth(AttributesComponent->GetHealthMax()))
+	if (AttributesComponent->TryChangeHealth(this, AttributesComponent->GetHealthMax()))
 	{
 		CooldownPowerup();
 	}

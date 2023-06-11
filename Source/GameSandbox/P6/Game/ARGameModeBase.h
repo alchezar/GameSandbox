@@ -20,11 +20,18 @@ public:
 	AARGameModeBase();
 	virtual void StartPlay() override;
 
+	UFUNCTION()
+	void OnPlayerKilled(AActor* Victim, AActor* Killer);
+
 protected:
 	void SpawnBot();
 
 	UFUNCTION()
 	void OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
+
+private:
+	UFUNCTION(Exec)
+	void KillAll();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")

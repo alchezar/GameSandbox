@@ -8,8 +8,9 @@
 #include "Engine/TargetPoint.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "P6/Component/ARInteractionComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
+#include "P6/Component/ARInteractionComponent.h"
+#include "P6/UI/ARCrosshairWidget.h"
 #include "P6/Weapon/ARProjectileMagic.h"
 
 AARCharacter::AARCharacter()
@@ -21,8 +22,8 @@ AARCharacter::AARCharacter()
 void AARCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
 	AttributeComp->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
+	AttributeComp->AROnDead.AddDynamic(this, &ThisClass::OnDeadHandle);
 }
 
 void AARCharacter::BeginPlay()
@@ -186,8 +187,18 @@ void AARCharacter::AddWidget()
 
 	HUD = CreateWidget(GetWorld(), HUDClass);
 	if (!HUD) return;
-
 	HUD->AddToViewport();
+	
+	if (const auto CrosshairWidget = Cast<UARCrosshairWidget>(HUD))
+	{
+		CrosshairWidget->BindHealthToAliveBody(this);
+	}
+}
+
+void AARCharacter::RemoveWidget()
+{
+	if (!HUD) return;
+	HUD->RemoveFromParent();
 }
 
 UARAttributesComponent* AARCharacter::GetAttributesComp() const
@@ -203,5 +214,21 @@ void AARCharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesC
 		if (!PlayerController) return;
 
 		DisableInput(PlayerController);
+
+		// Ragdoll
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->MovementState.bCanJump = false;
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetCollisionProfileName("Ragdoll");
 	}
+}
+
+void AARCharacter::OnDeadHandle(AActor* DeadActor)
+{
+	RemoveWidget();
+}
+
+void AARCharacter::HealSelf(float Amount)
+{
+	AttributeComp->TryChangeHealth(this, Amount);
 }

@@ -30,6 +30,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	URadialForceComponent* ForceComp;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
 	float Damage = 40.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
+	float Impulse = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
+	float Radius = 750.f;
 };

@@ -89,7 +89,7 @@ bool ASTU_BaseWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 {
 	FRotator ViewRotation;
 	if (!GetPlayerViewPoint(OUT TraceStart,OUT ViewRotation)) return false;
-	TraceEnd = TraceStart + ViewRotation.Vector() * TraceMaxDistance;
+	TraceEnd = TraceStart + ViewRotation.Vector() * FVector(TraceMaxDistance);
 	return true;
 }
 
