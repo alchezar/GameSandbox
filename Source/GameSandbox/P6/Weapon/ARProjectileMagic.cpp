@@ -3,8 +3,7 @@
 #include "ARProjectileMagic.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-#include "P6/Component/ARAttributesComponent.h"
-#include "Particles/ParticleSystemComponent.h"
+#include "P6/Util/ARFuncLibrary.h"
 
 AARProjectileMagic::AARProjectileMagic()
 {
@@ -45,8 +44,6 @@ void AARProjectileMagic::SetTarget(AActor* TheTarget)
 
 void AARProjectileMagic::OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	// const FString DebugString = FString::Printf(TEXT("Hit location: %s"), *Hit.ImpactPoint.ToString());
-	// DrawDebugString(GetWorld(), Hit.ImpactPoint, DebugString, nullptr, FColor::Green, 5.f);
 	if (Target)
 	{
 		Target->Destroy();
@@ -58,11 +55,10 @@ void AARProjectileMagic::OnProjectileBeginOverlap(UPrimitiveComponent* Overlappe
 {
 	if (!OtherActor || OtherActor == GetInstigator()) return;
 
-	const auto AttributeComp = Cast<UARAttributesComponent>(OtherActor->GetComponentByClass(UARAttributesComponent::StaticClass()));
-	if (!AttributeComp) return;
-
-	AttributeComp->TryChangeHealth(GetInstigator(), -Damage);
-	Destroy();
+	if (UARFuncLibrary::ApplyDamage(GetInstigator(), OtherActor, Damage))
+	{
+		Explode();
+	}
 }
 
 void AARProjectileMagic::Explode()

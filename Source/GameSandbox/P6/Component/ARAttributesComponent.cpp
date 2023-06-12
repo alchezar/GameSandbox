@@ -1,9 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAttributesComponent.h"
-
 #include "P6/Game/ARGameModeBase.h"
-#include "P6/Player/ARCharacter.h"
 
 UARAttributesComponent::UARAttributesComponent()
 {
@@ -23,7 +21,7 @@ void UARAttributesComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 bool UARAttributesComponent::TryChangeHealth(AActor* InstigatorActor, const float Delta)
 {
-	if (!GetOwner()->CanBeDamaged()) return false;
+	// if (!GetOwner()->CanBeDamaged()) return false;
 	
 	const float OldHealth = Health;
 	Health = FMath::Clamp(Health + Delta, 0.f, HealthMax);

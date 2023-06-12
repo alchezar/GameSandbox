@@ -5,13 +5,13 @@
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
-#include "Engine/TargetPoint.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P6/Ability/ARAbility.h"
+#include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Component/ARInteractionComponent.h"
 #include "P6/UI/ARCrosshairWidget.h"
-#include "P6/Weapon/ARProjectileMagic.h"
 
 AARCharacter::AARCharacter()
 {
@@ -35,6 +35,7 @@ void AARCharacter::BeginPlay()
 	AddMappingContext();
 	SetTeamColor();
 	AddWidget();
+	ExposeAbilities();
 }
 
 void AARCharacter::Tick(const float DeltaTime)
@@ -58,6 +59,7 @@ void AARCharacter::ConstructComponents()
 
 	InteractionComp = CreateDefaultSubobject<UARInteractionComponent>("InteractionComponent");
 	AttributeComp = CreateDefaultSubobject<UARAttributesComponent>("AttributesComponent");
+	AbilityComp = CreateDefaultSubobject<UARAbilityComponent>("ActionComponent");
 }
 
 void AARCharacter::AddMappingContext() const
@@ -83,6 +85,8 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::Fire);
 	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::PrimaryInteract);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ThisClass::SprintStart);
+	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ThisClass::SprintStop);
 }
 
 void AARCharacter::Move(const FInputActionValue& InputValue)
@@ -121,59 +125,7 @@ void AARCharacter::SetTeamColor() const
 
 void AARCharacter::Fire()
 {
-	if (AttackMontage)
-	{
-		PlayAnimMontage(AttackMontage);
-	}
-
-	const FVector Start = CameraComp->GetComponentLocation();
-	const FVector End = Start + GetControlRotation().Vector() * FVector(10000.f);
-	FHitResult HitResult;
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
-
-	// FTimerDelegate AttackDelegate;
-	// AttackDelegate.BindLambda([=]()
-	// {
-	// 	SpawnProjectile(bHomingProjectile, ProjectileClass, HitResult);
-	// });
-	FTimerHandle AttackTimer;
-	GetWorld()->GetTimerManager().SetTimer(AttackTimer, [=]()
-	{
-		this->SpawnProjectile(bHomingProjectile, ProjectileClass, HitResult);
-	}, 1.f, false, 0.2f);
-}
-
-void AARCharacter::SpawnProjectile(const bool bHoming, const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult)
-{
-	const FVector HandLocation = GetMesh()->GetSocketLocation(HandSocketName);
-
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Instigator = this;
-
-	if (HitResult.bBlockingHit && bHoming)
-	{
-		ATargetPoint* Target = GetWorld()->SpawnActor<ATargetPoint>(ATargetPoint::StaticClass(), HitResult.ImpactPoint, FRotator::ZeroRotator);
-		Target->SetLifeSpan(5.f);
-
-		AActor* SpawnedProjectile = GetWorld()->SpawnActor<AActor>(ClassToSpawn, FTransform(GetActorRotation(), HandLocation), SpawnParams);
-		if (!SpawnedProjectile) return;
-		AARProjectileMagic* SpawnedHomingProjectile = Cast<AARProjectileMagic>(SpawnedProjectile);
-		if (!SpawnedHomingProjectile) return;
-
-		SpawnedHomingProjectile->AddActorToIgnore(this);
-		SpawnedHomingProjectile->SetTarget(Target);
-		return;
-	}
-
-	const FVector TargetLocation = HitResult.bBlockingHit
-		? HitResult.ImpactPoint
-		: CameraComp->GetComponentLocation() + GetControlRotation().Vector() * FVector(10000.f);
-
-	const FRotator CorrectRotation = FRotationMatrix::MakeFromX(TargetLocation - HandLocation).Rotator();
-	const FTransform SpawnTransform = FTransform(CorrectRotation, HandLocation, FVector(1.f));
-
-	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransform, SpawnParams);
+	AbilityComp->StartAbilityByName(this, "PrimaryAttack"); //TODO: Replace hardcode
 }
 
 void AARCharacter::PrimaryInteract()
@@ -199,6 +151,18 @@ void AARCharacter::RemoveWidget()
 {
 	if (!HUD) return;
 	HUD->RemoveFromParent();
+}
+
+void AARCharacter::ExposeAbilities()
+{
+	if (MagicProjectileAbility)
+	{
+		AbilityComp->AddAbility(MagicProjectileAbility);
+	}
+	if (SprintAbility)
+	{
+		AbilityComp->AddAbility(SprintAbility);
+	}
 }
 
 UARAttributesComponent* AARCharacter::GetAttributesComp() const
@@ -231,4 +195,24 @@ void AARCharacter::OnDeadHandle(AActor* DeadActor)
 void AARCharacter::HealSelf(float Amount)
 {
 	AttributeComp->TryChangeHealth(this, Amount);
+}
+
+void AARCharacter::SprintStart()
+{
+	AbilityComp->StartAbilityByName(this, "Sprint"); // TODO: Replace hardcode
+}
+
+void AARCharacter::SprintStop()
+{
+	AbilityComp->StartAbilityByName(this, "Sprint"); // TODO: Replace hardcode
+}
+
+UCameraComponent* AARCharacter::GetCameraComp() const
+{
+	return CameraComp;
+}
+
+FVector AARCharacter::GetPawnViewLocation() const
+{
+	return CameraComp->GetComponentLocation();
 }

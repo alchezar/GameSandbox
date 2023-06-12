@@ -5,6 +5,7 @@
 #include "BrainComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/UI/ARWorldUserWidget.h"
@@ -13,6 +14,9 @@
 AARAICharacter::AARAICharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
+	GetMesh()->SetGenerateOverlapEvents(true);
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -85,6 +89,7 @@ void AARAICharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttribute
 			GetCharacterMovement()->MovementState.bCanJump = false;
 			GetMesh()->SetAllBodiesSimulatePhysics(true);
 			GetMesh()->SetCollisionProfileName("Ragdoll");
+			GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
 			SetLifeSpan(10.f);
 		}
