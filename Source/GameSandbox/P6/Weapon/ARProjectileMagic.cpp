@@ -3,6 +3,7 @@
 #include "ARProjectileMagic.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "P6/Component/ARAbilityComponent.h"
 #include "P6/Util/ARFuncLibrary.h"
 
 AARProjectileMagic::AARProjectileMagic()
@@ -13,6 +14,7 @@ AARProjectileMagic::AARProjectileMagic()
 void AARProjectileMagic::BeginPlay()
 {
 	Super::BeginPlay();
+	SetLifeSpan(10.f);
 	MovementComp->bIsHomingProjectile = true;
 	// MovementComp->HomingAccelerationMagnitude = 5000.f;
 }
@@ -26,7 +28,7 @@ void AARProjectileMagic::Tick(const float DeltaTime)
 	if (FMath::IsNearlyZero(CurrentDistance)) return;
 
 	MovementComp->HomingAccelerationMagnitude = 100.f / CurrentDistance * 100000;
-	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Cyan, FString::Printf(TEXT("%f"), MovementComp->HomingAccelerationMagnitude));
+	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Cyan, FString::Printf(TEXT("%f"), MovementComp->HomingAccelerationMagnitude));
 }
 
 void AARProjectileMagic::AddActorToIgnore(AActor* Actor)
@@ -55,6 +57,14 @@ void AARProjectileMagic::OnProjectileBeginOverlap(UPrimitiveComponent* Overlappe
 {
 	if (!OtherActor || OtherActor == GetInstigator()) return;
 
+	const UARAbilityComponent* AbilityComp = OtherActor->FindComponentByClass<UARAbilityComponent>();	
+	if (AbilityComp && AbilityComp->ActiveGameplayTags.HasTag(ParryTag))
+	{
+		MovementComp->Velocity *= -1;
+		SetInstigator(Cast<APawn>(OtherActor));
+		return;
+	}
+	
 	if (UARFuncLibrary::ApplyDamage(GetInstigator(), OtherActor, Damage))
 	{
 		Explode();

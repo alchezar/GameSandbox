@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbility.h"
+#include "P6/Component/ARAbilityComponent.h"
 
 UWorld* UARAbility::GetWorld() const
 {
 	// return UObject::GetWorld();
-	
+
 	/* Outer set in ARAbilityComponent by NewObject<>() */
 	const UActorComponent* ActorComp = Cast<UActorComponent>(GetOuter());
 	if (!ActorComp) return nullptr;
@@ -13,12 +14,30 @@ UWorld* UARAbility::GetWorld() const
 	return ActorComp->GetWorld();
 }
 
-void UARAbility::StartAction_Implementation(AActor* Instigator)
+UARAbilityComponent* UARAbility::GetAbilityComponent() const
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Running: %s"), *GetNameSafe(this)));
+	return Cast<UARAbilityComponent>(GetOuter());
 }
 
-void UARAbility::StopAction_Implementation(AActor* Instigator)
+void UARAbility::StartAbility_Implementation(AActor* Instigator)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Stopped: %s"), *GetNameSafe(this)));
+	GetAbilityComponent()->ActiveGameplayTags.AppendTags(GrantsTags);
+	bRunning = true;
+}
+
+void UARAbility::StopAbility_Implementation(AActor* Instigator)
+{
+	GetAbilityComponent()->ActiveGameplayTags.RemoveTags(GrantsTags);
+	bRunning = false;
+}
+
+bool UARAbility::CanStart_Implementation(AActor* Instigator)
+{
+	if (bRunning) return false;
+	return !GetAbilityComponent()->ActiveGameplayTags.HasAny(BlockedTags);
+}
+
+bool UARAbility::GetIsRunning() const
+{
+	return bRunning;
 }

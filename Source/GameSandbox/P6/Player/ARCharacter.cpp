@@ -87,6 +87,7 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::PrimaryInteract);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ThisClass::SprintStart);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ThisClass::SprintStop);
+	EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ThisClass::Parry);
 }
 
 void AARCharacter::Move(const FInputActionValue& InputValue)
@@ -125,7 +126,7 @@ void AARCharacter::SetTeamColor() const
 
 void AARCharacter::Fire()
 {
-	AbilityComp->StartAbilityByName(this, "PrimaryAttack"); //TODO: Replace hardcode
+	AbilityComp->StartAbilityByName(this, AttackTagName);
 }
 
 void AARCharacter::PrimaryInteract()
@@ -155,13 +156,9 @@ void AARCharacter::RemoveWidget()
 
 void AARCharacter::ExposeAbilities()
 {
-	if (MagicProjectileAbility)
+	for(const TSubclassOf<UARAbility> AbilityClass : AbilityClasses)
 	{
-		AbilityComp->AddAbility(MagicProjectileAbility);
-	}
-	if (SprintAbility)
-	{
-		AbilityComp->AddAbility(SprintAbility);
+		AbilityComp->AddAbility(AbilityClass);
 	}
 }
 
@@ -199,12 +196,17 @@ void AARCharacter::HealSelf(float Amount)
 
 void AARCharacter::SprintStart()
 {
-	AbilityComp->StartAbilityByName(this, "Sprint"); // TODO: Replace hardcode
+	AbilityComp->StartAbilityByName(this, SprintTagName);
 }
 
 void AARCharacter::SprintStop()
 {
-	AbilityComp->StartAbilityByName(this, "Sprint"); // TODO: Replace hardcode
+	AbilityComp->StopAbilityByName(this, SprintTagName);
+}
+
+void AARCharacter::Parry()
+{
+	AbilityComp->StartAbilityByName(this, ParryTagName);
 }
 
 UCameraComponent* AARCharacter::GetCameraComp() const

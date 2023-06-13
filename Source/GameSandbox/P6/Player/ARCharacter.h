@@ -43,6 +43,7 @@ protected:
 	void SetTeamColor() const;
 	void SprintStart();
 	void SprintStop();
+	void Parry();
 
 private:
 	void AddMappingContext() const;
@@ -93,13 +94,19 @@ protected:
 	UInputAction* InteractAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* SprintAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* ParryAction;
 #pragma endregion // Input
 
 #pragma region Ability
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UARAbility> SprintAbility;
+	TArray<TSubclassOf<UARAbility>> AbilityClasses;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UARAbility> MagicProjectileAbility;
+	FName AttackTagName = "PrimaryAttack";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	FName SprintTagName = "SprintAbility";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	FName ParryTagName = "ParryAbility";
 #pragma endregion  //Ability
 
 private:

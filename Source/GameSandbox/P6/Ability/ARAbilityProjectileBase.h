@@ -16,8 +16,8 @@ class GAMESANDBOX_API UARAbilityProjectileBase : public UARAbility
 
 public:
 	UARAbilityProjectileBase();
-	virtual void StartAction_Implementation(AActor* Instigator) override;
-	virtual void StopAction_Implementation(AActor* Instigator) override;
+	virtual void StartAbility_Implementation(AActor* Instigator) override;
+	virtual void StopAbility_Implementation(AActor* Instigator) override;
 
 protected:
 	UFUNCTION()

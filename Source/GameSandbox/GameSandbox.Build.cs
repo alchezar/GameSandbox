@@ -19,6 +19,7 @@ public class GameSandbox : ModuleRules
 			"PhysicsCore",
 			"AIModule",
 			"GameplayTasks",
+			"GameplayTags",
 			"NavigationSystem",
 			"ProceduralMeshComponent"
 		});

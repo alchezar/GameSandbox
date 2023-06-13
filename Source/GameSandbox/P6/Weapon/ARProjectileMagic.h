@@ -15,7 +15,6 @@ class GAMESANDBOX_API AARProjectileMagic : public AARProjectileBase
 public:
 	AARProjectileMagic();
 	virtual void Tick(float DeltaTime) override;
-
 	virtual void AddActorToIgnore(AActor* Actor) override;
 	
 	void SetTarget(AActor* TheTarget);

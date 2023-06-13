@@ -4,22 +4,21 @@
 
 #include "CoreMinimal.h"
 #include "ARAbility.h"
-#include "ARAbilitySprint.generated.h"
+#include "ARAbilityParry.generated.h"
 
 UCLASS()
-class GAMESANDBOX_API UARAbilitySprint : public UARAbility
+class GAMESANDBOX_API UARAbilityParry : public UARAbility
 {
 	GENERATED_BODY()
 
 public:
-	UARAbilitySprint();
+	UARAbilityParry();
 	virtual void StartAbility_Implementation(AActor* Instigator) override;
 	virtual void StopAbility_Implementation(AActor* Instigator) override;
 
-public:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Sprint")
-	float BonusSpeed = 600.f;
-
-protected:
-	float DefaultSpeed = 0.f;
+// protected:
+// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++")
+// 	FGameplayTag ParryTag;
 };
+
+

@@ -1,13 +1,18 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbilitySprint.h"
+// #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-void UARAbilitySprint::StartAction_Implementation(AActor* Instigator)
+UARAbilitySprint::UARAbilitySprint()
+{}
+
+void UARAbilitySprint::StartAbility_Implementation(AActor* Instigator)
 {
-	Super::StartAction_Implementation(Instigator);
+	Super::StartAbility_Implementation(Instigator);
 
 	UCharacterMovementComponent* MovementComp = Instigator->FindComponentByClass<UCharacterMovementComponent>();
+	// UCharacterMovementComponent* MovementComp = Cast<ACharacter>(Instigator)->GetCharacterMovement();
 	if (!MovementComp) return;
 
 	if (DefaultSpeed == 0.f)
@@ -15,14 +20,15 @@ void UARAbilitySprint::StartAction_Implementation(AActor* Instigator)
 		DefaultSpeed = MovementComp->MaxWalkSpeed;
 	}
 
-	MovementComp->MaxWalkSpeed = MovementComp->MaxWalkSpeed + BonusSpeed;
+	MovementComp->MaxWalkSpeed +=  BonusSpeed;
 }
 
-void UARAbilitySprint::StopAction_Implementation(AActor* Instigator)
+void UARAbilitySprint::StopAbility_Implementation(AActor* Instigator)
 {
-	Super::StopAction_Implementation(Instigator);
+	Super::StopAbility_Implementation(Instigator);
 
 	UCharacterMovementComponent* MovementComp = Instigator->FindComponentByClass<UCharacterMovementComponent>();
+	// UCharacterMovementComponent* MovementComp = Cast<ACharacter>(Instigator)->GetCharacterMovement();
 	if (!MovementComp) return;
 
 	MovementComp->MaxWalkSpeed = DefaultSpeed;

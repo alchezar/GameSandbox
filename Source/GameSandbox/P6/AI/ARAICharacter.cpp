@@ -7,6 +7,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/UI/ARWorldUserWidget.h"
 #include "Perception/PawnSensingComponent.h"
@@ -22,6 +23,7 @@ AARAICharacter::AARAICharacter()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	AttributesComp = CreateDefaultSubobject<UARAttributesComponent>("AttributesComponent");
+	AbilityComp = CreateDefaultSubobject<UARAbilityComponent>("AbilityComponent");
 }
 
 void AARAICharacter::PostInitializeComponents()

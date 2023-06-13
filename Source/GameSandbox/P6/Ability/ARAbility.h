@@ -3,9 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "UObject/Object.h"
 #include "ARAbility.generated.h"
 
+class UARAbilityComponent;
 class UWorld;
 
 UCLASS(Blueprintable)
@@ -14,14 +16,31 @@ class GAMESANDBOX_API UARAbility : public UObject
 	GENERATED_BODY()
 
 public:
-	UWorld* GetWorld() const override;
+	virtual UWorld* GetWorld() const override;
+
+	bool GetIsRunning() const;
 	
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
-	void StartAction(AActor* Instigator);
+	void StartAbility(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
-	void StopAction(AActor* Instigator);
+	void StopAbility(AActor* Instigator);
+	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
+	bool CanStart(AActor* Instigator);
+
+protected:
+	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
+	UARAbilityComponent* GetAbilityComponent() const;
 
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Action")
-	FName ActionName;
+	FName AbilityName;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
+	FGameplayTagContainer GrantsTags;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
+	FGameplayTagContainer BlockedTags;
+
+private:
+	bool bRunning;
 };

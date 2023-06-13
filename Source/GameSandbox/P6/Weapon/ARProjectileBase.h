@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "GameFramework/Actor.h"
 #include "ARProjectileBase.generated.h"
 
@@ -43,7 +44,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Damage")
 	float Damage = 20.f;
-
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Damage")
+	FGameplayTag ParryTag;
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Effect")
 	UParticleSystem* Impact;
 };

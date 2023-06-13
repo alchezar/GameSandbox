@@ -6,11 +6,11 @@
 #include "P6/Weapon/ARProjectileMagic.h"
 
 UARAbilityProjectileBase::UARAbilityProjectileBase()
-{ }
+{}
 
-void UARAbilityProjectileBase::StartAction_Implementation(AActor* Instigator)
+void UARAbilityProjectileBase::StartAbility_Implementation(AActor* Instigator)
 {
-	Super::StartAction_Implementation(Instigator);
+	Super::StartAbility_Implementation(Instigator);
 
 	ACharacter* Character = Cast<ACharacter>(Instigator);
 	if (!Character) return;
@@ -32,9 +32,9 @@ void UARAbilityProjectileBase::StartAction_Implementation(AActor* Instigator)
 	GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0.2f, false, 0.2f);
 }
 
-void UARAbilityProjectileBase::StopAction_Implementation(AActor* Instigator)
+void UARAbilityProjectileBase::StopAbility_Implementation(AActor* Instigator)
 {
-	Super::StopAction_Implementation(Instigator);
+	Super::StopAbility_Implementation(Instigator);
 }
 
 void UARAbilityProjectileBase::SpawnProjectile(ACharacter* Instigator, const bool bHoming, const TSubclassOf<AActor> ClassToSpawn, const FHitResult& HitResult)
@@ -57,6 +57,8 @@ void UARAbilityProjectileBase::SpawnProjectile(ACharacter* Instigator, const boo
 
 		SpawnedHomingProjectile->AddActorToIgnore(Instigator);
 		SpawnedHomingProjectile->SetTarget(Target);
+
+		StopAbility(Instigator);
 		return;
 	}
 
@@ -68,5 +70,5 @@ void UARAbilityProjectileBase::SpawnProjectile(ACharacter* Instigator, const boo
 
 	GetWorld()->SpawnActor<AActor>(ClassToSpawn, SpawnTransform, SpawnParams);
 
-	StopAction(Instigator);
+	StopAbility(Instigator);
 }
