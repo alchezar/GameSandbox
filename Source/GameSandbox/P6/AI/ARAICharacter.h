@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "ARAICharacter.generated.h"
 
+class UARDamagePopUp;
 class UARAbilityComponent;
 class UARWorldUserWidget;
 class UPawnSensingComponent;
@@ -42,6 +43,8 @@ protected:
 	UARAbilityComponent* AbilityComp;
 	UPROPERTY(EditAnywhere, Category = "C++ | UI")
 	TSubclassOf<UARWorldUserWidget> HealthBarWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++ | UI")
+	TSubclassOf<UARDamagePopUp> DamagePopupWidgetClass;
 
 private:
 	UPROPERTY()

@@ -5,6 +5,7 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "P6/Component/ARAbilityComponent.h"
 #include "P6/Util/ARFuncLibrary.h"
+#include "P6/Ability/ARAbilityEffect.h"
 
 AARProjectileMagic::AARProjectileMagic()
 {
@@ -57,16 +58,20 @@ void AARProjectileMagic::OnProjectileBeginOverlap(UPrimitiveComponent* Overlappe
 {
 	if (!OtherActor || OtherActor == GetInstigator()) return;
 
-	const UARAbilityComponent* AbilityComp = OtherActor->FindComponentByClass<UARAbilityComponent>();	
+	UARAbilityComponent* AbilityComp = OtherActor->FindComponentByClass<UARAbilityComponent>();
 	if (AbilityComp && AbilityComp->ActiveGameplayTags.HasTag(ParryTag))
 	{
 		MovementComp->Velocity *= -1;
 		SetInstigator(Cast<APawn>(OtherActor));
 		return;
 	}
-	
+
 	if (UARFuncLibrary::ApplyDamage(GetInstigator(), OtherActor, Damage))
 	{
+		if (AbilityComp)
+		{
+			AbilityComp->AddAbility(GetInstigator(), BurningEffectClass);
+		}
 		Explode();
 	}
 }

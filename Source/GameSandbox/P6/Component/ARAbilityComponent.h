@@ -20,11 +20,13 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
-	void AddAbility(TSubclassOf<UARAbility> ActionClass);
+	void AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass);
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
-	bool StartAbilityByName(AActor* Instigator, FName AbilityName);
+	void RemoveAbility(UARAbility* AbilityToRemove);
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
-	bool StopAbilityByName(AActor* Instigator, FName AbilityName);
+	bool StartAbilityByName(AActor* Instigator, const FName AbilityName);
+	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
+	bool StopAbilityByName(AActor* Instigator, const FName AbilityName);
 
 protected:
 	virtual void BeginPlay() override;

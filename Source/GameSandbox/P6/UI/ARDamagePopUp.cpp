@@ -16,10 +16,7 @@ void UARDamagePopUp::NativeConstruct()
 	Super::NativeConstruct();
 
 	FTimerHandle RemoveTimer;
-	GetWorld()->GetTimerManager().SetTimer(RemoveTimer, [&]()
-	{
-		RemoveFromParent();
-	}, 1.f, false);
+	GetWorld()->GetTimerManager().SetTimer(RemoveTimer, [&](){ RemoveFromParent(); }, 1.f, false);
 }
 
 void UARDamagePopUp::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

@@ -27,7 +27,7 @@ bool UARAttributesComponent::TryChangeHealth(AActor* InstigatorActor, const floa
 	Health = FMath::Clamp(Health + Delta, 0.f, HealthMax);
 
 	const float ActualDelta = Health - OldHealth;
-	AROnHealthChanged.Broadcast(InstigatorActor, this, Health, Delta);
+	AROnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
 
 	if (ActualDelta < 0.f && Health == 0.f)
 	{

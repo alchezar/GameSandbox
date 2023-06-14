@@ -42,6 +42,9 @@ protected:
 	TSubclassOf<AActor> MinionClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	UCurveFloat* DifficultyCurve;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
+	int32 CreditsPerKill = 5;
 	
 private:
 	FTimerHandle SpawnBotTimer;

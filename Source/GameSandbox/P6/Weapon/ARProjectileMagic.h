@@ -7,6 +7,8 @@
 #include "P6/Weapon/ARProjectileBase.h"
 #include "ARProjectileMagic.generated.h"
 
+class UARAbilityEffect;
+
 UCLASS()
 class GAMESANDBOX_API AARProjectileMagic : public AARProjectileBase
 {
@@ -24,6 +26,10 @@ protected:
 	virtual void OnProjectileHit(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) override;
 	virtual void OnProjectileBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void Explode() override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
+	TSubclassOf<UARAbilityEffect> BurningEffectClass;
 	
 private:
 	UPROPERTY()

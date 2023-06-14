@@ -158,7 +158,7 @@ void AARCharacter::ExposeAbilities()
 {
 	for(const TSubclassOf<UARAbility> AbilityClass : AbilityClasses)
 	{
-		AbilityComp->AddAbility(AbilityClass);
+		AbilityComp->AddAbility(this, AbilityClass);
 	}
 }
 

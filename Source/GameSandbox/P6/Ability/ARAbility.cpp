@@ -21,13 +21,23 @@ UARAbilityComponent* UARAbility::GetAbilityComponent() const
 
 void UARAbility::StartAbility_Implementation(AActor* Instigator)
 {
-	GetAbilityComponent()->ActiveGameplayTags.AppendTags(GrantsTags);
+	UARAbilityComponent* AbilityComp = GetAbilityComponent();
+	if (!AbilityComp) return;
+	
+	if (AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
+
+	AbilityComp->ActiveGameplayTags.AppendTags(GrantsTags);
 	bRunning = true;
 }
 
 void UARAbility::StopAbility_Implementation(AActor* Instigator)
 {
-	GetAbilityComponent()->ActiveGameplayTags.RemoveTags(GrantsTags);
+	UARAbilityComponent* AbilityComp = GetAbilityComponent();
+	if (!AbilityComp) return;
+	
+	if (!AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
+	
+	AbilityComp->ActiveGameplayTags.RemoveTags(GrantsTags);
 	bRunning = false;
 }
 

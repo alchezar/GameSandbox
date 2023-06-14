@@ -34,7 +34,9 @@ protected:
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Action")
 	FName AbilityName;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Action")
+	bool bAutostart = false;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer GrantsTags;

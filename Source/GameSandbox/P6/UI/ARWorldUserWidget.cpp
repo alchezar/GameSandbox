@@ -10,6 +10,9 @@ void UARWorldUserWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 	DynamicHealthBar = HealthBarImage->GetDynamicMaterial();
+
+	FTimerHandle RemoveTimer;
+	GetWorld()->GetTimerManager().SetTimer(RemoveTimer, [&](){ RemoveFromParent(); }, 1.f, false);
 }
 
 void UARWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

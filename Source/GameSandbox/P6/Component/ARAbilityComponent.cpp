@@ -21,17 +21,27 @@ void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Silver, DebugMsg);
 }
 
-void UARAbilityComponent::AddAbility(TSubclassOf<UARAbility> ActionClass)
+void UARAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass)
 {
 	if (!ActionClass) return;
 
-	UARAbility* NewAction = NewObject<UARAbility>(this, ActionClass);
-	if (!NewAction) return;
+	UARAbility* NewAbility = NewObject<UARAbility>(this, ActionClass);
+	if (!NewAbility) return;
 
-	Abilities.Add(NewAction);
+	Abilities.Add(NewAbility);
+	if (NewAbility->bAutostart && NewAbility->CanStart(Instigator))
+	{
+		NewAbility->StartAbility(Instigator);
+	}
 }
 
-bool UARAbilityComponent::StartAbilityByName(AActor* Instigator, FName AbilityName)
+void UARAbilityComponent::RemoveAbility(UARAbility* AbilityToRemove)
+{
+	if (!AbilityToRemove || AbilityToRemove->GetIsRunning()) return;	
+	Abilities.Remove(AbilityToRemove);
+}
+
+bool UARAbilityComponent::StartAbilityByName(AActor* Instigator, const FName AbilityName)
 {
 	for (UARAbility* Ability : Abilities)
 	{
@@ -43,7 +53,7 @@ bool UARAbilityComponent::StartAbilityByName(AActor* Instigator, FName AbilityNa
 	return false;
 }
 
-bool UARAbilityComponent::StopAbilityByName(AActor* Instigator, FName AbilityName)
+bool UARAbilityComponent::StopAbilityByName(AActor* Instigator, const FName AbilityName)
 {
 	for (UARAbility* Ability : Abilities)
 	{

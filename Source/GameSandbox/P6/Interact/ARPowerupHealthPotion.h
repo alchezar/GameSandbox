@@ -24,4 +24,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Component")
 	UStaticMeshComponent* MeshComp;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Credit")
+	int32 CreditsCost = 5;
 };

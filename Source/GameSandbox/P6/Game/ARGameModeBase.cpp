@@ -1,15 +1,17 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARGameModeBase.h"
-
 #include "EngineUtils.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "P6/AI/ARAICharacter.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Player/ARCharacter.h"
+#include "P6/Player/ARPlayerState.h"
 
 AARGameModeBase::AARGameModeBase()
-{}
+{	
+	PlayerStateClass = AARPlayerState::StaticClass();
+}
 
 void AARGameModeBase::StartPlay()
 {
@@ -69,24 +71,27 @@ void AARGameModeBase::KillAll()
 
 void AARGameModeBase::OnPlayerKilled(AActor* Victim, AActor* Killer)
 {
-	AARCharacter* Player = Cast<AARCharacter>(Victim);
-	if (!Player) return;
-
-	// Player->RemoveWidget();
-
-	FTimerHandle RespawnTimer;
-	FTimerDelegate RespawnDelegate;
-	RespawnDelegate.BindLambda([=]()
+	if (const AARCharacter* Player = Cast<AARCharacter>(Victim))
 	{
-		if (AController* Controller = Player->GetController())
+		FTimerHandle RespawnTimer;
+		FTimerDelegate RespawnDelegate;
+		RespawnDelegate.BindLambda([=]()
 		{
-			Controller->UnPossess();
-			RestartPlayer(Controller);
-			// Player->AddWidget();
-			// Player->RefreshWidget();
-			// Player->RemoveWidget();
-		}
-	});
-	constexpr float RespawnDelay = 2.f;
-	GetWorld()->GetTimerManager().SetTimer(RespawnTimer, RespawnDelegate, RespawnDelay, false);
+			if (AController* Controller = Player->GetController())
+			{
+				Controller->UnPossess();
+				RestartPlayer(Controller);
+			}
+		});
+		constexpr float RespawnDelay = 2.f;
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, RespawnDelegate, RespawnDelay, false);
+	}
+
+	if (const APawn* KillerPawn = Cast<APawn>(Killer))
+	{
+		AARPlayerState* PlayerState = KillerPawn->GetPlayerState<AARPlayerState>();
+		if (!PlayerState) return;
+
+		PlayerState->AddCredits(CreditsPerKill);
+	}
 }

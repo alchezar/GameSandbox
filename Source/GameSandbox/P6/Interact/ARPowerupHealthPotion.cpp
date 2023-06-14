@@ -2,6 +2,7 @@
 
 #include "ARPowerupHealthPotion.h"
 #include "P6/Component/ARAttributesComponent.h"
+#include "P6/Player/ARPlayerState.h"
 
 AARPowerupHealthPotion::AARPowerupHealthPotion()
 {
@@ -27,11 +28,13 @@ void AARPowerupHealthPotion::Interact_Implementation(APawn* InstigatorPawn)
 	if (!InstigatorPawn) return;
 
 	UARAttributesComponent* AttributesComponent = UARAttributesComponent::GetAttributes(InstigatorPawn);
-	if (!AttributesComponent) return;
+	if (!AttributesComponent || AttributesComponent->GetIsHealthMax()) return;
 
-	if (AttributesComponent->TryChangeHealth(this, AttributesComponent->GetHealthMax()))
-	{
-		CooldownPowerup();
-	}
+	AARPlayerState* PlayerState = InstigatorPawn->GetPlayerState<AARPlayerState>();
+	if (!PlayerState) return;
+	
+	if (!PlayerState->RemoveCredits(CreditsCost)) return;
+	if (!AttributesComponent->TryChangeHealth(this, AttributesComponent->GetHealthMax())) return;
+
+	CooldownPowerup();
 }
-
