@@ -15,11 +15,15 @@ class GAMESANDBOX_API AARItemChest : public AActor, public IARGameplayInterface
 public:
 	AARItemChest();
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnRep_LidOpened();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Mesh")
@@ -28,4 +32,7 @@ protected:
 	UStaticMeshComponent* LidMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Mesh")
 	float TargetPitch = 110.f;
+	
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly)
+	bool bLidOpen = false;
 };

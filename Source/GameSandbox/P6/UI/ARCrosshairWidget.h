@@ -19,7 +19,7 @@ public:
 
 	void SetHealthText(const float NewHealth);
 	void BindHealthToAliveBody(const AARCharacter* NewBody);
-	// void RebindDelegates();
+	void BindDelegates();
 
 protected:
 	virtual void NativeConstruct() override;
@@ -29,9 +29,4 @@ protected:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TextBlockHealth;
-
-private:
-	UPROPERTY()
-	AARCharacter* LastPlayer;
-
 };

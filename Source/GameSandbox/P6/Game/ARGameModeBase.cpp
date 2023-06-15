@@ -6,11 +6,13 @@
 #include "P6/AI/ARAICharacter.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Player/ARCharacter.h"
+#include "P6/Player/ARPlayerController.h"
 #include "P6/Player/ARPlayerState.h"
 
 AARGameModeBase::AARGameModeBase()
 {	
 	PlayerStateClass = AARPlayerState::StaticClass();
+	PlayerControllerClass = AARPlayerController::StaticClass();
 }
 
 void AARGameModeBase::StartPlay()
@@ -22,7 +24,6 @@ void AARGameModeBase::StartPlay()
 
 void AARGameModeBase::SpawnBot()
 {
-	int32 MaxBotNum = 10;
 	int32 AliveBotsNum = 0;
 	for(TActorIterator<AARAICharacter> It(GetWorld()); It; ++It)
 	{

@@ -44,6 +44,8 @@ protected:
 	UCurveFloat* DifficultyCurve;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
+	int32 MaxBotNum = 10;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 CreditsPerKill = 5;
 	
 private:

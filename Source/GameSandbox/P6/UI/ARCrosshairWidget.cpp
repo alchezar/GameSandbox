@@ -15,7 +15,17 @@ void UARCrosshairWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	SetHealthText(100.f);
-	// BindHealthToAliveBody();
+	BindDelegates();
+}
+
+void UARCrosshairWidget::BindDelegates()
+{
+	const APawn* Player = GetOwningPlayerPawn();
+	if (!Player) return;
+	UARAttributesComponent* AttributesComp = Player->FindComponentByClass<UARAttributesComponent>();
+	if (!AttributesComp) return;
+
+	AttributesComp->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
 }
 
 void UARCrosshairWidget::BindHealthToAliveBody(const AARCharacter* NewBody)

@@ -49,8 +49,8 @@ private:
 	void AddMappingContext() const;
 	void ConstructComponents();
 	void PrimaryInteract();
-	void AddWidget();
-	void RemoveWidget();
+	// void AddWidget();
+	// void RemoveWidget();
 	void ExposeAbilities();
 	UFUNCTION()
 	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
@@ -76,8 +76,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
 	FLinearColor TeamColor = FLinearColor(1.f, 1.f, 0.f, 1.f);
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Interface")
-	TSubclassOf<UUserWidget> HUDClass;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Interface")
+	// TSubclassOf<UUserWidget> HUDClass;
 
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")

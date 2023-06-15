@@ -15,10 +15,15 @@ public:
 	UARInteractionComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	void PrimaryInteract();
+	void PrimaryInteract(APawn* InstigatorPawn);
 
 protected:
 	virtual void BeginPlay() override;
 
-public:
+	UFUNCTION(Server, Reliable)
+	void ServerInteract(APawn* InstigatorPawn);
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Interaction")
+	float SearchDistance = 1000.f;
 };

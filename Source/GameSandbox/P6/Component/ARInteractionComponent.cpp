@@ -1,6 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARInteractionComponent.h"
+#include "DrawDebugHelpers.h"
+#include "GameFramework/Pawn.h"
 #include "P6/Interface/ARGameplayInterface.h"
 
 UARInteractionComponent::UARInteractionComponent()
@@ -18,18 +20,27 @@ void UARInteractionComponent::TickComponent(float DeltaTime, ELevelTick TickType
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UARInteractionComponent::PrimaryInteract()
+void UARInteractionComponent::PrimaryInteract(APawn* InstigatorPawn)
 {
-	APawn* Owner = Cast<APawn>(GetOwner());
+	ServerInteract(InstigatorPawn);
+}
+
+void UARInteractionComponent::ServerInteract_Implementation(APawn* InstigatorPawn)
+{
+	// AARCharacter* Owner = Cast<AARCharacter>(GetOwner());
+	APawn* Owner = Cast<APawn>(InstigatorPawn);
 	if (!Owner) return;
 
-	FVector EyeLocation;
-	FRotator EyeRotation;
-	Owner->GetActorEyesViewPoint(OUT EyeLocation, OUT EyeRotation);
-	FVector SearchEndLocation = EyeLocation + EyeRotation.Vector() * 1000.f;
+	FVector EyeLocation = Owner->GetPawnViewLocation();
+	FRotator EyeRotation = Owner->GetViewRotation();
+
+	// Owner->GetActorEyesViewPoint(OUT EyeLocation, OUT EyeRotation);
+	FVector SearchEndLocation = EyeLocation + EyeRotation.Vector() * SearchDistance;
 	
 	FCollisionObjectQueryParams QueryParams;
 	QueryParams.AddObjectTypesToQuery(ECC_WorldDynamic);
+
+	DrawDebugLine(GetWorld(), EyeLocation, SearchEndLocation, FColor::Green, false, 5.f);
 
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByObjectType(OUT HitResult, EyeLocation, SearchEndLocation, QueryParams);

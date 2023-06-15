@@ -10,7 +10,9 @@ AARPowerupBase::AARPowerupBase()
 	SphereComp = CreateDefaultSubobject<USphereComponent>("SphereComponent");
 	SphereComp->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Overlap);
-	SetRootComponent(SphereComp);	
+	SetRootComponent(SphereComp);
+
+	SetReplicates(true);
 }
 
 void AARPowerupBase::BeginPlay()

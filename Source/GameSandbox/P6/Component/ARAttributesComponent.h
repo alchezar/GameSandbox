@@ -17,7 +17,8 @@ class GAMESANDBOX_API UARAttributesComponent : public UActorComponent
 public:
 	UARAttributesComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	bool TryChangeHealth(AActor* InstigatorActor, const float Delta);
 	bool GetIsAlive() const;
 	bool GetIsHealthMax() const;
@@ -32,6 +33,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
+
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Delegate")
 	FAROnHealthChangedSignature AROnHealthChanged;
@@ -39,9 +43,9 @@ public:
 	FAROnDeadSignature AROnDead;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Health")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "C++ | Health")
 	float HealthMax = 100.f;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Health")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "C++ | Health")
 	float Health;
 
 private:

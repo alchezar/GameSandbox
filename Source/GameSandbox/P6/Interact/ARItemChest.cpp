@@ -2,6 +2,7 @@
 
 #include "ARItemChest.h"
 #include "Components/StaticMeshComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AARItemChest::AARItemChest()
 {
@@ -11,6 +12,8 @@ AARItemChest::AARItemChest()
 	BaseMesh->SetupAttachment(RootComponent);
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(BaseMesh);
+
+	SetReplicates(true);
 }
 
 void AARItemChest::BeginPlay()
@@ -25,5 +28,18 @@ void AARItemChest::Tick(float DeltaTime)
 
 void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
-	LidMesh->SetRelativeRotation(FRotator(TargetPitch, 0.f, 0.f));
+	bLidOpen = !bLidOpen;
+	OnRep_LidOpened();
+}
+
+void AARItemChest::OnRep_LidOpened()
+{
+	const float CurrentPitch = bLidOpen ? TargetPitch : 0.f;
+	LidMesh->SetRelativeRotation(FRotator(CurrentPitch, 0.f, 0.f));
+}
+
+void AARItemChest::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, bLidOpen);
 }
