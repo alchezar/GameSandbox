@@ -28,14 +28,21 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
 	bool StopAbilityByName(AActor* Instigator, const FName AbilityName);
 
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
+
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION(Server, Reliable)
+	void ServerStartAbility(AActor* Instigator, const FName AbilityName);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer ActiveGameplayTags;
 
-private:
-	UPROPERTY()
+protected:	
+	UPROPERTY(Replicated)
 	TArray<UARAbility*> Abilities;
 };

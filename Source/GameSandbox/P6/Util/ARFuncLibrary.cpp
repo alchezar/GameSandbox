@@ -25,3 +25,14 @@ bool UARFuncLibrary::ApplyDirectDamage(AActor* DamageCauser, AActor* TargetActor
 	}
 	return false;
 }
+
+void UARFuncLibrary::LogOnScreen(UObject* WorldContext, const FString& Msg, FColor Color, float Duration)
+{
+	if (!WorldContext || !GEngine) return;
+
+	const UWorld* World = WorldContext->GetWorld();
+	if (!World) return;
+
+	FString NetPrefix = World->IsNetMode(NM_Client) ? "[Client] " : "[Server] ";
+	GEngine->AddOnScreenDebugMessage(-1, Duration, Color, NetPrefix + Msg);
+}

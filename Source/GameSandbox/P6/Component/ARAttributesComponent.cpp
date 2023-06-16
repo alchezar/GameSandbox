@@ -35,8 +35,6 @@ bool UARAttributesComponent::TryChangeHealth(AActor* InstigatorActor, const floa
 
 	if (ActualDelta < 0.f && Health == 0.f)
 	{
-		AROnDead.Broadcast(GetOwner());
-		
 		AARGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AARGameModeBase>();
 		if (!GameMode) return false;
 

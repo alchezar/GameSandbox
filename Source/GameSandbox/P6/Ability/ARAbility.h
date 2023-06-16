@@ -17,26 +17,39 @@ class GAMESANDBOX_API UARAbility : public UObject
 
 public:
 	virtual UWorld* GetWorld() const override;
-
-	bool GetIsRunning() const;
 	
+	void Initialize(UARAbilityComponent* NewAbilityComp);
+	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
+	bool GetIsRunning() const;	
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
 	void StartAbility(AActor* Instigator);
-	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "C++ | Action")
 	void StopAbility(AActor* Instigator);
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
 	bool CanStart(AActor* Instigator);
+
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual bool IsSupportedForNetworking() const override;
+	UFUNCTION()
+	void OnRep_IsRunning();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
 	UARAbilityComponent* GetAbilityComponent() const;
 
 public:
+	UPROPERTY(Replicated)
+	UARAbilityComponent* AbilityComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Action")
 	FName AbilityName;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Action")
 	bool bAutostart = false;
-	
+
+	/* Multiplayer */
+	UPROPERTY(ReplicatedUsing = OnRep_IsRunning)
+	bool bRunning;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer GrantsTags;
@@ -44,5 +57,4 @@ protected:
 	FGameplayTagContainer BlockedTags;
 
 private:
-	bool bRunning;
 };

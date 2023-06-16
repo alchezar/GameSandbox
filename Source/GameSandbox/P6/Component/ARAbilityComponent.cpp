@@ -1,11 +1,16 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbilityComponent.h"
+
+#include "Engine/ActorChannel.h"
+#include "Net/UnrealNetwork.h"
 #include "P6/Ability/ARAbility.h"
+#include "P6/Util/ARFuncLibrary.h"
 
 UARAbilityComponent::UARAbilityComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UARAbilityComponent::BeginPlay()
@@ -17,17 +22,32 @@ void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	const FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Silver, DebugMsg);
+	// const FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
+	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Silver, DebugMsg);
+
+	for (const UARAbility* Ability : Abilities)
+	{
+		if (!Ability) return;
+		
+		const FColor TextColor = Ability->GetIsRunning() ? FColor::Blue : FColor::White;
+		FString ActionMsg = FString::Printf(TEXT("[%s] Ability: %s : IsRunning: %s : Outer: %s"),
+			*GetNameSafe(GetOwner()),
+			*Ability->AbilityName.ToString(),
+			Ability->GetIsRunning() ? TEXT("true") : TEXT("false"),
+			*GetNameSafe(Ability->GetOuter()));
+
+		UARFuncLibrary::LogOnScreen(this, ActionMsg, TextColor, 0.f);
+	}
 }
 
 void UARAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass)
 {
 	if (!ActionClass) return;
 
-	UARAbility* NewAbility = NewObject<UARAbility>(this, ActionClass);
+	UARAbility* NewAbility = NewObject<UARAbility>(GetOwner(), ActionClass);
 	if (!NewAbility) return;
 
+	NewAbility->Initialize(this);
 	Abilities.Add(NewAbility);
 	if (NewAbility->bAutostart && NewAbility->CanStart(Instigator))
 	{
@@ -47,6 +67,11 @@ bool UARAbilityComponent::StartAbilityByName(AActor* Instigator, const FName Abi
 	{
 		if (!Ability || Ability->AbilityName != AbilityName || !Ability->CanStart(Instigator)) continue;
 
+		if (!GetOwner()->HasAuthority())
+		{
+			ServerStartAbility(Instigator, AbilityName);
+		}
+		
 		Ability->StartAbility(Instigator);
 		return true;
 	}
@@ -63,4 +88,27 @@ bool UARAbilityComponent::StopAbilityByName(AActor* Instigator, const FName Abil
 		return true;
 	}
 	return false;
+}
+
+void UARAbilityComponent::ServerStartAbility_Implementation(AActor* Instigator, const FName AbilityName)
+{
+	StartAbilityByName(Instigator, AbilityName);
+}
+
+void UARAbilityComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, Abilities);
+}
+
+bool UARAbilityComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool bWroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	for (UARAbility* Ability : Abilities)
+	{
+		if (!Ability) continue;
+
+		bWroteSomething |= Channel->ReplicateSubobject(Ability, *Bunch, *RepFlags);
+	}
+	return bWroteSomething;
 }

@@ -32,6 +32,7 @@ protected:
 	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
 
 private:
+	AActor* GetTargetActor() const;
 	void SetTargetActor(AActor* NewTarget);
 
 protected:

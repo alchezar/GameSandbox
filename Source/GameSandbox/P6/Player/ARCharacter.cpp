@@ -3,7 +3,6 @@
 #include "ARCharacter.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-// #include "Blueprint/UserWidget.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -11,7 +10,6 @@
 #include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Component/ARInteractionComponent.h"
-// #include "P6/UI/ARCrosshairWidget.h"
 
 AARCharacter::AARCharacter()
 {
@@ -23,7 +21,6 @@ void AARCharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	AttributeComp->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
-	AttributeComp->AROnDead.AddDynamic(this, &ThisClass::OnDeadHandle);
 }
 
 void AARCharacter::BeginPlay()
@@ -34,7 +31,6 @@ void AARCharacter::BeginPlay()
 
 	AddMappingContext();
 	SetTeamColor();
-	// AddWidget();
 	ExposeAbilities();
 }
 
@@ -134,28 +130,10 @@ void AARCharacter::PrimaryInteract()
 	InteractionComp->PrimaryInteract(this);
 }
 
-// void AARCharacter::AddWidget()
-// {
-// 	if (!HUDClass) return;
-//
-// 	HUD = CreateWidget(GetWorld(), HUDClass);
-// 	if (!HUD) return;
-// 	HUD->AddToViewport();
-// 	
-// 	if (const auto CrosshairWidget = Cast<UARCrosshairWidget>(HUD))
-// 	{
-// 		CrosshairWidget->BindHealthToAliveBody(this);
-// 	}
-// }
-//
-// void AARCharacter::RemoveWidget()
-// {
-// 	if (!HUD) return;
-// 	HUD->RemoveFromParent();
-// }
-
 void AARCharacter::ExposeAbilities()
 {
+	if (!HasAuthority()) return; // ServerOnly
+	
 	for(const TSubclassOf<UARAbility> AbilityClass : AbilityClasses)
 	{
 		AbilityComp->AddAbility(this, AbilityClass);
@@ -185,9 +163,7 @@ void AARCharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesC
 }
 
 void AARCharacter::OnDeadHandle(AActor* DeadActor)
-{
-	// RemoveWidget();
-}
+{}
 
 void AARCharacter::HealSelf(float Amount)
 {

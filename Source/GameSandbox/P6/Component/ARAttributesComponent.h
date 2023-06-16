@@ -7,7 +7,7 @@
 #include "ARAttributesComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAROnHealthChangedSignature, AActor*, InstigatorActor, UARAttributesComponent*, OwningComp, float, NewHealth, float, Delta);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAROnDeadSignature, AActor*, DeadActor);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAROnAttributeChangedSignature, AActor*, InstigatorActor, UARAttributesComponent*, OwningComp, float, NewValue, float, Delta);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UARAttributesComponent : public UActorComponent
@@ -17,7 +17,6 @@ class GAMESANDBOX_API UARAttributesComponent : public UActorComponent
 public:
 	UARAttributesComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 	bool TryChangeHealth(AActor* InstigatorActor, const float Delta);
 	bool GetIsAlive() const;
@@ -30,17 +29,21 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static bool GetIsActorAlive(AActor* Actor);
 
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 
+	/* Multiplayer */
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
 
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Delegate")
-	FAROnHealthChangedSignature AROnHealthChanged;
+	FAROnAttributeChangedSignature AROnHealthChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Delegate")
-	FAROnDeadSignature AROnDead;
+	FAROnAttributeChangedSignature AROnRageChanged;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "C++ | Health")

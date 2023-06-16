@@ -62,12 +62,6 @@ bool AARAICharacter::IsAlive() const
 	return true;
 }
 
-void AARAICharacter::OnPawnSeen(APawn* Pawn)
-{
-	SetTargetActor(Pawn);
-	DrawDebugString(GetWorld(), Pawn->GetActorLocation(), FString::Printf(TEXT("See you")), nullptr, FColor::Green, 2.f);
-}
-
 void AARAICharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta)
 {
 	if (InstigatorActor == this) return;
@@ -108,6 +102,24 @@ void AARAICharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttribute
 			SetLifeSpan(10.f);
 		}
 	}
+}
+
+void AARAICharacter::OnPawnSeen(APawn* Pawn)
+{
+	if (Pawn == GetTargetActor()) return;
+	
+	SetTargetActor(Pawn);
+	DrawDebugString(GetWorld(), Pawn->GetActorLocation(), FString::Printf(TEXT("❗")), nullptr, FColor::Red, 2.f);
+}
+
+AActor* AARAICharacter::GetTargetActor() const
+{
+	AAIController* AIController = Cast<AAIController>(GetController());
+	if (!AIController) return nullptr;
+	const UBlackboardComponent* Blackboard = AIController->GetBlackboardComponent();
+	if (!Blackboard) return nullptr;
+
+	return Cast<AActor>(Blackboard->GetValueAsObject("TargetActor"));
 }
 
 void AARAICharacter::SetTargetActor(AActor* NewTarget)
