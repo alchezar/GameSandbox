@@ -10,6 +10,17 @@
 class UARAbilityComponent;
 class UWorld;
 
+USTRUCT()
+struct FAbilityRepData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	bool bRunning;
+	UPROPERTY()
+	AActor* Instigator;
+};
+
 UCLASS(Blueprintable)
 class GAMESANDBOX_API UARAbility : public UObject
 {
@@ -32,7 +43,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override;
 	UFUNCTION()
-	void OnRep_IsRunning();
+	void OnRep_RepData();
 
 protected:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
@@ -47,8 +58,9 @@ public:
 	bool bAutostart = false;
 
 	/* Multiplayer */
-	UPROPERTY(ReplicatedUsing = OnRep_IsRunning)
-	bool bRunning;
+	UPROPERTY(ReplicatedUsing = OnRep_RepData)
+	FAbilityRepData RepData;
+	// bool bRunning;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")

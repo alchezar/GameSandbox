@@ -27,18 +27,22 @@ bool UARAttributesComponent::TryChangeHealth(AActor* InstigatorActor, const floa
 	if (!GetOwner()->CanBeDamaged()) return false;
 	
 	const float OldHealth = Health;
-	Health = FMath::Clamp(Health + Delta, 0.f, HealthMax);
-
-	const float ActualDelta = Health - OldHealth;
-	// AROnHealthChanged.Broadcast(InstigatorActor, this, Health, ActualDelta);
-	MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
-
-	if (ActualDelta < 0.f && Health == 0.f)
+	const float NewHealth = FMath::Clamp(Health + Delta, 0.f, HealthMax);
+	const float ActualDelta = NewHealth - OldHealth;
+	
+	if (GetOwner()->HasAuthority())
 	{
-		AARGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AARGameModeBase>();
-		if (!GameMode) return false;
+		Health = NewHealth;
+		MulticastHealthChanged(InstigatorActor, Health, ActualDelta);
 
-		GameMode->OnPlayerKilled(GetOwner(), InstigatorActor);
+		// When died
+		if (ActualDelta < 0.f && Health == 0.f)
+		{
+			AARGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AARGameModeBase>();
+			if (!GameMode) return false;
+
+			GameMode->OnPlayerKilled(GetOwner(), InstigatorActor);
+		}
 	}
 	
 	return ActualDelta != 0.f;

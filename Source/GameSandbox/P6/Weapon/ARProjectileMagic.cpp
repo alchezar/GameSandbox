@@ -2,8 +2,8 @@
 
 #include "ARProjectileMagic.h"
 #include "Components/SphereComponent.h"
-#include "GameFramework/ProjectileMovementComponent.h"
-#include "P6/Ability/ARAbilityEffect.h"
+#include "GameFramework/ProjectileMovementComponent.h" 
+#include "P6/Ability/ARAbilityEffect.h" // ReSharper disable once CppUnusedIncludeDirective
 #include "P6/Component/ARAbilityComponent.h"
 #include "P6/Util/ARFuncLibrary.h"
 
@@ -68,7 +68,7 @@ void AARProjectileMagic::OnProjectileBeginOverlap(UPrimitiveComponent* Overlappe
 
 	if (UARFuncLibrary::ApplyDamage(GetInstigator(), OtherActor, Damage))
 	{
-		if (AbilityComp)
+		if (AbilityComp && HasAuthority())
 		{
 			AbilityComp->AddAbility(GetInstigator(), BurningEffectClass);
 		}

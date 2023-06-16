@@ -4,6 +4,7 @@
 #include "Components/TextBlock.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Player/ARCharacter.h"
+#include "P6/Player/ARPlayerController.h"
 
 bool UARCrosshairWidget::Initialize()
 {
@@ -13,19 +14,28 @@ bool UARCrosshairWidget::Initialize()
 void UARCrosshairWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	SetHealthText(100.f);
+	// SetHealthText(100.f);
 	BindDelegates();
 }
 
 void UARCrosshairWidget::BindDelegates()
 {
-	const APawn* Player = GetOwningPlayerPawn();
+	AARPlayerController* Controller = Cast<AARPlayerController>(GetOwningPlayer());
+	if (!Controller) return;
+
+	Controller->OnPawnChanged.AddDynamic(this, &ThisClass::OnPawnChangedHandle);
+	OnPawnChangedHandle(Controller->GetPawn());
+}
+
+void UARCrosshairWidget::OnPawnChangedHandle(APawn* NewPawn)
+{
+	const AARCharacter* Player = Cast<AARCharacter>(NewPawn);
 	if (!Player) return;
 	UARAttributesComponent* AttributesComp = Player->FindComponentByClass<UARAttributesComponent>();
 	if (!AttributesComp) return;
 
 	AttributesComp->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
+	OnHealthChangedHandle(nullptr, AttributesComp, AttributesComp->GetHealth(), 0.f);
 }
 
 void UARCrosshairWidget::BindHealthToAliveBody(const AARCharacter* NewBody)
@@ -34,12 +44,13 @@ void UARCrosshairWidget::BindHealthToAliveBody(const AARCharacter* NewBody)
 	NewBody->GetAttributesComp()->AROnHealthChanged.AddDynamic(this, &ThisClass::OnHealthChangedHandle);
 }
 
-void UARCrosshairWidget::SetHealthText(const float NewHealth)
+void UARCrosshairWidget::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta)
 {
+	// SetHealthText(NewHealth);
 	TextBlockHealth->SetText(FText::AsNumber(NewHealth));
 }
 
-void UARCrosshairWidget::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta)
-{
-	SetHealthText(NewHealth);
-}
+// void UARCrosshairWidget::SetHealthText(const float NewHealth)
+// {
+// 	TextBlockHealth->SetText(FText::AsNumber(NewHealth));
+// }

@@ -37,12 +37,14 @@ protected:
 
 	UFUNCTION(Server, Reliable)
 	void ServerStartAbility(AActor* Instigator, const FName AbilityName);
+	UFUNCTION(Server, Reliable)
+	void ServerStopAbility(AActor* Instigator, const FName AbilityName);
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer ActiveGameplayTags;
 
-protected:	
+protected:
 	UPROPERTY(Replicated)
 	TArray<UARAbility*> Abilities;
 };

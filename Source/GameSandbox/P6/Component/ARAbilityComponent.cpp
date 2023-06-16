@@ -30,11 +30,7 @@ void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 		if (!Ability) return;
 		
 		const FColor TextColor = Ability->GetIsRunning() ? FColor::Blue : FColor::White;
-		FString ActionMsg = FString::Printf(TEXT("[%s] Ability: %s : IsRunning: %s : Outer: %s"),
-			*GetNameSafe(GetOwner()),
-			*Ability->AbilityName.ToString(),
-			Ability->GetIsRunning() ? TEXT("true") : TEXT("false"),
-			*GetNameSafe(Ability->GetOuter()));
+		FString ActionMsg = FString::Printf(TEXT("[%s] Ability: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Ability));
 
 		UARFuncLibrary::LogOnScreen(this, ActionMsg, TextColor, 0.f);
 	}
@@ -42,7 +38,7 @@ void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 
 void UARAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass)
 {
-	if (!ActionClass) return;
+	if (!ActionClass || !GetOwner()->HasAuthority()) return;
 
 	UARAbility* NewAbility = NewObject<UARAbility>(GetOwner(), ActionClass);
 	if (!NewAbility) return;
@@ -83,6 +79,11 @@ bool UARAbilityComponent::StopAbilityByName(AActor* Instigator, const FName Abil
 	for (UARAbility* Ability : Abilities)
 	{
 		if (!Ability || Ability->AbilityName != AbilityName || !Ability->GetIsRunning()) continue;
+
+		if (!GetOwner()->HasAuthority())
+		{
+			ServerStopAbility(Instigator, AbilityName);
+		}
 		
 		Ability->StopAbility(Instigator);
 		return true;
@@ -93,6 +94,11 @@ bool UARAbilityComponent::StopAbilityByName(AActor* Instigator, const FName Abil
 void UARAbilityComponent::ServerStartAbility_Implementation(AActor* Instigator, const FName AbilityName)
 {
 	StartAbilityByName(Instigator, AbilityName);
+}
+
+void UARAbilityComponent::ServerStopAbility_Implementation(AActor* Instigator, const FName AbilityName)
+{
+	StopAbilityByName(Instigator, AbilityName);
 }
 
 void UARAbilityComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

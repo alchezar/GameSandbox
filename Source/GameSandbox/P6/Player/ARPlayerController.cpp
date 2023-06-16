@@ -19,6 +19,12 @@ void AARPlayerController::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AARPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	OnPawnChanged.Broadcast(InPawn);
+}
+
 void AARPlayerController::AddWidget()
 {
 	if (!HUDClass) return;

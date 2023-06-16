@@ -25,11 +25,14 @@ void UARAbilityProjectileBase::StartAbility_Implementation(AActor* Instigator)
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility);
 
-	FTimerHandle AttackTimer;
-	FTimerDelegate AttackDelegate;
-	AttackDelegate.BindUFunction(this, "SpawnProjectile", Character, bHomingProjectile, ProjectileClass, HitResult);
+	if (Character->HasAuthority())
+	{
+		FTimerHandle AttackTimer;
+		FTimerDelegate AttackDelegate;
+		AttackDelegate.BindUFunction(this, "SpawnProjectile", Character, bHomingProjectile, ProjectileClass, HitResult);
 
-	GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0.2f, false, 0.2f);
+		GetWorld()->GetTimerManager().SetTimer(AttackTimer, AttackDelegate, 0.2f, false, 0.2f);
+	}
 }
 
 void UARAbilityProjectileBase::StopAbility_Implementation(AActor* Instigator)

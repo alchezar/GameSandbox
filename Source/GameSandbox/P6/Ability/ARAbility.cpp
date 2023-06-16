@@ -35,7 +35,8 @@ void UARAbility::StartAbility_Implementation(AActor* Instigator)
 	if (AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
 
 	AbilityComp->ActiveGameplayTags.AppendTags(GrantsTags);
-	bRunning = true;
+	RepData.bRunning = true;
+	RepData.Instigator = Instigator;
 }
 
 void UARAbility::StopAbility_Implementation(AActor* Instigator)
@@ -48,29 +49,29 @@ void UARAbility::StopAbility_Implementation(AActor* Instigator)
 	if (!AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
 	
 	AbilityComp->ActiveGameplayTags.RemoveTags(GrantsTags);
-	bRunning = false;
+	RepData = {false, Instigator};
 }
 
 bool UARAbility::CanStart_Implementation(AActor* Instigator)
 {
-	if (bRunning) return false;
+	if (RepData.bRunning) return false;
 	return !GetAbilityComponent()->ActiveGameplayTags.HasAny(BlockedTags);
 }
 
 bool UARAbility::GetIsRunning() const
 {
-	return bRunning;
+	return RepData.bRunning;
 }
 
-void UARAbility::OnRep_IsRunning()
+void UARAbility::OnRep_RepData()
 {
-	bRunning ? StartAbility(nullptr) : StopAbility(nullptr);
+	RepData.bRunning ? StartAbility(RepData.Instigator) : StopAbility(RepData.Instigator);
 }
 
 void UARAbility::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ThisClass, bRunning);
+	DOREPLIFETIME(ThisClass, RepData);
 	DOREPLIFETIME(ThisClass, AbilityComponent);
 }
 
