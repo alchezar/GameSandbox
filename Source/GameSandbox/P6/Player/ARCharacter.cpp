@@ -10,6 +10,9 @@
 #include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Component/ARInteractionComponent.h"
+#include "P6/Game/ARGameModeBase.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogARCharacter, All, All);
 
 AARCharacter::AARCharacter()
 {
@@ -79,11 +82,13 @@ void AARCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
+	
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::Fire);
 	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::PrimaryInteract);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Started, this, &ThisClass::SprintStart);
 	EnhancedInputComponent->BindAction(SprintAction, ETriggerEvent::Completed, this, &ThisClass::SprintStop);
 	EnhancedInputComponent->BindAction(ParryAction, ETriggerEvent::Started, this, &ThisClass::Parry);
+	EnhancedInputComponent->BindAction(SaveGameAction, ETriggerEvent::Started, this, &ThisClass::SaveGame);
 }
 
 void AARCharacter::Move(const FInputActionValue& InputValue)
@@ -183,6 +188,15 @@ void AARCharacter::SprintStop()
 void AARCharacter::Parry()
 {
 	AbilityComp->StartAbilityByName(this, ParryTagName);
+}
+
+void AARCharacter::SaveGame()
+{
+	if (AARGameModeBase* GameMode = GetWorld()->GetAuthGameMode<AARGameModeBase>())
+	{
+		GameMode->WriteSaveGame();
+		GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("World saved !")));
+	}
 }
 
 UCameraComponent* AARCharacter::GetCameraComp() const

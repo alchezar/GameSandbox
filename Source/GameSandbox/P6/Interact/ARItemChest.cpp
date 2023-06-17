@@ -10,10 +10,14 @@ AARItemChest::AARItemChest()
 
 	BaseMesh = CreateDefaultSubobject<UStaticMeshComponent>("BaseMesh");
 	BaseMesh->SetupAttachment(RootComponent);
+	BaseMesh->SetSimulatePhysics(true);
+	BaseMesh->SetIsReplicated(true);
+	
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(BaseMesh);
 
 	SetReplicates(true);
+	SetReplicatingMovement(true);
 }
 
 void AARItemChest::BeginPlay()
@@ -24,12 +28,19 @@ void AARItemChest::BeginPlay()
 void AARItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, bLidOpen ? "Chest Opened" : "Chest Closes");
 }
 
 void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
 {
 	bLidOpen = !bLidOpen;
 	OnRep_LidOpened();
+}
+
+void AARItemChest::OnActorLoaded_Implementation()
+{
+	OnRep_LidOpened();	
 }
 
 void AARItemChest::OnRep_LidOpened()

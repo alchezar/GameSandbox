@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "ARPlayerState.generated.h"
 
+class UARSaveGame;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FAROnCreditsChangedSignature, APlayerState*, PlayerState, int32, Credits, int32, Delta);
 
 UCLASS()
@@ -21,6 +22,9 @@ public:
 	void AddCredits(const int32 Delta);
 	bool RemoveCredits(const int32 Delta);
 
+	void SavePlayerState(UARSaveGame* SaveObject);
+	void LoadPlayerState(UARSaveGame* SaveObject);
+	
 protected:
 	virtual void BeginPlay() override;
 

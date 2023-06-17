@@ -44,6 +44,7 @@ protected:
 	void SprintStart();
 	void SprintStop();
 	void Parry();
+	void SaveGame();
 
 private:
 	void AddMappingContext() const;
@@ -91,6 +92,8 @@ protected:
 	UInputAction* SprintAction;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
 	UInputAction* ParryAction;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Kinder | Input")
+	UInputAction* SaveGameAction;
 #pragma endregion // Input
 
 #pragma region Ability

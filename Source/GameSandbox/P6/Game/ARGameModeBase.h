@@ -7,6 +7,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "ARGameModeBase.generated.h"
 
+class UARSaveGame;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
@@ -18,8 +19,14 @@ class GAMESANDBOX_API AARGameModeBase : public AGameModeBase
 
 public:
 	AARGameModeBase();
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void StartPlay() override;
 
+	virtual void HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer) override;
+
+	void WriteSaveGame();
+	void LoadSaveGame();
+	
 	UFUNCTION()
 	void OnPlayerKilled(AActor* Victim, AActor* Killer);
 
@@ -42,11 +49,15 @@ protected:
 	TSubclassOf<AActor> MinionClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	UCurveFloat* DifficultyCurve;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 MaxBotNum = 10;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 CreditsPerKill = 5;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
+	UARSaveGame* CurrentSaveGame;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
+	FString SlotName = "SaveGame01";
 	
 private:
 	FTimerHandle SpawnBotTimer;

@@ -15,10 +15,14 @@ class GAMESANDBOX_API AARItemChest : public AActor, public IARGameplayInterface
 public:
 	AARItemChest();
 	virtual void Tick(float DeltaTime) override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
+	
+	/* Interface */
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
-
+	virtual void OnActorLoaded_Implementation() override;
+	
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -33,6 +37,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Mesh")
 	float TargetPitch = 110.f;
 	
-	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly)
+	UPROPERTY(ReplicatedUsing = "OnRep_LidOpened", BlueprintReadOnly, SaveGame)
 	bool bLidOpen = false;
 };

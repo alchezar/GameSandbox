@@ -2,6 +2,8 @@
 
 #include "ARPlayerState.h"
 
+#include "P6/Game/ARSaveGame.h"
+
 AARPlayerState::AARPlayerState()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -38,5 +40,19 @@ bool AARPlayerState::RemoveCredits(const int32 Delta)
 	Credits -= Delta;
 	OnCreditsChanged.Broadcast(this, Credits, Delta);
 	return true;
+}
+
+void AARPlayerState::SavePlayerState(UARSaveGame* SaveObject)
+{
+	if (!SaveObject) return;
+
+	SaveObject->Credits = Credits;
+}
+
+void AARPlayerState::LoadPlayerState(UARSaveGame* SaveObject)
+{
+	if (!SaveObject) return;
+
+	Credits = SaveObject->Credits;
 }
 

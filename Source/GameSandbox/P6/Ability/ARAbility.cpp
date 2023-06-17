@@ -35,8 +35,7 @@ void UARAbility::StartAbility_Implementation(AActor* Instigator)
 	if (AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
 
 	AbilityComp->ActiveGameplayTags.AppendTags(GrantsTags);
-	RepData.bRunning = true;
-	RepData.Instigator = Instigator;
+	RepData = {true, Instigator};
 }
 
 void UARAbility::StopAbility_Implementation(AActor* Instigator)
@@ -54,8 +53,7 @@ void UARAbility::StopAbility_Implementation(AActor* Instigator)
 
 bool UARAbility::CanStart_Implementation(AActor* Instigator)
 {
-	if (RepData.bRunning) return false;
-	return !GetAbilityComponent()->ActiveGameplayTags.HasAny(BlockedTags);
+	return !RepData.bRunning && GetAbilityComponent() && !GetAbilityComponent()->ActiveGameplayTags.HasAny(BlockedTags);
 }
 
 bool UARAbility::GetIsRunning() const

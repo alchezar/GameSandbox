@@ -21,4 +21,6 @@ class GAMESANDBOX_API IARGameplayInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Kinder | Interaction")
 	void Interact(APawn* InstigatorPawn);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Kinder | Interaction")
+	void OnActorLoaded();
 };

@@ -26,9 +26,8 @@ bool UARAttributesComponent::TryChangeHealth(AActor* InstigatorActor, const floa
 {
 	if (!GetOwner()->CanBeDamaged()) return false;
 	
-	const float OldHealth = Health;
 	const float NewHealth = FMath::Clamp(Health + Delta, 0.f, HealthMax);
-	const float ActualDelta = NewHealth - OldHealth;
+	const float ActualDelta = NewHealth - Health;
 	
 	if (GetOwner()->HasAuthority())
 	{

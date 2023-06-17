@@ -11,8 +11,8 @@ void UARAbilityParry::StartAbility_Implementation(AActor* Instigator)
 
 	FTimerHandle ParryTimer;
 	FTimerDelegate ParryDelegate;
-	// ParryDelegate.BindUFunction(this, "StopAbility");
-	ParryDelegate.BindLambda([&](){	StopAbility(Instigator); });
+	ParryDelegate.BindUFunction(this, "StopAbility");
+	// ParryDelegate.BindLambda([&](){ StopAbility(Instigator); });
 	GetWorld()->GetTimerManager().SetTimer(ParryTimer, ParryDelegate, 1.f, false, 1.f);
 }
 
