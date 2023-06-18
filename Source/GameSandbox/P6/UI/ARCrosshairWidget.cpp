@@ -14,7 +14,6 @@ bool UARCrosshairWidget::Initialize()
 void UARCrosshairWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	// SetHealthText(100.f);
 	BindDelegates();
 }
 
@@ -46,11 +45,5 @@ void UARCrosshairWidget::BindHealthToAliveBody(const AARCharacter* NewBody)
 
 void UARCrosshairWidget::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta)
 {
-	// SetHealthText(NewHealth);
 	TextBlockHealth->SetText(FText::AsNumber(NewHealth));
 }
-
-// void UARCrosshairWidget::SetHealthText(const float NewHealth)
-// {
-// 	TextBlockHealth->SetText(FText::AsNumber(NewHealth));
-// }

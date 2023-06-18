@@ -23,15 +23,21 @@ public:
 	bool RemoveCredits(const int32 Delta);
 
 	void SavePlayerState(UARSaveGame* SaveObject);
-	void LoadPlayerState(UARSaveGame* SaveObject);
+	void LoadPlayerState(const UARSaveGame* SaveObject);
+
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const override;
 	
 protected:
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnRep_Credits(const int32 OldCredits);
 
 public:
 	FAROnCreditsChangedSignature OnCreditsChanged;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Credits")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, ReplicatedUsing = OnRep_Credits, Category = "C++ | Credits")
 	int32 Credits;
 };

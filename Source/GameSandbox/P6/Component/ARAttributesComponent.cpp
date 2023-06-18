@@ -93,3 +93,8 @@ void UARAttributesComponent::MulticastHealthChanged_Implementation(AActor* Insti
 {
 	AROnHealthChanged.Broadcast(InstigatorActor, this, NewHealth, Delta);
 }
+
+void UARAttributesComponent::MulticastRageChanged_Implementation(AActor* InstigatorActor, float NewRage, float Delta)
+{
+	AROnRageChanged.Broadcast(InstigatorActor, this, NewRage, Delta);
+}

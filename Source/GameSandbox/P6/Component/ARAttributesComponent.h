@@ -36,9 +36,11 @@ protected:
 	virtual void BeginPlay() override;
 
 	/* Multiplayer */
-	UFUNCTION(NetMulticast, Unreliable)
+	UFUNCTION(NetMulticast, Reliable)
 	void MulticastHealthChanged(AActor* InstigatorActor, float NewHealth, float Delta);
-
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastRageChanged(AActor* InstigatorActor, float NewRage, float Delta);
+	
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Delegate")
 	FAROnAttributeChangedSignature AROnHealthChanged;
@@ -50,6 +52,9 @@ protected:
 	float HealthMax = 100.f;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Replicated, Category = "C++ | Health")
 	float Health;
-
-private:
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "C++ | Rage")
+	float RageMax = 100.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Replicated, Category = "C++ | Rage")
+	float Rage;	
 };

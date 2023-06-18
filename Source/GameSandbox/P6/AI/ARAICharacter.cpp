@@ -109,7 +109,7 @@ void AARAICharacter::OnPawnSeen(APawn* Pawn)
 	if (Pawn == GetTargetActor()) return;
 	
 	SetTargetActor(Pawn);
-	DrawDebugString(GetWorld(), Pawn->GetActorLocation(), FString::Printf(TEXT("❗")), nullptr, FColor::Red, 2.f);
+	MulticastPawnSeen(Pawn);
 }
 
 AActor* AARAICharacter::GetTargetActor() const
@@ -131,4 +131,9 @@ void AARAICharacter::SetTargetActor(AActor* NewTarget)
 	if (!Blackboard) return;
 
 	Blackboard->SetValueAsObject("TargetActor", NewTarget);
+}
+
+void AARAICharacter::MulticastPawnSeen_Implementation(APawn* Pawn)
+{
+	DrawDebugString(GetWorld(), Pawn->GetActorLocation(), FString::Printf(TEXT("❗")), nullptr, FColor::Red, 2.f);
 }

@@ -2,6 +2,7 @@
 
 #include "ARPowerupBase.h"
 #include "Components/SphereComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AARPowerupBase::AARPowerupBase()
 {
@@ -30,6 +31,12 @@ void AARPowerupBase::Interact_Implementation(APawn* InstigatorPawn)
 	IARGameplayInterface::Interact_Implementation(InstigatorPawn);
 }
 
+void AARPowerupBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, bActive);
+}
+
 void AARPowerupBase::ShowPowerup()
 {
 	SetPowerupState(true);
@@ -40,6 +47,12 @@ void AARPowerupBase::CooldownPowerup()
 	SetPowerupState(false);
 	GetWorld()->GetTimerManager().ClearTimer(RespawnTimer);
 	GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &ThisClass::ShowPowerup, RespawnTime);
+}
+
+void AARPowerupBase::OnRep_Active()
+{
+	SetActorEnableCollision(bActive);
+	RootComponent->SetVisibility(bActive, true);
 }
 
 void AARPowerupBase::SetPowerupState(bool bNewState)

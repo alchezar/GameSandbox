@@ -19,12 +19,18 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void Interact_Implementation(APawn* InstigatorPawn) override;
 
+	/* Multiplayer */
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
 	void ShowPowerup();
 	void CooldownPowerup();
+
+	UFUNCTION()
+	void OnRep_Active();
 
 private:
 	void SetPowerupState(bool bNewState);
@@ -34,6 +40,9 @@ protected:
 	USphereComponent* SphereComp;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Powerup")
 	float RespawnTime = 10.f;
+
+	UPROPERTY(ReplicatedUsing = OnRep_Active)
+	bool bActive = false;
 
 private:
 	FTimerHandle RespawnTimer;

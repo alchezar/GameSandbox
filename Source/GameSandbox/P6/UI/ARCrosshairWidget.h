@@ -17,7 +17,6 @@ class GAMESANDBOX_API UARCrosshairWidget : public UUserWidget
 public:
 	virtual bool Initialize() override;
 
-	// void SetHealthText(const float NewHealth);
 	void BindHealthToAliveBody(const AARCharacter* NewBody);
 	void BindDelegates();
 

@@ -37,12 +37,11 @@ void AARGameModeBase::StartPlay()
 
 void AARGameModeBase::HandleStartingNewPlayer_Implementation(APlayerController* NewPlayer)
 {
-	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
-
 	if (AARPlayerState* PlayerState = NewPlayer->GetPlayerState<AARPlayerState>())
 	{
 		PlayerState->LoadPlayerState(CurrentSaveGame);
 	}
+	Super::HandleStartingNewPlayer_Implementation(NewPlayer);
 }
 
 void AARGameModeBase::SpawnBot()

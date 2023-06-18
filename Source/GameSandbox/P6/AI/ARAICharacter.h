@@ -31,6 +31,9 @@ protected:
 	UFUNCTION()
 	void OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesComponent* OwningComp, float NewHealth, float Delta);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPawnSeen(APawn* Pawn);
+
 private:
 	AActor* GetTargetActor() const;
 	void SetTargetActor(AActor* NewTarget);

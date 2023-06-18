@@ -1,7 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARPlayerState.h"
-
+#include "Net/UnrealNetwork.h"
 #include "P6/Game/ARSaveGame.h"
 
 AARPlayerState::AARPlayerState()
@@ -49,10 +49,20 @@ void AARPlayerState::SavePlayerState(UARSaveGame* SaveObject)
 	SaveObject->Credits = Credits;
 }
 
-void AARPlayerState::LoadPlayerState(UARSaveGame* SaveObject)
+void AARPlayerState::LoadPlayerState(const UARSaveGame* SaveObject)
 {
 	if (!SaveObject) return;
 
-	Credits = SaveObject->Credits;
+	AddCredits(SaveObject->Credits);
 }
 
+void AARPlayerState::OnRep_Credits(const int32 OldCredits)
+{
+	OnCreditsChanged.Broadcast(this, Credits, Credits - OldCredits);
+}
+
+void AARPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, Credits);
+}

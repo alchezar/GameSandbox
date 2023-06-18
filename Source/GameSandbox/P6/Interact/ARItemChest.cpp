@@ -28,8 +28,6 @@ void AARItemChest::BeginPlay()
 void AARItemChest::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Yellow, bLidOpen ? "Chest Opened" : "Chest Closes");
 }
 
 void AARItemChest::Interact_Implementation(APawn* InstigatorPawn)
