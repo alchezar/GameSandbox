@@ -27,27 +27,19 @@ UARAbilityComponent* UARAbility::GetAbilityComponent() const
 
 void UARAbility::StartAbility_Implementation(AActor* Instigator)
 {
-	UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *AbilityName.ToString()), FColor::Silver);
+	// UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *AbilityName.ToString()), FColor::Silver);
+	if (!AbilityComponent) return;
 	
-	UARAbilityComponent* AbilityComp = GetAbilityComponent();
-	if (!AbilityComp) return;
-	
-	if (AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
-
-	AbilityComp->ActiveGameplayTags.AppendTags(GrantsTags);
+	AbilityComponent->HandleActionStart(GrantsTags, this);
 	RepData = {true, Instigator};
 }
 
 void UARAbility::StopAbility_Implementation(AActor* Instigator)
 {
-	UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *AbilityName.ToString()), FColor::Silver);
-	
-	UARAbilityComponent* AbilityComp = GetAbilityComponent();
-	if (!AbilityComp) return;
-	
-	if (!AbilityComp->ActiveGameplayTags.HasAll(GrantsTags)) return;
-	
-	AbilityComp->ActiveGameplayTags.RemoveTags(GrantsTags);
+	// UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *AbilityName.ToString()), FColor::Silver);	
+	if (!AbilityComponent) return;
+
+	AbilityComponent->HandleActionStop(GrantsTags, this);
 	RepData = {false, Instigator};
 }
 
@@ -76,4 +68,9 @@ void UARAbility::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 bool UARAbility::IsSupportedForNetworking() const
 {
 	return true;
+}
+
+UTexture2D* UARAbility::GetIcon() const
+{
+	return  Icon;
 }

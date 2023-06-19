@@ -16,6 +16,10 @@ public:
 	UARAbilityEffect();
 	virtual void StartAbility_Implementation(AActor* Instigator) override;
 	virtual void StopAbility_Implementation(AActor* Instigator) override;
+
+	float GetTimeRemaining() const;
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	
 protected:
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Effect")
@@ -28,6 +32,9 @@ protected:
 	float Period;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Effect")
 	float DamageAmount = 4.f;
+
+	UPROPERTY(Replicated)
+	float TimeStarted;
 
 private:
 	FTimerHandle DurationTimer;

@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ARWorldUserWidget.generated.h"
 
+class UAREffectContainer;
 class UImage;
 class USizeBox;
 
@@ -32,6 +33,9 @@ protected:
 	UImage* HealthBarImage;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FName ProgressName = "ProgressAlpha";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (BindWidget))
+	UAREffectContainer* EffectContainer;
 
 private:
 	UPROPERTY()

@@ -1,10 +1,9 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbilityEffect.h"
-// #include "Kismet/GameplayStatics.h"
-// #include "Engine/DamageEvents.h"
+#include "GameFramework/GameStateBase.h"
+#include "Net/UnrealNetwork.h"
 #include "P6/Component/ARAbilityComponent.h"
-// #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Util/ARFuncLibrary.h"
 
 UARAbilityEffect::UARAbilityEffect()
@@ -27,6 +26,10 @@ void UARAbilityEffect::StartAbility_Implementation(AActor* Instigator)
 		FTimerDelegate PeriodDelegate;
 		PeriodDelegate.BindUObject(this, &ThisClass::ExecutePeriodicEffect, Instigator);
 		GetWorld()->GetTimerManager().SetTimer(PeriodTimer, PeriodDelegate, Period, false);
+	}
+	if (AbilityComponent->GetOwnerRole() == ROLE_Authority)
+	{
+		TimeStarted = GetWorld()->TimeSeconds;
 	}
 }
 
@@ -56,4 +59,20 @@ void UARAbilityEffect::ExecutePeriodicEffect_Implementation(AActor* Instigator)
 	if (!Owner) return;
 
 	UARFuncLibrary::ApplyDamage(Instigator, Owner, DamageAmount);
+}
+
+
+float UARAbilityEffect::GetTimeRemaining() const
+{
+	const AGameStateBase* GameState = GetWorld()->GetGameState<AGameStateBase>();
+	if (!GameState) return Duration;
+	
+	const float EndTime = TimeStarted + Duration;
+	return EndTime - GameState->GetServerWorldTimeSeconds();
+}
+
+void UARAbilityEffect::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, TimeStarted);
 }

@@ -39,15 +39,15 @@ public:
 	UFUNCTION(BlueprintNativeEvent, Category = "C++ | Action")
 	bool CanStart(AActor* Instigator);
 
+	UTexture2D* GetIcon() const;	
+	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
+	UARAbilityComponent* GetAbilityComponent() const;
+
 	/* Multiplayer */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool IsSupportedForNetworking() const override;
 	UFUNCTION()
 	void OnRep_RepData();
-
-protected:
-	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
-	UARAbilityComponent* GetAbilityComponent() const;
 
 public:
 	UPROPERTY(Replicated)
@@ -68,5 +68,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer BlockedTags;
 
-private:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | UI")
+	UTexture2D* Icon;
+
 };

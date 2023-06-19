@@ -29,8 +29,7 @@ void AARPlayerState::AddCredits(const int32 Delta)
 	if (Delta < 0) return;
 
 	Credits += Delta;
-	OnCreditsChanged.Broadcast(this, Credits, Delta);
-	
+	OnCreditsChanged.Broadcast(this, Credits, Delta);	
 }
 
 bool AARPlayerState::RemoveCredits(const int32 Delta)

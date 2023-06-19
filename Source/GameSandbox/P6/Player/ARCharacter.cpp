@@ -154,10 +154,7 @@ void AARCharacter::OnHealthChangedHandle(AActor* InstigatorActor, UARAttributesC
 {
 	if (FMath::IsNearlyZero(NewHealth) && Delta < 0.f)
 	{
-		APlayerController* PlayerController = Cast<APlayerController>(Controller);
-		if (!PlayerController) return;
-
-		DisableInput(PlayerController);
+		DisableInput(Cast<APlayerController>(Controller));
 
 		// Ragdoll
 		GetCharacterMovement()->DisableMovement();

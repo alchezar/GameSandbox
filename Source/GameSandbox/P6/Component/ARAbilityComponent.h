@@ -8,7 +8,9 @@
 #include "ARAbilityComponent.generated.h"
 
 class UARAbility;
-class UARAction;
+class UARAbilityComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FAROnAbilityChangedSignature, UARAbilityComponent*, AbilityComp, UARAbility*, Ability);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UARAbilityComponent : public UActorComponent
@@ -28,6 +30,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
 	bool StopAbilityByName(AActor* Instigator, const FName AbilityName);
 
+	void HandleActionStart(const FGameplayTagContainer& GrantsTags, UARAbility* Ability);
+	void HandleActionStop(const FGameplayTagContainer& GrantsTags, UARAbility* Ability);
+
+	TArray<UARAbility*> GetAbilities() const;
+
 	/* Multiplayer */
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
@@ -43,6 +50,9 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTagContainer ActiveGameplayTags;
+
+	FAROnAbilityChangedSignature OnAbilityStarted;
+	FAROnAbilityChangedSignature OnAbilityStopped;
 
 protected:
 	UPROPERTY(Replicated)

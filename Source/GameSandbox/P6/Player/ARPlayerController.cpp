@@ -63,8 +63,7 @@ void AARPlayerController::SetupInputComponent()
 	auto* EnhancedInputComponent = Cast<UEnhancedInputComponent>(InputComponent);
 	if (!EnhancedInputComponent) return;
 
-	EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Completed, this, &ThisClass::TogglePauseMenu);
-	
+	EnhancedInputComponent->BindAction(PauseAction, ETriggerEvent::Completed, this, &ThisClass::TogglePauseMenu);	
 }
 
 void AARPlayerController::TogglePauseMenu()

@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbilityComponent.h"
-
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 #include "P6/Ability/ARAbility.h"
@@ -117,4 +116,25 @@ bool UARAbilityComponent::ReplicateSubobjects(UActorChannel* Channel, FOutBunch*
 		bWroteSomething |= Channel->ReplicateSubobject(Ability, *Bunch, *RepFlags);
 	}
 	return bWroteSomething;
+}
+
+void UARAbilityComponent::HandleActionStart(const FGameplayTagContainer& GrantsTags, UARAbility* Ability)
+{
+	if (ActiveGameplayTags.HasAll(GrantsTags)) return;
+	
+	ActiveGameplayTags.AppendTags(GrantsTags);
+	OnAbilityStarted.Broadcast(this, Ability);
+}
+
+void UARAbilityComponent::HandleActionStop(const FGameplayTagContainer& GrantsTags, UARAbility* Ability)
+{
+	if (!ActiveGameplayTags.HasAll(GrantsTags)) return;
+	
+	ActiveGameplayTags.RemoveTags(GrantsTags);
+	OnAbilityStopped.Broadcast(this, Ability);
+}
+
+TArray<UARAbility*> UARAbilityComponent::GetAbilities() const
+{
+	return Abilities;
 }

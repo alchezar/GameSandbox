@@ -1,8 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARExplosiveBarrel.h"
-#include "PhysicsEngine/RadialForceComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
+#include "PhysicsEngine/RadialForceComponent.h"
 
 AARExplosiveBarrel::AARExplosiveBarrel()
 {

@@ -24,5 +24,4 @@ void UARPauseMenu::OnReturnToGameClicked()
 	if (!Controller) return;
 
 	Controller->TogglePauseMenu();
-
 }
