@@ -6,10 +6,10 @@
 #include "Blueprint/UserWidget.h"
 #include "ARMenuButton.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAROnButtonClickedSignature);
-
 class UTextBlock;
 class UButton;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FAROnButtonClickedSignature);
 
 UCLASS()
 class GAMESANDBOX_API UARMenuButton : public UUserWidget

@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "AREffectSlot.h"
-
 #include "Components/Image.h"
 #include "P6/Ability/ARAbilityEffect.h"
 #include "P6/Component/ARAbilityComponent.h"

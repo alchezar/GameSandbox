@@ -15,10 +15,6 @@ public:
 	UARAbilityParry();
 	virtual void StartAbility_Implementation(AActor* Instigator) override;
 	virtual void StopAbility_Implementation(AActor* Instigator) override;
-
-// protected:
-// 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++")
-// 	FGameplayTag ParryTag;
 };
 
 

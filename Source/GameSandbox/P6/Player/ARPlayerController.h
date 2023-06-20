@@ -8,6 +8,7 @@
 
 class UInputAction;
 class UInputMappingContext;
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FAROnPawnChangedSignature, APawn*, NewPawn);
 
 UCLASS()

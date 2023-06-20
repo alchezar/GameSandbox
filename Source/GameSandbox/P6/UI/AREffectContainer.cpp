@@ -2,9 +2,9 @@
 
 #include "AREffectContainer.h"
 #include "Components/HorizontalBox.h"
+#include "P6/Ability/ARAbilityEffect.h"
 #include "P6/Component/ARAbilityComponent.h"
 #include "P6/UI/AREffectSlot.h"
-#include "P6/Ability/ARAbilityEffect.h"
 
 bool UAREffectContainer::Initialize()
 {

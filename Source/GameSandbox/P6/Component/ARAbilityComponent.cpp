@@ -4,7 +4,6 @@
 #include "Engine/ActorChannel.h"
 #include "Net/UnrealNetwork.h"
 #include "P6/Ability/ARAbility.h"
-// #include "P6/Util/ARFuncLibrary.h"
 
 UARAbilityComponent::UARAbilityComponent()
 {
@@ -20,19 +19,6 @@ void UARAbilityComponent::BeginPlay()
 void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// const FString DebugMsg = GetNameSafe(GetOwner()) + " : " + ActiveGameplayTags.ToStringSimple();
-	// GEngine->AddOnScreenDebugMessage(-1, -1.f, FColor::Silver, DebugMsg);
-
-	// for (const UARAbility* Ability : Abilities)
-	// {
-	// 	if (!Ability) return;
-	// 	
-	// 	const FColor TextColor = Ability->GetIsRunning() ? FColor::Blue : FColor::White;
-	// 	FString ActionMsg = FString::Printf(TEXT("[%s] Ability: %s"), *GetNameSafe(GetOwner()), *GetNameSafe(Ability));
-	//
-	// 	UARFuncLibrary::LogOnScreen(this, ActionMsg, TextColor, 0.f);
-	// }
 }
 
 void UARAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass)

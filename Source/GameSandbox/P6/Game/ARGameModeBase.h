@@ -3,14 +3,43 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQueryTypes.h"
 #include "GameFramework/GameModeBase.h"
 #include "ARGameModeBase.generated.h"
 
+class UDataTable;
 class UARSaveGame;
 class UEnvQuery;
 class UEnvQueryInstanceBlueprintWrapper;
 class UCurveFloat;
+class UARMonsterData;
+
+USTRUCT(BlueprintType)
+struct FMonsterInfoRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FMonsterInfoRow()
+	{
+		// MonsterData = nullptr;
+		Weight = 1.f;
+		SpawnCost = 5.f;
+		KillReward = 20.f;
+	}
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite) // Don`t use Category property, because we won`t be able to edit DataTable in editor 
+	FPrimaryAssetId MonsterId;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Weight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float SpawnCost;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float KillReward;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FLinearColor TeamColor;
+};
 
 UCLASS()
 class GAMESANDBOX_API AARGameModeBase : public AGameModeBase
@@ -39,6 +68,7 @@ protected:
 private:
 	UFUNCTION(Exec)
 	void KillAll();
+	void OnMonsterLoaded(const FPrimaryAssetId LoadedId, const FVector SpawnLocation, const FLinearColor Color);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
@@ -46,19 +76,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	UEnvQuery* SpawnBotQuery;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
-	TSubclassOf<AActor> MinionClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	UCurveFloat* DifficultyCurve;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 MaxBotNum = 10;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 CreditsPerKill = 5;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI")
+	bool bUseTable = false;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI", meta = (EditCondition = "!bUseTable"))
+	TSubclassOf<AActor> MinionClass;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI", meta = (EditCondition = "bUseTable"))
+	UDataTable* MonsterTable;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
 	UARSaveGame* CurrentSaveGame;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
 	FString SlotName = "SaveGame01";
-	
+
 private:
 	FTimerHandle SpawnBotTimer;
 };

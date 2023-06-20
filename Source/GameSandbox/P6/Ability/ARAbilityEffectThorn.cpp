@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARAbilityEffectThorn.h"
-// #include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Util/ARFuncLibrary.h"
 

@@ -12,8 +12,6 @@
 #include "P6/Component/ARInteractionComponent.h"
 #include "P6/Game/ARGameModeBase.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogARCharacter, All, All);
-
 AARCharacter::AARCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;

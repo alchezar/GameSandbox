@@ -3,7 +3,6 @@
 #include "ARAbility.h"
 #include "Net/UnrealNetwork.h"
 #include "P6/Component/ARAbilityComponent.h"
-#include "P6/Util/ARFuncLibrary.h"
 
 UWorld* UARAbility::GetWorld() const
 {
@@ -21,13 +20,11 @@ void UARAbility::Initialize(UARAbilityComponent* NewAbilityComp)
 
 UARAbilityComponent* UARAbility::GetAbilityComponent() const
 {
-	// return Cast<UARAbilityComponent>(GetOuter());
 	return AbilityComponent;
 }
 
 void UARAbility::StartAbility_Implementation(AActor* Instigator)
 {
-	// UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Started: %s"), *AbilityName.ToString()), FColor::Silver);
 	if (!AbilityComponent) return;
 	
 	AbilityComponent->HandleActionStart(GrantsTags, this);
@@ -36,7 +33,6 @@ void UARAbility::StartAbility_Implementation(AActor* Instigator)
 
 void UARAbility::StopAbility_Implementation(AActor* Instigator)
 {
-	// UARFuncLibrary::LogOnScreen(this, FString::Printf(TEXT("Stopped: %s"), *AbilityName.ToString()), FColor::Silver);	
 	if (!AbilityComponent) return;
 
 	AbilityComponent->HandleActionStop(GrantsTags, this);
@@ -72,5 +68,5 @@ bool UARAbility::IsSupportedForNetworking() const
 
 UTexture2D* UARAbility::GetIcon() const
 {
-	return  Icon;
+	return  Icon.Get();
 }

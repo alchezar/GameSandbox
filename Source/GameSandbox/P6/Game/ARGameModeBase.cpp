@@ -3,15 +3,19 @@
 #include "ARGameModeBase.h"
 #include "ARSaveGame.h"
 #include "EngineUtils.h"
+#include "Engine/AssetManager.h"
+#include "Engine/DataTable.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "P6/AI/ARAICharacter.h"
+#include "P6/Component/ARAbilityComponent.h"
 #include "P6/Component/ARAttributesComponent.h"
 #include "P6/Interface/ARGameplayInterface.h"
 #include "P6/Player/ARCharacter.h"
 #include "P6/Player/ARPlayerController.h"
 #include "P6/Player/ARPlayerState.h"
+#include "P6/Util/ARMonsterData.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogARGameModeBase, All, All);
@@ -76,11 +80,48 @@ void AARGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 	if (QueryStatus != EEnvQueryStatus::Success) return;
 
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if (Locations.Num() > 0)
+	if (Locations.IsEmpty()) return; 
+	
+	if (bUseTable && MonsterTable)
+	{
+		TArray<FMonsterInfoRow*> Rows;
+		MonsterTable->GetAllRows("", Rows);
+		const int32 RandomRange = FMath::RandRange(0, Rows.Num() - 1);
+		const FMonsterInfoRow* SelectedRow = Rows[RandomRange];
+		
+		const TArray<FName> Bundles;
+		const FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(
+			this, &ThisClass::OnMonsterLoaded, SelectedRow->MonsterId, Locations[0], SelectedRow->TeamColor);
+		
+		UAssetManager* Manager = UAssetManager::GetIfValid();
+		if (!Manager) return;
+		Manager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
+	}
+	else
 	{
 		GetWorld()->SpawnActor<AActor>(MinionClass, Locations[0], FRotator::ZeroRotator);
 	}
 }
+
+void AARGameModeBase::OnMonsterLoaded(const FPrimaryAssetId LoadedId, const FVector SpawnLocation, const FLinearColor Color)
+{
+	const UAssetManager* Manager = UAssetManager::GetIfValid();
+	if (!Manager) return;
+	UARMonsterData* MonsterData = Manager->GetPrimaryAssetObject<UARMonsterData>(LoadedId);
+	if (!MonsterData) return;
+	
+	AARAICharacter* Bot = GetWorld()->SpawnActor<AARAICharacter>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
+	if (!Bot) return;		
+	Bot->SetTeamColor(Color);
+		
+	UARAbilityComponent* AbilityComp = Bot->FindComponentByClass<UARAbilityComponent>();
+	if (!AbilityComp) return;
+	for (const TSubclassOf<UARAbility> Ability : MonsterData->Abilities)
+	{
+		AbilityComp->AddAbility(Bot, Ability);
+	}
+}
+
 
 void AARGameModeBase::KillAll()
 {

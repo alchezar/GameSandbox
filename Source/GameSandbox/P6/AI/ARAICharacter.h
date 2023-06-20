@@ -23,9 +23,11 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	bool IsAlive() const;
+	void SetTeamColor(const FLinearColor& Color);
 
 protected:
 	virtual void BeginPlay() override;
+	
 	UFUNCTION()
 	void OnPawnSeen(APawn* Pawn);
 	UFUNCTION()
@@ -49,6 +51,11 @@ protected:
 	TSubclassOf<UARWorldUserWidget> HealthBarWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "C++ | UI")
 	TSubclassOf<UARDamagePopUp> DamagePopupWidgetClass;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FName TeamColorParameterName = "PaintColor";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Body")
+	FLinearColor TeamColor = FLinearColor(1.f, 0.f, 0.f, 1.f);
 
 private:
 	UPROPERTY()

@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "ARAttributesComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAROnHealthChangedSignature, AActor*, InstigatorActor, UARAttributesComponent*, OwningComp, float, NewHealth, float, Delta);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FAROnAttributeChangedSignature, AActor*, InstigatorActor, UARAttributesComponent*, OwningComp, float, NewValue, float, Delta);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))

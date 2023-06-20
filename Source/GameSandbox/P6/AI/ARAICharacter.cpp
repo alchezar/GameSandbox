@@ -137,3 +137,18 @@ void AARAICharacter::MulticastPawnSeen_Implementation(APawn* Pawn)
 {
 	DrawDebugString(GetWorld(), Pawn->GetActorLocation(), FString::Printf(TEXT("❗")), nullptr, FColor::Red, 2.f);
 }
+
+void AARAICharacter::SetTeamColor(const FLinearColor& Color)
+{
+	TeamColor = Color;
+	
+	UMaterialInstanceDynamic* DynamicBodyMaterial1 = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	UMaterialInstanceDynamic* DynamicBodyMaterial2 = GetMesh()->CreateAndSetMaterialInstanceDynamic(2);
+	UMaterialInstanceDynamic* DynamicBodyMaterial3 = GetMesh()->CreateAndSetMaterialInstanceDynamic(3);
+	if (DynamicBodyMaterial1 && DynamicBodyMaterial2 && DynamicBodyMaterial3)
+	{
+		DynamicBodyMaterial1->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+		DynamicBodyMaterial2->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+		DynamicBodyMaterial3->SetVectorParameterValue(TeamColorParameterName, TeamColor);
+	}
+}

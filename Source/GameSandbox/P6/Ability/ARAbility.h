@@ -69,6 +69,6 @@ protected:
 	FGameplayTagContainer BlockedTags;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | UI")
-	UTexture2D* Icon;
+	TSoftObjectPtr<UTexture2D> Icon;
 
 };
