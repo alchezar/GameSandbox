@@ -81,7 +81,7 @@ bool ASTU_BlasterWeapon::GetTraceData(FVector& TraceStart, FVector& TraceEnd)
 	TraceStart          = ViewLocation;
 	const float HalfRad = FMath::DegreesToRadians(BulletSpread / 2);
 	ShootDirection      = FMath::VRandCone(ViewRotation.Vector(), HalfRad);
-	TraceEnd            = TraceStart + ShootDirection * TraceMaxDistance;
+	TraceEnd            = TraceStart + ShootDirection * FVector(TraceMaxDistance);
 	return true;
 }
 
