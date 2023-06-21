@@ -21,6 +21,17 @@ void UARAbilityComponent::TickComponent(float DeltaTime, ELevelTick TickType, FA
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UARAbilityComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	TArray<UARAbility*> AbilitiesCopy = Abilities;
+	for (UARAbility* Ability : AbilitiesCopy)
+	{
+		if (!Ability || !Ability->GetIsRunning()) continue;
+		Ability->StopAbility(GetOwner());
+	}	
+	Super::EndPlay(EndPlayReason);
+}
+
 void UARAbilityComponent::AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass)
 {
 	if (!ActionClass || !GetOwner()->HasAuthority()) return;

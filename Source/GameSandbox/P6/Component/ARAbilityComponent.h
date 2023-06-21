@@ -20,6 +20,7 @@ class GAMESANDBOX_API UARAbilityComponent : public UActorComponent
 public:
 	UARAbilityComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	UFUNCTION(BlueprintCallable, Category = "C++ | Action")
 	void AddAbility(AActor* Instigator, TSubclassOf<UARAbility> ActionClass);

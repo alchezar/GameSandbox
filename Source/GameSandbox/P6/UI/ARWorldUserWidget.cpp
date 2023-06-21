@@ -37,13 +37,14 @@ void UARWorldUserWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTi
 		return;
 	}
 	
-	FVector2D ScreenPosition;
-	if (UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), AttachedActor->GetActorLocation(), ScreenPosition))
+	FVector2D ScreenPosition;  
+	if (const bool bInViewport = UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), AttachedActor->GetActorLocation(), ScreenPosition))
 	{
 		ScreenPosition /= UWidgetLayoutLibrary::GetViewportScale(this);
 		if (ParentSizeBox)
 		{
 			ParentSizeBox->SetRenderTranslation(ScreenPosition);
+			ParentSizeBox->SetVisibility(bInViewport ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 		}
 	}
 }

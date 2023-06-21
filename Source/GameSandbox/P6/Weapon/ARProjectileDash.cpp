@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARProjectileDash.h"
-
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"

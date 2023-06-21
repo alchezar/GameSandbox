@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "ARDamagePopUp.h"
-
 #include "Blueprint/WidgetLayoutLibrary.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
@@ -31,8 +30,9 @@ void UARDamagePopUp::UpdateScreenLocation() const
 	if (!ActorToAttach) return;
 
 	FVector2D ScreenPosition;
-	UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), ActorToAttach->GetActorLocation(), ScreenPosition);
+	const bool bInViewport = UGameplayStatics::ProjectWorldToScreen(GetOwningPlayer(), ActorToAttach->GetActorLocation(), ScreenPosition);
 	DamageText->SetRenderTranslation(ScreenPosition / UWidgetLayoutLibrary::GetViewportScale(GetWorld()));
+	DamageText->SetVisibility(bInViewport ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);
 }
 
 void UARDamagePopUp::SetDamageText(const float Delta)
