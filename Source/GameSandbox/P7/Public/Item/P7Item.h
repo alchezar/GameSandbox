@@ -17,4 +17,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Component")
+	UStaticMeshComponent* ItemMesh;
 };
