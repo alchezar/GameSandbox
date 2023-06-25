@@ -30,7 +30,7 @@ void AP7Bird::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MovePawn);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::OrientPawn);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookPawn);
 }
 
 void AP7Bird::SetupComponents()
@@ -43,7 +43,7 @@ void AP7Bird::SetupComponents()
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 200.f;
-	CameraBoom->SetRelativeRotation(FRotator(-30.f, 0.f, 0.f));
+	CameraBoom->SetRelativeRotation(FRotator(-10.f, 0.f, 0.f));
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	ViewCamera->SetupAttachment(CameraBoom);
@@ -72,7 +72,7 @@ void AP7Bird::MovePawn(const FInputActionValue& Value)
 	AddMovementInput(GetActorRightVector(), MovementVector.Y);
 }
 
-void AP7Bird::OrientPawn(const FInputActionValue& Value)
+void AP7Bird::LookPawn(const FInputActionValue& Value)
 {
 	if (!Controller) return;
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
