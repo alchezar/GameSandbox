@@ -6,6 +6,8 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P7/Public/Item/Weapon/P7Weapon.h"
+#include "P7/Public/Player/CharacterTypes.h"
 
 AP7Character::AP7Character()
 {
@@ -33,6 +35,7 @@ void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
+	EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &ThisClass::Grab);
 }
 
 void AP7Character::SetupComponents()
@@ -75,6 +78,15 @@ void AP7Character::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
+void AP7Character::Grab()
+{
+	if (AP7Weapon* Weapon = Cast<AP7Weapon>(OverlappingItem))
+	{
+		Weapon->Equip(GetMesh(), SocketName);
+		CharacterState = ECharacterState::ECS_OneHanded;
+	}
+}
+
 void AP7Character::OrientToMovement(const bool bOrient) const
 {
 	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
@@ -97,7 +109,7 @@ void AP7Character::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 }
 
-bool AP7Character::GetIsDoubleJump() const
+void AP7Character::SetOverlappingItem(AP7Item* Item)
 {
-	return bDoubleJump;
+	OverlappingItem = Item;
 }

@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "CharacterTypes.h"
 #include "Animation/AnimInstance.h"
 #include "P7AnimInstance.generated.h"
 
@@ -26,10 +27,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	bool bMoving = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
-	bool bJump;
+	bool bJump = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
-	bool bDoubleJump;
-	
+	bool bDoubleJump = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | State")
+	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::ECS_Unequipped;
+
 private:
 	UPROPERTY()
 	AP7Character* Player;

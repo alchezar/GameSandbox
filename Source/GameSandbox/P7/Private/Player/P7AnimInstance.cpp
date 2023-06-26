@@ -19,4 +19,5 @@ void UP7AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bMoving = Speed > 0.f;
 	bJump = MovementComponent->IsFalling();
 	bDoubleJump = Player->GetIsDoubleJump();
+	CharacterState = Player->GetCharacterState();
 }
