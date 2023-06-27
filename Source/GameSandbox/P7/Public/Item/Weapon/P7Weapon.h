@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "P7/Public/Item/P7Item.h"
+#include "P7/Public/Player/CharacterTypes.h"
 #include "P7Weapon.generated.h"
 
 UCLASS()
@@ -14,12 +15,13 @@ class GAMESANDBOX_API AP7Weapon : public AP7Item
 public:
 	AP7Weapon();
 	virtual void Tick(float DeltaTime) override;
-
 	void Equip(USceneComponent* InParent, FName SocketName);
+	FORCEINLINE ECharacterState GetWeaponState() const { return WeaponState; };
 
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+protected:
+	UPROPERTY(EditAnywhere, Category = "C++ | State")
+	TEnumAsByte<ECharacterState> WeaponState = ECharacterState::ECS_OneHanded;
 };

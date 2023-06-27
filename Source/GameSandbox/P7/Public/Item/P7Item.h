@@ -8,6 +8,13 @@
 
 class USphereComponent;
 
+UENUM()
+enum class EItemState : uint8
+{
+	EIS_Hovering,
+	EIS_Equipped
+};
+
 UCLASS()
 class GAMESANDBOX_API AP7Item : public AActor
 {
@@ -21,7 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 	
 	void Oscillation(const float DeltaTime);
-	void SetOscillation(const bool bNewSmoothMove);
+	void SetItemState(const EItemState NewState);
 	
 	float TransformedSin();
 	float TransformedCos();
@@ -43,5 +50,5 @@ protected:
 
 private:
 	float RunningTime = 0.f;
-	bool bOscillation = true;
+	EItemState ItemState = EItemState::EIS_Hovering;
 };

@@ -13,6 +13,8 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AP7Item;
+class AP7Weapon;
+class UAnimMontage;
 
 UCLASS()
 class GAMESANDBOX_API AP7Character : public ACharacter
@@ -35,11 +37,17 @@ protected:
 
 private:
 	void SetupComponents();
+	void OrientToMovement(const bool bOrient) const;
 	void AddMappingContext() const;
+	void InitAnimNotifies();
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Grab();
-	void OrientToMovement(const bool bOrient) const;
+	void Attack();
+	void PlayAttackMontage();
+	void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
+	void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);
+	void OnHiltVisibilityHandle(USkeletalMeshComponent* MeshComp);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -61,13 +69,27 @@ protected:
 	UInputAction* JumpAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* GrabAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* AttackAction;
 #pragma endregion // Input
+
+#pragma region Montage
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* AttackMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* EquipMontage;
+#pragma endregion // Montage
 
 private:
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
-	bool bDoubleJump = false;
 	UPROPERTY(VisibleInstanceOnly)
 	AP7Item* OverlappingItem;
+	UPROPERTY(VisibleInstanceOnly)
+	AP7Weapon* EquippedWeapon;
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	EActionState ActionState = EActionState::EAS_Unoccupied;
+	bool bDoubleJump = false;
+	int32 Section = 0;
+	FTimerHandle ComboTimer;
 };

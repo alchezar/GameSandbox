@@ -27,7 +27,7 @@ void AP7Item::BeginPlay()
 void AP7Item::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bOscillation)
+	if (ItemState == EItemState::EIS_Hovering)
 	{
 		Oscillation(DeltaTime);
 	}
@@ -39,9 +39,9 @@ void AP7Item::Oscillation(const float DeltaTime)
 	AddActorWorldOffset(FVector(0.f, 0.f, TransformedSin()));
 }
 
-void AP7Item::SetOscillation(const bool bNewSmoothMove)
+void AP7Item::SetItemState(const EItemState NewState)
 {
-	bOscillation = bNewSmoothMove;
+	ItemState = NewState;
 }
 
 float AP7Item::TransformedSin()

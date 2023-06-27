@@ -20,7 +20,7 @@ void AP7Weapon::Tick(const float DeltaTime)
 
 void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName)
 {
-	SetOscillation(false);
+	SetItemState(EItemState::EIS_Equipped);
 	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	const FAttachmentTransformRules AllRules(EAttachmentRule::SnapToTarget, true);		
@@ -28,14 +28,4 @@ void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName)
 	
 	ItemMesh->AddRelativeLocation(FVector(0.f, 2.f, 0.f));
 	ItemMesh->AddRelativeRotation(FRotator(25.f, 0.f, 10.f));
-}
-
-void AP7Weapon::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	Super::OnSphereBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);		
-}
-
-void AP7Weapon::OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	Super::OnSphereEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }
