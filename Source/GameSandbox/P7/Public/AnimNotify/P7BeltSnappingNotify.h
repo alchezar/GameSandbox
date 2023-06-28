@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimNotifies/AnimNotify.h"
-#include "P7HiltVisibilityNotify.generated.h"
+#include "P7BeltSnappingNotify.generated.h"
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FP7OnHiltVisibilitySignature, USkeletalMeshComponent*)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP7OnBeltSnappingSignature, USkeletalMeshComponent*)
 
 UCLASS()
-class GAMESANDBOX_API UP7HiltVisibilityNotify : public UAnimNotify
+class GAMESANDBOX_API UP7BeltSnappingNotify : public UAnimNotify
 {
 	GENERATED_BODY()
 
 public:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
-	FP7OnHiltVisibilitySignature OnHiltVisibility;
+	FP7OnBeltSnappingSignature OnBeltSnapping;
 };

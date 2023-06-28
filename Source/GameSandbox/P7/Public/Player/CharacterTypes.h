@@ -17,6 +17,7 @@ enum EActionState : uint8
 {
 	EAS_Unoccupied UMETA(DisplayName = "Unoccupied"),
 	EAS_Attacking  UMETA(DisplayName = "Attacking"),
+	EAS_Equipping  UMETA(DisplayName = "Equipping")
 };
 
 USTRUCT(BlueprintType)
@@ -27,4 +28,13 @@ struct FCurrentWeapon
 	UPROPERTY(VisibleInstanceOnly)
 	AP7Weapon* Weapon;
 	ECharacterState State;
+};
+
+USTRUCT(BlueprintType)
+struct FSnapOffset
+{
+	GENERATED_BODY()
+
+	FVector LocationOffset;
+	FRotator RotationOffset;
 };

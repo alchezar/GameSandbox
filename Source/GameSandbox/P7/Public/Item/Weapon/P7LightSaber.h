@@ -26,9 +26,9 @@ private:
 	void SetSaberColor(const FLinearColor NewColor);
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UStaticMeshComponent* Beam;
-	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPointLightComponent* SaberLight;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Light")

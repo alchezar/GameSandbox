@@ -39,9 +39,9 @@ protected:
 	virtual void OnSphereEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	UStaticMeshComponent* ItemMesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	USphereComponent* SphereTrigger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Smooth Moving")
 	float Amplitude = 0.25f;

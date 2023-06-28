@@ -8,12 +8,15 @@ AP7Item::AP7Item()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	
-	SphereTrigger = CreateDefaultSubobject<USphereComponent>("SphereTrigger");
-	SetRootComponent(SphereTrigger);
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>("ItemMeshComponent");
-	ItemMesh->SetupAttachment(RootComponent);
+	SetRootComponent(ItemMesh);
 	ItemMesh->SetCollisionProfileName("NoCollision");
+	
+	SphereTrigger = CreateDefaultSubobject<USphereComponent>("SphereTrigger");
+	SphereTrigger->SetupAttachment(RootComponent);
+	SphereTrigger->SetSphereRadius(64.f);
+	SphereTrigger->SetRelativeLocation(FVector(0.f, 0.f, 45.f));
 }
 
 void AP7Item::BeginPlay()

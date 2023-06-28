@@ -28,7 +28,7 @@ public:
 	virtual void Jump() override;
 	virtual void Landed(const FHitResult& Hit) override;
 	FORCEINLINE bool  GetIsDoubleJump() const { return bDoubleJump; };
-	FORCEINLINE FName GetSocketName()   const { return SocketName; };
+	FORCEINLINE FName GetSocketName()   const { return HandSocketName; };
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
 	void SetOverlappingItem(AP7Item* Item);
 
@@ -47,7 +47,7 @@ private:
 	void PlayAttackMontage();
 	void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
 	void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);
-	void OnHiltVisibilityHandle(USkeletalMeshComponent* MeshComp);
+	void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -56,7 +56,13 @@ protected:
 	UCameraComponent* ViewCamera;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
-	FName SocketName = "GripPoint";
+	FName HandSocketName = "GripPoint";
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
+	FName BeltSocketName = "BeltSocket";
+	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
+	FSnapOffset HandSnapOffset = {FVector(0.f, 2.f, 0.f), FRotator(25.f, 0.f, 10.f)};
+	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
+	FSnapOffset BeltSnapOffset;
 
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")

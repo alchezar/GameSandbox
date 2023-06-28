@@ -9,7 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "P7/Public/AnimNotify/P7AttackEndNotify.h"
 #include "P7/Public/AnimNotify/P7BeamTurningNotify.h"
-#include "P7/Public/AnimNotify/P7HiltVisibilityNotify.h"
+#include "P7/Public/AnimNotify/P7BeltSnappingNotify.h"
 #include "P7/Public/Item/Weapon/P7LightSaber.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
@@ -92,16 +92,20 @@ void AP7Character::InitAnimNotifies()
 		{
 			AttackEndNotify->OnBeamTurning.AddUObject(this, &ThisClass::OnBeamTurningHandle);
 		}
-		if (UP7HiltVisibilityNotify* AttackEndNotify = Cast<UP7HiltVisibilityNotify>(AnimNotify.Notify))
+		if (UP7BeltSnappingNotify* AttackEndNotify = Cast<UP7BeltSnappingNotify>(AnimNotify.Notify))
 		{
-			AttackEndNotify->OnHiltVisibility.AddUObject(this, &ThisClass::OnHiltVisibilityHandle);
+			AttackEndNotify->OnBeltSnapping.AddUObject(this, &ThisClass::OnBeltSnappingHandle);
+		}
+		if (UP7AttackEndNotify* AttackEndNotify = Cast<UP7AttackEndNotify>(AnimNotify.Notify))
+		{
+			AttackEndNotify->OnAnimEnd.AddUObject(this, &ThisClass::OnAttackEndHandle);
 		}
 	}
 }
 
 void AP7Character::Move(const FInputActionValue& Value)
 {
-	if (!Controller || ActionState == EAS_Attacking) return;
+	if (!Controller || ActionState != EAS_Unoccupied) return;
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
@@ -123,7 +127,7 @@ void AP7Character::Grab()
 	/* Try to find overlapping Weapon items at first*/
 	if (AP7Weapon* Weapon = Cast<AP7Weapon>(OverlappingItem))
 	{
-		Weapon->Equip(GetMesh(), SocketName);
+		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset);
 		EquippedWeapon = Weapon;
 		CharacterState = Weapon->GetWeaponState();
 		return;
@@ -143,19 +147,21 @@ void AP7Character::Grab()
 			CharacterState = ECS_Unequipped;
 		}
 		PlayAnimMontage(EquipMontage, 1.f, SectionName);
+		ActionState = EAS_Equipping;
 	}
 }
 
 void AP7Character::Attack()
 {
-	if (ActionState != EAS_Unoccupied || CharacterState == ECS_Unequipped) return;
+	if (!EquippedWeapon || ActionState != EAS_Unoccupied || CharacterState == ECS_Unequipped) return;
 	PlayAttackMontage();
+	ActionState = EAS_Attacking;
+	EquippedWeapon->SetWeaponCollision(ECollisionEnabled::QueryOnly);
 }
 
 void AP7Character::PlayAttackMontage()
 {
 	if (!AttackMontage) return;
-	ActionState = EAS_Attacking;
 	const FName SectionName = FName(*("Attack" + FString::FormatAsNumber(Section++ % 4 + 1)));
 	PlayAnimMontage(AttackMontage, 1.f, SectionName);
 }
@@ -183,7 +189,7 @@ void AP7Character::SetOverlappingItem(AP7Item* Item)
 void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
 	ActionState = EAS_Unoccupied;
-	
+
 	GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
 	FTimerDelegate ComboDelegate;
 	ComboDelegate.BindLambda([&]()
@@ -191,6 +197,11 @@ void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 		Section = 0;
 	});
 	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 1.f, false);
+
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->SetWeaponCollision(ECollisionEnabled::NoCollision);
+	}
 }
 
 void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)
@@ -200,7 +211,15 @@ void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)
 		LightSaber->SwitchSaber(CharacterState != ECS_Unequipped);
 	}
 }
-void AP7Character::OnHiltVisibilityHandle(USkeletalMeshComponent* MeshComp)
+
+void AP7Character::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp)
 {
-	EquippedWeapon->SetActorHiddenInGame(CharacterState == ECS_Unequipped);
+	if (EquippedWeapon && CharacterState == ECS_Unequipped)
+	{
+		EquippedWeapon->AttachToSocket(GetMesh(), BeltSocketName, BeltSnapOffset);
+	}
+	else
+	{
+		EquippedWeapon->AttachToSocket(GetMesh(), HandSocketName, HandSnapOffset);
+	}
 }
