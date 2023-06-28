@@ -130,6 +130,7 @@ void AP7Character::Grab()
 		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset);
 		EquippedWeapon = Weapon;
 		CharacterState = Weapon->GetWeaponState();
+		Weapon->SetOwner(this);
 		return;
 	}
 	/* Try to put current weapon away or get it back*/
@@ -189,6 +190,7 @@ void AP7Character::SetOverlappingItem(AP7Item* Item)
 void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
 	ActionState = EAS_Unoccupied;
+	EquippedWeapon->OnAttackEndHandle();
 
 	GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
 	FTimerDelegate ComboDelegate;
@@ -197,11 +199,6 @@ void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 		Section = 0;
 	});
 	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 1.f, false);
-
-	if (EquippedWeapon)
-	{
-		EquippedWeapon->SetWeaponCollision(ECollisionEnabled::NoCollision);
-	}
 }
 
 void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)

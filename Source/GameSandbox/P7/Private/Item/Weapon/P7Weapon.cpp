@@ -3,8 +3,8 @@
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "P7/Public/Interface/P7HitInterface.h"
+#include "P7/Public/Player/P7Character.h"
 
 AP7Weapon::AP7Weapon()
 {
@@ -31,12 +31,13 @@ AP7Weapon::AP7Weapon()
 void AP7Weapon::BeginPlay()
 {
 	Super::BeginPlay();
-	WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnWeaponBeginOverlap);
+	// WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnWeaponBeginOverlap);
 }
 
 void AP7Weapon::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	HitTrace();
 }
 
 void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset)
@@ -57,15 +58,18 @@ void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName
 
 void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	// if (OtherActor == GetOwner()) return;
-	// DrawDebugPoint(GetWorld(), SweepResult.ImpactPoint, 10.f, FColor::Red, false, 10.f);
-	// GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Hello")));
-
+	/*
+	if (OtherActor == GetOwner()) return;
+	DrawDebugPoint(GetWorld(), SweepResult.ImpactPoint, 10.f, FColor::Red, false, 10.f);
+	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Hello")));
+	
 	const FVector Start = TraceStart->GetComponentLocation();
-	const FVector End = TraceStart->GetComponentLocation();
+	const FVector End = TraceEnd->GetComponentLocation();
+	FQuat Rotation = TraceStart->GetComponentRotation().Quaternion();
+	
+	FHitResult HitResult;
 	TArray<AActor*> IgnoredActors;
 	IgnoredActors.Add(this);
-	FHitResult BoxHit;
 	UKismetSystemLibrary::BoxTraceSingle(
 		GetWorld(),
 		Start,
@@ -76,18 +80,66 @@ void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, A
 		false,
 		IgnoredActors,
 		EDrawDebugTrace::ForDuration,
-		BoxHit,
+		HitResult,
 		true);
-
-	if (AActor* HitActor = BoxHit.GetActor())
+	
+	if (AActor* HitActor = HitResult.GetActor())
 	{
 		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor);
 		if (!HitInterface) return;
-		HitInterface->GetHit(BoxHit.ImpactPoint);
+		HitInterface->GetHit(HitResult.ImpactPoint);
 	}
+*/
 }
 
 void AP7Weapon::SetWeaponCollision(const ECollisionEnabled::Type CollisionType)
 {
 	WeaponBox->SetCollisionEnabled(CollisionType);
+}
+
+void AP7Weapon::SetLastTickLocation(const FVector& LastLocation)
+{
+	LastTickLocation = LastLocation;
+}
+
+void AP7Weapon::HitTrace()
+{
+	if (!GetOwner() || bAlreadyHit) return;
+	if (!OwnerAsCharacter) OwnerAsCharacter = Cast<AP7Character>(GetOwner());
+	if (OwnerAsCharacter->GetActionState() != EAS_Attacking) return;
+
+	const bool bFirstTick = LastTickLocation == FVector::ZeroVector;
+	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();
+	
+	FHitResult HitResult;
+	FCollisionShape SweepShape;
+	SweepShape.SetCapsule(2.f, 44.f);
+
+	GetWorld()->SweepSingleByChannel(
+		HitResult,
+		!bFirstTick ? LastTickLocation : CurrentTickLocation,
+		CurrentTickLocation,
+		GetActorRotation().Quaternion(),
+		ECC_Visibility,
+		SweepShape);
+	DrawDebugCapsule(GetWorld(), CurrentTickLocation, 44.f, 2.f, GetActorRotation().Quaternion(), FColor::Red, false, 5.f);
+	DrawDebugLine(GetWorld(), CurrentTickLocation, !bFirstTick ? LastTickLocation : CurrentTickLocation, FColor::Red, false, 5.f);
+
+	if (AActor* HitActor = HitResult.GetActor())
+	{
+		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor);
+		if (!HitInterface) return;
+		HitInterface->GetHit(HitResult.ImpactPoint);
+		bAlreadyHit = true;
+		
+		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 30.f, FColor::Blue, false, 5.f);
+	}
+	SetLastTickLocation(CurrentTickLocation);
+}
+
+void AP7Weapon::OnAttackEndHandle()
+{
+	SetWeaponCollision(ECollisionEnabled::NoCollision);
+	SetLastTickLocation(FVector::ZeroVector);
+	bAlreadyHit = false;
 }

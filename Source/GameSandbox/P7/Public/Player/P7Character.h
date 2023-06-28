@@ -30,6 +30,7 @@ public:
 	FORCEINLINE bool  GetIsDoubleJump() const { return bDoubleJump; };
 	FORCEINLINE FName GetSocketName()   const { return HandSocketName; };
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
+	FORCEINLINE EActionState GetActionState() const { return ActionState; };
 	void SetOverlappingItem(AP7Item* Item);
 
 protected:
