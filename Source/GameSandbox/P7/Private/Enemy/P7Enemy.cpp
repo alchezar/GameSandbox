@@ -31,7 +31,20 @@ void AP7Enemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 
 void AP7Enemy::GetHit(const FVector& ImpactPoint)
 {
-	DrawDebugPoint(GetWorld(), ImpactPoint, 20.f, FColor::Red, false, 5.f);
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Hello")));
+	const FVector Forward = GetActorForwardVector();
+	FVector ToHit = (ImpactPoint - GetActorLocation()).GetSafeNormal();
+	ToHit.Z = Forward.Z;
+	const float Sign  = FMath::Sign(FVector::CrossProduct(Forward, ToHit).Z);
+	const float Angle = Sign * FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(Forward, ToHit)));
+
+	FName SectionName = FName("FromBack");
+	if		(Angle >=  -45.f && Angle <   45.f) SectionName = FName("FromFront");
+	else if (Angle >= -135.f && Angle <  -45.f) SectionName = FName("FromLeft");
+	else if (Angle >=   45.f && Angle <  135.f) SectionName = FName("FromRight");
+	PlayHitReactMontage(SectionName);
 }
 
+void AP7Enemy::PlayHitReactMontage(const FName& SectionName)
+{
+	PlayAnimMontage(HitReactMontage, 1.f, SectionName);
+}

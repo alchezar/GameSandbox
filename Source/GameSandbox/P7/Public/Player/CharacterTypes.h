@@ -3,6 +3,8 @@
 #include "CharacterTypes.generated.h"
 
 class AP7Weapon;
+class UNiagaraSystem;
+class USoundBase;
 
 UENUM(BlueprintType)
 enum ECharacterState : uint8
@@ -37,4 +39,44 @@ struct FSnapOffset
 
 	FVector LocationOffset;
 	FRotator RotationOffset;
+};
+
+USTRUCT(BlueprintType)
+struct FNiagaraEffect
+{
+	GENERATED_BODY()
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UNiagaraSystem* Effect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	FName ColorName = "RibbonColor";	
+};
+
+USTRUCT(BlueprintType)
+struct FDecalEffect
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UMaterialInterface* Material;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	float Size = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	FName ColorName = "Color";
+};
+
+USTRUCT(BlueprintType)
+struct FWeaponSound
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* Arm;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* Disarm;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* Hit;
+	UPROPERTY(EditDefaultsOnly)
+	USoundBase* Humming;
 };

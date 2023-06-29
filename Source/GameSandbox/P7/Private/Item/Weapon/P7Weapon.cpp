@@ -1,8 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Item/Weapon/P7Weapon.h"
+
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "P7/Public/Interface/P7HitInterface.h"
 #include "P7/Public/Player/P7Character.h"
 
@@ -44,7 +46,7 @@ void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, const F
 {
 	SetItemState(EItemState::EIS_Equipped);
 	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
-
+	SwitchRibbon(true);
 	AttachToSocket(InParent, SocketName, Offset);
 }
 
@@ -109,8 +111,7 @@ void AP7Weapon::HitTrace()
 	if (OwnerAsCharacter->GetActionState() != EAS_Attacking) return;
 
 	const bool bFirstTick = LastTickLocation == FVector::ZeroVector;
-	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();
-	
+	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();	
 	FHitResult HitResult;
 	FCollisionShape SweepShape;
 	SweepShape.SetCapsule(2.f, 44.f);
@@ -122,24 +123,42 @@ void AP7Weapon::HitTrace()
 		GetActorRotation().Quaternion(),
 		ECC_Visibility,
 		SweepShape);
-	DrawDebugCapsule(GetWorld(), CurrentTickLocation, 44.f, 2.f, GetActorRotation().Quaternion(), FColor::Red, false, 5.f);
-	DrawDebugLine(GetWorld(), CurrentTickLocation, !bFirstTick ? LastTickLocation : CurrentTickLocation, FColor::Red, false, 5.f);
 
 	if (AActor* HitActor = HitResult.GetActor())
 	{
 		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor);
 		if (!HitInterface) return;
-		HitInterface->GetHit(HitResult.ImpactPoint);
+		HitInterface->GetHit(OwnerAsCharacter->GetActorLocation());
 		bAlreadyHit = true;
-		
-		DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 30.f, FColor::Blue, false, 5.f);
+		if (WeaponSound.Hit)
+		{
+			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSound.Hit, HitResult.ImpactPoint);
+			SplashEffect(HitResult);
+		}
 	}
 	SetLastTickLocation(CurrentTickLocation);
+}
+
+void AP7Weapon::OnAttackStartHandle()
+{
+	SetWeaponCollision(ECollisionEnabled::QueryOnly);
+	SwitchRibbon(true);
 }
 
 void AP7Weapon::OnAttackEndHandle()
 {
 	SetWeaponCollision(ECollisionEnabled::NoCollision);
 	SetLastTickLocation(FVector::ZeroVector);
+	SwitchRibbon(false);
 	bAlreadyHit = false;
 }
+
+void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
+
+
+void AP7Weapon::SwitchWeapon(const bool bOn) {}
+
+void AP7Weapon::SwitchWeaponHard(const bool bOn) {}
+
+void AP7Weapon::SwitchRibbon(const bool bOn) {}
+

@@ -128,10 +128,12 @@ void AP7Character::Grab()
 	if (AP7Weapon* Weapon = Cast<AP7Weapon>(OverlappingItem))
 	{
 		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset);
-		EquippedWeapon = Weapon;
-		CharacterState = Weapon->GetWeaponState();
 		Weapon->SetOwner(this);
-		return;
+		EquippedWeapon = Weapon;
+		EquippedWeapon->SwitchWeaponHard(false);
+		// CharacterState = Weapon->GetWeaponState();
+		// OnBeamTurningHandle(GetMesh());
+		// return;
 	}
 	/* Try to put current weapon away or get it back*/
 	if (EquippedWeapon && ActionState != EAS_Attacking && EquipMontage)
@@ -157,7 +159,7 @@ void AP7Character::Attack()
 	if (!EquippedWeapon || ActionState != EAS_Unoccupied || CharacterState == ECS_Unequipped) return;
 	PlayAttackMontage();
 	ActionState = EAS_Attacking;
-	EquippedWeapon->SetWeaponCollision(ECollisionEnabled::QueryOnly);
+	EquippedWeapon->OnAttackStartHandle();
 }
 
 void AP7Character::PlayAttackMontage()
@@ -198,15 +200,16 @@ void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 	{
 		Section = 0;
 	});
-	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 1.f, false);
+	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 5.f, false);
 }
 
 void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)
 {
-	if (AP7LightSaber* LightSaber = Cast<AP7LightSaber>(EquippedWeapon))
-	{
-		LightSaber->SwitchSaber(CharacterState != ECS_Unequipped);
-	}
+	EquippedWeapon->SwitchWeapon(CharacterState != ECS_Unequipped);
+	// if (AP7LightSaber* LightSaber = Cast<AP7LightSaber>(EquippedWeapon))
+	// {
+		// LightSaber->SwitchWeapon(CharacterState != ECS_Unequipped);
+	// }
 }
 
 void AP7Character::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp)

@@ -6,7 +6,9 @@
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7LightSaber.generated.h"
 
+class UNiagaraComponent;
 class UPointLightComponent;
+class UAudioComponent;
 
 UCLASS()
 class GAMESANDBOX_API AP7LightSaber : public AP7Weapon
@@ -16,10 +18,13 @@ class GAMESANDBOX_API AP7LightSaber : public AP7Weapon
 public:
 	AP7LightSaber();
 	virtual void Tick(float DeltaTime) override;
-	void SwitchSaber(const bool bOn);
+	virtual void SwitchWeapon(const bool bOn) override;
+	virtual void SwitchWeaponHard(const bool bOn) override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SwitchRibbon(const bool bOn) override;
+	virtual void SplashEffect(const FHitResult& HitResult) override;
 
 private:
 	void SwitchingBeamSmoothly();
@@ -40,10 +45,17 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Light")
 	float TurningStep = 0.1f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	FDecalEffect Plasma;
+
 private:
-	bool bBeamActive = true;
+	bool bBeamActive = false;
 	FTimerHandle BeamTimer;
 	float CurrentBeamScale = 1.f;
 	UPROPERTY()
 	UMaterialInstanceDynamic* SaberColorMaterial;
+	UPROPERTY()
+	UNiagaraComponent* RibbonComponent;
+	UPROPERTY()
+	UAudioComponent* HummingSound;
 };

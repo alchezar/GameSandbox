@@ -20,4 +20,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void PlayHitReactMontage(const FName& SectionName);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* HitReactMontage;
 };
