@@ -13,7 +13,8 @@ AARPowerupBase::AARPowerupBase()
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Overlap);
 	SetRootComponent(SphereComp);
 
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 }
 
 void AARPowerupBase::BeginPlay()

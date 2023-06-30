@@ -23,7 +23,8 @@ AARProjectileBase::AARProjectileBase()
 	MovementComp->bInitialVelocityInLocalSpace = true;
 	MovementComp->ProjectileGravityScale = 0.f;
 
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 }
 
 void AARProjectileBase::BeginPlay()
