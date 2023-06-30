@@ -4,6 +4,7 @@
 
 class AP7Weapon;
 class UNiagaraSystem;
+class UMaterialInterface;
 class USoundBase;
 
 UENUM(BlueprintType)
@@ -42,32 +43,32 @@ struct FSnapOffset
 };
 
 USTRUCT(BlueprintType)
-struct FNiagaraEffect
+struct FP7NiagaraEffect
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* Effect;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	FName ColorName = "RibbonColor";	
 };
 
 USTRUCT(BlueprintType)
-struct FDecalEffect
+struct FP7DecalEffect
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UMaterialInterface* Material;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	float Size = 10.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Kinder | Effect")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	FName ColorName = "Color";
 };
 
 USTRUCT(BlueprintType)
-struct FWeaponSound
+struct FP7WeaponSound
 {
 	GENERATED_BODY()
 

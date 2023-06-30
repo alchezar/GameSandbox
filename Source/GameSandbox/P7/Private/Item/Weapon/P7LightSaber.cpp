@@ -1,7 +1,6 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Item/Weapon/P7LightSaber.h"
-
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"

@@ -10,7 +10,6 @@
 #include "P7/Public/AnimNotify/P7AttackEndNotify.h"
 #include "P7/Public/AnimNotify/P7BeamTurningNotify.h"
 #include "P7/Public/AnimNotify/P7BeltSnappingNotify.h"
-#include "P7/Public/Item/Weapon/P7LightSaber.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
 
@@ -206,10 +205,6 @@ void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)
 {
 	EquippedWeapon->SwitchWeapon(CharacterState != ECS_Unequipped);
-	// if (AP7LightSaber* LightSaber = Cast<AP7LightSaber>(EquippedWeapon))
-	// {
-		// LightSaber->SwitchWeapon(CharacterState != ECS_Unequipped);
-	// }
 }
 
 void AP7Character::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp)

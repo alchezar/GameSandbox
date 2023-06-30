@@ -9,6 +9,10 @@
 
 class AP7Character;
 class UBoxComponent;
+class UFieldSystemComponent;
+class URadialVector;
+class URadialFalloff;
+class UFieldSystemMetaDataFilter;
 
 UCLASS()
 class GAMESANDBOX_API AP7Weapon : public AP7Item
@@ -36,6 +40,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SwitchRibbon(const bool bOn);
 	virtual void SplashEffect(const FHitResult& HitResult);
+	void CreateFields(const FVector& FieldLocation);
 
 private:
 	void HitTrace();
@@ -51,16 +56,28 @@ protected:
 	USceneComponent* TraceEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
-	FNiagaraEffect Ribbon;
+	FP7NiagaraEffect Ribbon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
-	FNiagaraEffect Contact;
+	FP7NiagaraEffect Contact;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Effect")
-	FWeaponSound WeaponSound;
+	FP7WeaponSound WeaponSound;
 
+	UPROPERTY(EditAnywhere, Category = "C++ | Test")
+	float FieldMagnitude = 500000.f;
+	
 private:
 	UPROPERTY()
 	AP7Character* OwnerAsCharacter;
 	FVector LastTickLocation = FVector::ZeroVector;
-	bool bAlreadyHit = false; // Prevent multiple hits at the same attack 
+	bool bAlreadyHit = false; // Prevent multiple hits at the same attack
+
+	UPROPERTY()
+	UFieldSystemComponent* FieldSystem;
+	UPROPERTY()
+	URadialVector* RadialVector;
+	UPROPERTY()
+	URadialFalloff* RadialFalloff;
+	UPROPERTY()
+	UFieldSystemMetaDataFilter* MetaDataFilter;
 };
 

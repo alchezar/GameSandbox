@@ -46,7 +46,7 @@ protected:
 	float TurningStep = 0.1f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
-	FDecalEffect Plasma;
+	FP7DecalEffect Plasma;
 
 private:
 	bool bBeamActive = false;

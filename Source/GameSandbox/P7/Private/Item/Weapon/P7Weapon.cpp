@@ -1,9 +1,11 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Item/Weapon/P7Weapon.h"
-
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Field/FieldSystemAsset.h"
+#include "Field/FieldSystemComponent.h"
+#include "Field/FieldSystemObjects.h"
 #include "Kismet/GameplayStatics.h"
 #include "P7/Public/Interface/P7HitInterface.h"
 #include "P7/Public/Player/P7Character.h"
@@ -28,6 +30,11 @@ AP7Weapon::AP7Weapon()
 	TraceEnd = CreateDefaultSubobject<USceneComponent>("TraceEndPoint");
 	TraceEnd->SetupAttachment(RootComponent);
 	TraceEnd->SetRelativeLocation(FVector(0.f, 0.f, 101.f));
+
+	FieldSystem = CreateDefaultSubobject<UFieldSystemComponent>("FieldSystem");
+	RadialVector = CreateDefaultSubobject<URadialVector>("RadialVector");
+	RadialFalloff = CreateDefaultSubobject<URadialFalloff>("RadialFalloff");
+	MetaDataFilter = CreateDefaultSubobject<UFieldSystemMetaDataFilter>("MetaDataFilter");
 }
 
 void AP7Weapon::BeginPlay()
@@ -114,7 +121,7 @@ void AP7Weapon::HitTrace()
 	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();	
 	FHitResult HitResult;
 	FCollisionShape SweepShape;
-	SweepShape.SetCapsule(2.f, 44.f);
+	SweepShape.SetCapsule(2.f, 44.f);;
 
 	GetWorld()->SweepSingleByChannel(
 		HitResult,
@@ -126,15 +133,17 @@ void AP7Weapon::HitTrace()
 
 	if (AActor* HitActor = HitResult.GetActor())
 	{
-		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor);
-		if (!HitInterface) return;
-		HitInterface->GetHit(OwnerAsCharacter->GetActorLocation());
 		bAlreadyHit = true;
+		if (IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor))
+		{
+			HitInterface->GetHit(OwnerAsCharacter->GetActorLocation());
+		}
 		if (WeaponSound.Hit)
 		{
 			UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSound.Hit, HitResult.ImpactPoint);
-			SplashEffect(HitResult);
 		}
+		SplashEffect(HitResult);
+		CreateFields(HitResult.ImpactPoint);
 	}
 	SetLastTickLocation(CurrentTickLocation);
 }
@@ -153,8 +162,19 @@ void AP7Weapon::OnAttackEndHandle()
 	bAlreadyHit = false;
 }
 
-void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
+void AP7Weapon::CreateFields(const FVector& FieldLocation)
+{
+	RadialVector->SetRadialVector(FieldMagnitude, FieldLocation);
+	RadialFalloff->SetRadialFalloff(FieldMagnitude, 0.8f, 1.f, 0.f, 200.f, FieldLocation, EFieldFalloffType::Field_FallOff_None);
+	MetaDataFilter->ObjectType = EFieldObjectType::Field_Object_Destruction;
 
+	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_ExternalClusterStrain, nullptr, RadialFalloff);
+	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearForce, MetaDataFilter, RadialVector);
+
+	DrawDebugCapsule(GetWorld(), FieldLocation, 5.f, 10.f, FRotator::ZeroRotator.Quaternion(), FColor::Red, false, 5.f);	
+}
+
+void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
 
 void AP7Weapon::SwitchWeapon(const bool bOn) {}
 
