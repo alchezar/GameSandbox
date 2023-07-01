@@ -1,8 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Enemy/P7Enemy.h"
-#include "Components/SkeletalMeshComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "P7/Public/Component/P7AttributeComponent.h"
+#include "P7/Public/Widget/Component/P7HealthBarComponent.h"
 
 AP7Enemy::AP7Enemy()
 {
@@ -12,11 +14,18 @@ AP7Enemy::AP7Enemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	Attributes = CreateDefaultSubobject<UP7AttributeComponent>("AttributesComponent");
+	HealthBarComponent = CreateDefaultSubobject<UP7HealthBarComponent>("HealthBarWidgetComponent");
+	HealthBarComponent->SetupAttachment(RootComponent);
 }
 
 void AP7Enemy::BeginPlay()
 {
 	Super::BeginPlay();
+	if (HealthBarComponent)
+	{
+		HealthBarComponent->SetHealthPercent(1.f);
+	}
 }
 
 void AP7Enemy::Tick(float DeltaTime)

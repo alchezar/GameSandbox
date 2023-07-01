@@ -23,7 +23,7 @@ void AP7Treasure::OnSphereBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (AP7Character* Character = Cast<AP7Character>(OtherActor))
 	{
-		// Character->AddCoin();
+		// Character->AddCoin(Gold);
 		UGameplayStatics::PlaySoundAtLocation(GetWorld(), TreasureSound, GetActorLocation());
 		Destroy();
 	}

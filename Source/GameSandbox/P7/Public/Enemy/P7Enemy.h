@@ -7,6 +7,9 @@
 #include "P7/Public/Interface/P7HitInterface.h"
 #include "P7Enemy.generated.h"
 
+class UP7HealthBarComponent;
+class UP7AttributeComponent;
+
 UCLASS()
 class GAMESANDBOX_API AP7Enemy : public ACharacter, public IP7HitInterface
 {
@@ -23,6 +26,11 @@ protected:
 	void PlayHitReactMontage(const FName& SectionName);
 
 protected:
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UP7AttributeComponent* Attributes;
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UP7HealthBarComponent* HealthBarComponent;	
+	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
 	UAnimMontage* HitReactMontage;
 };

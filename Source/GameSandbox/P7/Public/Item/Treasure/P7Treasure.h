@@ -22,4 +22,6 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Sound")
 	USoundBase* TreasureSound;
+	UPROPERTY(EditAnywhere, Category = "C++ | Gold")
+	int32 Gold = 5;
 };
