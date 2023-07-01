@@ -18,18 +18,10 @@ AP7Weapon::AP7Weapon()
 	WeaponBox->SetupAttachment(RootComponent);
 	WeaponBox->SetRelativeLocation(FVector(0.f, 0.f, 60.f));
 	WeaponBox->SetBoxExtent(FVector(2.5f, 1.5f, 42.f));
-	WeaponBox->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponBox->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	WeaponBox->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
 	WeaponBox->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
 	WeaponBox->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Ignore);
-
-	TraceStart = CreateDefaultSubobject<USceneComponent>("TraceStartPoint");
-	TraceStart->SetupAttachment(RootComponent);
-	TraceStart->SetRelativeLocation(FVector(0.f, 0.f, 20.f));
-
-	TraceEnd = CreateDefaultSubobject<USceneComponent>("TraceEndPoint");
-	TraceEnd->SetupAttachment(RootComponent);
-	TraceEnd->SetRelativeLocation(FVector(0.f, 0.f, 101.f));
 
 	FieldSystem = CreateDefaultSubobject<UFieldSystemComponent>("FieldSystem");
 	RadialVector = CreateDefaultSubobject<URadialVector>("RadialVector");
@@ -40,7 +32,6 @@ AP7Weapon::AP7Weapon()
 void AP7Weapon::BeginPlay()
 {
 	Super::BeginPlay();
-	// WeaponBox->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnWeaponBeginOverlap);
 }
 
 void AP7Weapon::Tick(const float DeltaTime)
@@ -63,42 +54,6 @@ void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName
 	ItemMesh->AttachToComponent(InParent, AllRules, SocketName);
 	ItemMesh->AddRelativeLocation(Offset.LocationOffset);
 	ItemMesh->AddRelativeRotation(Offset.RotationOffset);
-}
-
-void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	/*
-	if (OtherActor == GetOwner()) return;
-	DrawDebugPoint(GetWorld(), SweepResult.ImpactPoint, 10.f, FColor::Red, false, 10.f);
-	GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Hello")));
-	
-	const FVector Start = TraceStart->GetComponentLocation();
-	const FVector End = TraceEnd->GetComponentLocation();
-	FQuat Rotation = TraceStart->GetComponentRotation().Quaternion();
-	
-	FHitResult HitResult;
-	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(this);
-	UKismetSystemLibrary::BoxTraceSingle(
-		GetWorld(),
-		Start,
-		End,
-		FVector(5.f),
-		TraceStart->GetComponentRotation(),
-		TraceTypeQuery1,
-		false,
-		IgnoredActors,
-		EDrawDebugTrace::ForDuration,
-		HitResult,
-		true);
-	
-	if (AActor* HitActor = HitResult.GetActor())
-	{
-		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor);
-		if (!HitInterface) return;
-		HitInterface->GetHit(HitResult.ImpactPoint);
-	}
-*/
 }
 
 void AP7Weapon::SetWeaponCollision(const ECollisionEnabled::Type CollisionType)
@@ -150,13 +105,13 @@ void AP7Weapon::HitTrace()
 
 void AP7Weapon::OnAttackStartHandle()
 {
-	SetWeaponCollision(ECollisionEnabled::QueryOnly);
+	// SetWeaponCollision(ECollisionEnabled::QueryOnly);
 	SwitchRibbon(true);
 }
 
 void AP7Weapon::OnAttackEndHandle()
 {
-	SetWeaponCollision(ECollisionEnabled::NoCollision);
+	// SetWeaponCollision(ECollisionEnabled::NoCollision);
 	SetLastTickLocation(FVector::ZeroVector);
 	SwitchRibbon(false);
 	bAlreadyHit = false;
@@ -173,6 +128,10 @@ void AP7Weapon::CreateFields(const FVector& FieldLocation)
 
 	DrawDebugCapsule(GetWorld(), FieldLocation, 5.f, 10.f, FRotator::ZeroRotator.Quaternion(), FColor::Red, false, 5.f);	
 }
+
+void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
+
+void AP7Weapon::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
 
 void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
 

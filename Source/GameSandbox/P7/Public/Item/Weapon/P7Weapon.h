@@ -34,8 +34,10 @@ public:
 	void SetLastTickLocation(const FVector& LastLocation);
 
 	UFUNCTION()
-	void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
+	virtual void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SwitchRibbon(const bool bOn);
@@ -50,10 +52,6 @@ protected:
 	TEnumAsByte<ECharacterState> WeaponState = ECharacterState::ECS_OneHanded;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UBoxComponent* WeaponBox;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
-	USceneComponent* TraceStart;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
-	USceneComponent* TraceEnd;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	FP7NiagaraEffect Ribbon;

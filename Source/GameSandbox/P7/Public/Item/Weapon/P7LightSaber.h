@@ -20,7 +20,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SwitchWeapon(const bool bOn) override;
 	virtual void SwitchWeaponHard(const bool bOn) override;
-
+virtual void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+virtual void OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void SwitchRibbon(const bool bOn) override;
@@ -29,12 +31,18 @@ protected:
 private:
 	void SwitchingBeamSmoothly();
 	void SetSaberColor(const FLinearColor NewColor);
+	void TouchTrace();
+	void PlasmaDecal(const FHitResult& HitResult);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UStaticMeshComponent* Beam;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPointLightComponent* SaberLight;
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	USceneComponent* TraceStart;
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	USceneComponent* TraceEnd;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Light")
 	FName ColorParameterName = "Color";
@@ -58,4 +66,9 @@ private:
 	UNiagaraComponent* RibbonComponent;
 	UPROPERTY()
 	UAudioComponent* HummingSound;
+	bool bBladeTouch = false;
+	UPROPERTY()
+	TArray<AActor*> OverlappedActors;
+	TArray<FP7PlasmaSpawn> PlasmaContacts;
+	TArray<FVector> AllPlasmaDecalLocations;
 };

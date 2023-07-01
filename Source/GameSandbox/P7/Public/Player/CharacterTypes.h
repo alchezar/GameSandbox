@@ -81,3 +81,24 @@ struct FP7WeaponSound
 	UPROPERTY(EditDefaultsOnly)
 	USoundBase* Humming;
 };
+
+USTRUCT(BlueprintType)
+struct FP7PlasmaSpawn
+{
+	GENERATED_BODY()
+
+	FVector Location;
+	FRotator Rotation;
+
+	FP7PlasmaSpawn()
+	{
+		Location = FVector::ZeroVector;
+		Rotation = FRotator::ZeroRotator;
+	}
+
+	explicit FP7PlasmaSpawn(const FHitResult& HitResult)
+	{
+		Location = HitResult.ImpactPoint;
+		Rotation = HitResult.ImpactNormal.Rotation();
+	}
+};

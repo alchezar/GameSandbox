@@ -130,9 +130,6 @@ void AP7Character::Grab()
 		Weapon->SetOwner(this);
 		EquippedWeapon = Weapon;
 		EquippedWeapon->SwitchWeaponHard(false);
-		// CharacterState = Weapon->GetWeaponState();
-		// OnBeamTurningHandle(GetMesh());
-		// return;
 	}
 	/* Try to put current weapon away or get it back*/
 	if (EquippedWeapon && ActionState != EAS_Attacking && EquipMontage)
