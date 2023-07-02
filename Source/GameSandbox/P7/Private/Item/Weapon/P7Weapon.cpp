@@ -40,12 +40,15 @@ void AP7Weapon::Tick(const float DeltaTime)
 	HitTrace();
 }
 
-void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset)
+void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset, AActor* NewOwner, APawn* NewInstigator)
 {
 	SetItemState(EItemState::EIS_Equipped);
 	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SwitchRibbon(true);
 	AttachToSocket(InParent, SocketName, Offset);
+	SetOwner(NewOwner);
+	SetInstigator(NewInstigator);
+
 }
 
 void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset)
@@ -89,6 +92,8 @@ void AP7Weapon::HitTrace()
 	if (AActor* HitActor = HitResult.GetActor())
 	{
 		bAlreadyHit = true;
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(), this, nullptr);
+
 		if (IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor))
 		{
 			HitInterface->GetHit(OwnerAsCharacter->GetActorLocation());

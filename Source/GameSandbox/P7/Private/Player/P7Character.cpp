@@ -126,8 +126,7 @@ void AP7Character::Grab()
 	/* Try to find overlapping Weapon items at first*/
 	if (AP7Weapon* Weapon = Cast<AP7Weapon>(OverlappingItem))
 	{
-		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset);
-		Weapon->SetOwner(this);
+		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset, this, this);
 		EquippedWeapon = Weapon;
 		EquippedWeapon->SwitchWeaponHard(false);
 	}

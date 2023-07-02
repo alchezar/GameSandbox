@@ -55,6 +55,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	FP7DecalEffect Plasma;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	float SpawnStep = 1.f;
 
 private:
 	bool bBeamActive = false;

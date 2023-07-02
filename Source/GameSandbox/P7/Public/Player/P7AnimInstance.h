@@ -19,6 +19,9 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+private:
+	float GetMovementDirection();
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	float Speed = 0.f;

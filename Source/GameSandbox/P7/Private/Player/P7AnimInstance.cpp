@@ -20,4 +20,16 @@ void UP7AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bJump = MovementComponent->IsFalling();
 	bDoubleJump = Player->GetIsDoubleJump();
 	CharacterState = Player->GetCharacterState();
+	Direction = GetMovementDirection();
+}
+
+float UP7AnimInstance::GetMovementDirection()
+{
+	if (FMath::IsNearlyZero(Speed)) return 0.f;
+
+	const FVector MeshDirection = Player->GetActorForwardVector();
+	const FVector MoveDirection = Player->GetVelocity().GetSafeNormal();
+	const float Angle = FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(MeshDirection, MoveDirection)));
+	const float AngleSign = FMath::Sign(FVector::CrossProduct(MeshDirection, MoveDirection).Z);	
+	return Angle * AngleSign;
 }

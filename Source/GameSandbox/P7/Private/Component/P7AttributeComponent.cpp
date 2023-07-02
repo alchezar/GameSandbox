@@ -10,10 +10,16 @@ UP7AttributeComponent::UP7AttributeComponent()
 void UP7AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	Health = MaxHealth;
 }
 
 void UP7AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UP7AttributeComponent::ReceiveDamage(const float Damage)
+{
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 }
 

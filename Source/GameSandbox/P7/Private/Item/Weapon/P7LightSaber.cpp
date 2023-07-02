@@ -153,6 +153,7 @@ void AP7LightSaber::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent,
 	{
 		bBladeTouch = false;
 	}
+	PlasmaContacts.Empty();
 }
 
 void AP7LightSaber::TouchTrace()
@@ -193,9 +194,9 @@ void AP7LightSaber::PlasmaDecal(const FHitResult& HitResult)
 	if (PlasmaContacts.Num() < 2) return;
 
 	const int32 Distance = (PlasmaContacts[1].Location - PlasmaContacts[0].Location).Size();
-	for (int i = 0; i < Distance; ++i)
+	for (int i = 0; i < Distance / SpawnStep; ++i)
 	{
-		AllPlasmaDecalLocations.Add(FMath::VInterpTo(PlasmaContacts[0].Location, PlasmaContacts[1].Location, i, 1.f / Distance));
+		AllPlasmaDecalLocations.Add(FMath::VInterpTo(PlasmaContacts[0].Location, PlasmaContacts[1].Location, i, SpawnStep / Distance));
 	}
 	PlasmaContacts.RemoveAt(0);
 

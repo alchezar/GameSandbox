@@ -24,7 +24,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SwitchWeapon(const bool bOn);
 	virtual void SwitchWeaponHard(const bool bOn);
-	void Equip(USceneComponent* InParent, FName SocketName, const FSnapOffset& Offset);
+	void Equip(USceneComponent* InParent, FName SocketName, const FSnapOffset& Offset, AActor* NewOwner, APawn* NewInstigator);
 	void AttachToSocket(USceneComponent* InParent, FName SocketName, const FSnapOffset& Offset);
 	void OnAttackStartHandle();
 	void OnAttackEndHandle();
@@ -60,7 +60,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Effect")
 	FP7WeaponSound WeaponSound;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Test")
+	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
+	float Damage = 20.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
 	float FieldMagnitude = 500000.f;
 	
 private:

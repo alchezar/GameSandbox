@@ -19,11 +19,16 @@ public:
 	AP7Enemy();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit(const FVector& ImpactPoint) override;
 
 protected:
 	virtual void BeginPlay() override;
 	void PlayHitReactMontage(const FName& SectionName);
+
+private:
+	void DirectionalHitReact(const FVector& ImpactPoint);
+	void Die();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -33,4 +38,11 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
 	UAnimMontage* HitReactMontage;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Combat")
+	float CombatRadius = 500.f;
+
+private:
+	UPROPERTY()
+	AActor* CombatTarget;
 };

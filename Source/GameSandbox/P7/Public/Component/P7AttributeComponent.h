@@ -14,6 +14,9 @@ class GAMESANDBOX_API UP7AttributeComponent : public UActorComponent
 public:
 	UP7AttributeComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void ReceiveDamage(const float Damage);
+	FORCEINLINE float GetHealthPercent() const { return Health / MaxHealth; };
+	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; };
 
 protected:
 	virtual void BeginPlay() override;

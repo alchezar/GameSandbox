@@ -17,6 +17,7 @@ public:
 	UP7HealthBarComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	void SetHealthPercent(const float HealthPercent);
+	void ReactOnDamage(const float HealthPercent, const bool bWidgetVisibility);
 
 protected:
 	virtual void BeginPlay() override;

@@ -29,3 +29,9 @@ void UP7HealthBarComponent::SetHealthPercent(const float HealthPercent)
 		HealthBarWidget->SetHealthPercent(HealthPercent);
 	}
 }
+
+void UP7HealthBarComponent::ReactOnDamage(const float HealthPercent, const bool bWidgetVisibility)
+{
+	SetHealthPercent(HealthPercent);
+	SetVisibility(bWidgetVisibility);
+}
