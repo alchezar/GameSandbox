@@ -23,6 +23,15 @@ enum EActionState : uint8
 	EAS_Equipping  UMETA(DisplayName = "Equipping")
 };
 
+UENUM(BlueprintType)
+enum EEnemyState : uint8
+{
+	EES_Patrolling UMETA(DisplayName = "Patrolling"),
+	EES_Chasing    UMETA(DisplayName = "Chasing"),
+	EES_Attaching  UMETA(DisplayName = "Attacking")
+};
+
+
 USTRUCT(BlueprintType)
 struct FCurrentWeapon
 {
@@ -38,7 +47,9 @@ struct FSnapOffset
 {
 	GENERATED_BODY()
 
+	UPROPERTY(EditAnywhere)
 	FVector LocationOffset;
+	UPROPERTY(EditAnywhere)
 	FRotator RotationOffset;
 };
 
@@ -101,4 +112,15 @@ struct FP7PlasmaSpawn
 		Location = HitResult.ImpactPoint;
 		Rotation = HitResult.ImpactNormal.Rotation();
 	}
+};
+
+USTRUCT()
+struct FP7PatrolTime
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	float Min = 2.f;
+	UPROPERTY(EditAnywhere)
+	float Max = 5.f;
 };

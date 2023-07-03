@@ -82,7 +82,7 @@ void AP7LightSaber::SwitchWeaponHard(const bool bOn)
 	SaberLight->SetIntensity(bOn ? BeamGlowIntensity : 0.f);
 	Beam->SetVisibility(bOn);
 	Beam->SetRelativeScale3D(FVector(bOn ? 1.f : 0.f));
-	SwitchRibbon(false);
+	SwitchRibbon(bOn);
 }
 
 void AP7LightSaber::SwitchingBeamSmoothly()

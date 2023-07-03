@@ -60,10 +60,6 @@ protected:
 	FName HandSocketName = "GripPoint";
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	FName BeltSocketName = "BeltSocket";
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	FSnapOffset HandSnapOffset = {FVector(0.f, 2.f, 0.f), FRotator(25.f, 0.f, 10.f)};
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	FSnapOffset BeltSnapOffset;
 
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")

@@ -40,18 +40,28 @@ void AP7Weapon::Tick(const float DeltaTime)
 	HitTrace();
 }
 
-void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset, AActor* NewOwner, APawn* NewInstigator)
+void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, AActor* NewOwner, APawn* NewInstigator)
 {
 	SetItemState(EItemState::EIS_Equipped);
 	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SwitchRibbon(true);
-	AttachToSocket(InParent, SocketName, Offset);
+	AttachToBelt(InParent, SocketName);
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
 
 }
 
-void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset)
+void AP7Weapon::AttachToHand(USceneComponent* InParent, const FName SocketName)
+{
+	AttachToSocket(InParent, SocketName, HandSnapOffset);
+}
+
+void AP7Weapon::AttachToBelt(USceneComponent* InParent, const FName SocketName)
+{
+	AttachToSocket(InParent, SocketName, BeltSnapOffset);
+}
+
+void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset) const
 {
 	const FAttachmentTransformRules AllRules(EAttachmentRule::SnapToTarget, true);
 	ItemMesh->AttachToComponent(InParent, AllRules, SocketName);

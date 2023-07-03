@@ -26,6 +26,7 @@ void AP7Character::BeginPlay()
 	Super::BeginPlay();
 	AddMappingContext();
 	InitAnimNotifies();
+	Tags.Add("Player");
 }
 
 void AP7Character::Tick(const float DeltaTime)
@@ -126,7 +127,7 @@ void AP7Character::Grab()
 	/* Try to find overlapping Weapon items at first*/
 	if (AP7Weapon* Weapon = Cast<AP7Weapon>(OverlappingItem))
 	{
-		Weapon->Equip(GetMesh(), HandSocketName, HandSnapOffset, this, this);
+		Weapon->Equip(GetMesh(), BeltSocketName, this, this);
 		EquippedWeapon = Weapon;
 		EquippedWeapon->SwitchWeaponHard(false);
 	}
@@ -207,10 +208,10 @@ void AP7Character::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp)
 {
 	if (EquippedWeapon && CharacterState == ECS_Unequipped)
 	{
-		EquippedWeapon->AttachToSocket(GetMesh(), BeltSocketName, BeltSnapOffset);
+		EquippedWeapon->AttachToBelt(GetMesh(), BeltSocketName);
 	}
 	else
 	{
-		EquippedWeapon->AttachToSocket(GetMesh(), HandSocketName, HandSnapOffset);
+		EquippedWeapon->AttachToHand(GetMesh(), HandSocketName);
 	}
 }

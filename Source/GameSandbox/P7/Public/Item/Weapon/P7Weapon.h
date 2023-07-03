@@ -24,12 +24,14 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SwitchWeapon(const bool bOn);
 	virtual void SwitchWeaponHard(const bool bOn);
-	void Equip(USceneComponent* InParent, FName SocketName, const FSnapOffset& Offset, AActor* NewOwner, APawn* NewInstigator);
-	void AttachToSocket(USceneComponent* InParent, FName SocketName, const FSnapOffset& Offset);
+	void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
+	void AttachToHand(USceneComponent* InParent, const FName SocketName);
+	void AttachToBelt(USceneComponent* InParent, const FName SocketName);
 	void OnAttackStartHandle();
 	void OnAttackEndHandle();
 	FORCEINLINE ECharacterState GetWeaponState() const { return WeaponState; };
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; };
+	FORCEINLINE FSnapOffset GetHandSnapOffset() const { return HandSnapOffset; };
 	void SetWeaponCollision(const ECollisionEnabled::Type CollisionType);
 	void SetLastTickLocation(const FVector& LastLocation);
 
@@ -46,6 +48,7 @@ protected:
 
 private:
 	void HitTrace();
+	void AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset) const;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | State")
@@ -64,6 +67,11 @@ protected:
 	float Damage = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
 	float FieldMagnitude = 500000.f;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Snapping")
+	FSnapOffset HandSnapOffset = {FVector(0.f, 2.f, 0.f), FRotator(25.f, 0.f, 10.f)};
+	UPROPERTY(EditAnywhere, Category = "C++ | Snapping")
+	FSnapOffset BeltSnapOffset;
 	
 private:
 	UPROPERTY()

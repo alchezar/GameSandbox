@@ -20,8 +20,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SwitchWeapon(const bool bOn) override;
 	virtual void SwitchWeaponHard(const bool bOn) override;
-virtual void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-virtual void OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	virtual void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
 	
 protected:
 	virtual void BeginPlay() override;
@@ -39,9 +39,9 @@ protected:
 	UStaticMeshComponent* Beam;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPointLightComponent* SaberLight;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USceneComponent* TraceStart;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USceneComponent* TraceEnd;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Light")

@@ -38,6 +38,8 @@ protected:
 
 private:
 	UPROPERTY()
+	ACharacter* Character;
+	UPROPERTY()
 	AP7Character* Player;
 	UPROPERTY()
 	UCharacterMovementComponent* MovementComponent;
