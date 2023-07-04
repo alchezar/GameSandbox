@@ -7,8 +7,9 @@
 #include "Animation/AnimInstance.h"
 #include "P7AnimInstance.generated.h"
 
-class UCharacterMovementComponent;
 class AP7Character;
+class AP7BaseCharacter;
+class UCharacterMovementComponent;
 
 UCLASS()
 class GAMESANDBOX_API UP7AnimInstance : public UAnimInstance
@@ -18,9 +19,6 @@ class GAMESANDBOX_API UP7AnimInstance : public UAnimInstance
 public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
-
-private:
-	float GetMovementDirection();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
@@ -38,7 +36,7 @@ protected:
 
 private:
 	UPROPERTY()
-	ACharacter* Character;
+	AP7BaseCharacter* Character;
 	UPROPERTY()
 	AP7Character* Player;
 	UPROPERTY()

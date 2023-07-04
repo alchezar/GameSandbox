@@ -3,18 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "P7/Public/Interface/P7HitInterface.h"
+#include "P7/Public/Player/P7BaseCharacter.h"
+// #include "P7/Public/Interface/P7HitInterface.h"
 #include "P7/Public/Player/CharacterTypes.h"
 #include "P7Enemy.generated.h"
 
-class UPawnSensingComponent;
 class AAIController;
 class UP7HealthBarComponent;
-class UP7AttributeComponent;
+class UPawnSensingComponent;
 
 UCLASS()
-class GAMESANDBOX_API AP7Enemy : public ACharacter, public IP7HitInterface
+class GAMESANDBOX_API AP7Enemy : public AP7BaseCharacter
 {
 	GENERATED_BODY()
 
@@ -22,17 +21,18 @@ public:
 	AP7Enemy();
 	virtual void Tick(float DeltaTime) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void Destroyed() override;
 	virtual void GetHit(const FVector& ImpactPoint) override;
+	virtual bool GetIsAttaching() override;
 
 protected:
 	virtual void BeginPlay() override;
-	void PlayHitReactMontage(const FName& SectionName);
+	virtual void Attack() override;
+	virtual void Die() override;
 	UFUNCTION()
 	void OnSeePawnHandle(APawn* Pawn);
 	
 private:
-	void DirectionalHitReact(const FVector& ImpactPoint);
-	void Die();
 	bool InTargetRange(const AActor* Target, const float Radius);
 	void ChangeTarget(EEnemyState NewState, AActor* NewTarget);
 	void CheckCombatTarget();
@@ -40,18 +40,16 @@ private:
 	void ChoosePatrolTarget();
 	void PatrolTimerFinished();
 	void MoveToTarget(AActor* Target);
+	void SpawnWeapon();
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
-	UP7AttributeComponent* Attributes;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UP7HealthBarComponent* HealthBarComponent;	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensing;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
-	UAnimMontage* HitReactMontage;
 
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
+	TSubclassOf<AP7Weapon> WeaponClass;
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
 	TArray<AActor*> PatrolTargets;
@@ -65,12 +63,14 @@ protected:
 	float AttackRadius = 150.f;
 	
 private:
+	EEnemyState EnemyState = EES_Patrolling;
+	FTimerHandle PatrolTimer;
 	UPROPERTY()
 	AActor* PatrolTarget;
 	UPROPERTY()
 	AActor* CombatTarget;
-	FTimerHandle PatrolTimer;
 	UPROPERTY()
 	AAIController* EnemyController;
-	EEnemyState EnemyState = EES_Patrolling;
+	UPROPERTY()
+	AP7Weapon* Weapon;
 };

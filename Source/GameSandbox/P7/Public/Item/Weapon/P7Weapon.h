@@ -7,6 +7,7 @@
 #include "P7/Public/Player/CharacterTypes.h"
 #include "P7Weapon.generated.h"
 
+class AP7BaseCharacter;
 class AP7Character;
 class UBoxComponent;
 class UFieldSystemComponent;
@@ -25,6 +26,7 @@ public:
 	virtual void SwitchWeapon(const bool bOn);
 	virtual void SwitchWeaponHard(const bool bOn);
 	void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
+	void Unequip();
 	void AttachToHand(USceneComponent* InParent, const FName SocketName);
 	void AttachToBelt(USceneComponent* InParent, const FName SocketName);
 	void OnAttackStartHandle();
@@ -75,7 +77,7 @@ protected:
 	
 private:
 	UPROPERTY()
-	AP7Character* OwnerAsCharacter;
+	AP7BaseCharacter* OwnerChar;
 	FVector LastTickLocation = FVector::ZeroVector;
 	bool bAlreadyHit = false; // Prevent multiple hits at the same attack
 

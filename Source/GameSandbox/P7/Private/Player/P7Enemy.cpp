@@ -1,12 +1,12 @@
 // Copyright (C) 2023, IKinder
 
-#include "P7/Public/Enemy/P7Enemy.h"
-
+#include "P7/Public/Player/P7Enemy.h"
 #include "AIController.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P7/Public/Component/P7AttributeComponent.h"
+#include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Widget/Component/P7HealthBarComponent.h"
 #include "Perception/PawnSensingComponent.h"
 
@@ -18,7 +18,6 @@ AP7Enemy::AP7Enemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	Attributes = CreateDefaultSubobject<UP7AttributeComponent>("AttributesComponent");
 	HealthBarComponent = CreateDefaultSubobject<UP7HealthBarComponent>("HealthBarWidgetComponent");
 	HealthBarComponent->SetupAttachment(RootComponent);
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
@@ -29,11 +28,10 @@ AP7Enemy::AP7Enemy()
 void AP7Enemy::BeginPlay()
 {
 	Super::BeginPlay();
-	check(Attributes);
 	check(HealthBarComponent);
 	check(PawnSensing);
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
-
+	SpawnWeapon();
 	HealthBarComponent->ReactOnDamage(1.f, false);
 	EnemyController = Cast<AAIController>(GetController());
 	ChoosePatrolTarget();
@@ -46,41 +44,36 @@ void AP7Enemy::Tick(const float DeltaTime)
 	EnemyState > EES_Patrolling ? CheckCombatTarget() : CheckPatrolTarget();  
 }
 
-void AP7Enemy::GetHit(const FVector& ImpactPoint)
+void AP7Enemy::SpawnWeapon()
 {
-	Attributes->GetIsAlive() ? DirectionalHitReact(ImpactPoint) : Die();
+	if (!WeaponClass) return;
+	Weapon = GetWorld()->SpawnActor<AP7Weapon>(WeaponClass);
+	if (!Weapon) return;
+	Weapon->Equip(GetMesh(), HandSocketName, this, this);
+	Weapon->AttachToHand(GetMesh(), HandSocketName);
 }
 
-void AP7Enemy::DirectionalHitReact(const FVector& ImpactPoint)
+void AP7Enemy::GetHit(const FVector& ImpactPoint)
 {
-	const FVector Forward = GetActorForwardVector();
-	FVector ToHit = (ImpactPoint - GetActorLocation()).GetSafeNormal();
-	ToHit.Z = Forward.Z;
-	const float Sign  = FMath::Sign(FVector::CrossProduct(Forward, ToHit).Z);
-	const float Angle = Sign * FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(Forward, ToHit)));
+	Super::GetHit(ImpactPoint);
+}
 
-	FName SectionName = FName("FromBack");
-	if		(Angle >=  -45.f && Angle <   45.f) SectionName = FName("FromFront");
-	else if (Angle >= -135.f && Angle <  -45.f) SectionName = FName("FromLeft");
-	else if (Angle >=   45.f && Angle <  135.f) SectionName = FName("FromRight");
-	PlayHitReactMontage(SectionName);
+bool AP7Enemy::GetIsAttaching()
+{
+	return EnemyState == EES_Attaching;
+}
+
+void AP7Enemy::Attack()
+{
+	Super::Attack();
+	if (!CanAttack()) return;
+	EnemyState = EES_Attaching;
 }
 
 void AP7Enemy::Die()
 {
-	/* Ragdoll */
-	GetCharacterMovement()->DisableMovement();
-	GetCharacterMovement()->MovementState.bCanJump = false;
-	GetMesh()->SetAllBodiesSimulatePhysics(true);
-	GetMesh()->SetCollisionProfileName("Ragdoll");
-	SetLifeSpan(5.f);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Super::Die();
 	HealthBarComponent->ReactOnDamage(0.f, false);
-}
-
-void AP7Enemy::PlayHitReactMontage(const FName& SectionName)
-{
-	PlayAnimMontage(HitReactMontage, 1.f, SectionName);
 }
 
 float AP7Enemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -90,6 +83,15 @@ float AP7Enemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	CombatTarget = EventInstigator->GetPawn();
 	ChangeTarget(EES_Chasing, CombatTarget);
 	return DamageAmount;
+}
+
+void AP7Enemy::Destroyed()
+{
+	Super::Destroyed();
+	if (Weapon)
+	{
+		Weapon->Unequip();
+	}
 }
 
 bool AP7Enemy::InTargetRange(const AActor* Target, const float Radius)
@@ -121,8 +123,8 @@ void AP7Enemy::CheckCombatTarget()
 	}
 	else if (InTargetRange(CombatTarget, AttackRadius) && EnemyState != EES_Attaching)
 	{
-		EnemyState = EES_Attaching;
 		//Play anim montage
+		Attack();
 	}
 }
 

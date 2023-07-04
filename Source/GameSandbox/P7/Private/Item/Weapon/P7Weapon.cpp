@@ -48,7 +48,16 @@ void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, AActor*
 	AttachToBelt(InParent, SocketName);
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
+}
 
+void AP7Weapon::Unequip()
+{
+	SetItemState(EItemState::EIS_Hovering);
+	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Overlap);
+	FVector NewLocation = GetOwner()->GetActorLocation();
+	NewLocation.Z = 100.f;
+	SetActorLocation(NewLocation);
+	SetActorRotation(FRotator::ZeroRotator);
 }
 
 void AP7Weapon::AttachToHand(USceneComponent* InParent, const FName SocketName)
@@ -82,9 +91,9 @@ void AP7Weapon::SetLastTickLocation(const FVector& LastLocation)
 void AP7Weapon::HitTrace()
 {
 	if (!GetOwner() || bAlreadyHit) return;
-	if (!OwnerAsCharacter) OwnerAsCharacter = Cast<AP7Character>(GetOwner());
-	if (OwnerAsCharacter->GetActionState() != EAS_Attacking) return;
-
+	OwnerChar = OwnerChar ? OwnerChar : Cast<AP7BaseCharacter>(GetOwner());
+	if (!OwnerChar || !OwnerChar->GetIsAttaching()) return;
+	
 	const bool bFirstTick = LastTickLocation == FVector::ZeroVector;
 	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();	
 	FHitResult HitResult;
@@ -106,7 +115,7 @@ void AP7Weapon::HitTrace()
 
 		if (IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor))
 		{
-			HitInterface->GetHit(OwnerAsCharacter->GetActorLocation());
+			HitInterface->GetHit(OwnerChar->GetActorLocation());
 		}
 		if (WeaponSound.Hit)
 		{

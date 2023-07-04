@@ -7,9 +7,6 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "P7/Public/AnimNotify/P7AttackEndNotify.h"
-#include "P7/Public/AnimNotify/P7BeamTurningNotify.h"
-#include "P7/Public/AnimNotify/P7BeltSnappingNotify.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
 
@@ -25,13 +22,21 @@ void AP7Character::BeginPlay()
 {
 	Super::BeginPlay();
 	AddMappingContext();
-	InitAnimNotifies();
 	Tags.Add("Player");
 }
 
 void AP7Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AP7Character::AddMappingContext() const
+{
+	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!PlayerController) return;
+	auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
+	if (!Subsystem) return;
+	Subsystem->AddMappingContext(DefaultContext, 0);
 }
 
 void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -63,44 +68,6 @@ void AP7Character::OrientToMovement(const bool bOrient) const
 	if (!MovementComp) return;
 	MovementComp->bOrientRotationToMovement = bOrient;
 	MovementComp->bUseControllerDesiredRotation = !bOrient;
-}
-
-void AP7Character::AddMappingContext() const
-{
-	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!PlayerController) return;
-	auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer());
-	if (!Subsystem) return;
-	Subsystem->AddMappingContext(DefaultContext, 0);
-}
-
-void AP7Character::InitAnimNotifies()
-{
-	TArray<FAnimNotifyEvent> AnimNotifies = AttackMontage->Notifies;
-	for (const auto AnimNotify : AnimNotifies)
-	{
-		if (UP7AttackEndNotify* AttackEndNotify = Cast<UP7AttackEndNotify>(AnimNotify.Notify))
-		{
-			AttackEndNotify->OnAnimEnd.AddUObject(this, &ThisClass::OnAttackEndHandle);
-		}
-	}
-	AnimNotifies.Empty();
-	AnimNotifies = EquipMontage->Notifies;
-	for (const auto AnimNotify : AnimNotifies)
-	{
-		if (UP7BeamTurningNotify* AttackEndNotify = Cast<UP7BeamTurningNotify>(AnimNotify.Notify))
-		{
-			AttackEndNotify->OnBeamTurning.AddUObject(this, &ThisClass::OnBeamTurningHandle);
-		}
-		if (UP7BeltSnappingNotify* AttackEndNotify = Cast<UP7BeltSnappingNotify>(AnimNotify.Notify))
-		{
-			AttackEndNotify->OnBeltSnapping.AddUObject(this, &ThisClass::OnBeltSnappingHandle);
-		}
-		if (UP7AttackEndNotify* AttackEndNotify = Cast<UP7AttackEndNotify>(AnimNotify.Notify))
-		{
-			AttackEndNotify->OnAnimEnd.AddUObject(this, &ThisClass::OnAttackEndHandle);
-		}
-	}
 }
 
 void AP7Character::Move(const FInputActionValue& Value)
@@ -150,34 +117,26 @@ void AP7Character::Grab()
 	}
 }
 
+void AP7Character::GetHit(const FVector& ImpactPoint)
+{
+	Super::GetHit(ImpactPoint);
+}
+
+bool AP7Character::GetIsAttaching()
+{
+	return ActionState == EAS_Attacking;
+}
+
+bool AP7Character::CanAttack()
+{
+	return EquippedWeapon && ActionState == EAS_Unoccupied && CharacterState != ECS_Unequipped;
+}
+
 void AP7Character::Attack()
 {
-	if (!EquippedWeapon || ActionState != EAS_Unoccupied || CharacterState == ECS_Unequipped) return;
-	PlayAttackMontage();
+	Super::Attack();
+	if (!CanAttack()) return;
 	ActionState = EAS_Attacking;
-	EquippedWeapon->OnAttackStartHandle();
-}
-
-void AP7Character::PlayAttackMontage()
-{
-	if (!AttackMontage) return;
-	const FName SectionName = FName(*("Attack" + FString::FormatAsNumber(Section++ % 4 + 1)));
-	PlayAnimMontage(AttackMontage, 1.f, SectionName);
-}
-
-void AP7Character::Jump()
-{
-	Super::Jump();
-
-	if (!GetCharacterMovement()->IsFalling() || bDoubleJump) return;
-	bDoubleJump = true;
-	LaunchCharacter(GetVelocity() + FVector(0.f, 0.f, 700.f), true, true);
-}
-
-void AP7Character::Landed(const FHitResult& Hit)
-{
-	bDoubleJump = false;
-	Super::Landed(Hit);
 }
 
 void AP7Character::SetOverlappingItem(AP7Item* Item)
@@ -187,16 +146,8 @@ void AP7Character::SetOverlappingItem(AP7Item* Item)
 
 void AP7Character::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
+	Super::OnAttackEndHandle(MeshComp);
 	ActionState = EAS_Unoccupied;
-	EquippedWeapon->OnAttackEndHandle();
-
-	GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
-	FTimerDelegate ComboDelegate;
-	ComboDelegate.BindLambda([&]()
-	{
-		Section = 0;
-	});
-	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 5.f, false);
 }
 
 void AP7Character::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp)
