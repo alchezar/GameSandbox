@@ -31,49 +31,56 @@ void AP7Enemy::BeginPlay()
 	check(HealthBarComponent);
 	check(PawnSensing);
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
-	SpawnWeapon();
+	
 	HealthBarComponent->ReactOnDamage(1.f, false);
 	EnemyController = Cast<AAIController>(GetController());
+	SpawnWeapon();
 	ChoosePatrolTarget();
-	ChangeTarget(EES_Patrolling, PatrolTarget);
+	NewTargetBehavior(EES_Patrolling, PatrolTarget);
 }
 
 void AP7Enemy::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	if (EnemyState == EES_Dead) return;
 	EnemyState > EES_Patrolling ? CheckCombatTarget() : CheckPatrolTarget();  
 }
 
 void AP7Enemy::SpawnWeapon()
 {
 	if (!WeaponClass) return;
-	Weapon = GetWorld()->SpawnActor<AP7Weapon>(WeaponClass);
-	if (!Weapon) return;
-	Weapon->Equip(GetMesh(), HandSocketName, this, this);
-	Weapon->AttachToHand(GetMesh(), HandSocketName);
+	EquippedWeapon = GetWorld()->SpawnActor<AP7Weapon>(WeaponClass);
+	check(EquippedWeapon);
+	
+	EquippedWeapon->Equip(GetMesh(), HandSocketName, this, this);
+	EquippedWeapon->AttachToHand(GetMesh(), HandSocketName);
 }
 
 void AP7Enemy::GetHit(const FVector& ImpactPoint)
 {
 	Super::GetHit(ImpactPoint);
+	// if (Attributes->GetIsAlive())
+	// {
+	// 	
+	// }
 }
 
 bool AP7Enemy::GetIsAttaching()
 {
-	return EnemyState == EES_Attaching;
+	return EnemyState >= EES_Attaching;
 }
 
 void AP7Enemy::Attack()
 {
 	Super::Attack();
-	if (!CanAttack()) return;
-	EnemyState = EES_Attaching;
+	EnemyState = EES_Engaged;
 }
 
 void AP7Enemy::Die()
 {
 	Super::Die();
 	HealthBarComponent->ReactOnDamage(0.f, false);
+	EnemyState = EES_Dead;
 }
 
 float AP7Enemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -81,56 +88,60 @@ float AP7Enemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, 
 	Attributes->ReceiveDamage(DamageAmount);
 	HealthBarComponent->ReactOnDamage(Attributes->GetHealthPercent(), true);
 	CombatTarget = EventInstigator->GetPawn();
-	ChangeTarget(EES_Chasing, CombatTarget);
+	NewTargetBehavior(EES_Chasing, CombatTarget);
 	return DamageAmount;
 }
 
 void AP7Enemy::Destroyed()
 {
 	Super::Destroyed();
-	if (Weapon)
+	if (EquippedWeapon)
 	{
-		Weapon->Unequip();
+		EquippedWeapon->Unequip();
 	}
 }
 
-bool AP7Enemy::InTargetRange(const AActor* Target, const float Radius)
+bool AP7Enemy::InsideTargetRadius(const AActor* Target, const float Radius)
 {
 	if (!Target) return false;
-	return FVector::Dist(Target->GetActorLocation(), GetActorLocation()) <= Radius;
+	return Radius > FVector::Dist(Target->GetActorLocation(), GetActorLocation());
 }
 
-void AP7Enemy::ChangeTarget(const EEnemyState NewState, AActor* NewTarget)
+void AP7Enemy::NewTargetBehavior(const EEnemyState NewState, AActor* NewTarget)
 {
 	EnemyState = NewState;
-	GetCharacterMovement()->MaxWalkSpeed = EnemyState > EES_Patrolling ? 600.f : 300.f;
+	GetCharacterMovement()->MaxWalkSpeed = EnemyState > EES_Patrolling ? ChasingSpeed : PatrolSpeed;
 	MoveToTarget(NewTarget);
+}
+
+bool AP7Enemy::CanAttack()
+{
+	return EnemyState != EES_Dead	   &&
+		   EnemyState <= EES_Chasing   &&
+		   InsideTargetRadius(CombatTarget, AttackRadius);
 }
 
 void AP7Enemy::CheckCombatTarget()
 {
-	if (!InTargetRange(CombatTarget, CombatRadius))
+	if (!InsideTargetRadius(CombatTarget, CombatRadius))
 	{
-		/* Outside combat radius, loose interest */
-		HealthBarComponent->SetVisibility(false);
-		CombatTarget = nullptr;
-		ChangeTarget(EES_Patrolling, PatrolTarget);
+		LoseInterest();
+		NewTargetBehavior(EES_Patrolling, PatrolTarget);
 	}
-	else if (!InTargetRange(CombatTarget, AttackRadius) && EnemyState != EES_Chasing)
+	else if (!InsideTargetRadius(CombatTarget, AttackRadius) && EnemyState != EES_Chasing)
 	{
 		/* Inside combat radius but outside attack radius */
-		ChangeTarget(EES_Chasing, CombatTarget);
+		NewTargetBehavior(EES_Chasing, CombatTarget);
 	}
-	else if (InTargetRange(CombatTarget, AttackRadius) && EnemyState != EES_Attaching)
+	else if (CanAttack())
 	{
-		//Play anim montage
 		Attack();
 	}
 }
 
 void AP7Enemy::CheckPatrolTarget()
 {
-	if (!InTargetRange(PatrolTarget, PatrolRadius)) return;
+	if (!InsideTargetRadius(PatrolTarget, PatrolAcceptRadius)) return;
 	ChoosePatrolTarget();
 	const float Waiting = FMath::RandRange(PatrolTime.Min, PatrolTime.Max);
 	GetWorld()->GetTimerManager().SetTimer(PatrolTimer, this, &ThisClass::PatrolTimerFinished, Waiting);
@@ -156,17 +167,26 @@ void AP7Enemy::PatrolTimerFinished()
 void AP7Enemy::MoveToTarget(AActor* Target)
 {
 	if (!Target || !EnemyController) return;
-	EnemyController->MoveToActor(Target, 15.f);
+	EnemyController->MoveToActor(Target, 60.f);
 }
 
 void AP7Enemy::OnSeePawnHandle(APawn* Pawn)
 {
-	if (!Pawn->ActorHasTag("Player")) return;
+	if (!Pawn->ActorHasTag("Player") || EnemyState != EES_Patrolling) return;
 	
 	GetWorld()->GetTimerManager().ClearTimer(PatrolTimer);
-	if (EnemyState == EES_Patrolling)
-	{
-		CombatTarget = Pawn;
-		ChangeTarget(EES_Chasing, CombatTarget);
-	}
+	CombatTarget = Pawn;
+	NewTargetBehavior(EES_Chasing, CombatTarget);
+}
+
+void AP7Enemy::LoseInterest()
+{
+	HealthBarComponent->SetVisibility(false);
+	CombatTarget = nullptr;
+}
+
+void AP7Enemy::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
+{
+	Super::OnAttackEndHandle(MeshComp);
+	if (EnemyState > EES_Chasing) EnemyState = EES_Chasing;
 }

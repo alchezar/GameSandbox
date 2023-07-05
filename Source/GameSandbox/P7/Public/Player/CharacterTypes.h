@@ -26,9 +26,11 @@ enum EActionState : uint8
 UENUM(BlueprintType)
 enum EEnemyState : uint8
 {
+	EES_Dead	   UMETA(DisplayName = "Dead"),
 	EES_Patrolling UMETA(DisplayName = "Patrolling"),
 	EES_Chasing    UMETA(DisplayName = "Chasing"),
-	EES_Attaching  UMETA(DisplayName = "Attacking")
+	EES_Attaching  UMETA(DisplayName = "Attacking"),
+	EES_Engaged    UMETA(DisplayName = "Engaged")
 };
 
 
@@ -119,8 +121,8 @@ struct FP7PatrolTime
 {
 	GENERATED_BODY()
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (Units = "Seconds"))
 	float Min = 2.f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (Units = "Seconds"))
 	float Max = 5.f;
 };

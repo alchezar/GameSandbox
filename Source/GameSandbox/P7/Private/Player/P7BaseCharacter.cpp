@@ -64,15 +64,16 @@ bool AP7BaseCharacter::GetIsAttaching()
 void AP7BaseCharacter::Attack()
 {
 	if (!CanAttack()) return;
-	PlayAttackMontage();
+	PlayMontageSection(AttackMontage);
 	EquippedWeapon->OnAttackStartHandle();
 }
 
-void AP7BaseCharacter::PlayAttackMontage()
+void AP7BaseCharacter::PlayMontageSection(UAnimMontage* Montage)
 {
-	if (!AttackMontage) return;
-	const FName SectionName = FName(*("Attack" + FString::FormatAsNumber(Section++ % 4 + 1)));
-	PlayAnimMontage(AttackMontage, 1.f, SectionName);
+	if (!Montage) return;
+	const int32 SectionsNum = Montage->GetNumSections();
+	const FName SectionName = SectionsNum > 1 ? Montage->GetSectionName(Section++ % SectionsNum) : NAME_None;
+	PlayAnimMontage(Montage, 1.f, SectionName);
 }
 
 void AP7BaseCharacter::PlayHitReactMontage(const FName& SectionName)
@@ -85,6 +86,7 @@ void AP7BaseCharacter::Die()
 	/* Ragdoll */
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->MovementState.bCanJump = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetMesh()->SetAllBodiesSimulatePhysics(true);
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 	SetLifeSpan(5.f);

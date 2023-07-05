@@ -38,7 +38,7 @@ protected:
 	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp);
 	void InitAnimNotifies();
-	void PlayAttackMontage();
+	void PlayMontageSection(UAnimMontage* Montage);
 	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	double AngleBetweenVectors(const FVector& Vector1, const FVector& Vector2) const;

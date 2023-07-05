@@ -29,18 +29,21 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Attack() override;
 	virtual void Die() override;
+	virtual bool CanAttack() override;
+	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;
 	UFUNCTION()
 	void OnSeePawnHandle(APawn* Pawn);
 	
 private:
-	bool InTargetRange(const AActor* Target, const float Radius);
-	void ChangeTarget(EEnemyState NewState, AActor* NewTarget);
+	bool InsideTargetRadius(const AActor* Target, const float Radius);
+	void NewTargetBehavior(EEnemyState NewState, AActor* NewTarget);
 	void CheckCombatTarget();
 	void CheckPatrolTarget();
 	void ChoosePatrolTarget();
 	void PatrolTimerFinished();
 	void MoveToTarget(AActor* Target);
 	void SpawnWeapon();
+	void LoseInterest();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -55,22 +58,25 @@ protected:
 	TArray<AActor*> PatrolTargets;
 	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
 	FP7PatrolTime PatrolTime;
-	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
-	float PatrolRadius = 200.f;	
-	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
-	float CombatRadius = 500.f;
-	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Moving", meta = (Units = "Centimeters"))
+	float PatrolAcceptRadius = 200.f;	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Moving", meta = (Units = "Centimeters"))
+	float CombatRadius = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Moving", meta = (Units = "Centimeters"))
 	float AttackRadius = 150.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving", meta = (Units = "CentimetersPerSecond"))
+	float PatrolSpeed = 300.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving", meta = (Units = "CentimetersPerSecond"))
+	float ChasingSpeed = 600.f;
 	
 private:
 	EEnemyState EnemyState = EES_Patrolling;
 	FTimerHandle PatrolTimer;
+	FTimerHandle AttackTimer;
 	UPROPERTY()
 	AActor* PatrolTarget;
 	UPROPERTY()
 	AActor* CombatTarget;
 	UPROPERTY()
 	AAIController* EnemyController;
-	UPROPERTY()
-	AP7Weapon* Weapon;
 };
