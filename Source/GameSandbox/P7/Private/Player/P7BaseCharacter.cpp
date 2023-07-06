@@ -13,6 +13,8 @@ AP7BaseCharacter::AP7BaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	Attributes = CreateDefaultSubobject<UP7AttributeComponent>("AttributesComponent");
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
+	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
 void AP7BaseCharacter::BeginPlay()
@@ -51,14 +53,26 @@ void AP7BaseCharacter::GetHit(const FVector& ImpactPoint)
 	Attributes->GetIsAlive() ? DirectionalHitReact(ImpactPoint) : Die();
 }
 
-bool AP7BaseCharacter::CanAttack()
-{
-	return EquippedWeapon != nullptr;
-}
-
 bool AP7BaseCharacter::GetIsAttaching()
 {
 	return false;
+}
+
+float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Attributes->ReceiveDamage(DamageAmount);
+	return DamageAmount;
+}
+
+float AP7BaseCharacter::GetMovementDirectionAngle()
+{
+	if (FMath::IsNearlyZero(GetVelocity().Size2D())) return 0.f;
+	return AngleBetweenVectors(GetActorForwardVector(), GetVelocity().GetSafeNormal());
+}
+
+void AP7BaseCharacter::SetAnimSection(const int32 StartSection)
+{
+	Section = StartSection;
 }
 
 void AP7BaseCharacter::Attack()
@@ -66,19 +80,6 @@ void AP7BaseCharacter::Attack()
 	if (!CanAttack()) return;
 	PlayMontageSection(AttackMontage);
 	EquippedWeapon->OnAttackStartHandle();
-}
-
-void AP7BaseCharacter::PlayMontageSection(UAnimMontage* Montage)
-{
-	if (!Montage) return;
-	const int32 SectionsNum = Montage->GetNumSections();
-	const FName SectionName = SectionsNum > 1 ? Montage->GetSectionName(Section++ % SectionsNum) : NAME_None;
-	PlayAnimMontage(Montage, 1.f, SectionName);
-}
-
-void AP7BaseCharacter::PlayHitReactMontage(const FName& SectionName)
-{
-	PlayAnimMontage(HitReactMontage, 1.f, SectionName);
 }
 
 void AP7BaseCharacter::Die()
@@ -93,24 +94,30 @@ void AP7BaseCharacter::Die()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
-void AP7BaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
+bool AP7BaseCharacter::CanAttack()
 {
-	const FVector Forward = GetActorForwardVector();
-	FVector ToHit = (ImpactPoint - GetActorLocation()).GetSafeNormal();
-	ToHit.Z = Forward.Z;
-	const double Angle = AngleBetweenVectors(Forward, ToHit);
-
-	FName SectionName = FName("FromBack");
-	if		(Angle >=  -45.f && Angle <   45.f) SectionName = FName("FromFront");
-	else if (Angle >= -135.f && Angle <  -45.f) SectionName = FName("FromLeft");
-	else if (Angle >=   45.f && Angle <  135.f) SectionName = FName("FromRight");
-	PlayHitReactMontage(SectionName);
+	return EquippedWeapon != nullptr;
 }
 
-void AP7BaseCharacter::SetAnimSection(const int32 StartSection)
+void AP7BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
-	Section = StartSection;
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->OnAttackEndHandle();
+	}
+
+	GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
+	FTimerDelegate ComboDelegate;
+	ComboDelegate.BindLambda([&]()
+	{
+		SetAnimSection(0);
+	});
+	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 5.f, false);
 }
+
+void AP7BaseCharacter::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) {}
+
+void AP7BaseCharacter::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) {}
 
 void AP7BaseCharacter::InitAnimNotifies()
 {
@@ -141,30 +148,31 @@ void AP7BaseCharacter::InitAnimNotifies()
 	}
 }
 
-void AP7BaseCharacter::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
+void AP7BaseCharacter::PlayMontageSection(UAnimMontage* Montage)
 {
-	if (EquippedWeapon)
-	{
-		EquippedWeapon->OnAttackEndHandle();
-	}
-
-	GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
-	FTimerDelegate ComboDelegate;
-	ComboDelegate.BindLambda([&]()
-	{
-		SetAnimSection(0);
-	});
-	GetWorld()->GetTimerManager().SetTimer(ComboTimer, ComboDelegate, 5.f, false);
+	if (!Montage) return;
+	const int32 SectionsNum = Montage->GetNumSections();
+	const FName SectionName = SectionsNum > 1 ? Montage->GetSectionName(Section++ % SectionsNum) : NAME_None;
+	PlayAnimMontage(Montage, 1.f, SectionName);
 }
 
-void AP7BaseCharacter::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) {}
-
-void AP7BaseCharacter::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) {}
-
-float AP7BaseCharacter::GetMovementDirectionAngle()
+void AP7BaseCharacter::PlayHitReactMontage(const FName& SectionName)
 {
-	if (FMath::IsNearlyZero(GetVelocity().Size2D())) return 0.f;
-	return AngleBetweenVectors(GetActorForwardVector(), GetVelocity().GetSafeNormal());
+	PlayAnimMontage(HitReactMontage, 1.f, SectionName);
+}
+
+void AP7BaseCharacter::DirectionalHitReact(const FVector& ImpactPoint)
+{
+	const FVector Forward = GetActorForwardVector();
+	FVector ToHit = (ImpactPoint - GetActorLocation()).GetSafeNormal();
+	ToHit.Z = Forward.Z;
+	const double Angle = AngleBetweenVectors(Forward, ToHit);
+
+	FName SectionName = FName("FromBack");
+	if		(Angle >=  -45.f && Angle <   45.f) SectionName = FName("FromFront");
+	else if (Angle >= -135.f && Angle <  -45.f) SectionName = FName("FromLeft");
+	else if (Angle >=   45.f && Angle <  135.f) SectionName = FName("FromRight");
+	PlayHitReactMontage(SectionName);
 }
 
 double AP7BaseCharacter::AngleBetweenVectors(const FVector& Vector1, const FVector& Vector2) const

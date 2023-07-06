@@ -40,11 +40,14 @@ void AP7Weapon::Tick(const float DeltaTime)
 	HitTrace();
 }
 
+void AP7Weapon::SwitchWeapon(const bool bOn) {}
+
+void AP7Weapon::SwitchWeaponHard(const bool bOn) {}
+
 void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, AActor* NewOwner, APawn* NewInstigator)
 {
 	SetItemState(EItemState::EIS_Equipped);
 	SphereTrigger->SetCollisionResponseToAllChannels(ECR_Ignore);
-	SwitchRibbon(true);
 	AttachToBelt(InParent, SocketName);
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
@@ -78,6 +81,14 @@ void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName
 	ItemMesh->AddRelativeRotation(Offset.RotationOffset);
 }
 
+void AP7Weapon::OnAttackStartHandle() {}
+
+void AP7Weapon::OnAttackEndHandle()
+{
+	SetLastTickLocation(FVector::ZeroVector);
+	bAlreadyHit = false;
+}
+
 void AP7Weapon::SetWeaponCollision(const ECollisionEnabled::Type CollisionType)
 {
 	WeaponBox->SetCollisionEnabled(CollisionType);
@@ -88,28 +99,37 @@ void AP7Weapon::SetLastTickLocation(const FVector& LastLocation)
 	LastTickLocation = LastLocation;
 }
 
+void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
+
+void AP7Weapon::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
+
+void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
+
+void AP7Weapon::CreateFields(const FVector& FieldLocation)
+{
+	RadialVector->SetRadialVector(FieldMagnitude, FieldLocation);
+	RadialFalloff->SetRadialFalloff(FieldMagnitude, 0.8f, 1.f, 0.f, 200.f, FieldLocation, EFieldFalloffType::Field_FallOff_None);
+	MetaDataFilter->ObjectType = EFieldObjectType::Field_Object_Destruction;
+
+	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_ExternalClusterStrain, nullptr, RadialFalloff);
+	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearForce, MetaDataFilter, RadialVector);
+
+	DrawDebugCapsule(GetWorld(), FieldLocation, 5.f, 10.f, FRotator::ZeroRotator.Quaternion(), FColor::Red, false, 5.f);	
+}
+
 void AP7Weapon::HitTrace()
 {
-	if (!GetOwner() || bAlreadyHit) return;
+	if (bAlreadyHit || !GetOwner()) return;
 	OwnerChar = OwnerChar ? OwnerChar : Cast<AP7BaseCharacter>(GetOwner());
 	if (!OwnerChar || !OwnerChar->GetIsAttaching()) return;
 	
-	const bool bFirstTick = LastTickLocation == FVector::ZeroVector;
-	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();	
 	FHitResult HitResult;
-	FCollisionShape SweepShape;
-	SweepShape.SetCapsule(2.f, 44.f);;
-
-	GetWorld()->SweepSingleByChannel(
-		HitResult,
-		!bFirstTick ? LastTickLocation : CurrentTickLocation,
-		CurrentTickLocation,
-		GetActorRotation().Quaternion(),
-		ECC_Visibility,
-		SweepShape);
+	SweepCapsule(HitResult);
 
 	if (AActor* HitActor = HitResult.GetActor())
 	{
+		if (GetOwner()->ActorHasTag("Enemy") && HitActor->ActorHasTag("Enemy")) return;
+		
 		bAlreadyHit = true;
 		UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(), this, nullptr);
 
@@ -124,44 +144,23 @@ void AP7Weapon::HitTrace()
 		SplashEffect(HitResult);
 		CreateFields(HitResult.ImpactPoint);
 	}
+	
+}
+
+void AP7Weapon::SweepCapsule(FHitResult& HitResult)
+{
+	const FVector CurrentTickLocation = WeaponBox->GetComponentLocation();	
+	const FVector StartLocation = LastTickLocation == FVector::ZeroVector ? CurrentTickLocation : LastTickLocation;
+	const FQuat   Rotation = GetActorRotation().Quaternion();
+	
+	FCollisionShape SweepShape;
+	SweepShape.SetCapsule(2.f, 44.f);;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(GetOwner());
+	
+	GetWorld()->SweepSingleByChannel(
+		HitResult, StartLocation, CurrentTickLocation, Rotation, ECC_Visibility, SweepShape, QueryParams);
+	
 	SetLastTickLocation(CurrentTickLocation);
 }
-
-void AP7Weapon::OnAttackStartHandle()
-{
-	// SetWeaponCollision(ECollisionEnabled::QueryOnly);
-	SwitchRibbon(true);
-}
-
-void AP7Weapon::OnAttackEndHandle()
-{
-	// SetWeaponCollision(ECollisionEnabled::NoCollision);
-	SetLastTickLocation(FVector::ZeroVector);
-	SwitchRibbon(false);
-	bAlreadyHit = false;
-}
-
-void AP7Weapon::CreateFields(const FVector& FieldLocation)
-{
-	RadialVector->SetRadialVector(FieldMagnitude, FieldLocation);
-	RadialFalloff->SetRadialFalloff(FieldMagnitude, 0.8f, 1.f, 0.f, 200.f, FieldLocation, EFieldFalloffType::Field_FallOff_None);
-	MetaDataFilter->ObjectType = EFieldObjectType::Field_Object_Destruction;
-
-	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_ExternalClusterStrain, nullptr, RadialFalloff);
-	FieldSystem->ApplyPhysicsField(true, EFieldPhysicsType::Field_LinearForce, MetaDataFilter, RadialVector);
-
-	DrawDebugCapsule(GetWorld(), FieldLocation, 5.f, 10.f, FRotator::ZeroRotator.Quaternion(), FColor::Red, false, 5.f);	
-}
-
-void AP7Weapon::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {}
-
-void AP7Weapon::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) {}
-
-void AP7Weapon::SplashEffect(const FHitResult& HitResult) {}
-
-void AP7Weapon::SwitchWeapon(const bool bOn) {}
-
-void AP7Weapon::SwitchWeaponHard(const bool bOn) {}
-
-void AP7Weapon::SwitchRibbon(const bool bOn) {}
 

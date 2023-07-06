@@ -25,9 +25,11 @@ public:
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual void GetHit(const FVector& ImpactPoint) override;
 	virtual bool GetIsAttaching();
-	FORCEINLINE bool  GetIsDoubleJump() const { return bDoubleJump; };
-	void SetAnimSection(const int32 StartSection);
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	FORCEINLINE bool GetIsDoubleJump() const { return bDoubleJump; };
+	FORCEINLINE UP7AttributeComponent* GetAttributes() const { return Attributes; };
 	float GetMovementDirectionAngle();
+	void SetAnimSection(const int32 StartSection);
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,6 +39,8 @@ protected:
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp);
+
+private:
 	void InitAnimNotifies();
 	void PlayMontageSection(UAnimMontage* Montage);
 	void PlayHitReactMontage(const FName& SectionName);
@@ -44,12 +48,12 @@ protected:
 	double AngleBetweenVectors(const FVector& Vector1, const FVector& Vector2) const;
 
 protected:	
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component") // enemy
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UP7AttributeComponent* Attributes;
 	
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon") // char
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	FName HandSocketName = "GripPoint";
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon") // char
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	FName BeltSocketName = "BeltSocket";
 
 #pragma region Montage
@@ -57,7 +61,7 @@ protected:
 	UAnimMontage* AttackMontage{};
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
 	UAnimMontage* EquipMontage{};
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage") // enemy
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
 	UAnimMontage* HitReactMontage{};
 #pragma endregion // Montage
 
@@ -65,7 +69,7 @@ protected:
 	AP7Weapon* EquippedWeapon{};
 
 private:
-	bool bDoubleJump = false; // char
+	bool bDoubleJump = false;
 	int32 Section = 0;
 	FTimerHandle ComboTimer;
 };

@@ -25,12 +25,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SwitchWeapon(const bool bOn);
 	virtual void SwitchWeaponHard(const bool bOn);
-	void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
+	virtual void OnAttackStartHandle();
+	virtual void OnAttackEndHandle();
+	virtual void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator);
 	void Unequip();
 	void AttachToHand(USceneComponent* InParent, const FName SocketName);
 	void AttachToBelt(USceneComponent* InParent, const FName SocketName);
-	void OnAttackStartHandle();
-	void OnAttackEndHandle();
 	FORCEINLINE ECharacterState GetWeaponState() const { return WeaponState; };
 	FORCEINLINE UBoxComponent* GetWeaponBox() const { return WeaponBox; };
 	FORCEINLINE FSnapOffset GetHandSnapOffset() const { return HandSnapOffset; };
@@ -44,12 +44,12 @@ public:
 	
 protected:
 	virtual void BeginPlay() override;
-	virtual void SwitchRibbon(const bool bOn);
 	virtual void SplashEffect(const FHitResult& HitResult);
 	void CreateFields(const FVector& FieldLocation);
 
 private:
 	void HitTrace();
+	void SweepCapsule(FHitResult& HitResult);
 	void AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset) const;
 
 protected:

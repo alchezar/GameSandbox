@@ -22,7 +22,7 @@ AP7Item::AP7Item()
 void AP7Item::BeginPlay()
 {
 	Super::BeginPlay();
-
+	check(SphereTrigger);
 	SphereTrigger->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereBeginOverlap);
 	SphereTrigger->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnSphereEndOverlap);
 }

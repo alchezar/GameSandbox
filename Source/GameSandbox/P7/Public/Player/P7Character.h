@@ -39,6 +39,7 @@ protected:
 	void Grab();
 
 private:
+	void EquipWeapon(AP7Weapon* Weapon);
 	void SetupComponents();
 	void OrientToMovement(const bool bOrient) const;
 	void AddMappingContext() const;

@@ -8,6 +8,7 @@
 #include "Components/DecalComponent.h"
 #include "Components/PointLightComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "P7/Public/Player/P7Enemy.h"
 
 AP7LightSaber::AP7LightSaber()
 {
@@ -99,6 +100,45 @@ void AP7LightSaber::SwitchingBeamSmoothly()
 	GetWorldTimerManager().ClearTimer(BeamTimer);
 }
 
+void AP7LightSaber::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	bBladeOverlapped = true;
+	OverlappedActors.AddUnique(OtherActor);
+}
+
+void AP7LightSaber::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	OverlappedActors.RemoveSingle(OtherActor);
+	if (OverlappedActors.IsEmpty())
+	{
+		bBladeOverlapped = false;
+	}
+	PlasmaContacts.Empty();
+}
+
+void AP7LightSaber::OnAttackStartHandle()
+{
+	Super::OnAttackStartHandle();
+	SwitchRibbon(true);
+}
+
+void AP7LightSaber::OnAttackEndHandle()
+{
+	Super::OnAttackEndHandle();
+	SwitchRibbon(false);
+}
+
+void AP7LightSaber::Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator)
+{
+	Super::Equip(InParent, SocketName, NewOwner, NewInstigator);
+	SwitchRibbon(true);
+	/* I prefer to let the weapon choose its color instead of the character */
+	if (const AP7Enemy* EnemyOwner = Cast<AP7Enemy>(GetOwner()))
+	{
+		SetSaberColor(EnemyOwner->GetTeamColor());
+	}
+}
+
 void AP7LightSaber::SetSaberColor(const FLinearColor NewColor)
 {
 	if (!Beam || !SaberLight) return;
@@ -109,24 +149,24 @@ void AP7LightSaber::SetSaberColor(const FLinearColor NewColor)
 
 	SaberColorMaterial->SetVectorParameterValue(ColorParameterName, Color);
 	SaberLight->SetLightColor(Color);
+
+	if (RibbonComponent)
+	{
+		RibbonComponent->SetVariableLinearColor(Ribbon.ColorName, NewColor);
+	}
 }
 
 void AP7LightSaber::SwitchRibbon(const bool bOn)
 {
 	if (RibbonComponent)
 	{
-		if (!bOn)
-		{
-			RibbonComponent->Deactivate();
-			return;
-		}
-		RibbonComponent->Activate();
+		bOn ? RibbonComponent->Activate() : RibbonComponent->Deactivate();
 		return;
 	}
 	/* Create niagara on the first try */
+	if (!Ribbon.Effect) return;
 	RibbonComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
 		Ribbon.Effect, GetRootComponent(), NAME_None, FVector(0.f, 0.f, 61.f), FRotator::ZeroRotator, EAttachLocation::SnapToTarget, false);
-	if (!RibbonComponent) return;
 
 	RibbonComponent->SetVariableLinearColor(Ribbon.ColorName, Color);
 }
@@ -140,51 +180,30 @@ void AP7LightSaber::SplashEffect(const FHitResult& HitResult)
 	}
 }
 
-void AP7LightSaber::OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	bBladeTouch = true;
-	OverlappedActors.AddUnique(OtherActor);
-}
-
-void AP7LightSaber::OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
-{
-	OverlappedActors.RemoveSingle(OtherActor);
-	if (OverlappedActors.IsEmpty())
-	{
-		bBladeTouch = false;
-	}
-	PlasmaContacts.Empty();
-}
-
 void AP7LightSaber::TouchTrace()
 {
-	if (!bBladeTouch) return;
+	if (!bBladeOverlapped) return;
+	FHitResult HitResult;
+	SweepSphere(HitResult);
+	/* Decals & splashes but without damage */
+	if (!HitResult.bBlockingHit) return;
+	SplashEffect(HitResult);
+	PlasmaDecal(HitResult);
+}
 
+void AP7LightSaber::SweepSphere(FHitResult& HitResult)
+{
 	const FVector Start = TraceStart->GetComponentLocation();
 	const FVector End = TraceEnd->GetComponentLocation();
-	FQuat Rotation = TraceStart->GetComponentRotation().Quaternion();
+	const FQuat Rotation = TraceStart->GetComponentRotation().Quaternion();
 
 	FCollisionShape SphereShape;
 	SphereShape.SetSphere(5.f);
 	FCollisionQueryParams QueryParams;
 	QueryParams.AddIgnoredActor(this);
 
-	FHitResult HitResult;
-	GetWorld()->SweepSingleByChannel(
-		HitResult,
-		Start,
-		End,
-		Rotation,
-		ECC_Visibility,
-		SphereShape,
-		QueryParams);
+	GetWorld()->SweepSingleByChannel(HitResult, Start, End, Rotation, ECC_Visibility, SphereShape, QueryParams);
 
-	if (HitResult.bBlockingHit)
-	{
-		/* Decals & splashes but without damage */
-		SplashEffect(HitResult);
-		PlasmaDecal(HitResult);
-	}
 }
 
 void AP7LightSaber::PlasmaDecal(const FHitResult& HitResult)

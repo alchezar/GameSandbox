@@ -24,25 +24,28 @@ public:
 	virtual void Destroyed() override;
 	virtual void GetHit(const FVector& ImpactPoint) override;
 	virtual bool GetIsAttaching() override;
+	FORCEINLINE FColor GetTeamColor() const { return TeamColor; };
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Attack() override;
 	virtual void Die() override;
+	virtual void Attack() override;
 	virtual bool CanAttack() override;
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;
 	UFUNCTION()
 	void OnSeePawnHandle(APawn* Pawn);
 	
 private:
-	bool InsideTargetRadius(const AActor* Target, const float Radius);
+	void InitializeEnemy();
+	void SpawnWeapon();
+	/* AI Behavior */
+	bool InsideTargetRadius(const AActor* Target, const float Radius) const;
+	void MoveToTarget(AActor* Target);
 	void NewTargetBehavior(EEnemyState NewState, AActor* NewTarget);
 	void CheckCombatTarget();
 	void CheckPatrolTarget();
 	void ChoosePatrolTarget();
 	void PatrolTimerFinished();
-	void MoveToTarget(AActor* Target);
-	void SpawnWeapon();
 	void LoseInterest();
 
 protected:
@@ -50,10 +53,10 @@ protected:
 	UP7HealthBarComponent* HealthBarComponent;	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensing;
-
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	TSubclassOf<AP7Weapon> WeaponClass;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
+	FColor TeamColor = FColor::Red;	
 	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
 	TArray<AActor*> PatrolTargets;
 	UPROPERTY(EditAnywhere, Category = "C++ | Moving")

@@ -22,16 +22,20 @@ public:
 	virtual void SwitchWeaponHard(const bool bOn) override;
 	virtual void OnWeaponBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void OnWeaponEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex) override;
+	virtual void OnAttackStartHandle() override;
+	virtual void OnAttackEndHandle() override;
+	virtual void Equip(USceneComponent* InParent, FName SocketName, AActor* NewOwner, APawn* NewInstigator) override;
+	void SetSaberColor(const FLinearColor NewColor);
 	
 protected:
 	virtual void BeginPlay() override;
-	virtual void SwitchRibbon(const bool bOn) override;
 	virtual void SplashEffect(const FHitResult& HitResult) override;
+	void SwitchRibbon(const bool bOn);
 
 private:
 	void SwitchingBeamSmoothly();
-	void SetSaberColor(const FLinearColor NewColor);
 	void TouchTrace();
+	void SweepSphere(FHitResult& HitResult);
 	void PlasmaDecal(const FHitResult& HitResult);
 	
 protected:
@@ -68,7 +72,7 @@ private:
 	UNiagaraComponent* RibbonComponent;
 	UPROPERTY()
 	UAudioComponent* HummingSound;
-	bool bBladeTouch = false;
+	bool bBladeOverlapped = false;
 	UPROPERTY()
 	TArray<AActor*> OverlappedActors;
 	TArray<FP7PlasmaSpawn> PlasmaContacts;
