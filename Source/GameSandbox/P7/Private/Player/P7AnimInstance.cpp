@@ -21,5 +21,6 @@ void UP7AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bJump = MovementComponent->IsFalling();
 	Direction = Character->GetMovementDirectionAngle();
 	bDoubleJump = Character->GetIsDoubleJump();
+	bBlock = Character->GetIsBlocked();
 	CharacterState = Player ? Player->GetCharacterState() : ECS_OneHanded;
 }

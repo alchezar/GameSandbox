@@ -30,11 +30,11 @@ void AP7BreakableActor::BeginPlay()
 	GeometryCollection->OnChaosBreakEvent.AddDynamic(this, &ThisClass::OnBreakHandle);
 }
 
-void AP7BreakableActor::GetHit(const FVector& ImpactPoint)
+void AP7BreakableActor::GetHit(const FVector& HitterLocation)
 {
 	if (!GetWorld() || !TreasureClass) return;
 	
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SmashSound, ImpactPoint);
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SmashSound, HitterLocation);
 	const FVector SpawnLocation = GetActorLocation() + FVector(0.f, 0.f, 100.f);
 	const FRotator SpawnRotation = GetActorRotation() + FRotator(90.f, 0.f, 0.f);
 	GetWorld()->SpawnActor<AP7Treasure>(TreasureClass, SpawnLocation, SpawnRotation);

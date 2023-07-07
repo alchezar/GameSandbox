@@ -31,6 +31,8 @@ protected:
 	bool bJump = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	bool bDoubleJump = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	bool bBlock = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | State")
 	TEnumAsByte<ECharacterState> CharacterState = ECharacterState::ECS_Unequipped;
 

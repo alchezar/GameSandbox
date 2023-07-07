@@ -23,13 +23,15 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Jump() override;
 	virtual void Landed(const FHitResult& Hit) override;
-	virtual void GetHit(const FVector& ImpactPoint) override;
+	virtual void GetHit(const FVector& HitterLocation) override;
 	virtual bool GetIsAttaching();
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	FORCEINLINE bool GetIsDoubleJump() const { return bDoubleJump; };
+	FORCEINLINE bool GetIsBlocked() const { return bBlocking; };
 	FORCEINLINE UP7AttributeComponent* GetAttributes() const { return Attributes; };
 	float GetMovementDirectionAngle();
 	void SetAnimSection(const int32 StartSection);
+	void SetIsBlocked(const bool bBlock);
 
 protected:
 	virtual void BeginPlay() override;
@@ -39,7 +41,8 @@ protected:
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp);
-
+	virtual void OnHitReactEndHandle(USkeletalMeshComponent* MeshComp);
+	
 private:
 	void InitAnimNotifies();
 	void PlayMontageSection(UAnimMontage* Montage);
@@ -58,18 +61,21 @@ protected:
 
 #pragma region Montage
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
-	UAnimMontage* AttackMontage{};
+	UAnimMontage* AttackMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
-	UAnimMontage* EquipMontage{};
+	UAnimMontage* EquipMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
-	UAnimMontage* HitReactMontage{};
+	UAnimMontage* HitReactMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* BlockingHitMontage;
 #pragma endregion // Montage
 
 	UPROPERTY(VisibleInstanceOnly)
-	AP7Weapon* EquippedWeapon{};
+	AP7Weapon* EquippedWeapon;
 
 private:
 	bool bDoubleJump = false;
+	bool bBlocking = false;
 	int32 Section = 0;
 	FTimerHandle ComboTimer;
 };

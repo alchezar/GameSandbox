@@ -19,7 +19,7 @@ class GAMESANDBOX_API AP7BreakableActor : public AActor, public IP7HitInterface
 
 public:
 	AP7BreakableActor();
-	virtual void GetHit(const FVector& ImpactPoint) override;
+	virtual void GetHit(const FVector& HitterLocation) override;
 
 protected:
 	virtual void BeginPlay() override;

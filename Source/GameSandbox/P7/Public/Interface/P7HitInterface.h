@@ -19,5 +19,5 @@ class GAMESANDBOX_API IP7HitInterface
 	GENERATED_BODY()
 
 public:
-	virtual void GetHit(const FVector& ImpactPoint) = 0;
+	virtual void GetHit(const FVector& HitterLocation) = 0;
 };

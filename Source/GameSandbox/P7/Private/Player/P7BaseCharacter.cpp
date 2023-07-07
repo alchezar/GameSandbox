@@ -48,9 +48,22 @@ void AP7BaseCharacter::Landed(const FHitResult& Hit)
 	Super::Landed(Hit);
 }
 
-void AP7BaseCharacter::GetHit(const FVector& ImpactPoint)
+void AP7BaseCharacter::GetHit(const FVector& HitterLocation)
 {
-	Attributes->GetIsAlive() ? DirectionalHitReact(ImpactPoint) : Die();
+	if (!Attributes->GetIsAlive())
+	{
+		Die();
+		return;
+	}
+	if (!bBlocking)
+	{
+		DirectionalHitReact(HitterLocation);
+		return;
+	}	
+	if (BlockingHitMontage) /* Now its blocking */
+	{
+		PlayAnimMontage(BlockingHitMontage);
+	}
 }
 
 bool AP7BaseCharacter::GetIsAttaching()
@@ -60,6 +73,7 @@ bool AP7BaseCharacter::GetIsAttaching()
 
 float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (bBlocking) return 0.f;
 	Attributes->ReceiveDamage(DamageAmount);
 	return DamageAmount;
 }
@@ -73,6 +87,11 @@ float AP7BaseCharacter::GetMovementDirectionAngle()
 void AP7BaseCharacter::SetAnimSection(const int32 StartSection)
 {
 	Section = StartSection;
+}
+
+void AP7BaseCharacter::SetIsBlocked(const bool bBlock)
+{
+	bBlocking = bBlock;
 }
 
 void AP7BaseCharacter::Attack()
@@ -119,6 +138,8 @@ void AP7BaseCharacter::OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) {}
 
 void AP7BaseCharacter::OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) {}
 
+void AP7BaseCharacter::OnHitReactEndHandle(USkeletalMeshComponent* MeshComp) {}
+
 void AP7BaseCharacter::InitAnimNotifies()
 {
 	TArray<FAnimNotifyEvent> AnimNotifies = AttackMontage->Notifies;
@@ -144,6 +165,15 @@ void AP7BaseCharacter::InitAnimNotifies()
 		if (UP7AttackEndNotify* AttackEndNotify = Cast<UP7AttackEndNotify>(AnimNotify.Notify))
 		{
 			AttackEndNotify->OnAnimEnd.AddUObject(this, &ThisClass::OnAttackEndHandle);
+		}
+	}
+	AnimNotifies.Empty();
+	AnimNotifies = HitReactMontage->Notifies;
+	for(const FAnimNotifyEvent& AnimNotify : AnimNotifies)
+	{
+		if (UP7AttackEndNotify* AnimEndNotify = Cast<UP7AttackEndNotify>(AnimNotify.Notify))
+		{
+			AnimEndNotify->OnAnimEnd.AddUObject(this, &ThisClass::OnHitReactEndHandle);
 		}
 	}
 }

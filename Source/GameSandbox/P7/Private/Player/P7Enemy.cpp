@@ -5,7 +5,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P7/Public/Component/P7AttributeComponent.h"
-#include "P7/Public/Item/Weapon/P7LightSaber.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Widget/Component/P7HealthBarComponent.h"
 #include "Perception/PawnSensingComponent.h"
@@ -15,7 +14,6 @@ AP7Enemy::AP7Enemy()
 	PrimaryActorTick.bCanEverTick = true;
 	GetMesh()->SetGenerateOverlapEvents(true);
 	GetMesh()->SetCollisionObjectType(ECC_WorldDynamic);
-	// GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	HealthBarComponent = CreateDefaultSubobject<UP7HealthBarComponent>("HealthBarWidgetComponent");
 	HealthBarComponent->SetupAttachment(RootComponent);
@@ -58,9 +56,10 @@ void AP7Enemy::Destroyed()
 	}
 }
 
-void AP7Enemy::GetHit(const FVector& ImpactPoint)
+void AP7Enemy::GetHit(const FVector& HitterLocation)
 {
-	Super::GetHit(ImpactPoint);
+	Super::GetHit(HitterLocation);
+	EnemyState = EES_Chasing;
 }
 
 bool AP7Enemy::GetIsAttaching()
@@ -87,11 +86,13 @@ bool AP7Enemy::CanAttack()
 	const AP7BaseCharacter* TargetCharacter = Cast<AP7BaseCharacter>(CombatTarget);
 	if (!TargetCharacter) return false;
 	const bool bTargetAlive = TargetCharacter->GetAttributes()->GetIsAlive();
+	const bool bSelfAlive = GetAttributes()->GetIsAlive();
 	
 	return EnemyState != EES_Dead	   &&
 		   EnemyState <= EES_Chasing   &&
 		   InsideTargetRadius(CombatTarget, AttackRadius) &&
-	   	   bTargetAlive;
+	   	   bTargetAlive &&
+		   bSelfAlive;
 }
 
 void AP7Enemy::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)

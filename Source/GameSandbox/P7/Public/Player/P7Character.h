@@ -23,7 +23,7 @@ public:
 	AP7Character();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void GetHit(const FVector& ImpactPoint) override;
+	virtual void GetHit(const FVector& HitterLocation) override;
 	virtual bool GetIsAttaching() override;
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
 	FORCEINLINE EActionState GetActionState() const { return ActionState; };
@@ -36,6 +36,7 @@ protected:
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;
 	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) override;
 	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) override;
+	virtual void OnHitReactEndHandle(USkeletalMeshComponent* MeshComp) override;
 	void Grab();
 
 private:
@@ -45,7 +46,8 @@ private:
 	void AddMappingContext() const;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
-
+	void Block(bool bBlock);
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;
@@ -65,6 +67,8 @@ protected:
 	UInputAction* GrabAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AttackAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* BlockAction;
 #pragma endregion // Input
 
 private:
