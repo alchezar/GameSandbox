@@ -35,8 +35,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void Attack();
 	virtual void Die();
+	virtual void Attack();
 	virtual bool CanAttack();
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp);
 	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp);

@@ -3,11 +3,28 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
+#include "GameFramework/HUD.h"
 #include "P7HUD.generated.h"
 
+class UP7PlayerOverlay;
+
 UCLASS()
-class GAMESANDBOX_API UP7HUD : public UUserWidget
+class GAMESANDBOX_API AP7HUD : public AHUD
 {
 	GENERATED_BODY()
+
+public:
+	AP7HUD();
+	FORCEINLINE UP7PlayerOverlay* GetPlayerOverlay() const { return PlayerOverlayWidget; }; 
+	
+protected:
+	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UP7PlayerOverlay> PlayerOverlayClass;
+
+private:
+	UPROPERTY()
+	UP7PlayerOverlay* PlayerOverlayWidget;
 };

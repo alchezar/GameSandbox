@@ -10,7 +10,7 @@ UP7AttributeComponent::UP7AttributeComponent()
 void UP7AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	Health = MaxHealth;
+	ResetHealth();
 }
 
 void UP7AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -20,6 +20,11 @@ void UP7AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, 
 
 void UP7AttributeComponent::ReceiveDamage(const float Damage)
 {
-	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
+	OnReceiveDamage.Broadcast(CurrentHealth / MaxHealth);
 }
 
+void UP7AttributeComponent::ResetHealth()
+{
+	CurrentHealth = MaxHealth;
+}

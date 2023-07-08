@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 class AP7Item;
+class UP7PlayerOverlay;
 
 UCLASS()
 class GAMESANDBOX_API AP7Character : public AP7BaseCharacter
@@ -21,6 +22,7 @@ class GAMESANDBOX_API AP7Character : public AP7BaseCharacter
 
 public:
 	AP7Character();
+	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit(const FVector& HitterLocation) override;
@@ -47,6 +49,8 @@ private:
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
 	void Block(bool bBlock);
+	void InitOverlayWidget();
+	void OnReceiveDamageHandle(float HealthPercent);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -72,10 +76,12 @@ protected:
 #pragma endregion // Input
 
 private:
+	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
+	EActionState ActionState = EActionState::EAS_Unoccupied;
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
 	UPROPERTY(VisibleInstanceOnly)
 	AP7Item* OverlappingItem;
-	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
-	EActionState ActionState = EActionState::EAS_Unoccupied;
+	UPROPERTY()
+	UP7PlayerOverlay* OverlayWidget;
 };

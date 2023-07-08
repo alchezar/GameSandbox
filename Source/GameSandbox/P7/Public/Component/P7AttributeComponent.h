@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "P7AttributeComponent.generated.h"
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP7OnReceiveDamageDelegate, float /* HealthPercent */);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP7AttributeComponent : public UActorComponent
 {
@@ -14,16 +16,20 @@ class GAMESANDBOX_API UP7AttributeComponent : public UActorComponent
 public:
 	UP7AttributeComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	FORCEINLINE float GetHealthPercent() const { return CurrentHealth / MaxHealth; };
+	FORCEINLINE bool GetIsAlive() const { return CurrentHealth > 0.f; };
 	void ReceiveDamage(const float Damage);
-	FORCEINLINE float GetHealthPercent() const { return Health / MaxHealth; };
-	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; };
+	void ResetHealth();
 
 protected:
 	virtual void BeginPlay() override;
 
+public:
+	FP7OnReceiveDamageDelegate OnReceiveDamage;
+	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Health")
 	float MaxHealth = 100.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Health")
-	float Health = 0.f;	
+	float CurrentHealth = 0.f;	
 };

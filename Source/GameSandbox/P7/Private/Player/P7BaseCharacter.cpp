@@ -12,9 +12,9 @@
 AP7BaseCharacter::AP7BaseCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	Attributes = CreateDefaultSubobject<UP7AttributeComponent>("AttributesComponent");
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	Attributes = CreateDefaultSubobject<UP7AttributeComponent>("AttributesComponent");
 }
 
 void AP7BaseCharacter::BeginPlay()
@@ -22,6 +22,7 @@ void AP7BaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	check(Attributes)
 	InitAnimNotifies();
+	Attributes->ResetHealth();
 }
 
 void AP7BaseCharacter::Tick(float DeltaTime)
@@ -107,10 +108,10 @@ void AP7BaseCharacter::Die()
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->MovementState.bCanJump = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetAllBodiesSimulatePhysics(true);
 	GetMesh()->SetCollisionProfileName("Ragdoll");
 	SetLifeSpan(5.f);
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 }
 
 bool AP7BaseCharacter::CanAttack()

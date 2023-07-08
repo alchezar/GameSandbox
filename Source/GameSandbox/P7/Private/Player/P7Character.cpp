@@ -7,8 +7,11 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P7/Public/Component/P7AttributeComponent.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
+#include "P7/Public/Widget/P7HUD.h"
+#include "P7/Public/Widget/P7PlayerOverlay.h"
 
 AP7Character::AP7Character()
 {
@@ -23,6 +26,8 @@ void AP7Character::BeginPlay()
 	Super::BeginPlay();
 	AddMappingContext();
 	Tags.Add("Player");
+	InitOverlayWidget();
+	Attributes->OnReceiveDamage.AddUObject(this, &ThisClass::OnReceiveDamageHandle);
 }
 
 void AP7Character::Tick(const float DeltaTime)
@@ -183,4 +188,19 @@ void AP7Character::Block(bool bBlock)
 {
 	SetIsBlocked(bBlock);
 	GetCharacterMovement()->MaxWalkSpeed = bBlock ? 200.f : 600.f;
+}
+
+void AP7Character::InitOverlayWidget()
+{
+	const APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC) return;
+	const AP7HUD* GameHUD = Cast<AP7HUD>(PC->GetHUD());
+	if (!GameHUD) return;
+	OverlayWidget = GameHUD->GetPlayerOverlay();
+}
+
+void AP7Character::OnReceiveDamageHandle(float HealthPercent)
+{
+	if (!OverlayWidget) return;
+	OverlayWidget->SetHealthPercent(HealthPercent);
 }
