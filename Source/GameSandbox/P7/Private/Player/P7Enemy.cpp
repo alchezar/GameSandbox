@@ -8,6 +8,7 @@
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Widget/Component/P7HealthBarComponent.h"
 #include "Perception/PawnSensingComponent.h"
+#include "P7/Public/Item/P7Soul.h"
 
 AP7Enemy::AP7Enemy()
 {
@@ -27,6 +28,7 @@ void AP7Enemy::BeginPlay()
 	Super::BeginPlay();
 	check(HealthBarComponent);
 	check(PawnSensing);
+	check(SoulClass);
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
 	InitializeEnemy();
 }
@@ -52,14 +54,14 @@ void AP7Enemy::Destroyed()
 	Super::Destroyed();
 	if (EquippedWeapon)
 	{
-		EquippedWeapon->Unequip();
+		EquippedWeapon->Destroy();
 	}
 }
 
 void AP7Enemy::GetHit(const FVector& HitterLocation)
 {
 	Super::GetHit(HitterLocation);
-	EnemyState = EES_Chasing;
+	EnemyState = EES_Patrolling;
 }
 
 bool AP7Enemy::GetIsAttaching()
@@ -72,6 +74,7 @@ void AP7Enemy::Die()
 	Super::Die();
 	HealthBarComponent->ReactOnDamage(0.f, false);
 	EnemyState = EES_Dead;
+	GetWorld()->SpawnActor<AP7Soul>(SoulClass, GetActorLocation(), FRotator::ZeroRotator);
 }
 
 void AP7Enemy::Attack()
@@ -99,6 +102,12 @@ void AP7Enemy::OnAttackEndHandle(USkeletalMeshComponent* MeshComp)
 {
 	Super::OnAttackEndHandle(MeshComp);
 	if (EnemyState > EES_Chasing) EnemyState = EES_Chasing;
+}
+
+void AP7Enemy::OnHitReactEndHandle(USkeletalMeshComponent* MeshComp)
+{
+	Super::OnHitReactEndHandle(MeshComp);
+	EnemyState = EES_Chasing;
 }
 
 void AP7Enemy::OnSeePawnHandle(APawn* Pawn)

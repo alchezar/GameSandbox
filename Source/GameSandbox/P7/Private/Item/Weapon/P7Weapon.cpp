@@ -1,8 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Item/Weapon/P7Weapon.h"
+#include "NiagaraComponent.h"
 #include "Components/BoxComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
 #include "Field/FieldSystemAsset.h"
 #include "Field/FieldSystemComponent.h"
 #include "Field/FieldSystemObjects.h"
@@ -51,6 +53,7 @@ void AP7Weapon::Equip(USceneComponent* InParent, const FName SocketName, AActor*
 	AttachToBelt(InParent, SocketName);
 	SetOwner(NewOwner);
 	SetInstigator(NewInstigator);
+	EffectActivation(false);
 }
 
 void AP7Weapon::Unequip()
@@ -61,6 +64,7 @@ void AP7Weapon::Unequip()
 	NewLocation.Z = 100.f;
 	SetActorLocation(NewLocation);
 	SetActorRotation(FRotator::ZeroRotator);
+	EffectActivation(true);
 }
 
 void AP7Weapon::AttachToHand(USceneComponent* InParent, const FName SocketName)
@@ -79,6 +83,12 @@ void AP7Weapon::AttachToSocket(USceneComponent* InParent, const FName SocketName
 	ItemMesh->AttachToComponent(InParent, AllRules, SocketName);
 	ItemMesh->AddRelativeLocation(Offset.LocationOffset);
 	ItemMesh->AddRelativeRotation(Offset.RotationOffset);
+}
+
+void AP7Weapon::EffectActivation(const bool bActive) const
+{
+	if (!ItemEffect) return;
+	bActive ? ItemEffect->Activate() : ItemEffect->Deactivate();
 }
 
 void AP7Weapon::OnAttackStartHandle() {}
@@ -131,7 +141,8 @@ void AP7Weapon::HitTrace()
 		if (GetOwner()->ActorHasTag("Enemy") && HitActor->ActorHasTag("Enemy")) return;
 		
 		bAlreadyHit = true;
-		UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(), this, nullptr);
+		HitResult.GetActor()->TakeDamage(Damage, FDamageEvent(), GetInstigator()->GetController(), this);
+		// UGameplayStatics::ApplyDamage(HitResult.GetActor(), Damage, GetInstigator()->GetController(), this, nullptr);
 
 		if (IP7HitInterface* HitInterface = Cast<IP7HitInterface>(HitActor))
 		{

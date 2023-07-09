@@ -2,6 +2,7 @@
 
 #include "P7/Public/Player/P7BaseCharacter.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P7/Public/AnimNotify/P7AttackEndNotify.h"
 #include "P7/Public/AnimNotify/P7BeamTurningNotify.h"
@@ -74,7 +75,15 @@ bool AP7BaseCharacter::GetIsAttaching()
 
 float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (bBlocking) return 0.f;
+	if (bBlocking)
+	{
+		/* Prevent infinity attacks to blocking character */
+		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(DamageCauser->GetInstigator());
+		if (!HitInterface) return 0.f;
+		DamageCauser->GetInstigator()->TakeDamage(1.f, FDamageEvent{}, GetController(), this);
+		HitInterface->GetHit(GetActorLocation());
+		return 0.f;
+	}
 	Attributes->ReceiveDamage(DamageAmount);
 	return DamageAmount;
 }
@@ -189,6 +198,7 @@ void AP7BaseCharacter::PlayMontageSection(UAnimMontage* Montage)
 
 void AP7BaseCharacter::PlayHitReactMontage(const FName& SectionName)
 {
+	StopAnimMontage();
 	PlayAnimMontage(HitReactMontage, 1.f, SectionName);
 }
 

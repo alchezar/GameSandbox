@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "P7Item.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
 class USphereComponent;
 
 UENUM()
@@ -26,10 +28,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+	virtual void SpawnPickupFX();
 	void Oscillation(const float DeltaTime);
-	void SetItemState(const EItemState NewState);
-	
+	void SetItemState(const EItemState NewState);	
 	float TransformedSin();
 	float TransformedCos();
 
@@ -43,6 +44,12 @@ protected:
 	UStaticMeshComponent* ItemMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Component")
 	USphereComponent* SphereTrigger;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Effect")
+	UNiagaraComponent* ItemEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Effect")
+	UNiagaraSystem* PickupEffect;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Effect")
+	USoundBase* PickupSound;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Smooth Moving")
 	float Amplitude = 0.25f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Smooth Moving")

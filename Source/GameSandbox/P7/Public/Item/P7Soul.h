@@ -3,16 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "P7/Public/Item/P7Item.h"
-#include "P7Treasure.generated.h"
+#include "P7Item.h"
+#include "P7Soul.generated.h"
+
+class UNiagaraSystem;
 
 UCLASS()
-class GAMESANDBOX_API AP7Treasure : public AP7Item
+class GAMESANDBOX_API AP7Soul : public AP7Item
 {
 	GENERATED_BODY()
 
 public:
-	AP7Treasure();
+	AP7Soul();
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -21,5 +23,5 @@ protected:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Gold")
-	int32 Gold = 5;
+	int32 Souls = 1;
 };

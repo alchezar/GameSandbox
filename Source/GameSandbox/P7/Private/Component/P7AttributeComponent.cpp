@@ -28,3 +28,15 @@ void UP7AttributeComponent::ResetHealth()
 {
 	CurrentHealth = MaxHealth;
 }
+
+void UP7AttributeComponent::AddCoins(const int32 NewCoins)
+{
+	Coins += NewCoins;
+	OnReceiveGold.Broadcast(NewCoins);
+}
+
+void UP7AttributeComponent::AddSoul(const int32 NewSouls)
+{
+	Souls+= NewSouls;
+	OnReceiveSoul.Broadcast(NewSouls);
+}

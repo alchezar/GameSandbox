@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "CharacterTypes.h"
+#include "P7/Public/Interface/P7PickupInterface.h"
 #include "P7/Public/Player/P7BaseCharacter.h"
 #include "P7Character.generated.h"
 
@@ -16,7 +17,7 @@ class AP7Item;
 class UP7PlayerOverlay;
 
 UCLASS()
-class GAMESANDBOX_API AP7Character : public AP7BaseCharacter
+class GAMESANDBOX_API AP7Character : public AP7BaseCharacter, public IP7PickupInterface
 {
 	GENERATED_BODY()
 
@@ -25,20 +26,22 @@ public:
 	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	virtual void GetHit(const FVector& HitterLocation) override;
-	virtual bool GetIsAttaching() override;
+	virtual void GetHit(const FVector& HitterLocation) override; // AP7BaseCharacter
+	virtual bool GetIsAttaching() override;                      // AP7BaseCharacter
+	virtual void SetOverlappingItem(AP7Item* Item) override;     // IP7PickupInterface
+	virtual void AddCoins(const int32 Coins) override;           // IP7PickupInterface
+	virtual void AddSouls(const int32 Souls) override;                             // IP7PickupInterface
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
 	FORCEINLINE EActionState GetActionState() const { return ActionState; };
-	void SetOverlappingItem(AP7Item* Item);
 
 protected:
 	virtual void BeginPlay() override;
-	virtual bool CanAttack() override;
-	virtual void Attack() override;
-	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;
-	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) override;
-	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) override;
-	virtual void OnHitReactEndHandle(USkeletalMeshComponent* MeshComp) override;
+	virtual bool CanAttack() override;                                            // AP7BaseCharacter
+	virtual void Attack() override;                                               // AP7BaseCharacter
+	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;    // AP7BaseCharacter
+	virtual void OnBeamTurningHandle(USkeletalMeshComponent* MeshComp) override;  // AP7BaseCharacter
+	virtual void OnBeltSnappingHandle(USkeletalMeshComponent* MeshComp) override; // AP7BaseCharacter
+	virtual void OnHitReactEndHandle(USkeletalMeshComponent* MeshComp) override;  // AP7BaseCharacter
 	void Grab();
 
 private:
@@ -50,7 +53,6 @@ private:
 	void Look(const FInputActionValue& Value);
 	void Block(bool bBlock);
 	void InitOverlayWidget();
-	void OnReceiveDamageHandle(float HealthPercent);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")

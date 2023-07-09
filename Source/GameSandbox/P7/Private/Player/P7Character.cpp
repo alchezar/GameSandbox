@@ -27,7 +27,7 @@ void AP7Character::BeginPlay()
 	AddMappingContext();
 	Tags.Add("Player");
 	InitOverlayWidget();
-	Attributes->OnReceiveDamage.AddUObject(this, &ThisClass::OnReceiveDamageHandle);
+	// Attributes->OnReceiveDamage.AddUObject(this, &ThisClass::OnReceiveDamageHandle);
 }
 
 void AP7Character::Tick(const float DeltaTime)
@@ -62,6 +62,16 @@ bool AP7Character::GetIsAttaching()
 void AP7Character::SetOverlappingItem(AP7Item* Item)
 {
 	OverlappingItem = Item;
+}
+
+void AP7Character::AddCoins(const int32 Coins)
+{
+	Attributes->AddCoins(Coins);
+}
+
+void AP7Character::AddSouls(const int32 Souls)
+{
+	Attributes->AddSoul(Souls);
 }
 
 bool AP7Character::CanAttack()
@@ -197,10 +207,4 @@ void AP7Character::InitOverlayWidget()
 	const AP7HUD* GameHUD = Cast<AP7HUD>(PC->GetHUD());
 	if (!GameHUD) return;
 	OverlayWidget = GameHUD->GetPlayerOverlay();
-}
-
-void AP7Character::OnReceiveDamageHandle(float HealthPercent)
-{
-	if (!OverlayWidget) return;
-	OverlayWidget->SetHealthPercent(HealthPercent);
 }

@@ -8,6 +8,7 @@
 #include "P7/Public/Player/CharacterTypes.h"
 #include "P7Enemy.generated.h"
 
+class AP7Soul;
 class AAIController;
 class UP7HealthBarComponent;
 class UPawnSensingComponent;
@@ -32,6 +33,7 @@ protected:
 	virtual void Attack() override;
 	virtual bool CanAttack() override;
 	virtual void OnAttackEndHandle(USkeletalMeshComponent* MeshComp) override;
+	virtual void OnHitReactEndHandle(USkeletalMeshComponent* MeshComp) override;
 	UFUNCTION()
 	void OnSeePawnHandle(APawn* Pawn);
 	
@@ -53,6 +55,8 @@ protected:
 	UP7HealthBarComponent* HealthBarComponent;	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensing;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	TSubclassOf<AP7Soul> SoulClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	TSubclassOf<AP7Weapon> WeaponClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")

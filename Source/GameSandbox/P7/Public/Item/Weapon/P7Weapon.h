@@ -51,6 +51,7 @@ private:
 	void HitTrace();
 	void SweepCapsule(FHitResult& HitResult);
 	void AttachToSocket(USceneComponent* InParent, const FName SocketName, const FSnapOffset& Offset) const;
+	void EffectActivation(const bool bActive) const;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | State")
