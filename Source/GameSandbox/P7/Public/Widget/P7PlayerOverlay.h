@@ -21,7 +21,7 @@ public:
 	void SetStaminaPercent(const float Percent);
 	void AddCoins(const int32 NewCoins);
 	void AddSouls(const int32 NewSouls);
-	void SetPlayerCharacter(AP7Character* PlayerCharacter);
+	void ConnectToCharacter(AP7Character* PlayerCharacter);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -29,9 +29,10 @@ protected:
 private:
 	void Respawn();
 	void BindDelegates();
-	void OnReceiveDamageHandle(float HealthPercent);
-	void OnReceiveGoldHandle(int32 NewGold);
-	void OnReceiveSoul(const int32 NewSouls);
+	void OnReceiveDamageHandle(ACharacter* Owner, float HealthPercent);
+	void OnStaminaUsedHandle(ACharacter* Owner, float StaminaPercent);
+	void OnReceiveGoldHandle(ACharacter* Owner, int32 NewGold);
+	void OnReceiveSoul(ACharacter* Owner, const int32 NewSouls);
 
 protected:
 	UPROPERTY(meta = (BindWidget))

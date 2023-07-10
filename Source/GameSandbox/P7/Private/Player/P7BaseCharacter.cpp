@@ -23,7 +23,7 @@ void AP7BaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	check(Attributes)
 	InitAnimNotifies();
-	Attributes->ResetHealth();
+	Attributes->SetDefaultAttributes(this);
 }
 
 void AP7BaseCharacter::Tick(float DeltaTime)

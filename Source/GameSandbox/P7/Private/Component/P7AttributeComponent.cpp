@@ -10,18 +10,53 @@ UP7AttributeComponent::UP7AttributeComponent()
 void UP7AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	ResetHealth();
 }
 
 void UP7AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (GetStaminaPercent() < 1.f)
+	{
+		RefillStamina(StaminaRegenRate * DeltaTime);
+	}
 }
 
 void UP7AttributeComponent::ReceiveDamage(const float Damage)
 {
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.f, MaxHealth);
-	OnReceiveDamage.Broadcast(CurrentHealth / MaxHealth);
+	OnReceiveDamage.Broadcast(Character, GetHealthPercent());
+}
+
+void UP7AttributeComponent::UseStamina(const float StaminaCost)
+{
+	CurrentStamina = FMath::Clamp(CurrentStamina - StaminaCost, 0.f, MaxStamina);
+	OnStaminaUsed.Broadcast(Character, GetStaminaPercent());
+}
+
+void UP7AttributeComponent::RefillStamina(const float StaminaRate)
+{
+	UseStamina(-1 * StaminaRate);
+}
+
+void UP7AttributeComponent::AddCoins(const int32 NewCoins)
+{
+	Coins += NewCoins;
+	OnReceiveGold.Broadcast(Character, NewCoins);
+}
+
+
+void UP7AttributeComponent::AddSoul(const int32 NewSouls)
+{
+	Souls+= NewSouls;
+	OnReceiveSoul.Broadcast(Character, NewSouls);
+}
+
+void UP7AttributeComponent::SetDefaultAttributes(ACharacter* OwnerCharacter)
+{
+	ResetHealth();
+	ResetStamina();
+	SetCharacter(OwnerCharacter);
 }
 
 void UP7AttributeComponent::ResetHealth()
@@ -29,14 +64,12 @@ void UP7AttributeComponent::ResetHealth()
 	CurrentHealth = MaxHealth;
 }
 
-void UP7AttributeComponent::AddCoins(const int32 NewCoins)
+void UP7AttributeComponent::ResetStamina()
 {
-	Coins += NewCoins;
-	OnReceiveGold.Broadcast(NewCoins);
+	CurrentStamina = MaxStamina;
 }
 
-void UP7AttributeComponent::AddSoul(const int32 NewSouls)
+void UP7AttributeComponent::SetCharacter(ACharacter* OwnerCharacter)
 {
-	Souls+= NewSouls;
-	OnReceiveSoul.Broadcast(NewSouls);
+	Character = OwnerCharacter;
 }

@@ -20,9 +20,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void SetCharacterInWidget();
-
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP7PlayerOverlay> PlayerOverlayClass;

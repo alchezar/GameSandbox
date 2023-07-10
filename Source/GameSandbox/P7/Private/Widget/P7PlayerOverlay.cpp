@@ -14,7 +14,6 @@ bool UP7PlayerOverlay::Initialize()
 void UP7PlayerOverlay::NativeConstruct()
 {
 	Super::NativeConstruct();
-	Respawn();
 }
 
 void UP7PlayerOverlay::SetHealthPercent(const float Percent)
@@ -39,19 +38,22 @@ void UP7PlayerOverlay::AddSouls(const int32 NewSouls)
 	SoulCount->SetText(FText::AsNumber(Souls));
 }
 
-void UP7PlayerOverlay::SetPlayerCharacter(AP7Character* PlayerCharacter)
+void UP7PlayerOverlay::ConnectToCharacter(AP7Character* PlayerCharacter)
 {
-	if (!PlayerCharacter) return;
 	Character = PlayerCharacter;
+	Respawn();
 	BindDelegates();
 }
 
 void UP7PlayerOverlay::Respawn()
 {
-	SetHealthPercent(1.f);
-	SetStaminaPercent(1.f);
-	AddCoins(0);
-	AddSouls(0);
+	if (!Character) return;
+	const UP7AttributeComponent* Attributes = Character->GetAttributes();
+	if (!Attributes) return;
+	SetHealthPercent(Attributes->GetHealthPercent());
+	SetStaminaPercent(Attributes->GetStaminaPercent());
+	AddCoins(Attributes->GetCoins());
+	AddSouls(Attributes->GetSouls());
 }
 
 void UP7PlayerOverlay::BindDelegates()
@@ -60,21 +62,31 @@ void UP7PlayerOverlay::BindDelegates()
 	UP7AttributeComponent* Attributes = Character->GetAttributes();
 	if (!Attributes) return;
 	Attributes->OnReceiveDamage.AddUObject(this, &ThisClass::OnReceiveDamageHandle);
+	Attributes->OnStaminaUsed.AddUObject(this, &ThisClass::OnStaminaUsedHandle);
 	Attributes->OnReceiveGold.AddUObject(this, &ThisClass::OnReceiveGoldHandle);
 	Attributes->OnReceiveSoul.AddUObject(this, &ThisClass::OnReceiveSoul);
 }
 
-void UP7PlayerOverlay::OnReceiveDamageHandle(float HealthPercent)
+void UP7PlayerOverlay::OnReceiveDamageHandle(ACharacter* Owner, float HealthPercent)
 {
+	if (Owner != Character) return;
 	SetHealthPercent(HealthPercent);
 }
 
-void UP7PlayerOverlay::OnReceiveGoldHandle(int32 NewGold)
+void UP7PlayerOverlay::OnStaminaUsedHandle(ACharacter* Owner, float StaminaPercent)
 {
+	if (Owner != Character) return;
+	SetStaminaPercent(StaminaPercent);
+}
+
+void UP7PlayerOverlay::OnReceiveGoldHandle(ACharacter* Owner, int32 NewGold)
+{
+	if (Owner != Character) return;
 	AddCoins(NewGold);
 }
 
-void UP7PlayerOverlay::OnReceiveSoul(const int32 NewSouls)
+void UP7PlayerOverlay::OnReceiveSoul(ACharacter* Owner, const int32 NewSouls)
 {
+	if (Owner != Character) return;
 	AddSouls(NewSouls);
 }

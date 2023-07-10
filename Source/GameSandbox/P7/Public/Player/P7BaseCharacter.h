@@ -23,9 +23,9 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Jump() override;
 	virtual void Landed(const FHitResult& Hit) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit(const FVector& HitterLocation) override;
 	virtual bool GetIsAttaching();
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	FORCEINLINE bool GetIsDoubleJump() const { return bDoubleJump; };
 	FORCEINLINE bool GetIsBlocked() const { return bBlocking; };
 	FORCEINLINE UP7AttributeComponent* GetAttributes() const { return Attributes; };
@@ -68,6 +68,8 @@ protected:
 	UAnimMontage* HitReactMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
 	UAnimMontage* BlockingHitMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* RollMontage;
 #pragma endregion // Montage
 
 	UPROPERTY(VisibleInstanceOnly)

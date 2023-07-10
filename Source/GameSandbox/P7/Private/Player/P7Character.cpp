@@ -18,7 +18,7 @@ AP7Character::AP7Character()
 	PrimaryActorTick.bCanEverTick = true;
 	SetupComponents();
 	bUseControllerRotationYaw = false;
-	OrientToMovement(true);
+	OrientToMovement(false);
 }
 
 void AP7Character::BeginPlay()
@@ -27,7 +27,6 @@ void AP7Character::BeginPlay()
 	AddMappingContext();
 	Tags.Add("Player");
 	InitOverlayWidget();
-	// Attributes->OnReceiveDamage.AddUObject(this, &ThisClass::OnReceiveDamageHandle);
 }
 
 void AP7Character::Tick(const float DeltaTime)
@@ -39,13 +38,17 @@ void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 {
 	check(PlayerInputComponent);
 	EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::Stand);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::Jump);
 	EnhancedInputComponent->BindAction(GrabAction, ETriggerEvent::Started, this, &ThisClass::Grab);
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::Attack);
+	EnhancedInputComponent->BindAction(RollAction, ETriggerEvent::Started, this, &ThisClass::Roll);
 	EnhancedInputComponent->BindAction<ThisClass, bool>(BlockAction, ETriggerEvent::Started, this, &ThisClass::Block, true);
 	EnhancedInputComponent->BindAction<ThisClass, bool>(BlockAction, ETriggerEvent::Completed, this, &ThisClass::Block, false);
+	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Started, this, &ThisClass::Run, true);
+	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Completed, this, &ThisClass::Run, false);
 }
 
 void AP7Character::GetHit(const FVector& HitterLocation)
@@ -173,19 +176,6 @@ void AP7Character::AddMappingContext() const
 	Subsystem->AddMappingContext(DefaultContext, 0);
 }
 
-void AP7Character::Move(const FInputActionValue& Value)
-{
-	if (!Controller || ActionState != EAS_Unoccupied) return;
-	StopAnimMontage(AttackMontage);
-	
-	const FVector2D MovementVector = Value.Get<FVector2D>();
-	const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
-	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	AddMovementInput(Forward, MovementVector.Y);
-	AddMovementInput(Right, MovementVector.X);
-}
-
 void AP7Character::Look(const FInputActionValue& Value)
 {
 	if (!Controller) return;
@@ -194,10 +184,53 @@ void AP7Character::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
+void AP7Character::Move(const FInputActionValue& Value)
+{
+	if (!Controller || ActionState != EAS_Unoccupied) return;
+	StopAnimMontage(AttackMontage);
+	OrientToMovement(false);
+	
+	const FVector2D MovementVector = Value.Get<FVector2D>();
+	const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
+	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	AddMovementInput(Forward, MovementVector.Y);
+	AddMovementInput(Right, MovementVector.X);
+	LastMovementVector = MovementVector;
+}
+
+void AP7Character::Stand(const FInputActionValue& Value)
+{
+	OrientToMovement(true);
+	LastMovementVector = FVector2D::ZeroVector;
+}
+
 void AP7Character::Block(bool bBlock)
 {
 	SetIsBlocked(bBlock);
 	GetCharacterMovement()->MaxWalkSpeed = bBlock ? 200.f : 600.f;
+}
+
+void AP7Character::Run(bool bRun)
+{
+	if (GetIsBlocked()) return;
+	GetCharacterMovement()->MaxWalkSpeed = bRun ? 900.f : 600.f;
+}
+
+void AP7Character::Roll()
+{
+	if (!RollMontage || Attributes->GetCurrentStamina() < StaminaCost) return;
+	
+	FString SectionString = "RollBack";
+	if      (LastMovementVector.X < 0.f) SectionString = "RollLeft";
+	else if (LastMovementVector.X > 0.f) SectionString = "RollRight";
+	else if	(LastMovementVector.Y > 0.f) SectionString = "RollFront";
+	if (CharacterState > ECS_Unequipped) SectionString = "Combat" + SectionString;
+	const FName SectionName = FName(SectionString);
+	PlayAnimMontage(RollMontage, 1.f, SectionName);
+	
+	Attributes->UseStamina(StaminaCost);
+
 }
 
 void AP7Character::InitOverlayWidget()
@@ -207,4 +240,5 @@ void AP7Character::InitOverlayWidget()
 	const AP7HUD* GameHUD = Cast<AP7HUD>(PC->GetHUD());
 	if (!GameHUD) return;
 	OverlayWidget = GameHUD->GetPlayerOverlay();
+	OverlayWidget->ConnectToCharacter(this);
 }

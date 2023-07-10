@@ -22,15 +22,14 @@ class GAMESANDBOX_API AP7Character : public AP7BaseCharacter, public IP7PickupIn
 	GENERATED_BODY()
 
 public:
-	AP7Character();
-	
+	AP7Character();	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void GetHit(const FVector& HitterLocation) override; // AP7BaseCharacter
 	virtual bool GetIsAttaching() override;                      // AP7BaseCharacter
 	virtual void SetOverlappingItem(AP7Item* Item) override;     // IP7PickupInterface
 	virtual void AddCoins(const int32 Coins) override;           // IP7PickupInterface
-	virtual void AddSouls(const int32 Souls) override;                             // IP7PickupInterface
+	virtual void AddSouls(const int32 Souls) override;           // IP7PickupInterface
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
 	FORCEINLINE EActionState GetActionState() const { return ActionState; };
 
@@ -51,7 +50,10 @@ private:
 	void AddMappingContext() const;
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
+	void Stand(const FInputActionValue& Value);
+	void Roll();
 	void Block(bool bBlock);
+	void Run(bool bRun);
 	void InitOverlayWidget();
 	
 protected:
@@ -59,6 +61,9 @@ protected:
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* ViewCamera;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Moving")
+	float StaminaCost = 20.f;
 
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
@@ -75,11 +80,16 @@ protected:
 	UInputAction* AttackAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* BlockAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* RollAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* RunAction;
 #pragma endregion // Input
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;
 	EActionState ActionState = EActionState::EAS_Unoccupied;
+	FVector2D LastMovementVector = FVector2D::ZeroVector;
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
 	UPROPERTY(VisibleInstanceOnly)
