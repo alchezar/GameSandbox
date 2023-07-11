@@ -75,9 +75,8 @@ bool AP7BaseCharacter::GetIsAttaching()
 
 float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (bBlocking)
+	if (bBlocking) /* Prevent infinity attacks to blocking character */
 	{
-		/* Prevent infinity attacks to blocking character */
 		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(DamageCauser->GetInstigator());
 		if (!HitInterface) return 0.f;
 		DamageCauser->GetInstigator()->TakeDamage(1.f, FDamageEvent{}, GetController(), this);

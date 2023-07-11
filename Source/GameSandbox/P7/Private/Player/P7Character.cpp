@@ -142,8 +142,13 @@ void AP7Character::Grab()
 void AP7Character::EquipWeapon(AP7Weapon* Weapon)
 {
 	if (!Weapon) return;
-	Weapon->Equip(GetMesh(), BeltSocketName, this, this);
+	if (EquippedWeapon)
+	{
+		EquippedWeapon->Destroy();
+		CharacterState = ECS_Unequipped;
+	}
 	EquippedWeapon = Weapon;
+	EquippedWeapon->Equip(GetMesh(), BeltSocketName, this, this);
 	EquippedWeapon->SwitchWeaponHard(false);
 }
 
