@@ -26,12 +26,13 @@ public:
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void GetHit(const FVector& HitterLocation) override;
 	virtual bool GetIsAttaching();
-	FORCEINLINE bool GetIsDoubleJump() const { return bDoubleJump; };
+	FORCEINLINE EJumpState GetJumpState() const { return JumpState; };
 	FORCEINLINE bool GetIsBlocked() const { return bBlocking; };
 	FORCEINLINE UP7AttributeComponent* GetAttributes() const { return Attributes; };
 	float GetMovementDirectionAngle();
 	void SetAnimSection(const int32 StartSection);
 	void SetIsBlocked(const bool bBlock);
+	void SetJumpState(EJumpState NewState);
 
 protected:
 	virtual void BeginPlay() override;
@@ -49,6 +50,7 @@ private:
 	void PlayHitReactMontage(const FName& SectionName);
 	void DirectionalHitReact(const FVector& ImpactPoint);
 	double AngleBetweenVectors(const FVector& Vector1, const FVector& Vector2) const;
+	void DoubleJump();
 
 protected:	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -76,7 +78,7 @@ protected:
 	AP7Weapon* EquippedWeapon;
 
 private:
-	bool bDoubleJump = false;
+	EJumpState JumpState = EJS_Landed;
 	bool bBlocking = false;
 	int32 Section = 0;
 	FTimerHandle ComboTimer;

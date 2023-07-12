@@ -34,6 +34,13 @@ enum EEnemyState : uint8
 	EES_Engaged    UMETA(DisplayName = "Engaged")
 };
 
+UENUM()
+enum EJumpState : uint8
+{
+	EJS_Landed UMETA(DisplayName = "Landed"),
+	EJS_Single UMETA(DisplayName = "Single"),
+	EJS_Double UMETA(DisplayName = "Double")
+};
 
 USTRUCT(BlueprintType)
 struct FCurrentWeapon

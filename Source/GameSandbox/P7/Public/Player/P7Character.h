@@ -55,6 +55,7 @@ private:
 	void Block(bool bBlock);
 	void Run(bool bRun);
 	void InitOverlayWidget();
+	void Climb();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -85,6 +86,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* RunAction;
 #pragma endregion // Input
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
+	UAnimMontage* ClimbMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Debug")
+	bool bDebug = false;
 
 private:
 	ECharacterState CharacterState = ECharacterState::ECS_Unequipped;

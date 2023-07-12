@@ -38,15 +38,18 @@ void AP7BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 void AP7BaseCharacter::Jump()
 {
+	if (GetJumpState() == EJS_Single)
+	{
+		DoubleJump();
+		return;
+	}
 	Super::Jump();
-	if (!GetCharacterMovement()->IsFalling() || bDoubleJump) return;
-	bDoubleJump = true;
-	LaunchCharacter(FVector(0.0, 0.0, 700.0) + GetVelocity(), true, true);
+	SetJumpState(EJS_Single);
 }
 
 void AP7BaseCharacter::Landed(const FHitResult& Hit)
 {
-	bDoubleJump = false;
+	SetJumpState(EJS_Landed);
 	Super::Landed(Hit);
 }
 
@@ -101,6 +104,11 @@ void AP7BaseCharacter::SetAnimSection(const int32 StartSection)
 void AP7BaseCharacter::SetIsBlocked(const bool bBlock)
 {
 	bBlocking = bBlock;
+}
+
+void AP7BaseCharacter::SetJumpState(EJumpState NewState)
+{
+	JumpState = NewState;
 }
 
 void AP7BaseCharacter::Attack()
@@ -219,4 +227,11 @@ double AP7BaseCharacter::AngleBetweenVectors(const FVector& Vector1, const FVect
 {
 	const double Sign = FMath::Sign(FVector::CrossProduct(Vector1, Vector2).Z);
 	return Sign * FMath::RadiansToDegrees(FMath::Acos(FVector::DotProduct(Vector1, Vector2)));
+}
+
+void AP7BaseCharacter::DoubleJump()
+{
+	if (GetJumpState() == EJS_Double) return;
+	SetJumpState(EJS_Double);
+	LaunchCharacter(FVector(0.0, 0.0, 700.0) + GetVelocity(), true, true);
 }

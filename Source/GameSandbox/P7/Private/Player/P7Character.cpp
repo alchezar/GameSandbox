@@ -5,8 +5,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Animation/AnimMontage.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "P7/Public/Component/P7AttributeComponent.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
@@ -32,6 +34,7 @@ void AP7Character::BeginPlay()
 void AP7Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	Climb();
 }
 
 void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -246,4 +249,45 @@ void AP7Character::InitOverlayWidget()
 	if (!GameHUD) return;
 	OverlayWidget = GameHUD->GetPlayerOverlay();
 	OverlayWidget->ConnectToCharacter(this);
+}
+
+void AP7Character::Climb()
+{
+	if (GetJumpState() < EJS_Single) return;
+	/* Search any obstacles in front of the player */
+	constexpr float MinDistanceToClimb = 75.f; 
+	FVector Start = GetActorLocation();
+	FVector End = Start + GetActorForwardVector() * MinDistanceToClimb;
+	FHitResult ForwardHitResult;
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(ForwardHitResult, Start, End, ECC_Visibility, QueryParams);
+	if (!ForwardHitResult.bBlockingHit) return;
+	
+	/* Check if the height of the obstacle is acceptable */
+	constexpr float MaxHeightToClimb = 160.f;
+	FHitResult DownHitResult;
+	End = ForwardHitResult.ImpactPoint + ForwardHitResult.ImpactNormal * -40.f;
+	Start = End + FVector(0.f, 0.f, MaxHeightToClimb);
+	GetWorld()->LineTraceSingleByChannel(DownHitResult, Start, End, ECC_Visibility);
+	if (!DownHitResult.bBlockingHit) return;
+
+	/* Find new acceptable location */
+	const float CapsuleHalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	if ((DownHitResult.ImpactPoint - GetActorLocation()).Z > CapsuleHalfHeight) return;
+	FVector NewLocation = DownHitResult.ImpactPoint + FVector(0.f, 0.f, CapsuleHalfHeight);
+	FRotator NewRotation = GetActorRotation();
+	NewRotation.Yaw = (ForwardHitResult.ImpactNormal * -1.f).Rotation().Yaw;
+	
+	/* Move the player root to a new acceptable location */
+	FLatentActionInfo LatentInfo;
+	LatentInfo.CallbackTarget = this;
+	UKismetSystemLibrary::MoveComponentTo(GetCapsuleComponent(), NewLocation, NewRotation, true, true, 0.2f, false, EMoveComponentAction::Move, LatentInfo);
+
+	/* Play Climbing Anim Montage */
+	if (ClimbMontage)
+	{
+		PlayAnimMontage(ClimbMontage);
+	}
+	SetJumpState(EJS_Landed);
 }
