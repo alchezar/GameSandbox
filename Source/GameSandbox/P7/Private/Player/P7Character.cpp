@@ -10,6 +10,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "P7/Public/Component/P7AttributeComponent.h"
+#include "P7/Public/Component/P7WallRunComponent.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Player/CharacterTypes.h"
 #include "P7/Public/Widget/P7HUD.h"
@@ -21,6 +22,8 @@ AP7Character::AP7Character()
 	SetupComponents();
 	bUseControllerRotationYaw = false;
 	OrientToMovement(false);
+
+	WallRunComponent = CreateDefaultSubobject<UP7WallRunComponent>("WallRunComponent");
 }
 
 void AP7Character::BeginPlay()
@@ -34,7 +37,7 @@ void AP7Character::BeginPlay()
 void AP7Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	Climb();
+	if (GetJumpState() >= EJS_Single) Climb();
 }
 
 void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -253,7 +256,6 @@ void AP7Character::InitOverlayWidget()
 
 void AP7Character::Climb()
 {
-	if (GetJumpState() < EJS_Single) return;
 	/* Search any obstacles in front of the player */
 	constexpr float MinDistanceToClimb = 75.f; 
 	FVector Start = GetActorLocation();

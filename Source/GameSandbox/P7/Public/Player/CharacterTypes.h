@@ -58,9 +58,9 @@ struct FSnapOffset
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere)
-	FVector LocationOffset;
+	FVector LocationOffset = FVector::ZeroVector;
 	UPROPERTY(EditAnywhere)
-	FRotator RotationOffset;
+	FRotator RotationOffset = FRotator::ZeroRotator;
 };
 
 USTRUCT(BlueprintType)

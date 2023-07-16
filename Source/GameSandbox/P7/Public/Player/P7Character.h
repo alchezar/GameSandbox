@@ -8,6 +8,7 @@
 #include "P7/Public/Player/P7BaseCharacter.h"
 #include "P7Character.generated.h"
 
+class UP7WallRunComponent;
 struct FInputActionValue;
 class USpringArmComponent;
 class UCameraComponent;
@@ -62,6 +63,8 @@ protected:
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* ViewCamera;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UP7WallRunComponent* WallRunComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Moving")
 	float StaminaCost = 20.f;
