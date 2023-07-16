@@ -245,7 +245,7 @@ void UP7WallRunComponent::DetectWall(EWallSide Side)
 	  * it uses the impact point and wall normal from the previous trace to start a short distance forward and away from the wall,
 	  * then traces in the reverse direction of that wall's normal (towards the wall).
 	  * The end position is moved slightly forward to better detect inside corners. */
-	constexpr bool bDrawAllDebugs = false; 
+	constexpr bool bDrawAllDebugs = true;
 	FHitResult SecondaryHit;
 	FWallRunTraceInfo SecondaryTraceInfo = FWallRunTraceInfo(1.5f, -0.9f, 0.75f, -1.5f, 0.f);
 	LineTraceRelativeToCapsuleAndWall(PrimaryTraceNormal, CurrentWallLocation, SecondaryTraceInfo, Side, SecondaryHit, bDrawAllDebugs);
@@ -450,17 +450,16 @@ bool UP7WallRunComponent::LineTraceRelativeToCapsuleAndWall(const FVector& WallN
 	/* Allow display of the debug lines if desired */
 	if (bShowDebug)
 	{
-		constexpr bool bPersistent = false;
 		constexpr float LifeTime = 20.f;
 		if (bTrace)
 		{
-			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Red, bPersistent, LifeTime);
-			DrawDebugLine(GetWorld(), HitResult.ImpactPoint, End, FColor::Green, bPersistent, LifeTime);
-			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red, bPersistent, LifeTime);
+			DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Red, false, LifeTime);
+			DrawDebugLine(GetWorld(), HitResult.ImpactPoint, End, FColor::Green, false, LifeTime);
+			DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red, false, LifeTime);
 		}
 		else
 		{
-			DrawDebugLine(GetWorld(), Start, End, FColor::Red, bPersistent, LifeTime);
+			DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, LifeTime);
 		}
 	}
 	/* Return true and the Hit Result if the line trace hit a surface. Otherwise, return false. */
@@ -609,6 +608,8 @@ void UP7WallRunComponent::WallHug()
 
 bool UP7WallRunComponent::StartWallJump()
 {
+	SetComponentTickEnabled(true);
+	// ManageTick(Player, MovementComponent->GetGroundMovementMode(), 0);
 	/* If the player is not wall running, stop the function and return False to indicate no jump was performed. */
 	if (!bWallRunning) return false;
 	/* If the player is currently wall running, stop the wall run and proceed with the wall jump. */
@@ -659,7 +660,7 @@ void UP7WallRunComponent::WallJumpTick(const float DeltaTime) const
 	  * direction of movement input being applied to the character, and not the actual direction of the character's movement. */
 	if (!bWallJumping) return;
 	const FRotator CurrentRotation = Player->GetActorRotation();
-	const FRotator TargetRotation = FRotator(0.f, 0.f, Player->GetVelocity().Rotation().Yaw);
+	const FRotator TargetRotation = FRotator(0.f, Player->GetVelocity().Rotation().Yaw, 0.f);
 	const FRotator InterpRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaTime, 5.f);
 	Player->SetActorRotation(InterpRotation);
 }
@@ -682,7 +683,7 @@ void UP7WallRunComponent::UpdateAnimationValues()
 	FVector Direction2D = VelocityDirection;
 	Direction2D.Z = 0.f;
 	const float AngleSign = FMath::Sign(VelocityDirection.Z);
-	CurrentArcAngle = AngleSign * FMath::Acos(VelocityDirection.Dot(Direction2D));
+	CurrentArcAngle = AngleSign * FMath::RadiansToDegrees(FMath::Acos(VelocityDirection.Dot(Direction2D)));
 	/** Find how fast we're turning around an outside corner and map it to a range of 0-1.
 	  * To do this, we get the delta of the character's current and previous rotation, map it to a range of -1 to 1,
 	  * switch the sign depending on what side the wall is on (so that outside corners always result in a positive value),

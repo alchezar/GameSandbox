@@ -22,13 +22,12 @@ AP7Character::AP7Character()
 	SetupComponents();
 	bUseControllerRotationYaw = false;
 	OrientToMovement(false);
-
-	WallRunComponent = CreateDefaultSubobject<UP7WallRunComponent>("WallRunComponent");
 }
 
 void AP7Character::BeginPlay()
 {
 	Super::BeginPlay();
+	check(WallRunComponent);
 	AddMappingContext();
 	Tags.Add("Player");
 	InitOverlayWidget();
@@ -37,7 +36,7 @@ void AP7Character::BeginPlay()
 void AP7Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (GetJumpState() >= EJS_Single) Climb();
+	// if (GetJumpState() >= EJS_Single) Climb();
 }
 
 void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -55,6 +54,12 @@ void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	EnhancedInputComponent->BindAction<ThisClass, bool>(BlockAction, ETriggerEvent::Completed, this, &ThisClass::Block, false);
 	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Started, this, &ThisClass::Run, true);
 	EnhancedInputComponent->BindAction<ThisClass, bool>(RunAction, ETriggerEvent::Completed, this, &ThisClass::Run, false);
+}
+
+void AP7Character::Jump()
+{
+	if (WallRunComponent->StartWallJump()) return;
+	Super::Jump();
 }
 
 void AP7Character::GetHit(const FVector& HitterLocation)
@@ -168,6 +173,8 @@ void AP7Character::SetupComponents()
 
 	ViewCamera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	ViewCamera->SetupAttachment(CameraBoom);
+	
+	WallRunComponent = CreateDefaultSubobject<UP7WallRunComponent>("WallRunComponent");
 }
 
 void AP7Character::OrientToMovement(const bool bOrient) const

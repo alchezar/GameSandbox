@@ -26,6 +26,7 @@ public:
 	AP7Character();	
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Jump() override;
 	virtual void GetHit(const FVector& HitterLocation) override; // AP7BaseCharacter
 	virtual bool GetIsAttaching() override;                      // AP7BaseCharacter
 	virtual void SetOverlappingItem(AP7Item* Item) override;     // IP7PickupInterface
@@ -33,6 +34,7 @@ public:
 	virtual void AddSouls(const int32 Souls) override;           // IP7PickupInterface
 	FORCEINLINE ECharacterState GetCharacterState() const { return CharacterState; };
 	FORCEINLINE EActionState GetActionState() const { return ActionState; };
+	FORCEINLINE UP7WallRunComponent* GetWallRunComponent() const { return WallRunComponent; }
 
 protected:
 	virtual void BeginPlay() override;

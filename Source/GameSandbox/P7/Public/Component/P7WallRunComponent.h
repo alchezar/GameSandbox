@@ -42,6 +42,15 @@ class GAMESANDBOX_API UP7WallRunComponent : public UActorComponent
 public:
 	UP7WallRunComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	FORCEINLINE bool GetIsWallRunning()           const { return bWallRunning; }
+	FORCEINLINE bool GetIsWallJumping()           const { return bWallJumping; }
+	FORCEINLINE EWallSide GetWallSide()           const { return WallSide; }
+	FORCEINLINE float GetArcCurrAngle()           const { return CurrentArcAngle; }
+	FORCEINLINE float GetTurnRate()               const { return CurrentTurnRate; }
+	FORCEINLINE float GetJumpHorizontalVelocity() const { return WallJumpHorizontalVelocity; }
+	FORCEINLINE float GetJumpVerticalVelocity()   const { return WallJumpVerticalVelocity; }
+	/* Wall jump */
+	bool StartWallJump();
 
 protected:
 	virtual void BeginPlay() override;
@@ -76,31 +85,44 @@ private:
 	void WallRunTick();
 	void WallHug();
 	/* Wall jump */
-	bool StartWallJump();
 	void StopWallJump();
 	void WallJumpTick(const float DeltaTime) const;
 	/* Mics */
 	void GatherPlayerInfo();
 	void UpdateAnimationValues();
 
+protected:
+	/* Wall run parameters */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallRunSpeed = 800.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float ArcAmount = 0.8f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallRunDurationLimit = 3.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float OutsideCornerLimit = 45.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float InsideCornerLimit = 45.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallJumpAngle = 45.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallJumpHorizontalVelocity = 800.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallJumpVerticalVelocity = 500.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	float WallJumpAirControl = 0.3f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	bool bRequiresTag = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	FName TagForAllowingWallRun = "WallRun";
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | WallRun")
+	FName TagForPreventingWallRun = "NoWallRun";
+
 private:
 	UPROPERTY()
 	AP7Character* Player;
 	UPROPERTY()
 	UCharacterMovementComponent* MovementComponent;
-	/* Wall run parameters */
-	float WallRunSpeed = 800.f;
-	float ArcAmount = 0.8f;
-	float WallRunDurationLimit = 3.f;
-	float OutsideCornerLimit = 45.f;
-	float InsideCornerLimit = 45.f;
-	float WallJumpAngle = 45.f;
-	float WallJumpHorizontalVelocity = 800.f;
-	float WallJumpVerticalVelocity = 500.f;
-	float WallJumpAirControl = 0.3f;
-	bool bRequiresTag = false;
-	FName TagForAllowingWallRun = "WallRun";
-	FName TagForPreventingWallRun = "NoWallRun";
 	/* Original character information */
 	float CapsuleRadius;
 	float DefaultMaxFlySpeed;
