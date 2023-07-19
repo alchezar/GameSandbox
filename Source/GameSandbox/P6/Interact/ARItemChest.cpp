@@ -16,8 +16,9 @@ AARItemChest::AARItemChest()
 	LidMesh = CreateDefaultSubobject<UStaticMeshComponent>("LidMesh");
 	LidMesh->SetupAttachment(BaseMesh);
 
-	SetReplicates(true);
+	// SetReplicates(true);
 	SetReplicatingMovement(true);
+	bReplicates = true;
 }
 
 void AARItemChest::BeginPlay()

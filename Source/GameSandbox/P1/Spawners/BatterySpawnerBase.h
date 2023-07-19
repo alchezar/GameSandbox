@@ -8,6 +8,7 @@
 
 class UBoxComponent;
 class APickUpBase;
+class UBillboardComponent;
 
 UCLASS()
 class GAMESANDBOX_API ABatterySpawnerBase : public AActor

@@ -21,7 +21,10 @@ public class GameSandbox : ModuleRules
 			"GameplayTasks",
 			"GameplayTags",
 			"NavigationSystem",
-			"ProceduralMeshComponent"
+			"ProceduralMeshComponent",
+			"FieldSystemEngine",
+			"GeometryCollectionEngine",
+			"ChaosSolverEngine"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore", "AnimGraphRuntime" });
