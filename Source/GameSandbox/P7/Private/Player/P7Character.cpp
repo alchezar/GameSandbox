@@ -36,7 +36,7 @@ void AP7Character::BeginPlay()
 void AP7Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	// if (GetJumpState() >= EJS_Single) Climb();
+	if (GetJumpState() >= EJS_Single && !WallRunComponent->GetIsWallRunning()) Climb();
 }
 
 void AP7Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -165,13 +165,13 @@ void AP7Character::EquipWeapon(AP7Weapon* Weapon)
 
 void AP7Character::SetupComponents()
 {
-	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
+	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomComponent");
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.f;
 	CameraBoom->SocketOffset = FVector(0.f, 50.f, 0.f);
 	CameraBoom->bUsePawnControlRotation = true;
 
-	ViewCamera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
+	ViewCamera = CreateDefaultSubobject<UCameraComponent>("ViewCameraComponent");
 	ViewCamera->SetupAttachment(CameraBoom);
 	
 	WallRunComponent = CreateDefaultSubobject<UP7WallRunComponent>("WallRunComponent");
@@ -272,7 +272,8 @@ void AP7Character::Climb()
 	QueryParams.AddIgnoredActor(this);
 	GetWorld()->LineTraceSingleByChannel(ForwardHitResult, Start, End, ECC_Visibility, QueryParams);
 	if (!ForwardHitResult.bBlockingHit) return;
-	
+	/* Check if obstacle has tag */
+	if (!ForwardHitResult.GetActor()->ActorHasTag("WallClimb")) return;
 	/* Check if the height of the obstacle is acceptable */
 	constexpr float MaxHeightToClimb = 160.f;
 	FHitResult DownHitResult;

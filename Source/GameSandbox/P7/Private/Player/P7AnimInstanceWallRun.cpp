@@ -34,11 +34,11 @@ void UP7AnimInstanceWallRun::NativeUpdateAnimation(float DeltaSeconds)
 	float ArcAngleAlpha;
 	if (CurrentArcAngle >= 15.f)
 	{
-		ArcAngleAlpha = FMath::GetMappedRangeValueClamped(FVector2D(30.f, 45.f), FVector2D(1.f, 0.f), CurrentArcAngle);
+		ArcAngleAlpha = FMath::GetMappedRangeValueClamped(FVector2D(15.f, 45.f), FVector2D(1.f, 0.f), CurrentArcAngle);
 	}
 	else
 	{
-		ArcAngleAlpha = FMath::GetMappedRangeValueClamped(FVector2D(0.f, 30.f), FVector2D(0.f, 1.f), CurrentArcAngle);
+		ArcAngleAlpha = FMath::GetMappedRangeValueClamped(FVector2D(0.f, 15.f), FVector2D(0.f, 1.f), CurrentArcAngle);
 	}
 	HandCorrectionAdditive = FMath::FInterpTo(HandCorrectionAdditive, ArcAngleAlpha, GetWorld()->GetDeltaSeconds(), 7.f);
 }

@@ -1,6 +1,8 @@
 // Copyright (C) 2023, IKinder
 
 #include "P7/Public/Component/P7AttributeComponent.h"
+#include "GameFramework/Character.h"
+#include "P7/Public/Player/P7BaseCharacter.h"
 
 UP7AttributeComponent::UP7AttributeComponent()
 {
@@ -15,8 +17,8 @@ void UP7AttributeComponent::BeginPlay()
 void UP7AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (GetStaminaPercent() < 1.f)
+	/* Refill stamina only after the character has stopped blocking */
+	if (GetStaminaPercent() < 1.f && !Character->GetIsBlocked())
 	{
 		RefillStamina(StaminaRegenRate * DeltaTime);
 	}
@@ -71,5 +73,5 @@ void UP7AttributeComponent::ResetStamina()
 
 void UP7AttributeComponent::SetCharacter(ACharacter* OwnerCharacter)
 {
-	Character = OwnerCharacter;
+	Character = Cast<AP7BaseCharacter>(OwnerCharacter);
 }

@@ -78,13 +78,23 @@ bool AP7BaseCharacter::GetIsAttaching()
 
 float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	if (bBlocking) /* Prevent infinity attacks to blocking character */
+	/** Player can block the attack. But when he runs out of stamina or the attack does not happen in front of the player, he takes damage
+	  * Each successful block has its stamina cost which is equal damage amaunt. */
+	if (bBlocking && Attributes->GetCurrentStamina() >= DamageAmount)
 	{
-		IP7HitInterface* HitInterface = Cast<IP7HitInterface>(DamageCauser->GetInstigator());
-		if (!HitInterface) return 0.f;
-		DamageCauser->GetInstigator()->TakeDamage(1.f, FDamageEvent{}, GetController(), this);
-		HitInterface->GetHit(GetActorLocation());
-		return 0.f;
+		/* Block attack only 150 degrees in front of the player */
+		if (!DamageCauser) return 0.f;
+		const float AttackAngle = AngleBetweenVectors(GetActorLocation(), DamageCauser->GetActorLocation());
+		if (-75.f <= AttackAngle && AttackAngle <= 75.f)
+		{
+			/* Return some small amount of damage, to prevent endless attacks on the blocking character */
+			IP7HitInterface* HitInterface = Cast<IP7HitInterface>(DamageCauser->GetInstigator());
+			if (!HitInterface) return 0.f;
+			DamageCauser->GetInstigator()->TakeDamage(1.f, FDamageEvent{}, GetController(), this);
+			HitInterface->GetHit(GetActorLocation());
+			Attributes->UseStamina(DamageAmount);
+			return 0.f;
+		}
 	}
 	Attributes->ReceiveDamage(DamageAmount);
 	return DamageAmount;
@@ -92,7 +102,7 @@ float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 
 float AP7BaseCharacter::GetMovementDirectionAngle()
 {
-	if (FMath::IsNearlyZero(GetVelocity().Size2D())) return 0.f;
+	if (FMath::IsNearlyZero(GetVelocity().Size2D())) return 0.f; 
 	return AngleBetweenVectors(GetActorForwardVector(), GetVelocity().GetSafeNormal());
 }
 

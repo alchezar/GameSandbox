@@ -203,7 +203,6 @@ void AP7LightSaber::SweepSphere(FHitResult& HitResult)
 	QueryParams.AddIgnoredActor(this);
 
 	GetWorld()->SweepSingleByChannel(HitResult, Start, End, Rotation, ECC_Visibility, SphereShape, QueryParams);
-
 }
 
 void AP7LightSaber::PlasmaDecal(const FHitResult& HitResult)
@@ -226,7 +225,7 @@ void AP7LightSaber::PlasmaDecal(const FHitResult& HitResult)
 			GetWorld(), Plasma.Material, FVector(Plasma.Size), Location, HitResult.ImpactNormal.Rotation());
 		if (!PlasmaComponent) return;
 		PlasmaComponent->SetFadeOut(5.f, 1.f, false);
-		
+
 		UMaterialInstanceDynamic* DynamicPlasma = PlasmaComponent->CreateDynamicMaterialInstance();
 		if (!DynamicPlasma) return;
 		DynamicPlasma->SetVectorParameterValue(Plasma.ColorName, Color);

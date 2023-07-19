@@ -96,8 +96,8 @@ void UP7WallRunComponent::ManageTick(ACharacter* Character, EMovementMode PrevMo
 	{
 		SetComponentTickEnabled(false);
 	}
-	/* If we are currently wall jumping, end the jump.
-	 * (The change in movement mode suggests the player may have hit the ground after jumping.) */
+	/** If we are currently wall jumping, end the jump.
+	  * (The change in movement mode suggests the player may have hit the ground after jumping.) */
 	if (bWallJumping)
 	{
 		StopWallJump();
@@ -170,7 +170,9 @@ void UP7WallRunComponent::MonitorSpeed()
 	  * but we don't want to do anything about it yet in case it's just a momentary drop in velocity.
 	  * If the test fails again in the next interval, then we stop the wall run.
 	  * If the test does not fail two times consecutively, we set SpeedTooLow back to false so the process can start over. */
-	if (Player->GetVelocity().Projection().Length() < WallRunSpeed * 0.25f)
+	FVector Velocity2d = Player->GetVelocity();
+	Velocity2d.Z = 0.f;
+	if (Velocity2d.Length() < WallRunSpeed * 0.25f)
 	{
 		if (bSpeedTooLow)
 		{
@@ -245,7 +247,7 @@ void UP7WallRunComponent::DetectWall(EWallSide Side)
 	  * it uses the impact point and wall normal from the previous trace to start a short distance forward and away from the wall,
 	  * then traces in the reverse direction of that wall's normal (towards the wall).
 	  * The end position is moved slightly forward to better detect inside corners. */
-	constexpr bool bDrawAllDebugs = true;
+	constexpr bool bDrawAllDebugs = false;
 	FHitResult SecondaryHit;
 	FWallRunTraceInfo SecondaryTraceInfo = FWallRunTraceInfo(1.5f, -0.9f, 0.75f, -1.5f, 0.f);
 	LineTraceRelativeToCapsuleAndWall(PrimaryTraceNormal, CurrentWallLocation, SecondaryTraceInfo, Side, SecondaryHit, bDrawAllDebugs);

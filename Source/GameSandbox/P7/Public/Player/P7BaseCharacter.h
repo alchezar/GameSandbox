@@ -55,7 +55,6 @@ private:
 protected:	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UP7AttributeComponent* Attributes;
-	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
 	FName HandSocketName = "GripPoint";
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")

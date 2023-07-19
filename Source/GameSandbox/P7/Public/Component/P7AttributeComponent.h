@@ -34,7 +34,7 @@ public:
 	FORCEINLINE float GetCurrentStamina() const { return CurrentStamina; };
 	FORCEINLINE int32 GetCoins() const { return Coins; };
 	FORCEINLINE int32 GetSouls() const { return Souls; };
-	FORCEINLINE ACharacter* GetOwnerCharacter() const { return Character; };
+	FORCEINLINE AP7BaseCharacter* GetOwnerCharacter() const { return Character; };
 	void SetDefaultAttributes(ACharacter* OwnerCharacter);
 	
 protected:
@@ -65,5 +65,5 @@ protected:
 
 private:
 	UPROPERTY()
-	ACharacter* Character;
+	AP7BaseCharacter* Character;
 };
