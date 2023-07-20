@@ -84,7 +84,8 @@ float AP7BaseCharacter::TakeDamage(float DamageAmount, FDamageEvent const& Damag
 	{
 		/* Block attack only 150 degrees in front of the player */
 		if (!DamageCauser) return 0.f;
-		const float AttackAngle = AngleBetweenVectors(GetActorLocation(), DamageCauser->GetActorLocation());
+		const FVector EnemyDirection = (DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal();
+		const float AttackAngle = AngleBetweenVectors(GetActorForwardVector(), EnemyDirection);
 		if (-75.f <= AttackAngle && AttackAngle <= 75.f)
 		{
 			/* Return some small amount of damage, to prevent endless attacks on the blocking character */
