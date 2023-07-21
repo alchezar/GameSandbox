@@ -14,6 +14,7 @@ class GAMESANDBOX_API AP8MovablePlatform : public AStaticMeshActor
 public:
 	AP8MovablePlatform();
 	virtual void Tick(const float DeltaTime) override;
+	void SetTriggerActivation(const bool bActive);
 
 protected:
 	virtual void BeginPlay() override;

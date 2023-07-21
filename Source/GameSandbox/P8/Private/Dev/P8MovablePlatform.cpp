@@ -19,6 +19,7 @@ void AP8MovablePlatform::BeginPlay()
 	}
 	GlobalStartLocation = GetActorLocation();
 	GlobalTargetLocation = GetTransform().TransformPosition(TargetLocation);
+	SetActorTickEnabled(false);
 }
 
 void AP8MovablePlatform::Tick(const float DeltaTime)
@@ -31,7 +32,7 @@ void AP8MovablePlatform::Tick(const float DeltaTime)
 		const FVector Direction = (GlobalTargetLocation - Location).GetSafeNormal();
 		Location += Direction * Speed * DeltaTime;
 		SetActorLocation(Location);
-		
+		/* Swap start & target points after reaching last one, so the platform direction becomes inverted */
 		if ((Location - GlobalStartLocation).Size() >= (GlobalTargetLocation - GlobalStartLocation).Size())
 		{
 			/* Swap variables without creating temp vector */
@@ -42,3 +43,7 @@ void AP8MovablePlatform::Tick(const float DeltaTime)
 	}
 }
 
+void AP8MovablePlatform::SetTriggerActivation(const bool bActive)
+{
+	SetActorTickEnabled(bActive);
+}
