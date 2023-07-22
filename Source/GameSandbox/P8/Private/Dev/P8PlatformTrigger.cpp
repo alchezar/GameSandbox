@@ -7,8 +7,12 @@
 AP8PlatformTrigger::AP8PlatformTrigger()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SceneRoot = CreateDefaultSubobject<USceneComponent>("SceneRoot");
+	SetRootComponent(SceneRoot);
 	PressureVolume = CreateDefaultSubobject<UBoxComponent>("PressureVolume");
+	PressureVolume->SetupAttachment(RootComponent);
 	PressurePad = CreateDefaultSubobject<UStaticMeshComponent>("PressurePad");
+	PressurePad->SetupAttachment(RootComponent);
 }
 
 void AP8PlatformTrigger::PostInitializeComponents()

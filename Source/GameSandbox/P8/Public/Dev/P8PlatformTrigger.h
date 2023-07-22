@@ -17,8 +17,8 @@ class GAMESANDBOX_API AP8PlatformTrigger : public AActor
 public:
 	AP8PlatformTrigger();
 	virtual void PostInitializeComponents() override;
-	virtual void Tick(float DeltaTime) override;
-
+	virtual void Tick(float DeltaTime) override;	
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -31,10 +31,12 @@ private:
 	void MovePlatforms(const bool bMove);
 	
 protected:
-	UPROPERTY(EditAnywhere, Category = "C++")
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Components")
+	USceneComponent* SceneRoot;	
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Components")
 	UBoxComponent* PressureVolume;
-	UPROPERTY(EditAnywhere, Category = "C++")
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Components")
 	UStaticMeshComponent* PressurePad;
-	UPROPERTY(EditAnywhere, Category = "C++")
+	UPROPERTY(EditAnywhere, Category = "C++ | Platforms")
 	TArray<AP8MovablePlatform*> MovablePlatforms;
 };
