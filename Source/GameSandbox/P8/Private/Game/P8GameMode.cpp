@@ -23,4 +23,3 @@ void AP8GameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 }
-

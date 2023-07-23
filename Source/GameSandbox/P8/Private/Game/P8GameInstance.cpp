@@ -22,6 +22,16 @@ void UP8GameInstance::Init()
 	UE_LOG(LogP8GameInstance, Log, TEXT("Game instance initialized"));
 }
 
+void UP8GameInstance::Host()
+{
+	HostServer();
+}
+
+void UP8GameInstance::Join(const FString& Address)
+{
+	JoinServer(Address);
+}
+
 void UP8GameInstance::LoadMenu() const
 {
 	if (!MainMenuClass) return;
@@ -38,13 +48,15 @@ void UP8GameInstance::LoadMenu() const
 	PlayerController->bShowMouseCursor = true;
 }
 
-void UP8GameInstance::Host() const
+void UP8GameInstance::HostServer() const
 {
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Hosting");
-	if (GetWorld()) GetWorld()->ServerTravel("/Game/Project/P8/Level/MasterMultiplayer?listen");
+	if (!GetWorld()) return;
+	const FString GoToURL = GameLevelURL + "?listen";
+	GetWorld()->ServerTravel(GoToURL);
 }
 
-void UP8GameInstance::Join(const FString& Address) const
+void UP8GameInstance::JoinServer(const FString& Address) const
 {
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Joining: %s"), *Address));
 	if (!GetWorld()) return;

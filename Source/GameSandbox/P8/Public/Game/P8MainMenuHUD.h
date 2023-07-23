@@ -9,7 +9,7 @@
 class UP8MainMenuWidget;
 
 UCLASS()
-class GAMESANDBOX_API AP8MainMenuHUD : public ADebugCameraHUD
+class GAMESANDBOX_API AP8MainMenuHUD : public AHUD
 {
 	GENERATED_BODY()
 
@@ -20,6 +20,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void CreateMainMenu();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Widget")
