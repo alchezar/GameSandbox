@@ -19,7 +19,6 @@ class GAMESANDBOX_API UP8MainMenuWidget : public UUserWidget
 public:
 	virtual bool Initialize() override;
 	void Setup();
-	void SetMenuInterface(IP8MenuInterface* NewMenuInterface);
 	
 protected:
 	virtual void NativeConstruct() override;

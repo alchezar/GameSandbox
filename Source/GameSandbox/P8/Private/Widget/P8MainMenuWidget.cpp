@@ -15,11 +15,6 @@ void UP8MainMenuWidget::Setup()
 	MenuInterface = Cast<IP8MenuInterface>(GetGameInstance());
 }
 
-void UP8MainMenuWidget::SetMenuInterface(IP8MenuInterface* NewMenuInterface)
-{
-	MenuInterface = NewMenuInterface;
-}
-
 void UP8MainMenuWidget::NativeConstruct()
 {
 	Super::NativeConstruct();

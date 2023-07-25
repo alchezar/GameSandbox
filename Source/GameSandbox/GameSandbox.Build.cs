@@ -24,7 +24,8 @@ public class GameSandbox : ModuleRules
 			"ProceduralMeshComponent",
 			"FieldSystemEngine",
 			"GeometryCollectionEngine",
-			"ChaosSolverEngine"
+			"ChaosSolverEngine",
+			"OnlineSubsystem"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore", "AnimGraphRuntime" });

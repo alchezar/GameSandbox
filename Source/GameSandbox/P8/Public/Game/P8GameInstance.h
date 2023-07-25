@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "P8/Public/Interface/P8MenuInterface.h"
 #include "P8GameInstance.generated.h"
+
+class FOnlineSessionSearch;
 
 UCLASS()
 class GAMESANDBOX_API UP8GameInstance : public UGameInstance, public IP8MenuInterface
@@ -27,6 +30,16 @@ protected:
 	UFUNCTION(Exec)
 	void JoinServer(const FString& Address) const;
 
+private:
+	void OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
+	void OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionCompleteHandle(bool bWasSuccessful);
+	void CreateSession();
+
+	void Test1();
+	void Test2();
+
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")
 	FString LobbyLevelURL = "/Game/Project/P8/Level/Lobby";
@@ -35,4 +48,7 @@ protected:
 
 private:
 	TSubclassOf<UUserWidget> MainMenuClass;
+	IOnlineSessionPtr SessionInterface;
+	FName CurrentSessionName = FName("MySessionGame");
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 };

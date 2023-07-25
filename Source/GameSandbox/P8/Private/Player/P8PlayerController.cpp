@@ -65,7 +65,7 @@ void AP8PlayerController::SwitchGamePause()
 	if (!MainGameHUD) return;
 	GamePauseWidget = MainGameHUD->ShowPauseMenu(bGamePause);
 	/* Send reference of player controller interface to pause widget.
-	 * To prevent unnecessary assigns - do it once when pause widget is nullptr. */
+	 * To prevent unnecessary assigns - do it once when PC interface in pause widget is nullptr. */
 	if (!GamePauseWidget->GetPCInterface())
 	{
 		GamePauseWidget->SetPCInterface(this);
