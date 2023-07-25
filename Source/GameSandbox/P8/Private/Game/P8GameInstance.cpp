@@ -5,9 +5,11 @@
 #include "OnlineSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "P8/Public/Game/P8MainMenuHUD.h"
+#include "P8/Public/Widget/P8MainMenuWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
-DEFINE_LOG_CATEGORY_STATIC(LogP8GameInstance, All, All);
+DEFINE_LOG_CATEGORY_STATIC(LogP8GameInstance, All, All)
 
 UP8GameInstance::UP8GameInstance(const FObjectInitializer& ObjectInitializer)
 {
@@ -15,7 +17,11 @@ UP8GameInstance::UP8GameInstance(const FObjectInitializer& ObjectInitializer)
 	if (MainMenuBPClass.Class)
 	{
 		MainMenuClass = MainMenuBPClass.Class;
-		// UE_LOG(LogP8GameInstance, Log, TEXT("Found class %s"), *MainMenuClass->GetName());
+	}
+	const ConstructorHelpers::FClassFinder<UUserWidget> ServerRowBPClass(TEXT("/Game/Project/P8/Widget/WBP_ServerRow"));
+	if (ServerRowBPClass.Class)
+	{
+		ServerRowClass = ServerRowBPClass.Class;
 	}
 }
 
@@ -38,14 +44,9 @@ void UP8GameInstance::Init()
 		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDeleteSessionCompleteHandle);
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionCompleteHandle);
 	}
-
-	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-	if (SessionSearch)
-	{
-		// SessionSearch->bIsLanQuery = true;
-		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-		UE_LOG(LogP8GameInstance, Log, TEXT("Starting to find session"));
-	}
+	/** Since GameInstance doesn`t have BeginPlay event, and Init is executed much before the game starts,
+	  * this delegate will execute callback after the level is loaded. */
+	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapHandle);
 }
 
 void UP8GameInstance::Host()
@@ -62,20 +63,39 @@ void UP8GameInstance::Host()
 
 void UP8GameInstance::Join(const FString& Address)
 {
-	JoinServer(Address);
+	// JoinServer(Address);
+
+	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
+	if (!PC) return;
+	const AP8MainMenuHUD* MainMenuHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
+	if (!MainMenuHUD) return;
+	MainMenuWidget = MainMenuHUD->GetMainMenuWidget();
+	if (!MainMenuWidget) return;
+	MainMenuWidget->SetServerList({"Test1", "Test2", "Test3"});
+}
+
+void UP8GameInstance::RefreshServerList()
+{
+	SessionSearch = MakeShareable(new FOnlineSessionSearch());
+	if (SessionSearch)
+	{
+		// SessionSearch->bIsLanQuery = true;
+		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
+		/* OnFindSessionCompleteHandle will be called when the search is complete */
+	}
 }
 
 void UP8GameInstance::LoadMenu() const
 {
 	if (!MainMenuClass) return;
-	UUserWidget* MainMenuWidget = CreateWidget<UUserWidget>(GetWorld(), MainMenuClass);
-	if (!MainMenuWidget) return;
-	MainMenuWidget->AddToViewport();
+	UUserWidget* MainMenuWidget_Unused = CreateWidget<UUserWidget>(GetWorld(), MainMenuClass);
+	if (!MainMenuWidget_Unused) return;
+	MainMenuWidget_Unused->AddToViewport();
 
 	APlayerController* PlayerController = GetFirstLocalPlayerController(GetWorld());
 	if (!PlayerController) return;
 	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
+	InputMode.SetWidgetToFocus(MainMenuWidget_Unused->TakeWidget());
 	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 	PlayerController->SetInputMode(InputMode);
 	PlayerController->bShowMouseCursor = true;
@@ -112,14 +132,23 @@ void UP8GameInstance::OnDeleteSessionCompleteHandle(FName SessionName, bool bWas
 
 void UP8GameInstance::OnFindSessionCompleteHandle(bool bWasSuccessful)
 {
-	if (!SessionSearch) return;
-	
-	UE_LOG(LogP8GameInstance, Log, TEXT("Session found"));
-	for(const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
+	if (!bWasSuccessful || !SessionSearch || !MainMenuWidget) return;
+	TArray<FString> ServerNames;
+	for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 	{
 		if (!SearchResult.IsValid()) continue;
-		UE_LOG(LogP8GameInstance, Log, TEXT("Found session name: %s"), *SearchResult.GetSessionIdStr());
+		ServerNames.Add(SearchResult.GetSessionIdStr());
 	}
+	MainMenuWidget->SetServerList(ServerNames);
+}
+
+void UP8GameInstance::OnPostLoadMapHandle(UWorld* World)
+{
+	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
+	if (!PC) return;
+	const AP8MainMenuHUD* MainMenuHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
+	if (!MainMenuHUD) return;
+	MainMenuWidget = MainMenuHUD->GetMainMenuWidget();
 }
 
 void UP8GameInstance::CreateSession()

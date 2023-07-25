@@ -8,6 +8,7 @@
 #include "P8/Public/Interface/P8MenuInterface.h"
 #include "P8GameInstance.generated.h"
 
+class UP8MainMenuWidget;
 class FOnlineSessionSearch;
 
 UCLASS()
@@ -20,6 +21,7 @@ public:
 	virtual void Init() override;                       // UGameInstance
 	virtual void Host() override;                       // IP8MenuInterface
 	virtual void Join(const FString& Address) override; // IP8MenuInterface
+	virtual void RefreshServerList() override;          // IP8MenuInterface
 	FORCEINLINE FString GetLobbyURL() const { return LobbyLevelURL; };
 
 protected:
@@ -34,11 +36,11 @@ private:
 	void OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
 	void OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionCompleteHandle(bool bWasSuccessful);
+	void OnPostLoadMapHandle(UWorld* World);
 	void CreateSession();
 
 	void Test1();
 	void Test2();
-
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")
@@ -48,7 +50,10 @@ protected:
 
 private:
 	TSubclassOf<UUserWidget> MainMenuClass;
+	TSubclassOf<UUserWidget> ServerRowClass;
 	IOnlineSessionPtr SessionInterface;
 	FName CurrentSessionName = FName("MySessionGame");
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+	UPROPERTY()
+	UP8MainMenuWidget* MainMenuWidget;
 };
