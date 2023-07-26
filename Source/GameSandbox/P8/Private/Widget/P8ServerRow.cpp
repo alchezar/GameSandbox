@@ -8,7 +8,8 @@
 void UP8ServerRow::NativeConstruct()
 {
 	Super::NativeConstruct();
-	check(RowButton);
+	check(RowButton)
+	check(ServerName)
 
 	RowButton->OnClicked.AddDynamic(this, &ThisClass::OnRowButtonClickedHandle);
 }
@@ -19,14 +20,9 @@ void UP8ServerRow::OnRowButtonClickedHandle()
 	ParentWidget->SetSelectedIndex(Index);
 }
 
-void UP8ServerRow::Setup(UP8MainMenuWidget* Parent, const uint32 NewIndex)
+void UP8ServerRow::SetupRow(UP8MainMenuWidget* Parent, const uint32 NewIndex, const FText& NewName)
 {
 	ParentWidget = Parent;
 	Index = NewIndex;
-}
-
-void UP8ServerRow::SetServerName(const FText& NewName) const
-{
-	if (!ServerName) return;
 	ServerName->SetText(NewName);
 }

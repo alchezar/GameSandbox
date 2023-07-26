@@ -68,19 +68,13 @@ void UP8MainMenuWidget::OnCancelClickedHandle()
 
 void UP8MainMenuWidget::OnConnectClickedHandle()
 {
-	if (SelectedIndex.IsSet())
+	if (SelectedIndex.IsSet() && MenuInterface)
 	{
 		UE_LOG(LogP8MainMenuWidget, Log, TEXT("Selected index: %d"), SelectedIndex.GetValue());
+		MenuInterface->Join(SelectedIndex.GetValue());
+		return;
 	}
-	else
-	{
-		UE_LOG(LogP8MainMenuWidget, Log, TEXT("Selected index NOT set!"));
-	}
-	
-	if (MenuInterface)
-	{
-		MenuInterface->Join("");
-	}
+	UE_LOG(LogP8MainMenuWidget, Log, TEXT("Selected index NOT set!"));
 }
 
 void UP8MainMenuWidget::SetServerList(TArray<FString> ServerNames)
@@ -91,8 +85,7 @@ void UP8MainMenuWidget::SetServerList(TArray<FString> ServerNames)
 	{
 		UP8ServerRow* ServerRowWidget = CreateWidget<UP8ServerRow>(GetWorld(), ServerRowClass);
 		if (!ServerRowWidget) return;
-		ServerRowWidget->Setup(this, Index++);
-		ServerRowWidget->SetServerName( FText::FromString(ServerName));
+		ServerRowWidget->SetupRow(this, Index++, FText::FromString(ServerName));
 		ServerListScrollBox->AddChild(ServerRowWidget);
 	}
 	

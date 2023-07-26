@@ -43,10 +43,8 @@ void UP8GameInstance::Init()
 		SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnCreateSessionCompleteHandle);
 		SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDeleteSessionCompleteHandle);
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionCompleteHandle);
+		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::OnJoinSessionCompleteHandle);
 	}
-	/** Since GameInstance doesn`t have BeginPlay event, and Init is executed much before the game starts,
-	  * this delegate will execute callback after the level is loaded. */
-	FCoreUObjectDelegates::PostLoadMapWithWorld.AddUObject(this, &ThisClass::OnPostLoadMapHandle);
 }
 
 void UP8GameInstance::Host()
@@ -56,22 +54,17 @@ void UP8GameInstance::Host()
 	if (ExistingSession)
 	{
 		SessionInterface->DestroySession(CurrentSessionName);
+		/* OnDeleteSessionCompleteHandle fired when a destroying an online session has completed. */
 		return;
 	}
 	CreateSession();
 }
 
-void UP8GameInstance::Join(const FString& Address)
+void UP8GameInstance::Join(uint32 Index)
 {
-	// JoinServer(Address);
-
-	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
-	if (!PC) return;
-	const AP8MainMenuHUD* MainMenuHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
-	if (!MainMenuHUD) return;
-	MainMenuWidget = MainMenuHUD->GetMainMenuWidget();
-	if (!MainMenuWidget) return;
-	MainMenuWidget->SetServerList({"Test1", "Test2", "Test3"});
+	if (!SessionInterface || !SessionSearch) return;
+	SessionInterface->JoinSession(0, CurrentSessionName, SessionSearch->SearchResults[Index]);
+	/* OnJoinSessionCompleteHandle fired when the process for a local user joining an online session has completed. */
 }
 
 void UP8GameInstance::RefreshServerList()
@@ -81,47 +74,20 @@ void UP8GameInstance::RefreshServerList()
 	{
 		// SessionSearch->bIsLanQuery = true;
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-		/* OnFindSessionCompleteHandle will be called when the search is complete */
+		/* OnFindSessionCompleteHandle fired when the search for an online session has completed. */
 	}
-}
-
-void UP8GameInstance::LoadMenu() const
-{
-	if (!MainMenuClass) return;
-	UUserWidget* MainMenuWidget_Unused = CreateWidget<UUserWidget>(GetWorld(), MainMenuClass);
-	if (!MainMenuWidget_Unused) return;
-	MainMenuWidget_Unused->AddToViewport();
-
-	APlayerController* PlayerController = GetFirstLocalPlayerController(GetWorld());
-	if (!PlayerController) return;
-	FInputModeUIOnly InputMode;
-	InputMode.SetWidgetToFocus(MainMenuWidget_Unused->TakeWidget());
-	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-	PlayerController->SetInputMode(InputMode);
-	PlayerController->bShowMouseCursor = true;
-}
-
-void UP8GameInstance::HostServer() const
-{
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Hosting");
-	if (!GetWorld()) return;
-	const FString GoToURL = GameLevelURL + "?listen";
-	GetWorld()->ServerTravel(GoToURL);
-}
-
-void UP8GameInstance::JoinServer(const FString& Address) const
-{
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Joining: %s"), *Address));
-	if (!GetWorld()) return;
-	APlayerController* PlayerController = GetFirstLocalPlayerController(GetWorld());
-	if (!PlayerController) return;
-	PlayerController->ClientTravel(Address, TRAVEL_Absolute);
+	/* Once the search is complete, we`ll need a reference to the MainMenu widget. */
+	FindMenuWidget();
 }
 
 void UP8GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful)
 {
-	if (!bWasSuccessful) return;
-	HostServer();
+	/* Server Host */
+	if (!bWasSuccessful || !GetWorld()) return;
+	const FString GoToURL = GameLevelURL + "?listen";
+	GetWorld()->ServerTravel(GoToURL);
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Hosting");
 }
 
 void UP8GameInstance::OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful)
@@ -142,13 +108,20 @@ void UP8GameInstance::OnFindSessionCompleteHandle(bool bWasSuccessful)
 	MainMenuWidget->SetServerList(ServerNames);
 }
 
-void UP8GameInstance::OnPostLoadMapHandle(UWorld* World)
+void UP8GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
-	if (!PC) return;
-	const AP8MainMenuHUD* MainMenuHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
-	if (!MainMenuHUD) return;
-	MainMenuWidget = MainMenuHUD->GetMainMenuWidget();
+	if (!SessionInterface) return;
+	FString Address;
+	if (!SessionInterface->GetResolvedConnectString(SessionName, Address))
+	{
+		UE_LOG(LogP8GameInstance, Log, TEXT("Could not ged connecting string."));
+		return;
+	}
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Joining: %s"), *Address));
+	if (!GetWorld()) return;
+	APlayerController* PlayerController = GetFirstLocalPlayerController(GetWorld());
+	if (!PlayerController) return;
+	PlayerController->ClientTravel(Address, TRAVEL_Absolute);
 }
 
 void UP8GameInstance::CreateSession()
@@ -159,9 +132,30 @@ void UP8GameInstance::CreateSession()
 	SessionSettings.NumPublicConnections = 2;
 	SessionSettings.bShouldAdvertise = true;
 	SessionInterface->CreateSession(0, CurrentSessionName, SessionSettings);
+	/* OnCreateSessionCompleteHandle fired when a session create request has completed. */
 }
 
-// Tests
-void UP8GameInstance::Test1() {}
+void UP8GameInstance::FindMenuWidget()
+{
+	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
+	if (!PC) return;
+	const AP8MainMenuHUD* LobbyHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
+	if (!LobbyHUD) return;
+	MainMenuWidget = LobbyHUD->GetMainMenuWidget();
+}
 
-void UP8GameInstance::Test2() {}
+void UP8GameInstance::LoadMenu() const
+{
+	if (!MainMenuClass) return;
+	UUserWidget* MainMenuWidget_Unused = CreateWidget<UUserWidget>(GetWorld(), MainMenuClass);
+	if (!MainMenuWidget_Unused) return;
+	MainMenuWidget_Unused->AddToViewport();
+
+	APlayerController* PlayerController = GetFirstLocalPlayerController(GetWorld());
+	if (!PlayerController) return;
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(MainMenuWidget_Unused->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+	PlayerController->SetInputMode(InputMode);
+	PlayerController->bShowMouseCursor = true;
+}

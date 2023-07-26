@@ -18,29 +18,23 @@ class GAMESANDBOX_API UP8GameInstance : public UGameInstance, public IP8MenuInte
 
 public:
 	UP8GameInstance(const FObjectInitializer& ObjectInitializer);
-	virtual void Init() override;                       // UGameInstance
-	virtual void Host() override;                       // IP8MenuInterface
-	virtual void Join(const FString& Address) override; // IP8MenuInterface
-	virtual void RefreshServerList() override;          // IP8MenuInterface
+	virtual void Init() override;              // UGameInstance
+	virtual void Host() override;              // IP8MenuInterface
+	virtual void Join(uint32 Index) override;  // IP8MenuInterface
+	virtual void RefreshServerList() override; // IP8MenuInterface
 	FORCEINLINE FString GetLobbyURL() const { return LobbyLevelURL; };
 
 protected:
 	UFUNCTION(Exec)
 	void LoadMenu() const;
-	UFUNCTION(Exec)
-	void HostServer() const;
-	UFUNCTION(Exec)
-	void JoinServer(const FString& Address) const;
 
 private:
 	void OnCreateSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
 	void OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionCompleteHandle(bool bWasSuccessful);
-	void OnPostLoadMapHandle(UWorld* World);
+	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void CreateSession();
-
-	void Test1();
-	void Test2();
+	void FindMenuWidget();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")

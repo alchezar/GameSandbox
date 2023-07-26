@@ -16,8 +16,7 @@ class GAMESANDBOX_API UP8ServerRow : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void Setup(UP8MainMenuWidget* Parent, const uint32 NewIndex);
-	void SetServerName(const FText& NewName) const;
+	void SetupRow(UP8MainMenuWidget* Parent, const uint32 NewIndex, const FText& NewName);
 
 protected:
 	virtual void NativeConstruct() override;
