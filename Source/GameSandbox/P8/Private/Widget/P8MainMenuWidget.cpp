@@ -5,6 +5,7 @@
 #include "Components/EditableTextBox.h"
 #include "Components/ScrollBox.h"
 #include "Components/WidgetSwitcher.h"
+#include "P8/Public/Util/P8Utils.h"
 #include "P8/Public/Widget/P8ServerRow.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP8MainMenuWidget, All, All)
@@ -77,15 +78,15 @@ void UP8MainMenuWidget::OnConnectClickedHandle()
 	UE_LOG(LogP8MainMenuWidget, Log, TEXT("Selected index NOT set!"));
 }
 
-void UP8MainMenuWidget::SetServerList(TArray<FString> ServerNames)
+void UP8MainMenuWidget::SetServerList(TArray<FP8ServerData> ServerData)
 {
 	ServerListScrollBox->ClearChildren();
 	uint32 Index = 0;
-	for (const FString& ServerName : ServerNames)
+	for (const  FP8ServerData& Data : ServerData)
 	{
 		UP8ServerRow* ServerRowWidget = CreateWidget<UP8ServerRow>(GetWorld(), ServerRowClass);
 		if (!ServerRowWidget) return;
-		ServerRowWidget->SetupRow(this, Index++, FText::FromString(ServerName));
+		ServerRowWidget->SetupRow(this, Index++, Data);
 		ServerListScrollBox->AddChild(ServerRowWidget);
 	}
 	
@@ -94,4 +95,21 @@ void UP8MainMenuWidget::SetServerList(TArray<FString> ServerNames)
 void UP8MainMenuWidget::SetSelectedIndex(const uint32 Index)
 {
 	SelectedIndex = Index;
+	UpdateChildren();
+}
+
+FString UP8MainMenuWidget::GetCustomServerName() const
+{
+	return CustomServerName->GetText().ToString();
+}
+
+void UP8MainMenuWidget::UpdateChildren()
+{
+	TArray<UWidget*> Rows = ServerListScrollBox->GetAllChildren();
+	for (int i = 0; i < Rows.Num(); ++i)
+	{
+		auto* Row = Cast<UP8ServerRow>(Rows[i]);
+		if (!Row || !Row->bSelected || !SelectedIndex.IsSet() || i == SelectedIndex) continue;
+		Row->Unselect();
+	}
 }

@@ -50,4 +50,5 @@ private:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	UPROPERTY()
 	UP8MainMenuWidget* MainMenuWidget;
+	FName CustomServerNameKey = FName("CustomServerNameKey");
 };

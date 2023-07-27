@@ -7,12 +7,14 @@
 #include "P8/Public/Interface/P8MenuInterface.h"
 #include "P8MainMenuWidget.generated.h"
 
+struct FP8ServerData;
 class UP8ServerRow;
 class UScrollBox;
 class UWidgetSwitcher;
 class UEditableTextBox;
 class UP8GameInstance;
 class UButton;
+class UScrollBox;
 
 UCLASS()
 class GAMESANDBOX_API UP8MainMenuWidget : public UUserWidget
@@ -22,8 +24,9 @@ class GAMESANDBOX_API UP8MainMenuWidget : public UUserWidget
 public:
 	virtual bool Initialize() override;
 	void Setup();
-	void SetServerList(TArray<FString> ServerNames);
+	void SetServerList(TArray<FP8ServerData> ServerData);
 	void SetSelectedIndex(const uint32 Index);
+	FString GetCustomServerName() const;
 	
 protected:
 	virtual void NativeConstruct() override;
@@ -39,6 +42,9 @@ protected:
 	void OnCancelClickedHandle();
 	UFUNCTION()
 	void OnConnectClickedHandle();
+
+private:
+	void UpdateChildren();
 	
 protected:
 	/* Switch between widget pages */
@@ -52,7 +58,9 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* QuitButton;
 	UPROPERTY(meta = (BindWidget))
+	UEditableTextBox* CustomServerName;
 	/* Widget index 1 */
+	UPROPERTY(meta = (BindWidget))
 	UButton* CancelButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* ConnectButton;

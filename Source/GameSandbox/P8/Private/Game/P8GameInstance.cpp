@@ -5,7 +5,9 @@
 #include "OnlineSubsystem.h"
 #include "Blueprint/UserWidget.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "Online/OnlineSessionNames.h"
 #include "P8/Public/Game/P8MainMenuHUD.h"
+#include "P8/Public/Util/P8Utils.h"
 #include "P8/Public/Widget/P8MainMenuWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
@@ -32,10 +34,10 @@ void UP8GameInstance::Init()
 	const IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();
 	if (!OnlineSubsystem)
 	{
-		UE_LOG(LogP8GameInstance, Log, TEXT("Found no subsystem"));
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("Found no subsystem")));
 		return;
 	}
-	UE_LOG(LogP8GameInstance, Log, TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString());
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString()));
 
 	SessionInterface = OnlineSubsystem->GetSessionInterface();
 	if (SessionInterface)
@@ -57,6 +59,7 @@ void UP8GameInstance::Host()
 		/* OnDeleteSessionCompleteHandle fired when a destroying an online session has completed. */
 		return;
 	}
+	FindMenuWidget();
 	CreateSession();
 }
 
@@ -72,6 +75,8 @@ void UP8GameInstance::RefreshServerList()
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	if (SessionSearch)
 	{
+		SessionSearch->MaxSearchResults = 100;
+		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		// SessionSearch->bIsLanQuery = true;
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 		/* OnFindSessionCompleteHandle fired when the search for an online session has completed. */
@@ -99,13 +104,23 @@ void UP8GameInstance::OnDeleteSessionCompleteHandle(FName SessionName, bool bWas
 void UP8GameInstance::OnFindSessionCompleteHandle(bool bWasSuccessful)
 {
 	if (!bWasSuccessful || !SessionSearch || !MainMenuWidget) return;
-	TArray<FString> ServerNames;
+	TArray<FP8ServerData> ServerData;
+	
 	for (const FOnlineSessionSearchResult& SearchResult : SessionSearch->SearchResults)
 	{
 		if (!SearchResult.IsValid()) continue;
-		ServerNames.Add(SearchResult.GetSessionIdStr());
+		FP8ServerData Data;
+
+		Data.SessionID = SearchResult.GetSessionIdStr();
+		Data.MaxPlayers = SearchResult.Session.SessionSettings.NumPublicConnections;
+		Data.CurrentPlayers = Data.MaxPlayers - SearchResult.Session.NumOpenPublicConnections;
+		Data.HostUserName = SearchResult.Session.OwningUserName;
+		/* Take from our custom settings field, using the same key that was set in CreateSession() */
+		SearchResult.Session.SessionSettings.Get(CustomServerNameKey, Data.ServerName);
+
+		ServerData.Add(Data);
 	}
-	MainMenuWidget->SetServerList(ServerNames);
+	MainMenuWidget->SetServerList(ServerData);
 }
 
 void UP8GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
@@ -128,15 +143,22 @@ void UP8GameInstance::CreateSession()
 {
 	if (!SessionInterface) return;
 	FOnlineSessionSettings SessionSettings;
-	SessionSettings.bIsLANMatch = true;
+
+	SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
 	SessionSettings.NumPublicConnections = 2;
 	SessionSettings.bShouldAdvertise = true;
+	SessionSettings.bUsesPresence = true;
+	SessionSettings.bUseLobbiesIfAvailable = true;
+	/* Add custom field in session settings by using key. In our case it is CustomServerName */
+	SessionSettings.Set(CustomServerNameKey, MainMenuWidget->GetCustomServerName(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
 	SessionInterface->CreateSession(0, CurrentSessionName, SessionSettings);
 	/* OnCreateSessionCompleteHandle fired when a session create request has completed. */
 }
 
 void UP8GameInstance::FindMenuWidget()
 {
+	if (MainMenuWidget) return;
 	const APlayerController* PC = GetFirstLocalPlayerController(GetWorld());
 	if (!PC) return;
 	const AP8MainMenuHUD* LobbyHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
