@@ -15,6 +15,10 @@ void UP8ServerRow::NativeConstruct()
 	RowButton->OnClicked.AddDynamic(this, &ThisClass::OnRowButtonClickedHandle);
 	RowButton->OnHovered.AddDynamic(this, &ThisClass::OnRowButtonHoveredHandle);
 	RowButton->OnUnhovered.AddDynamic(this, &ThisClass::OnRowButtonUnhoveredHandle);
+
+	AllText.Add(ServerName);
+	AllText.Add(ServerOwnerName);
+	AllText.Add(Players);
 }
 
 void UP8ServerRow::OnRowButtonClickedHandle()
@@ -23,25 +27,25 @@ void UP8ServerRow::OnRowButtonClickedHandle()
 	ParentWidget->SetSelectedIndex(Index);
 
 	bSelected = true;
-	ServerName->SetColorAndOpacity(FSlateColor(FColor::Green));
+	SetRowTextColor(FColor::Green);
 }
 
 void UP8ServerRow::OnRowButtonHoveredHandle()
 {
 	if (bHeader) return;
-	ServerName->SetColorAndOpacity(FSlateColor(bSelected ? FColor::Green : FColor::Yellow));
+	SetRowTextColor(bSelected ? FColor::Green : FColor::Yellow);
 }
 
 void UP8ServerRow::OnRowButtonUnhoveredHandle()
 {
-	ServerName->SetColorAndOpacity(FSlateColor(bSelected ? FColor::Green : FColor::White));
+	SetRowTextColor(bSelected ? FColor::Green : FColor::White);
 }
 
 void UP8ServerRow::SetupRow(UP8MainMenuWidget* Parent, const uint32 NewIndex, const FP8ServerData& Data)
 {
 	ParentWidget = Parent;
 	Index = NewIndex;
-	ServerName->SetText(FText::FromString(Data.ServerName.IsEmpty() ?  Data.SessionID : Data.ServerName));
+	ServerName->SetText(FText::FromString(Data.ServerName.IsEmpty() ? Data.SessionID : Data.ServerName));
 	ServerOwnerName->SetText(FText::FromString(Data.HostUserName));
 	Players->SetText(FText::FromString(FString::FromInt(Data.CurrentPlayers) + "/" + FString::FromInt(Data.MaxPlayers)));
 }
@@ -49,5 +53,13 @@ void UP8ServerRow::SetupRow(UP8MainMenuWidget* Parent, const uint32 NewIndex, co
 void UP8ServerRow::Unselect()
 {
 	bSelected = false;
-	ServerName->SetColorAndOpacity(FSlateColor(FColor::White));
+	SetRowTextColor(FColor::White);
+}
+
+void UP8ServerRow::SetRowTextColor(const FColor NewColor)
+{
+	for (UTextBlock* Text : AllText)
+	{
+		Text->SetColorAndOpacity(FSlateColor(NewColor));
+	}
 }

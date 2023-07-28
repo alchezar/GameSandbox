@@ -47,7 +47,7 @@ void AP8PlayerController::GoToLobby()
 {
 	const UP8GameInstance* GameInstance = Cast<UP8GameInstance>(GetGameInstance());
 	if (!GameInstance) return;
-	ClientTravel(GameInstance->GetLobbyURL(), TRAVEL_Absolute);
+	ClientTravel(GameInstance->GetStartURL(), TRAVEL_Absolute);
 }
 
 void AP8PlayerController::SwitchGamePause()

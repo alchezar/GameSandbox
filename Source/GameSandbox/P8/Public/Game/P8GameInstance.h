@@ -17,12 +17,15 @@ class GAMESANDBOX_API UP8GameInstance : public UGameInstance, public IP8MenuInte
 	GENERATED_BODY()
 
 public:
-	UP8GameInstance(const FObjectInitializer& ObjectInitializer);
+	explicit UP8GameInstance(const FObjectInitializer& ObjectInitializer);
 	virtual void Init() override;              // UGameInstance
 	virtual void Host() override;              // IP8MenuInterface
 	virtual void Join(uint32 Index) override;  // IP8MenuInterface
 	virtual void RefreshServerList() override; // IP8MenuInterface
+	FORCEINLINE FString GetStartURL() const { return StartLevelURL; };
 	FORCEINLINE FString GetLobbyURL() const { return LobbyLevelURL; };
+	FORCEINLINE FString GetGameURL() const { return GameLevelURL; };
+	void StartSession();
 
 protected:
 	UFUNCTION(Exec)
@@ -33,10 +36,13 @@ private:
 	void OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionCompleteHandle(bool bWasSuccessful);
 	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnNetworkFailureHandle(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Type, const FString& ErrorString);
 	void CreateSession();
 	void FindMenuWidget();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")
+	FString StartLevelURL = "/Game/Project/P8/Level/Start";
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")
 	FString LobbyLevelURL = "/Game/Project/P8/Level/Lobby";
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | URL")
@@ -46,7 +52,7 @@ private:
 	TSubclassOf<UUserWidget> MainMenuClass;
 	TSubclassOf<UUserWidget> ServerRowClass;
 	IOnlineSessionPtr SessionInterface;
-	FName CurrentSessionName = FName("MySessionGame");
+	FName CurrentSessionName = FName("Game");
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	UPROPERTY()
 	UP8MainMenuWidget* MainMenuWidget;

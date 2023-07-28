@@ -4,6 +4,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "Blueprint/UserWidget.h"
+#include "GameFramework/PlayerState.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Online/OnlineSessionNames.h"
 #include "P8/Public/Game/P8MainMenuHUD.h"
@@ -47,19 +48,25 @@ void UP8GameInstance::Init()
 		SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionCompleteHandle);
 		SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::OnJoinSessionCompleteHandle);
 	}
+	if (GEngine)
+	{
+		GEngine->OnNetworkFailure().AddUObject(this, &ThisClass::OnNetworkFailureHandle);
+	}
+	CurrentSessionName = GetDefault<APlayerState>()->SessionName;
 }
 
 void UP8GameInstance::Host()
 {
 	if (!SessionInterface) return;
+	FindMenuWidget();
+	
 	const FNamedOnlineSession* ExistingSession = SessionInterface->GetNamedSession(CurrentSessionName);
 	if (ExistingSession)
 	{
 		SessionInterface->DestroySession(CurrentSessionName);
-		/* OnDeleteSessionCompleteHandle fired when a destroying an online session has completed. */
+		/* OnDeleteSessionCompleteHandle callback when completed. */
 		return;
 	}
-	FindMenuWidget();
 	CreateSession();
 }
 
@@ -67,7 +74,7 @@ void UP8GameInstance::Join(uint32 Index)
 {
 	if (!SessionInterface || !SessionSearch) return;
 	SessionInterface->JoinSession(0, CurrentSessionName, SessionSearch->SearchResults[Index]);
-	/* OnJoinSessionCompleteHandle fired when the process for a local user joining an online session has completed. */
+	/* OnJoinSessionCompleteHandle callback when completed. */
 }
 
 void UP8GameInstance::RefreshServerList()
@@ -79,7 +86,7 @@ void UP8GameInstance::RefreshServerList()
 		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
 		// SessionSearch->bIsLanQuery = true;
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
-		/* OnFindSessionCompleteHandle fired when the search for an online session has completed. */
+		/* OnFindSessionCompleteHandle callback when completed. */
 	}
 	/* Once the search is complete, we`ll need a reference to the MainMenu widget. */
 	FindMenuWidget();
@@ -89,10 +96,11 @@ void UP8GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bWas
 {
 	/* Server Host */
 	if (!bWasSuccessful || !GetWorld()) return;
-	const FString GoToURL = GameLevelURL + "?listen";
-	GetWorld()->ServerTravel(GoToURL);
-
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Hosting");
+	const FString GoToURL = LobbyLevelURL + "?listen";
+	if (GetWorld()->ServerTravel(GoToURL))
+	{
+		if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, FString::Printf(TEXT("Hosting: %s"), *SessionName.ToString()));
+	}
 }
 
 void UP8GameInstance::OnDeleteSessionCompleteHandle(FName SessionName, bool bWasSuccessful)
@@ -139,13 +147,20 @@ void UP8GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSess
 	PlayerController->ClientTravel(Address, TRAVEL_Absolute);
 }
 
+void UP8GameInstance::OnNetworkFailureHandle(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Type, const FString& ErrorString)
+{
+	APlayerController* PlayerController = World->GetFirstPlayerController();
+	if (!PlayerController) return;
+	PlayerController->ClientTravel(GetStartURL(), TRAVEL_Absolute);
+}
+
 void UP8GameInstance::CreateSession()
 {
 	if (!SessionInterface) return;
 	FOnlineSessionSettings SessionSettings;
 
 	SessionSettings.bIsLANMatch = IOnlineSubsystem::Get()->GetSubsystemName() == "NULL";
-	SessionSettings.NumPublicConnections = 2;
+	SessionSettings.NumPublicConnections = 3;
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
 	SessionSettings.bUseLobbiesIfAvailable = true;
@@ -153,7 +168,7 @@ void UP8GameInstance::CreateSession()
 	SessionSettings.Set(CustomServerNameKey, MainMenuWidget->GetCustomServerName(), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
 	SessionInterface->CreateSession(0, CurrentSessionName, SessionSettings);
-	/* OnCreateSessionCompleteHandle fired when a session create request has completed. */
+	/* OnCreateSessionCompleteHandle callback when completed. */
 }
 
 void UP8GameInstance::FindMenuWidget()
@@ -164,6 +179,12 @@ void UP8GameInstance::FindMenuWidget()
 	const AP8MainMenuHUD* LobbyHUD = Cast<AP8MainMenuHUD>(PC->GetHUD());
 	if (!LobbyHUD) return;
 	MainMenuWidget = LobbyHUD->GetMainMenuWidget();
+}
+
+void UP8GameInstance::StartSession()
+{
+	if (!SessionInterface) return;
+	SessionInterface->StartSession(CurrentSessionName);
 }
 
 void UP8GameInstance::LoadMenu() const

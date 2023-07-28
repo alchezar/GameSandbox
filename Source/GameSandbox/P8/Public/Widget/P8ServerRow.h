@@ -29,6 +29,9 @@ protected:
 	UFUNCTION()
 	void OnRowButtonUnhoveredHandle();
 
+private:
+	void SetRowTextColor(const FColor NewColor);
+
 public:
 	bool bSelected = false;
 
@@ -48,4 +51,5 @@ private:
 	uint32 Index = 0;
 	UPROPERTY()
 	UP8MainMenuWidget* ParentWidget;
+	TArray<UTextBlock*> AllText;
 };
