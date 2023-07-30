@@ -7,8 +7,8 @@
 #include "GameFramework/Pawn.h"
 #include "P8Kart.generated.h"
 
-class UBoxComponent;
 struct FInputActionValue;
+class UBoxComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
@@ -23,11 +23,15 @@ public:
 	AP8Kart();
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
 protected:
 	virtual void BeginPlay() override;
-	UFUNCTION()
-	void OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
+	/* Multiplayer */
+	void LocalMove(const FInputActionValue& Value);
+	UFUNCTION(Server, Unreliable, WithValidation)
+	void Server_Move(const FInputActionValue& Value);
 
 private:
 	void SetupComponents();
@@ -53,11 +57,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputMappingContext* DefaultContext;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
-	UInputAction* MoveAction;	
+	UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* LookAction;
 #pragma endregion/* Input */
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m/s"))
 	float Speed = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "kg"))
@@ -69,13 +73,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
 	float DragCoefficient = 16.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
-	float RollingCoefficient = 0.015f; 
-	
+	float RollingCoefficient = 0.015f;
+
 private:
 	FVector Velocity = FVector::ZeroVector;
 	float MoveAlpha = 0.f; // Throttle
 	float TurnAlpha = 0.f; // SteeringThrow
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
-
 };

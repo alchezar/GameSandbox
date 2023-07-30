@@ -10,13 +10,13 @@
 AP8Kart::AP8Kart()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 	SetupComponents();
 }
 
 void AP8Kart::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBoxBeginOverlap);
 }
 
 void AP8Kart::BeginPlay()
@@ -31,7 +31,14 @@ void AP8Kart::BeginPlay()
 void AP8Kart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	
+	if (!HasAuthority())
+	{
+		Server_MovementUpdate(DeltaTime);
+	}
 	MovementUpdate(DeltaTime);
+
+	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 100.f),UEnum::GetValueAsString(GetLocalRole()).RightChop(5), this, FColor::White, 0.f);
 }
 
 void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -41,8 +48,8 @@ void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	check(EnhancedInputComponent)
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::LocalMove);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::LocalMove);
 }
 
 void AP8Kart::SetupComponents()
@@ -78,6 +85,20 @@ void AP8Kart::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookDirection.Y);
 }
 
+void AP8Kart::LocalMove(const FInputActionValue& Value)
+{
+	if (!HasAuthority())
+	{
+		Server_Move(Value);
+	}
+	Move(Value);
+}
+
+void AP8Kart::Server_Move_Implementation(const FInputActionValue& Value)
+{
+	Move(Value);
+}
+
 void AP8Kart::Move(const FInputActionValue& Value)
 {
 	const FVector2D MovementDirection = Value.Get<FVector2D>();
@@ -85,9 +106,11 @@ void AP8Kart::Move(const FInputActionValue& Value)
 	TurnAlpha = MovementDirection.X;
 }
 
-void AP8Kart::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+bool AP8Kart::Server_Move_Validate(const FInputActionValue& Value)
 {
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("Hello")));
+	const float AbsX = FMath::Abs(Value.Get<FVector2D>().X);
+	const float AbsY = FMath::Abs(Value.Get<FVector2D>().Y);
+	return AbsX <= 1.f && AbsY <= 1.f;
 }
 
 void AP8Kart::MovementUpdate(const float DeltaTime)
@@ -107,10 +130,10 @@ void AP8Kart::MovementUpdate(const float DeltaTime)
 	{
 		Velocity = FVector::ZeroVector;
 	}
-	
+
 	const float RotationAngle = (GetActorForwardVector().Dot(Velocity) * DeltaTime) / MinTurnRadius * TurnAlpha;
 	const FQuat RotationDelta = FQuat(GetActorUpVector(), RotationAngle);
 	AddActorWorldRotation(RotationDelta, true);
-	
+
 	Velocity = RotationDelta.RotateVector(Velocity);
 }
