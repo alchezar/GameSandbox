@@ -93,21 +93,24 @@ void AP8Kart::OnBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor
 void AP8Kart::MovementUpdate(const float DeltaTime)
 {
 	check(Mass > 0.f)
+	/* Resistances */
+	const float NormalForce = Mass * (-GetWorld()->GetGravityZ() / 100);
+	const FVector RollingResistance = RollingCoefficient * NormalForce * Velocity.GetSafeNormal();
 	const FVector AirResistance = DragCoefficient * Velocity.SizeSquared() * Velocity.GetSafeNormal();
-	const FVector Force = GetActorForwardVector() * MaxMoveForce * MoveAlpha - AirResistance;
+	/* Velocity */
+	const FVector Force = GetActorForwardVector() * MaxMoveForce * MoveAlpha - AirResistance - RollingResistance;
 	const FVector Acceleration = Force / Mass;
 	Velocity += Acceleration * DeltaTime;
-	
 	FHitResult HitResult;
 	AddActorWorldOffset(Velocity * 100.f * DeltaTime, true, &HitResult);
 	if (HitResult.bBlockingHit)
 	{
 		Velocity = FVector::ZeroVector;
 	}
-
-	const float BackRotationFix = MoveAlpha < 0 ? -1.f : 1.f;
-	const float RotationAngle = MaxTurnPerSecond * TurnAlpha * BackRotationFix * DeltaTime;
-	const FQuat RotationDelta = FQuat(GetActorUpVector(), FMath::DegreesToRadians(RotationAngle));
+	
+	const float RotationAngle = (GetActorForwardVector().Dot(Velocity) * DeltaTime) / MinTurnRadius * TurnAlpha;
+	const FQuat RotationDelta = FQuat(GetActorUpVector(), RotationAngle);
 	AddActorWorldRotation(RotationDelta, true);
+	
 	Velocity = RotationDelta.RotateVector(Velocity);
 }

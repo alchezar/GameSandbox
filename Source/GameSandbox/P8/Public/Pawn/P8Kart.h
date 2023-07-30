@@ -64,10 +64,12 @@ protected:
 	float Mass = 1000.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "N"))
 	float MaxMoveForce = 10000.f;
-	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "deg"))
-	float MaxTurnPerSecond = 90.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m"))
+	float MinTurnRadius = 10.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
 	float DragCoefficient = 16.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
+	float RollingCoefficient = 0.015f; 
 	
 private:
 	FVector Velocity = FVector::ZeroVector;
