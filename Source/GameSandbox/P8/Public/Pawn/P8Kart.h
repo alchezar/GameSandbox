@@ -24,14 +24,21 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 protected:
 	virtual void BeginPlay() override;
 
 	/* Multiplayer */
-	void LocalMove(const FInputActionValue& Value);
-	UFUNCTION(Server, Unreliable, WithValidation)
+	void GeneralMove(const FInputActionValue& Value, bool bPressed);
+	UFUNCTION(Reliable, Server)
 	void Server_Move(const FInputActionValue& Value);
+	UFUNCTION(Reliable, NetMulticast)
+	void Broadcast_Move(const FInputActionValue& Value);
+	UFUNCTION(Unreliable, Server)
+	void Server_MovementUpdate(const float DeltaTime);
+	UFUNCTION(Unreliable, NetMulticast)
+	void Multicast_MovementUpdate(const float DeltaTime);
 
 private:
 	void SetupComponents();
@@ -79,6 +86,16 @@ private:
 	FVector Velocity = FVector::ZeroVector;
 	float MoveAlpha = 0.f; // Throttle
 	float TurnAlpha = 0.f; // SteeringThrow
+
+	UPROPERTY(Replicated)
+	float RepMoveAlpha = 0.f;
+	UPROPERTY(Replicated)
+	float RepTurnAlpha = 0.f;
+
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
+	UPROPERTY(Replicated)
+	FVector RepLocation;
+	UPROPERTY(Replicated)
+	FRotator RepRotation;
 };

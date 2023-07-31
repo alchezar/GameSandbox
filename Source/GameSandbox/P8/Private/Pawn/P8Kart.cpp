@@ -6,6 +6,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AP8Kart::AP8Kart()
 {
@@ -31,7 +32,7 @@ void AP8Kart::BeginPlay()
 void AP8Kart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
+
 	if (!HasAuthority())
 	{
 		Server_MovementUpdate(DeltaTime);
@@ -41,6 +42,15 @@ void AP8Kart::Tick(float DeltaTime)
 	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 100.f),UEnum::GetValueAsString(GetLocalRole()).RightChop(5), this, FColor::White, 0.f);
 }
 
+void AP8Kart::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, RepLocation);
+	DOREPLIFETIME(ThisClass, RepRotation);
+	DOREPLIFETIME(ThisClass, RepMoveAlpha);
+	DOREPLIFETIME(ThisClass, RepTurnAlpha);
+}
+
 void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -48,8 +58,8 @@ void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	check(EnhancedInputComponent)
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::LocalMove);
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::LocalMove);
+	EnhancedInputComponent->BindAction<ThisClass, bool>(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::GeneralMove, true);
+	EnhancedInputComponent->BindAction<ThisClass, bool>(MoveAction, ETriggerEvent::Completed, this, &ThisClass::GeneralMove, false);
 }
 
 void AP8Kart::SetupComponents()
@@ -85,7 +95,7 @@ void AP8Kart::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookDirection.Y);
 }
 
-void AP8Kart::LocalMove(const FInputActionValue& Value)
+void AP8Kart::GeneralMove(const FInputActionValue& Value, bool bPressed)
 {
 	if (!HasAuthority())
 	{
@@ -96,7 +106,13 @@ void AP8Kart::LocalMove(const FInputActionValue& Value)
 
 void AP8Kart::Server_Move_Implementation(const FInputActionValue& Value)
 {
+	Broadcast_Move(Value);
+}
+
+void AP8Kart::Broadcast_Move_Implementation(const FInputActionValue& Value)
+{
 	Move(Value);
+	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 50.f),FString::Printf(TEXT("%s: Move: %f, Turn: %f"), *GetActorLabel(), RepMoveAlpha, RepTurnAlpha), this, FColor::Green, 0.f, true);
 }
 
 void AP8Kart::Move(const FInputActionValue& Value)
@@ -104,16 +120,25 @@ void AP8Kart::Move(const FInputActionValue& Value)
 	const FVector2D MovementDirection = Value.Get<FVector2D>();
 	MoveAlpha = MovementDirection.Y;
 	TurnAlpha = MovementDirection.X;
+	
+	if (HasAuthority())
+	{
+		RepMoveAlpha = MoveAlpha;
+		RepTurnAlpha = TurnAlpha;
+	}
 }
 
-bool AP8Kart::Server_Move_Validate(const FInputActionValue& Value)
+void AP8Kart::Server_MovementUpdate_Implementation(const float DeltaTime)
 {
-	const float AbsX = FMath::Abs(Value.Get<FVector2D>().X);
-	const float AbsY = FMath::Abs(Value.Get<FVector2D>().Y);
-	return AbsX <= 1.f && AbsY <= 1.f;
+	Multicast_MovementUpdate(DeltaTime);
 }
 
-void AP8Kart::MovementUpdate(const float DeltaTime)
+void AP8Kart::Multicast_MovementUpdate_Implementation(const float DeltaTime)
+{
+	MovementUpdate(DeltaTime);
+}
+
+void AP8Kart::MovementUpdate(float DeltaTime)
 {
 	check(Mass > 0.f)
 	/* Resistances */
@@ -125,7 +150,7 @@ void AP8Kart::MovementUpdate(const float DeltaTime)
 	const FVector Acceleration = Force / Mass;
 	Velocity += Acceleration * DeltaTime;
 	FHitResult HitResult;
-	AddActorWorldOffset(Velocity * 100.f * DeltaTime, true, &HitResult);
+	AddActorWorldOffset(Velocity * 100.0 * DeltaTime, true, &HitResult);
 	if (HitResult.bBlockingHit)
 	{
 		Velocity = FVector::ZeroVector;
@@ -134,6 +159,16 @@ void AP8Kart::MovementUpdate(const float DeltaTime)
 	const float RotationAngle = (GetActorForwardVector().Dot(Velocity) * DeltaTime) / MinTurnRadius * TurnAlpha;
 	const FQuat RotationDelta = FQuat(GetActorUpVector(), RotationAngle);
 	AddActorWorldRotation(RotationDelta, true);
-
 	Velocity = RotationDelta.RotateVector(Velocity);
+
+	if (HasAuthority())
+	{
+		RepLocation = GetActorLocation();
+		RepRotation = GetActorRotation();
+	}
+	else
+	{
+		// SetActorLocation(RepLocation);
+		// SetActorRotation(RepRotation);
+	}
 }
