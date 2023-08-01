@@ -27,16 +27,17 @@ void AP8Kart::BeginPlay()
 	check(CameraBoom)
 	check(CameraView)
 	AddMappingContext();
+
+	if (APlayerController* PC = GetLocalViewingPlayerController())
+	{
+		PossessedBy(PC);
+	}
 }
 
 void AP8Kart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!HasAuthority())
-	{
-		Server_MovementUpdate(DeltaTime);
-	}
 	MovementUpdate(DeltaTime);
 
 	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 100.f),UEnum::GetValueAsString(GetLocalRole()).RightChop(5), this, FColor::White, 0.f);
@@ -47,8 +48,6 @@ void AP8Kart::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, RepLocation);
 	DOREPLIFETIME(ThisClass, RepRotation);
-	DOREPLIFETIME(ThisClass, RepMoveAlpha);
-	DOREPLIFETIME(ThisClass, RepTurnAlpha);
 }
 
 void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -97,45 +96,29 @@ void AP8Kart::Look(const FInputActionValue& Value)
 
 void AP8Kart::GeneralMove(const FInputActionValue& Value, bool bPressed)
 {
+	const FVector2D MovementDirection = Value.Get<FVector2D>();
+	
 	if (!HasAuthority())
 	{
-		Server_Move(Value);
+		Server_Move(MovementDirection);
 	}
+	Move(MovementDirection);
+}
+
+void AP8Kart::Server_Move_Implementation(const FVector2D Value)
+{
+	Multicast_Move(Value);
+}
+
+void AP8Kart::Multicast_Move_Implementation(const FVector2D Value)
+{
 	Move(Value);
 }
 
-void AP8Kart::Server_Move_Implementation(const FInputActionValue& Value)
+void AP8Kart::Move(const FVector2D Value)
 {
-	Broadcast_Move(Value);
-}
-
-void AP8Kart::Broadcast_Move_Implementation(const FInputActionValue& Value)
-{
-	Move(Value);
-	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 50.f),FString::Printf(TEXT("%s: Move: %f, Turn: %f"), *GetActorLabel(), RepMoveAlpha, RepTurnAlpha), this, FColor::Green, 0.f, true);
-}
-
-void AP8Kart::Move(const FInputActionValue& Value)
-{
-	const FVector2D MovementDirection = Value.Get<FVector2D>();
-	MoveAlpha = MovementDirection.Y;
-	TurnAlpha = MovementDirection.X;
-	
-	if (HasAuthority())
-	{
-		RepMoveAlpha = MoveAlpha;
-		RepTurnAlpha = TurnAlpha;
-	}
-}
-
-void AP8Kart::Server_MovementUpdate_Implementation(const float DeltaTime)
-{
-	Multicast_MovementUpdate(DeltaTime);
-}
-
-void AP8Kart::Multicast_MovementUpdate_Implementation(const float DeltaTime)
-{
-	MovementUpdate(DeltaTime);
+	MoveAlpha = Value.Y;
+	TurnAlpha = Value.X;
 }
 
 void AP8Kart::MovementUpdate(float DeltaTime)
@@ -168,7 +151,7 @@ void AP8Kart::MovementUpdate(float DeltaTime)
 	}
 	else
 	{
-		// SetActorLocation(RepLocation);
-		// SetActorRotation(RepRotation);
+		SetActorLocation(RepLocation);
+		SetActorRotation(RepRotation);
 	}
 }
