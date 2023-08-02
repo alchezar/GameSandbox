@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
+#include "P8/Public/Util/P8Utils.h"
 #include "P8Kart.generated.h"
 
 struct FInputActionValue;
@@ -31,17 +32,18 @@ protected:
 
 	/* Multiplayer */
 	void GeneralMove(const FInputActionValue& Value, bool bPressed);
-	UFUNCTION(Reliable, Server)
-	void Server_Move(FVector2D Value);
-	UFUNCTION(Reliable, NetMulticast)
-	void Multicast_Move(FVector2D Value);
+	UFUNCTION(Unreliable, Server, WithValidation)
+	void Server_SendMove(FP8Move ServerMove);
+	UFUNCTION()
+	void OnRep_ServerState();
 
 private:
 	void SetupComponents();
 	void AddMappingContext() const;
 	void Move(FVector2D Value);
 	void Look(const FInputActionValue& Value);
-	void MovementUpdate(const float DeltaTime);
+	void SimulateMove(const FP8Move& TheMove);
+	void ClearAcknowledgeMoves(FP8Move LastMove);
 
 protected:
 #pragma region Component
@@ -68,9 +70,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m/s"))
 	float Speed = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "kg"))
-	float Mass = 1000.f;
+	double Mass = 1000.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "N"))
-	float MaxMoveForce = 10000.f;
+	double MaxMoveForce = 10000.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m"))
 	float MinTurnRadius = 10.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
@@ -79,14 +81,15 @@ protected:
 	float RollingCoefficient = 0.015f;
 
 private:
+	UPROPERTY(ReplicatedUsing = "OnRep_ServerState")
+	FP8State ServerState;
+	
 	FVector Velocity = FVector::ZeroVector;
-	float MoveAlpha = 0.f; // Throttle
+	double MoveAlpha = 0.f; // Throttle
 	float TurnAlpha = 0.f; // SteeringThrow
 
 	UPROPERTY()
 	UEnhancedInputComponent* EnhancedInputComponent;
-	UPROPERTY(Replicated)
-	FVector RepLocation;
-	UPROPERTY(Replicated)
-	FRotator RepRotation;
+
+	TArray<FP8Move> UnacknowledgeMoves;
 };
