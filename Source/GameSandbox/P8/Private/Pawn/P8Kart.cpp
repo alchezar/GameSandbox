@@ -5,10 +5,10 @@
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
-#include "GameFramework/GameStateBase.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Math/Vector.h"
-#include "Net/UnrealNetwork.h"
+#include "P8/Public/Component/P8MovementComponent.h"
+#include "P8/Public/Component/P8ReplicatorComponent.h"
 
 AP8Kart::AP8Kart()
 {
@@ -17,17 +17,14 @@ AP8Kart::AP8Kart()
 	SetupComponents();
 }
 
-void AP8Kart::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
-}
-
 void AP8Kart::BeginPlay()
 {
 	Super::BeginPlay();
 	check(KartMesh)
 	check(CameraBoom)
 	check(CameraView)
+	check(MoveComp)
+	check(RepComp)
 	AddMappingContext();
 
 	if (HasAuthority())
@@ -36,35 +33,9 @@ void AP8Kart::BeginPlay()
 	}
 }
 
-void AP8Kart::Tick(float DeltaTime)
+void AP8Kart::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	const FP8Move CurrentMove = FP8Move(MoveAlpha, TurnAlpha, DeltaTime, GetWorld()->GetGameState()->GetServerWorldTimeSeconds());
-	/* We are the client */
-	if (GetLocalRole() == ROLE_AutonomousProxy)
-	{
-		SimulateMove(CurrentMove);
-		UnacknowledgeMoves.Add(CurrentMove);
-		Server_SendMove(CurrentMove);
-	}
-	/* We are the server and in control of the pawn */
-	if (HasAuthority() && IsLocallyControlled())
-	{
-		Server_SendMove(CurrentMove);
-	}
-	/* Client prediction */
-	if (GetLocalRole() == ROLE_SimulatedProxy)
-	{
-		SimulateMove(ServerState.LastMove);
-	}
-	// DrawDebugString(GetWorld(), FVector(0.f, 0.f, 100.f), UEnum::GetValueAsString(GetLocalRole()).RightChop(5), this, FColor::White, 0.f);
-}
-
-void AP8Kart::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ThisClass, ServerState);
 }
 
 void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -74,8 +45,8 @@ void AP8Kart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	check(EnhancedInputComponent)
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	EnhancedInputComponent->BindAction<ThisClass, bool>(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::GeneralMove, true);
-	EnhancedInputComponent->BindAction<ThisClass, bool>(MoveAction, ETriggerEvent::Completed, this, &ThisClass::GeneralMove, false);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::Move);
 }
 
 void AP8Kart::SetupComponents()
@@ -93,6 +64,10 @@ void AP8Kart::SetupComponents()
 
 	CameraView = CreateDefaultSubobject<UCameraComponent>("CameraViewComponent");
 	CameraView->SetupAttachment(CameraBoom);
+
+	MoveComp = CreateDefaultSubobject<UP8MovementComponent>("KartMovementComponent");
+	RepComp = CreateDefaultSubobject<UP8ReplicatorComponent>("KartMovementReplicatorComponent");
+	RepComp->SetMoveComp(MoveComp);
 }
 
 void AP8Kart::AddMappingContext() const
@@ -111,76 +86,7 @@ void AP8Kart::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookDirection.Y);
 }
 
-void AP8Kart::GeneralMove(const FInputActionValue& Value, bool bPressed)
+void AP8Kart::Move(const FInputActionValue& Value)
 {
-	Move(Value.Get<FVector2D>());
-}
-
-void AP8Kart::Server_SendMove_Implementation(FP8Move ServerMove)
-{
-	// Move(FVector2D(ServerMove.TurnAlpha, ServerMove.MoveAlpha));
-	SimulateMove(ServerMove);
-	ServerState.LastMove = ServerMove;
-	ServerState.Transform = GetActorTransform();
-	ServerState.Velocity = Velocity;
-}
-
-bool AP8Kart::Server_SendMove_Validate(FP8Move ServerMove)
-{
-	return FMath::Abs(ServerMove.MoveAlpha) <= 1.f && FMath::Abs(ServerMove.TurnAlpha) <= 1.f;
-}
-
-void AP8Kart::Move(const FVector2D Value)
-{
-	MoveAlpha = Value.Y;
-	TurnAlpha = Value.X;
-}
-
-void AP8Kart::OnRep_ServerState()
-{
-	SetActorTransform(ServerState.Transform);
-	Velocity = ServerState.Velocity;
-	
-	ClearAcknowledgeMoves(ServerState.LastMove);
-	for (const FP8Move& UnacknowledgeMove : UnacknowledgeMoves)
-	{
-		SimulateMove(UnacknowledgeMove);
-	}
-}
-
-void AP8Kart::SimulateMove(const FP8Move& TheMove)
-{
-	check(Mass > 0.f)
-	/* Calculate Resistances */
-	const double NormalForce = Mass * (-GetWorld()->GetGravityZ() / 100);
-	const FVector RollingResistance = RollingCoefficient * NormalForce * Velocity.GetSafeNormal();
-	const FVector AirResistance = DragCoefficient * Velocity.SizeSquared() * Velocity.GetSafeNormal();
-	/* Find kart Velocity */
-	const FVector Force = GetActorForwardVector() * MaxMoveForce * TheMove.MoveAlpha - AirResistance - RollingResistance;
-	const FVector Acceleration = Force / Mass;
-	Velocity += Acceleration * TheMove.DeltaTime; 
-	FHitResult HitResult;
-	AddActorWorldOffset(Velocity * 100.0 * TheMove.DeltaTime, true, &HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		Velocity = FVector::ZeroVector;
-	}
-
-	const float RotationAngle = (GetActorForwardVector().Dot(Velocity) * TheMove.DeltaTime) / MinTurnRadius * TheMove.TurnAlpha;
-	const FQuat RotationDelta = FQuat(GetActorUpVector(), RotationAngle);
-	AddActorWorldRotation(RotationDelta, true);
-	Velocity = RotationDelta.RotateVector(Velocity);
-}
-
-void AP8Kart::ClearAcknowledgeMoves(const FP8Move LastMove)
-{
-	TArray<FP8Move> NewMoves;
-	for (const FP8Move& UnacknowledgeMove : UnacknowledgeMoves)
-	{
-		if (UnacknowledgeMove.Time > LastMove.Time)
-		{
-			NewMoves.Add(UnacknowledgeMove);
-		}
-	}
-	UnacknowledgeMoves = NewMoves;
+	MoveComp->Move(Value.Get<FVector2D>());
 }
