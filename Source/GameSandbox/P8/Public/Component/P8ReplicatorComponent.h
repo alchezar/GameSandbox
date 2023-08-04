@@ -32,6 +32,7 @@ protected:
 private:
 	void ClearAcknowledgeMoves(FP8Move LastMove);
 	void UpdateServerState(FP8Move LastMove);
+	void ClientTick(const float DeltaTime);
 
 private:
 	TArray<FP8Move> UnacknowledgeMoves;
@@ -39,4 +40,9 @@ private:
 	FP8State ServerState;
 	UPROPERTY()
 	UP8MovementComponent* MoveComp;
+
+	float ClientTimeSinceUpdate = 0.f;
+	float ClientTimeBetweenUpdates = 0.f;
+	FTransform ClientStartTransform = FTransform::Identity;
+	FVector ClientStartVelocity = FVector::ZeroVector;
 };

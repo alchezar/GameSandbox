@@ -32,9 +32,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m/s"))
 	float Speed = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "kg"))
-	double Mass = 1000.f;
+	float Mass = 1000.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "N"))
-	double MaxMoveForce = 10000.f;
+	float MaxMoveForce = 10000.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement", meta = (Units = "m"))
 	float MinTurnRadius = 10.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement") // kg/m
@@ -44,7 +44,7 @@ protected:
 
 private:
 	FVector Velocity = FVector::ZeroVector;
-	double MoveAlpha = 0.f; // Throttle
-	double TurnAlpha = 0.f; // SteeringThrow
+	float MoveAlpha = 0.f; // Throttle
+	float TurnAlpha = 0.f; // SteeringThrow
 	FP8Move LastMove;
 };

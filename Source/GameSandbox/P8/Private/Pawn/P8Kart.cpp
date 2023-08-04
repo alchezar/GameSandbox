@@ -13,7 +13,9 @@
 AP8Kart::AP8Kart()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
+	SetReplicates(true);
+	SetReplicatingMovement(false);
+	
 	SetupComponents();
 }
 

@@ -36,7 +36,7 @@ void UP8ReplicatorComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	/* Client prediction */
 	if (GetOwnerRole() == ROLE_SimulatedProxy)
 	{
-		MoveComp->SimulateMove(ServerState.LastMove);
+		ClientTick(DeltaTime);
 	}
 	DrawDebugString(GetWorld(), FVector(0.f, 0.f, 100.f), UEnum::GetValueAsString(GetOwnerRole()).RightChop(5), GetOwner(), FColor::White, 0.f);
 }
@@ -84,12 +84,46 @@ void UP8ReplicatorComponent::UpdateServerState(const FP8Move LastMove)
 
 void UP8ReplicatorComponent::OnRep_ServerState()
 {
-	GetOwner()->SetActorTransform(ServerState.Transform);
-	MoveComp->SetVelocity(ServerState.Velocity);
-	
-	ClearAcknowledgeMoves(ServerState.LastMove);
-	for (const FP8Move& UnacknowledgeMove : UnacknowledgeMoves)
+	if (GetOwnerRole() == ROLE_AutonomousProxy)
 	{
-		MoveComp->SimulateMove(UnacknowledgeMove);
+		GetOwner()->SetActorTransform(ServerState.Transform);
+		MoveComp->SetVelocity(ServerState.Velocity);
+	
+		ClearAcknowledgeMoves(ServerState.LastMove);
+		for (const FP8Move& UnacknowledgeMove : UnacknowledgeMoves)
+		{
+			MoveComp->SimulateMove(UnacknowledgeMove);
+		}
 	}
+	/* Simulated proxy */
+	if (GetOwnerRole() == ROLE_SimulatedProxy)
+	{
+		ClientTimeBetweenUpdates = ClientTimeSinceUpdate;
+		ClientTimeSinceUpdate = 0.f;
+		ClientStartTransform = GetOwner()->GetActorTransform();
+		ClientStartVelocity = MoveComp->GetVelocity();
+	}
+}
+
+void UP8ReplicatorComponent::ClientTick(const float DeltaTime)
+{
+	ClientTimeSinceUpdate += DeltaTime;
+	if (ClientTimeBetweenUpdates < KINDA_SMALL_NUMBER) return;
+	const float LerpRatio = ClientTimeSinceUpdate / ClientTimeBetweenUpdates;
+	
+	/* Cubic interpolate location */
+	const FVector StartLocation = ClientStartTransform.GetLocation();
+	const FVector TargetLocation = ServerState.Transform.GetLocation();
+	const float VelocityToDerivative = ClientTimeBetweenUpdates * 100.f;
+	const FVector StartDerivative = ClientStartVelocity * VelocityToDerivative;
+	const FVector TargetDerivative = ServerState.Velocity * VelocityToDerivative;
+	GetOwner()->SetActorLocation(FMath::CubicInterp(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRatio));
+	
+	/* Interpolate velocity */
+	const FVector NewDerivative = FMath::CubicInterpDerivative(StartLocation, StartDerivative, TargetLocation, TargetDerivative, LerpRatio);
+	MoveComp->SetVelocity(NewDerivative / VelocityToDerivative);
+	
+	/* Interpolate rotation */
+	const FQuat TargetRotation = ServerState.Transform.GetRotation();
+	GetOwner()->SetActorRotation(FQuat::Slerp(ClientStartTransform.GetRotation(), TargetRotation, LerpRatio));
 }
