@@ -24,10 +24,20 @@ public class GameSandbox : ModuleRules
 			"ProceduralMeshComponent",
 			"FieldSystemEngine",
 			"GeometryCollectionEngine",
-			"ChaosSolverEngine"
+			"ChaosSolverEngine",
+			"OnlineSubsystem",
+			"OnlineSubsystemUtils",
+			"OnlineSubsystemSteam"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new[] { "EnhancedInput", "Slate", "SlateCore", "AnimGraphRuntime" });
+		PrivateDependencyModuleNames.AddRange(new[]
+		{
+			"EnhancedInput", 
+			"Slate", 
+			"SlateCore", 
+			"AnimGraphRuntime",
+			"OnlineSubsystem"
+		});
 
 		PublicIncludePaths.AddRange(new[]
 		{
@@ -39,6 +49,8 @@ public class GameSandbox : ModuleRules
 			"GameSandbox/P5",
 			"GameSandbox/P6"
 		});
+		
+		// DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
