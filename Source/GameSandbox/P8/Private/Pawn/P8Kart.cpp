@@ -19,14 +19,22 @@ AP8Kart::AP8Kart()
 	SetupComponents();
 }
 
-void AP8Kart::BeginPlay()
+void AP8Kart::PostInitializeComponents()
 {
-	Super::BeginPlay();
+	Super::PostInitializeComponents();
+	
 	check(KartMesh)
 	check(CameraBoom)
 	check(CameraView)
 	check(MoveComp)
 	check(RepComp)
+	
+	RepComp->Setup(MoveComp, MeshOffsetRoot);
+}
+
+void AP8Kart::BeginPlay()
+{
+	Super::BeginPlay();
 	AddMappingContext();
 
 	if (HasAuthority())
@@ -58,18 +66,20 @@ void AP8Kart::SetupComponents()
 	BoxCollision->SetBoxExtent(FVector(230.f, 90.f, 75.f));
 	BoxCollision->SetCollisionProfileName("BlockAllDynamic");
 
+	MeshOffsetRoot = CreateDefaultSubobject<USceneComponent>("MeshOffsetRootComponent");
+	MeshOffsetRoot->SetupAttachment(RootComponent);
+
 	KartMesh = CreateDefaultSubobject<USkeletalMeshComponent>("KartSkeletalMesh");
-	KartMesh->SetupAttachment(RootComponent);
+	KartMesh->SetupAttachment(MeshOffsetRoot);
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
-	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->SetupAttachment(MeshOffsetRoot);
 
 	CameraView = CreateDefaultSubobject<UCameraComponent>("CameraViewComponent");
 	CameraView->SetupAttachment(CameraBoom);
 
 	MoveComp = CreateDefaultSubobject<UP8MovementComponent>("KartMovementComponent");
 	RepComp = CreateDefaultSubobject<UP8ReplicatorComponent>("KartMovementReplicatorComponent");
-	RepComp->SetMoveComp(MoveComp);
 }
 
 void AP8Kart::AddMappingContext() const

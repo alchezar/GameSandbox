@@ -18,7 +18,7 @@ public:
 	UP8ReplicatorComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	void SetMoveComp(UP8MovementComponent* MoveCompRef);
+	void Setup(UP8MovementComponent* MoveCompRef, USceneComponent* MeshOffsetRootComp);
 
 protected:
 	virtual void BeginPlay() override;
@@ -36,13 +36,11 @@ private:
 
 private:
 	TArray<FP8Move> UnacknowledgeMoves;
+	FP8ClientData ClientData = FP8ClientData();
 	UPROPERTY(ReplicatedUsing = "OnRep_ServerState")
 	FP8State ServerState;
 	UPROPERTY()
 	UP8MovementComponent* MoveComp;
-
-	float ClientTimeSinceUpdate = 0.f;
-	float ClientTimeBetweenUpdates = 0.f;
-	FTransform ClientStartTransform = FTransform::Identity;
-	FVector ClientStartVelocity = FVector::ZeroVector;
+	UPROPERTY()
+	USceneComponent* OffsetRt;
 };

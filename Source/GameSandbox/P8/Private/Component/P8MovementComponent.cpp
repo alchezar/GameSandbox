@@ -28,21 +28,21 @@ void UP8MovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 void UP8MovementComponent::SimulateMove(const FP8Move& TheMove)
 {
 	check(Mass > 0.f)
+
 	/* Calculate Resistances */
 	const double NormalForce = Mass * (-GetWorld()->GetGravityZ() / 100);
 	const FVector RollingResistance = RollingCoefficient * NormalForce * Velocity.GetSafeNormal();
 	const FVector AirResistance = DragCoefficient * Velocity.SizeSquared() * Velocity.GetSafeNormal();
+
 	/* Find kart Velocity */
 	const FVector Force = GetOwner()->GetActorForwardVector() * MaxMoveForce * TheMove.MoveAlpha - AirResistance - RollingResistance;
 	const FVector Acceleration = Force / Mass;
 	Velocity += Acceleration * TheMove.DeltaTime; 
 	FHitResult HitResult;
 	GetOwner()->AddActorWorldOffset(Velocity * 100.0 * TheMove.DeltaTime, true, &HitResult);
-	if (HitResult.bBlockingHit)
-	{
-		Velocity = FVector::ZeroVector;
-	}
+	if (HitResult.bBlockingHit) Velocity = FVector::ZeroVector;
 
+	/* Find kart Rotation */
 	const float RotationAngle = (GetOwner()->GetActorForwardVector().Dot(Velocity) * TheMove.DeltaTime) / MinTurnRadius * TheMove.TurnAlpha;
 	const FQuat RotationDelta = FQuat(GetOwner()->GetActorUpVector(), RotationAngle);
 	GetOwner()->AddActorWorldRotation(RotationDelta, true);

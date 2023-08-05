@@ -25,6 +25,7 @@ public:
 	AP8Kart();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void PostInitializeComponents() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,15 +39,15 @@ private:
 protected:
 #pragma region Component
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
-	USceneComponent* SceneRoot;
+	UBoxComponent* BoxCollision;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	USceneComponent* MeshOffsetRoot;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USkeletalMeshComponent* KartMesh;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* CameraView;
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
-	UBoxComponent* BoxCollision;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UP8MovementComponent* MoveComp;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
