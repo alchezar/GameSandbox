@@ -28,3 +28,10 @@ enum class EP9AttackType : uint8
 {
 	MELEE_FIST UMETA(DisplayName = "Melee - Fist")
 };
+
+UENUM(BlueprintType)
+enum class EP9CharState : uint8
+{
+	IDLE      UMETA(DisplayName = "Idle"),
+	ATTACKING UMETA(DisplayName = "Attaching")
+};
