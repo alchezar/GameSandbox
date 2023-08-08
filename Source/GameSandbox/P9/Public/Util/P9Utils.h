@@ -1,8 +1,9 @@
 // Copyright (C) 2023, IKinder
+
 // ReSharper disable CppUE4CodingStandardNamingViolationWarning
 
 #pragma once
-
+#include "Engine/DataTable.h"
 #include "P9Utils.generated.h"
 
 UENUM(BlueprintType)
@@ -33,5 +34,39 @@ UENUM(BlueprintType)
 enum class EP9CharState : uint8
 {
 	IDLE      UMETA(DisplayName = "Idle"),
-	ATTACKING UMETA(DisplayName = "Attaching")
+	ATTACKING UMETA(DisplayName = "Attaching"),
+	PUNCHED   UMETA(DisplayName = "Punched")
+};
+
+USTRUCT(BlueprintType)
+struct FP9MeleeCollisionProfile
+{
+	GENERATED_BODY()
+
+	FP9MeleeCollisionProfile()
+		: Enabled(FName("Weapon")), Disabled(FName("NoCollision")) {}
+
+	FP9MeleeCollisionProfile(const FString& EnabledStr, const FString& DisabledStr)
+		: Enabled(FName(EnabledStr)), Disabled(FName(DisabledStr)) {}
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Components")
+	FName Enabled;
+	UPROPERTY(EditAnywhere, Category = "C++ | Components")
+	FName Disabled;
+};
+
+USTRUCT(BlueprintType)
+struct FP9PlayerAttackMontage : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	FP9PlayerAttackMontage()
+		: Montage(nullptr), AnimSectionCount(0), Description("Empty") {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 AnimSectionCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FString Description;
 };

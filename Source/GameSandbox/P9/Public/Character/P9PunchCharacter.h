@@ -34,12 +34,21 @@ protected:
 	void Look(const FInputActionValue& Value);
 	void Attack();
 	void OnPunchHandle(USkeletalMeshComponent* MeshComp, bool bStart);
+	UFUNCTION()
+	void OnAttackHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	UFUNCTION()
+	void OnAttackBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void OnAttackEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
+	
 private:
 	void SetupComponents();
+	void SetupReferences();
 	void CheckHardReferences();
 	void AddMappingContext();
-	void InitAnimNotifies();
+	void CallbackDelegates();
+	void CallbackAnimNotifies();
 	
 	/**
 	 * Log - prints a message to all the log outputs with a specific color
@@ -78,11 +87,14 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AttackAction;
 #pragma endregion /* Input */
-#pragma region Montage
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Montage")
-	UAnimMontage* MeleeFistAttackMontage;
-#pragma endregion /* Montage */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Punch")
+	UDataTable* PlayerAttackDataTable;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
+	USoundBase* PunchSound;
 
 private:
+	FP9MeleeCollisionProfile MeleeCollisionProfile = FP9MeleeCollisionProfile("Weapon", "NoCollision");
 	EP9CharState CharState = EP9CharState::IDLE;
+	UPROPERTY()
+	UAudioComponent* PunchAudioComp;
 };

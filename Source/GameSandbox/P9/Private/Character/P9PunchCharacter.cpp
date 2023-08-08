@@ -4,6 +4,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Components/AudioComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -24,6 +25,7 @@ AP9PunchCharacter::AP9PunchCharacter()
 	bUseControllerRotationYaw = false;
 	/* Create new and setup current components */
 	SetupComponents();
+	SetupReferences();
 }
 
 void AP9PunchCharacter::BeginPlay()
@@ -31,7 +33,8 @@ void AP9PunchCharacter::BeginPlay()
 	Super::BeginPlay();
 	CheckHardReferences();
 	AddMappingContext();
-	InitAnimNotifies();
+	CallbackAnimNotifies();
+	CallbackDelegates();
 }
 
 void AP9PunchCharacter::Tick(const float DeltaTime)
@@ -55,18 +58,40 @@ void AP9PunchCharacter::SetupComponents()
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>("FollowCameraComponent");
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
 	FollowCamera->bUsePawnControlRotation = false;
-	/* Punch collisions */
+	/* Left fist Punch collisions */
 	LeftFistCollision = CreateDefaultSubobject<USphereComponent>("LeftFistCollisionComponent");
 	LeftFistCollision->SetupAttachment(GetMesh(), "SupportPoint");
 	LeftFistCollision->SetSphereRadius(10.f);
 	LeftFistCollision->AddLocalOffset(FVector(6.f, 2.f, 0.f));
-	LeftFistCollision->SetCollisionProfileName("NoCollision");
-	
+	LeftFistCollision->SetCollisionProfileName(MeleeCollisionProfile.Disabled);
+	LeftFistCollision->SetNotifyRigidBodyCollision(false);
+	LeftFistCollision->SetGenerateOverlapEvents(false);
+	/* Right fist Punch collisions */
 	RightFistCollision = CreateDefaultSubobject<USphereComponent>("RightFistCollisionComponent");
 	RightFistCollision->SetupAttachment(GetMesh(), "GripPoint");
 	RightFistCollision->SetSphereRadius(10.f);;
 	RightFistCollision->AddLocalOffset(FVector(-2.f, 1.f, -1.f));
-	RightFistCollision->SetCollisionProfileName("NoCollision");
+	RightFistCollision->SetCollisionProfileName(MeleeCollisionProfile.Disabled);
+	RightFistCollision->SetNotifyRigidBodyCollision(false);
+	RightFistCollision->SetGenerateOverlapEvents(false);
+	/* Audio Component */
+	PunchAudioComp = CreateDefaultSubobject<UAudioComponent>("PunchAudioComponent");
+	PunchAudioComp->SetupAttachment(RootComponent);
+}
+
+void AP9PunchCharacter::SetupReferences()
+{
+	/* Load default hard references. */
+	static ConstructorHelpers::FObjectFinder<USoundBase> PunchSoundObject(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/P9/Audio/SFX_Punch.SFX_Punch'"));
+	if (PunchSoundObject.Succeeded())
+	{
+		PunchSound = PunchSoundObject.Object;
+	}
+	static ConstructorHelpers::FObjectFinder<UDataTable> PlayerAttackMontageDataObject(TEXT("/Script/Engine.DataTable'/Game/Project/P9/DataTable/DT_PlayerAttackMontages.DT_PlayerAttackMontages'"));
+	if (PlayerAttackMontageDataObject.Succeeded())
+	{
+		PlayerAttackDataTable = PlayerAttackMontageDataObject.Object;
+	}
 }
 
 void AP9PunchCharacter::CheckHardReferences()
@@ -78,7 +103,11 @@ void AP9PunchCharacter::CheckHardReferences()
 	check(JumpAction)
 	
 	/* Check Montages */
-	check(MeleeFistAttackMontage)
+	check(PlayerAttackDataTable)
+
+	/* Check Sounds */
+	check(PunchAudioComp)
+	check(PunchSound)
 }
 
 void AP9PunchCharacter::AddMappingContext()
@@ -89,7 +118,6 @@ void AP9PunchCharacter::AddMappingContext()
 	if (!Subsystem) return;
 	Subsystem->AddMappingContext(DefaultContext, 0);
 }
-
 
 void AP9PunchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -127,40 +155,92 @@ void AP9PunchCharacter::Attack()
 {
 	/* Prevent spam multiple attacks. */
 	if (CharState >= EP9CharState::ATTACKING) return;
+	/* Find random table row key name. */
+	const int RandomKeyNum = FMath::RandRange(0, PlayerAttackDataTable->GetRowNames().Num() - 1);
+	const FName RandomKey = PlayerAttackDataTable->GetRowNames()[RandomKeyNum];
+	/* Get data from Data Tables row. */
+	const auto* AttackMontageRow = PlayerAttackDataTable->FindRow<FP9PlayerAttackMontage>(RandomKey, "", true);
+	if (!AttackMontageRow) return;
+	UAnimMontage* AnimMontage = AttackMontageRow->Montage;
+	if (!AnimMontage) return;
+
 	/* Find first montage section name and chop the last symbol, to get the default section name. */
-	const FString MontageSectionName = MeleeFistAttackMontage->GetSectionName(0).ToString().LeftChop(1);
+	const FString MontageSectionName = AnimMontage->GetSectionName(0).ToString().LeftChop(1);
 	/* Generate random number */
-	const int MontageSectionIndex = FMath::RandRange(0, MeleeFistAttackMontage->GetNumSections() - 1);
-	PlayAnimMontage(MeleeFistAttackMontage, 1.f, FName(MontageSectionName + FString::FromInt(MontageSectionIndex)));
+	const int MontageSectionIndex = FMath::RandRange(1, AnimMontage->GetNumSections());
+	PlayAnimMontage(AnimMontage, 1.f, FName(MontageSectionName + FString::FromInt(MontageSectionIndex)));
 	CharState = EP9CharState::ATTACKING;
 	/* OnPunchHandle should be fired next, after the anim notify is triggered. */
-	
-	Log(EP9LogLevel::INFO, MontageSectionName + FString::FromInt(MontageSectionIndex));
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT("RowName: %s, Montage: %s"), *RandomKey.ToString(), *(MontageSectionName + FString::FromInt(MontageSectionIndex))));
 }
 
 void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bool bStart)
 {
 	if (MeshComp != GetMesh()) return;
-	Log(EP9LogLevel::INFO, bStart ? "Attack start" : "Attack end");
 	/* Setting Fists collisions depending on the input condition. */
-	LeftFistCollision->SetCollisionProfileName(bStart ? "Weapon" : "NoCollision");
-	RightFistCollision->SetCollisionProfileName(bStart ? "Weapon" : "NoCollision");
+	const FName ProfileName = bStart ? MeleeCollisionProfile.Enabled : MeleeCollisionProfile.Disabled;
+	LeftFistCollision->SetCollisionProfileName(ProfileName);
+	LeftFistCollision->SetNotifyRigidBodyCollision(bStart);
+	LeftFistCollision->SetGenerateOverlapEvents(bStart);
+	
+	RightFistCollision->SetCollisionProfileName(ProfileName);
+	RightFistCollision->SetNotifyRigidBodyCollision(bStart);
+	RightFistCollision->SetGenerateOverlapEvents(bStart);
 	/* Set correct character state. */
 	if (!bStart) CharState = EP9CharState::IDLE;
 }
 
-void AP9PunchCharacter::InitAnimNotifies()
+void AP9PunchCharacter::OnAttackHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	TArray<FAnimNotifyEvent> AnimNotifyEvents = MeleeFistAttackMontage->Notifies;
-	for (const FAnimNotifyEvent& NotifyEvent : AnimNotifyEvents)
+	if (OtherActor == this || CharState >= EP9CharState::PUNCHED) return;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%hs: %s"), __FUNCTION__, *Hit.GetActor()->GetActorNameOrLabel()));
+
+	if (!PunchAudioComp->GetSound()) PunchAudioComp->SetSound(PunchSound);
+	PunchAudioComp->Play(0.f);
+
+	CharState = EP9CharState::PUNCHED;
+}
+
+void AP9PunchCharacter::OnAttackBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (OtherActor == this) return;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%hs: %s"), __FUNCTION__, *OtherActor->GetActorNameOrLabel()));
+}
+
+void AP9PunchCharacter::OnAttackEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (OtherActor == this) return;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%hs: %s"), __FUNCTION__, *OtherActor->GetActorNameOrLabel()));
+}
+
+void AP9PunchCharacter::CallbackAnimNotifies()
+{
+	TArray<FP9PlayerAttackMontage*> Rows;
+	PlayerAttackDataTable->GetAllRows("", OUT Rows);
+	for (const FP9PlayerAttackMontage* Row : Rows)
 	{
-		UP9NotifyWindowPunch* NotifyWindowPunch = Cast<UP9NotifyWindowPunch>(NotifyEvent.NotifyStateClass);
-		if (NotifyWindowPunch)
+		if (!Row->Montage) continue;
+		for (const FAnimNotifyEvent& NotifyEvent : Row->Montage->Notifies)
 		{
+			UP9NotifyWindowPunch* NotifyWindowPunch = Cast<UP9NotifyWindowPunch>(NotifyEvent.NotifyStateClass);
+			if (!NotifyWindowPunch) return;
+			
 			NotifyWindowPunch->OnPunchStart.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, true);
 			NotifyWindowPunch->OnPunchEnd.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, false);
 		}
 	}
+}
+
+void AP9PunchCharacter::CallbackDelegates()
+{
+	LeftFistCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
+	LeftFistCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
+	LeftFistCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
+	
+	RightFistCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
+	RightFistCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
+	RightFistCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
 }
 
 void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message)
