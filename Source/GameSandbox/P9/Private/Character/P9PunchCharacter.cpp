@@ -9,6 +9,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P9/Public/AnimNotify/P9NotifyWhoosh.h"
 #include "P9/Public/AnimNotify/P9NotifyWindowPunch.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP9PunchCharacter, All, All)
@@ -23,9 +24,9 @@ AP9PunchCharacter::AP9PunchCharacter()
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false;
-	/* Create new and setup current components */
+	/* Create and setup components, find default hard references */
 	SetupComponents();
-	SetupReferences();
+	SetupDefaultReferences();
 }
 
 void AP9PunchCharacter::BeginPlay()
@@ -77,20 +78,27 @@ void AP9PunchCharacter::SetupComponents()
 	/* Audio Component */
 	PunchAudioComp = CreateDefaultSubobject<UAudioComponent>("PunchAudioComponent");
 	PunchAudioComp->SetupAttachment(RootComponent);
+	WhooshAudioComp = CreateDefaultSubobject<UAudioComponent>("SwooshAudioComponent");
+	WhooshAudioComp->SetupAttachment(RootComponent);
 }
 
-void AP9PunchCharacter::SetupReferences()
+void AP9PunchCharacter::SetupDefaultReferences()
 {
 	/* Load default hard references. */
+	static ConstructorHelpers::FObjectFinder<UDataTable> PlayerAttackMontageDataObject(TEXT("/Script/Engine.DataTable'/Game/Project/P9/DataTable/DT_PlayerAttackMontages.DT_PlayerAttackMontages'"));
+	if (PlayerAttackMontageDataObject.Succeeded())
+	{
+		PlayerAttackDataTable = PlayerAttackMontageDataObject.Object;
+	}
 	static ConstructorHelpers::FObjectFinder<USoundBase> PunchSoundObject(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/P9/Audio/SFX_Punch.SFX_Punch'"));
 	if (PunchSoundObject.Succeeded())
 	{
 		PunchSound = PunchSoundObject.Object;
 	}
-	static ConstructorHelpers::FObjectFinder<UDataTable> PlayerAttackMontageDataObject(TEXT("/Script/Engine.DataTable'/Game/Project/P9/DataTable/DT_PlayerAttackMontages.DT_PlayerAttackMontages'"));
-	if (PlayerAttackMontageDataObject.Succeeded())
+	static ConstructorHelpers::FObjectFinder<USoundBase> SwooshSoundObject(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/P9/Audio/SFX_Swoosh.SFX_Swoosh'"));
+	if (SwooshSoundObject.Succeeded())
 	{
-		PlayerAttackDataTable = PlayerAttackMontageDataObject.Object;
+		WhooshSound = SwooshSoundObject.Object;
 	}
 }
 
@@ -101,13 +109,16 @@ void AP9PunchCharacter::CheckHardReferences()
 	check(MoveAction)
 	check(LookAction)
 	check(JumpAction)
+	check(FireAction)
 	
 	/* Check Montages */
 	check(PlayerAttackDataTable)
 
 	/* Check Sounds */
 	check(PunchAudioComp)
+	check(WhooshAudioComp)
 	check(PunchSound)
+	check(WhooshSound)
 }
 
 void AP9PunchCharacter::AddMappingContext()
@@ -131,6 +142,7 @@ void AP9PunchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
 	/* Attack functionality */
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::Attack);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireLineTrace);
 }
 
 void AP9PunchCharacter::Move(const FInputActionValue& Value)
@@ -155,24 +167,44 @@ void AP9PunchCharacter::Attack()
 {
 	/* Prevent spam multiple attacks. */
 	if (CharState >= EP9CharState::ATTACKING) return;
-	/* Find random table row key name. */
+	
+	/* Find random table row key name and use it to get AnimMontage data from DataTable row. */
 	const int RandomKeyNum = FMath::RandRange(0, PlayerAttackDataTable->GetRowNames().Num() - 1);
 	const FName RandomKey = PlayerAttackDataTable->GetRowNames()[RandomKeyNum];
-	/* Get data from Data Tables row. */
 	const auto* AttackMontageRow = PlayerAttackDataTable->FindRow<FP9PlayerAttackMontage>(RandomKey, "", true);
 	if (!AttackMontageRow) return;
 	UAnimMontage* AnimMontage = AttackMontageRow->Montage;
 	if (!AnimMontage) return;
 
-	/* Find first montage section name and chop the last symbol, to get the default section name. */
+	/* To play animation we need to get any section name without last symbol. Then generate random number and use it as SectionName. */
 	const FString MontageSectionName = AnimMontage->GetSectionName(0).ToString().LeftChop(1);
-	/* Generate random number */
 	const int MontageSectionIndex = FMath::RandRange(1, AnimMontage->GetNumSections());
 	PlayAnimMontage(AnimMontage, 1.f, FName(MontageSectionName + FString::FromInt(MontageSectionIndex)));
 	CharState = EP9CharState::ATTACKING;
 	/* OnPunchHandle should be fired next, after the anim notify is triggered. */
+		
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT("RowName: %s, Montage: %s"), *RandomKey.ToString(), *(MontageSectionName + FString::FromInt(MontageSectionIndex))));
+}
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT("RowName: %s, Montage: %s"), *RandomKey.ToString(), *(MontageSectionName + FString::FromInt(MontageSectionIndex))));
+void AP9PunchCharacter::FireLineTrace()
+{
+	FVector Start;
+	FVector End;
+	if (LineTraceType == EP9LineTraceType::CAMERA)
+	{
+		Start = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * CameraBoom->TargetArmLength;
+	}
+	else if (LineTraceType == EP9LineTraceType::PLAYER)
+	{
+		Start = GetActorLocation() + FVector(0.f, 0.f, BaseEyeHeight);
+	}
+	End = Start + FollowCamera->GetForwardVector() * LineTraceDistance;
+	
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
+	TraceDebugLine(HitResult, Start, End);
 }
 
 void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bool bStart)
@@ -187,18 +219,26 @@ void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bo
 	RightFistCollision->SetCollisionProfileName(ProfileName);
 	RightFistCollision->SetNotifyRigidBodyCollision(bStart);
 	RightFistCollision->SetGenerateOverlapEvents(bStart);
-	/* Set correct character state. */
+	/* Set character state to idle, when the attack window is closed. */
 	if (!bStart) CharState = EP9CharState::IDLE;
+}
+
+void AP9PunchCharacter::OnWhooshHandle(USkeletalMeshComponent* MeshComp)
+{
+	if (!WhooshAudioComp->GetSound()) WhooshAudioComp->SetSound(WhooshSound);
+	WhooshAudioComp->Play();
 }
 
 void AP9PunchCharacter::OnAttackHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (OtherActor == this || CharState >= EP9CharState::PUNCHED) return;
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(TEXT("%hs: %s"), __FUNCTION__, *Hit.GetActor()->GetActorNameOrLabel()));
-
+	/* Play punch sound */
 	if (!PunchAudioComp->GetSound()) PunchAudioComp->SetSound(PunchSound);
-	PunchAudioComp->Play(0.f);
-
+	PunchAudioComp->Play();
+	/* Stop anim montage */
+	StopAnimMontage();
+	
 	CharState = EP9CharState::PUNCHED;
 }
 
@@ -223,11 +263,15 @@ void AP9PunchCharacter::CallbackAnimNotifies()
 		if (!Row->Montage) continue;
 		for (const FAnimNotifyEvent& NotifyEvent : Row->Montage->Notifies)
 		{
-			UP9NotifyWindowPunch* NotifyWindowPunch = Cast<UP9NotifyWindowPunch>(NotifyEvent.NotifyStateClass);
-			if (!NotifyWindowPunch) return;
-			
-			NotifyWindowPunch->OnPunchStart.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, true);
-			NotifyWindowPunch->OnPunchEnd.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, false);
+			if (UP9NotifyWindowPunch* NotifyWindowPunch = Cast<UP9NotifyWindowPunch>(NotifyEvent.NotifyStateClass))
+			{
+				NotifyWindowPunch->OnPunchStart.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, true);
+				NotifyWindowPunch->OnPunchEnd.AddUObject<ThisClass, bool>(this, &ThisClass::OnPunchHandle, false);
+			}
+			if (UP9NotifyWhoosh* NotifySwoosh = Cast<UP9NotifyWhoosh>(NotifyEvent.Notify))
+			{
+				NotifySwoosh->OnWhoosh.AddUObject(this, &ThisClass::OnWhooshHandle);
+			}
 		}
 	}
 }
@@ -277,6 +321,18 @@ void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message, con
 		default:                   UE_LOG(LogP9PunchCharacter, Log, TEXT("%s"), *Message);         break;
 		}
 	}
+}
+
+void AP9PunchCharacter::TraceDebugLine(const FHitResult& Hit, const FVector& Start, const FVector& End) const
+{
+	if (!Hit.bBlockingHit)
+	{
+		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 10.f);
+		return;
+	}
+	DrawDebugLine(GetWorld(), Start, Hit.ImpactPoint, FColor::Green, false, 10.f);
+	DrawDebugLine(GetWorld(), Hit.ImpactPoint, End, FColor::Red, false, 10.f);
+	DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 10.f, FColor::Red, false, 10.f);
 }
 
 float AP9PunchCharacter::GetMovementDirectionAngle()

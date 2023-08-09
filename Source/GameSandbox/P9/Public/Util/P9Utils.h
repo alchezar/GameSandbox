@@ -70,3 +70,10 @@ struct FP9PlayerAttackMontage : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
 };
+
+UENUM(BlueprintType)
+enum class EP9LineTraceType : uint8
+{
+	CAMERA UMETA(DisplayName = "Single trace from Camera"),
+	PLAYER UMETA(DisplayName = "Single trace from Player")
+};
