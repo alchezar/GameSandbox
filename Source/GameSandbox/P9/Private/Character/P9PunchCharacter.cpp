@@ -334,12 +334,3 @@ void AP9PunchCharacter::TraceDebugLine(const FHitResult& Hit, const FVector& Sta
 	DrawDebugLine(GetWorld(), Hit.ImpactPoint, End, FColor::Red, false, 10.f);
 	DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 10.f, FColor::Red, false, 10.f);
 }
-
-float AP9PunchCharacter::GetMovementDirectionAngle()
-{
-	if (FMath::IsNearlyZero(GetVelocity().Size2D())) return 0.f;
-	const FVector Vector1 = GetActorForwardVector();
-	const FVector Vector2 = GetVelocity().GetSafeNormal();
-	const float Sign = FMath::Sign(Vector1.Cross(Vector2).Z);
-	return Sign * FMath::RadiansToDegrees(FMath::Acos(Vector1.Dot(Vector2)));
-}

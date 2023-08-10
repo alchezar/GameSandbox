@@ -18,17 +18,20 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+private:
+	float GetMovementDirectionAngle() const;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	float Speed = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
-	float Direction = 0.f;	
+	float Direction = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	bool bInAir = false;
 
 private:
 	UPROPERTY()
-	AP9PunchCharacter* PunchCharacter;
+	APawn* Owner;
 	UPROPERTY()
-	UCharacterMovementComponent* MovementComponent ;
+	UPawnMovementComponent* MovementComponent;
 };
