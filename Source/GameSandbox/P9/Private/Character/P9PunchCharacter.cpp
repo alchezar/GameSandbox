@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "P9/Public/Character/P9PunchCharacter.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -51,6 +52,7 @@ void AP9PunchCharacter::SetupComponents()
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 	/* Create camera boom */
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomComponent");
 	CameraBoom->SetupAttachment(RootComponent);
@@ -111,6 +113,7 @@ void AP9PunchCharacter::CheckHardReferences()
 	check(LookAction)
 	check(JumpAction)
 	check(FireAction)
+	check(CrouchAction)
 	
 	/* Check Montages */
 	check(PlayerAttackDataTable)
@@ -137,16 +140,18 @@ void AP9PunchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	auto* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (!EnhancedInputComponent) return;
 	/* Default input actions */
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchInput, true);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ThisClass::CrouchInput, false);
 	/* Attack functionality */
-	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::Attack);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireLineTrace);
+	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::AttackInput);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireLineTraceInput);
 }
 
-void AP9PunchCharacter::Move(const FInputActionValue& Value)
+void AP9PunchCharacter::MoveInput(const FInputActionValue& Value)
 {
 	if (!Controller) return;
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -157,14 +162,21 @@ void AP9PunchCharacter::Move(const FInputActionValue& Value)
 	AddMovementInput(Right, MovementVector.X);
 }
 
-void AP9PunchCharacter::Look(const FInputActionValue& Value)
+void AP9PunchCharacter::LookInput(const FInputActionValue& Value)
 {
 	const FVector2D LookAxisVector = Value.Get<FVector2D>();
 	AddControllerYawInput(LookAxisVector.X);
 	AddControllerPitchInput(LookAxisVector.Y);
 }
 
-void AP9PunchCharacter::Attack()
+void AP9PunchCharacter::CrouchInput(const bool bEnable)
+{
+	bEnable ? Crouch() : UnCrouch();
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%hs"), bEnable ? "Crouch" : "UnCrouch"));
+}
+
+void AP9PunchCharacter::AttackInput()
 {
 	/* Prevent spam multiple attacks. */
 	if (CharState >= EP9CharState::ATTACKING) return;
@@ -181,13 +193,14 @@ void AP9PunchCharacter::Attack()
 	const FString MontageSectionName = AnimMontage->GetSectionName(0).ToString().LeftChop(1);
 	const int MontageSectionIndex = FMath::RandRange(1, AnimMontage->GetNumSections());
 	PlayAnimMontage(AnimMontage, 1.f, FName(MontageSectionName + FString::FromInt(MontageSectionIndex)));
+	
 	CharState = EP9CharState::ATTACKING;
 	/* OnPunchHandle should be fired next, after the anim notify is triggered. */
 		
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT("RowName: %s, Montage: %s"), *RandomKey.ToString(), *(MontageSectionName + FString::FromInt(MontageSectionIndex))));
 }
 
-void AP9PunchCharacter::FireLineTrace()
+void AP9PunchCharacter::FireLineTraceInput()
 {
 	FVector Start;
 	FVector End;
@@ -220,8 +233,13 @@ void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bo
 	RightFistCollision->SetCollisionProfileName(ProfileName);
 	RightFistCollision->SetNotifyRigidBodyCollision(bStart);
 	RightFistCollision->SetGenerateOverlapEvents(bStart);
-	/* Set character state to idle, when the attack window is closed. */
-	if (!bStart) CharState = EP9CharState::IDLE;
+	
+	/* When the attack window is closed, set character state to ARMED, and after CountdownToIdle time - change state to IDLE. */
+	if (!bStart)
+	{
+		CharState = EP9CharState::ARMED;
+		GetWorld()->GetTimerManager().SetTimer(ArmTimer, this, &ThisClass::DisarmHandle, CountdownToIdle);
+	}
 }
 
 void AP9PunchCharacter::OnWhooshHandle(USkeletalMeshComponent* MeshComp)
@@ -239,7 +257,6 @@ void AP9PunchCharacter::OnAttackHitHandle(UPrimitiveComponent* HitComponent, AAc
 	PunchAudioComp->Play();
 	/* Stop anim montage */
 	StopAnimMontage();
-	
 	CharState = EP9CharState::PUNCHED;
 
 	/* Get HUD reference and increment combo count */
@@ -308,6 +325,11 @@ void AP9PunchCharacter::ResetComboHandle()
 {
 	CurrentComboCount = 0;
 	HUD->ResetCombo();
+}
+
+void AP9PunchCharacter::DisarmHandle()
+{
+	CharState = EP9CharState::IDLE;
 }
 
 void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message)

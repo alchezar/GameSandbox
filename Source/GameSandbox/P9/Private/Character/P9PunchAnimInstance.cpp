@@ -1,14 +1,16 @@
 // Copyright (C) 2023, IKinder
 
 #include "P9/Public/Character/P9PunchAnimInstance.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P9/Public/Character/P9PunchCharacter.h"
 
 void UP9PunchAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
-	Owner = TryGetPawnOwner();
+	Owner = Cast<AP9PunchCharacter>(TryGetPawnOwner());
 	if (!Owner) return;
-	MovementComponent = Owner->GetMovementComponent();
+	MovementComponent = Owner->GetCharacterMovement();
 }
 
 void UP9PunchAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -19,6 +21,9 @@ void UP9PunchAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Speed = Owner->GetVelocity().Size2D();
 	Direction = GetMovementDirectionAngle();
 	bInAir = MovementComponent->IsFalling();
+	bArmed  = Owner->GetCharState() >= EP9CharState::ARMED ;
+	bMoving = Speed > 10.f;
+	bCrouching = MovementComponent->IsCrouching();
 }
 
 float UP9PunchAnimInstance::GetMovementDirectionAngle() const

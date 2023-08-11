@@ -7,6 +7,7 @@
 #include "P9/Public/Util/P9Utils.h"
 #include "P9PunchCharacter.generated.h"
 
+class AP9HUD;
 class USphereComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -26,17 +27,20 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+	FORCEINLINE EP9CharState GetCharState() const { return CharState; }
 
 protected:
 	virtual void BeginPlay() override;
 	/* Move character. */
-	void Move(const FInputActionValue& Value);
+	void MoveInput(const FInputActionValue& Value);
 	/* Rotate controller around the character. */
-	void Look(const FInputActionValue& Value);
+	void LookInput(const FInputActionValue& Value);
+	/*  */
+	void CrouchInput(const bool bEnable);
 	/* Fires when the attack button is pressed. */
-	void Attack();
+	void AttackInput();
 	/* Fires when the line trace button is pressed. */
-	void FireLineTrace();
+	void FireLineTraceInput();
 	/* The edges of the animation segment, when the fists are active and can deal damage. */
 	void OnPunchHandle(USkeletalMeshComponent* MeshComp, bool bStart);
 	/* The point on the animation, where the fists will makes whoosh sound. */
@@ -55,8 +59,8 @@ private:
 	void AddMappingContext();
 	void CallbackAnimNotifies();
 	void CallbackDelegates();
-	void CallbackAnimNotifies();
 	void ResetComboHandle();
+	void DisarmHandle();
 	
 	/**
 	 * Log - prints a message to all the log outputs with a specific color
@@ -95,6 +99,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* JumpAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* CrouchAction;	
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AttackAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* FireAction;
@@ -105,6 +111,8 @@ protected:
 	USoundBase* PunchSound;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
 	USoundBase* WhooshSound;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
+	float CountdownToIdle = 5.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
 	EP9LineTraceType LineTraceType = EP9LineTraceType::CAMERA;
 	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
@@ -113,6 +121,7 @@ protected:
 private:
 	int32 CurrentComboCount = 0;
 	FTimerHandle ComboTimer;
+	FTimerHandle ArmTimer;
 	FP9MeleeCollisionProfile MeleeCollisionProfile = FP9MeleeCollisionProfile("Weapon", "NoCollision");
 	EP9CharState CharState = EP9CharState::IDLE;
 	UPROPERTY()

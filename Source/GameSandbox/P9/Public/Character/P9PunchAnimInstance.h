@@ -28,10 +28,16 @@ protected:
 	float Direction = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	bool bInAir = false;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	bool bArmed = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	bool bMoving = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	bool bCrouching = false;
+		
 private:
 	UPROPERTY()
-	APawn* Owner;
+	AP9PunchCharacter* Owner;
 	UPROPERTY()
-	UPawnMovementComponent* MovementComponent;
+	UCharacterMovementComponent* MovementComponent;
 };

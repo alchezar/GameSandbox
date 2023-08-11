@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
 #include "P9/Public/AnimNotify/P9NotifyWindowPunch.h"
+
 UP9NotifyWindowPunch::UP9NotifyWindowPunch()
 {
 	NotifyName = "Punch";
