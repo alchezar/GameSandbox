@@ -53,8 +53,10 @@ private:
 	void SetupDefaultReferences();
 	void CheckHardReferences();
 	void AddMappingContext();
+	void CallbackAnimNotifies();
 	void CallbackDelegates();
 	void CallbackAnimNotifies();
+	void ResetComboHandle();
 	
 	/**
 	 * Log - prints a message to all the log outputs with a specific color
@@ -109,10 +111,14 @@ protected:
 	float LineTraceDistance = 100.f;	
 
 private:
+	int32 CurrentComboCount = 0;
+	FTimerHandle ComboTimer;
 	FP9MeleeCollisionProfile MeleeCollisionProfile = FP9MeleeCollisionProfile("Weapon", "NoCollision");
 	EP9CharState CharState = EP9CharState::IDLE;
 	UPROPERTY()
 	UAudioComponent* PunchAudioComp;
 	UPROPERTY()
 	UAudioComponent* WhooshAudioComp;
+	UPROPERTY()
+	AP9HUD* HUD;
 };

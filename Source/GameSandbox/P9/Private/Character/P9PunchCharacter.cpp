@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "P9/Public/AnimNotify/P9NotifyWhoosh.h"
 #include "P9/Public/AnimNotify/P9NotifyWindowPunch.h"
+#include "P9/Public/UI/P9HUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP9PunchCharacter, All, All)
 
@@ -240,6 +241,22 @@ void AP9PunchCharacter::OnAttackHitHandle(UPrimitiveComponent* HitComponent, AAc
 	StopAnimMontage();
 	
 	CharState = EP9CharState::PUNCHED;
+
+	/* Get HUD reference and increment combo count */
+	if (const auto PC = Cast<APlayerController>(Controller))
+	{
+		HUD = Cast<AP9HUD>(PC->GetHUD());
+		if (!HUD) return;
+
+		HUD->UpdateComboCount(++CurrentComboCount);
+
+		/* Update combo timer. */
+		if (GetWorld()->GetTimerManager().IsTimerActive(ComboTimer))
+		{
+			GetWorld()->GetTimerManager().ClearTimer(ComboTimer);
+		}
+		GetWorld()->GetTimerManager().SetTimer(ComboTimer, this, &ThisClass::ResetComboHandle, 5.f);
+	}
 }
 
 void AP9PunchCharacter::OnAttackBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -285,6 +302,12 @@ void AP9PunchCharacter::CallbackDelegates()
 	RightFistCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
 	RightFistCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
 	RightFistCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
+}
+
+void AP9PunchCharacter::ResetComboHandle()
+{
+	CurrentComboCount = 0;
+	HUD->ResetCombo();
 }
 
 void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message)

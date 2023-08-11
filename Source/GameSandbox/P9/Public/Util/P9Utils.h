@@ -34,6 +34,7 @@ UENUM(BlueprintType)
 enum class EP9CharState : uint8
 {
 	IDLE      UMETA(DisplayName = "Idle"),
+	ARMED     UMETA(DisplayName = "Armed"),
 	ATTACKING UMETA(DisplayName = "Attaching"),
 	PUNCHED   UMETA(DisplayName = "Punched")
 };
