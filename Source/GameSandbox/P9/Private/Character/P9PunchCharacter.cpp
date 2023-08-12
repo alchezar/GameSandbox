@@ -12,6 +12,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "P9/Public/AnimNotify/P9NotifyWhoosh.h"
 #include "P9/Public/AnimNotify/P9NotifyWindowPunch.h"
+#include "P9/Public/Interface/P9Interaction.h"
 #include "P9/Public/UI/P9HUD.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP9PunchCharacter, All, All)
@@ -43,16 +44,20 @@ void AP9PunchCharacter::BeginPlay()
 void AP9PunchCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), GetCharacterMovement()->MaxWalkSpeed));
 }
 
 void AP9PunchCharacter::SetupComponents()
 {
 	/* Configure character movement */
-	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 540.f, 0.f);
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeedCrouched = MaxCrouchSpeed;
 	/* Create camera boom */
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomComponent");
 	CameraBoom->SetupAttachment(RootComponent);
@@ -78,11 +83,27 @@ void AP9PunchCharacter::SetupComponents()
 	RightFistCollision->SetCollisionProfileName(MeleeCollisionProfile.Disabled);
 	RightFistCollision->SetNotifyRigidBodyCollision(false);
 	RightFistCollision->SetGenerateOverlapEvents(false);
+	/* Left leg Kick collisions */
+	LeftLegCollision = CreateDefaultSubobject<USphereComponent>("LeftLegCollisionComponent");
+	LeftLegCollision->SetupAttachment(GetMesh(), "LeftBall");
+	LeftLegCollision->SetSphereRadius(10.f);
+	LeftLegCollision->AddLocalOffset(FVector::ZeroVector);
+	LeftLegCollision->SetCollisionProfileName(MeleeCollisionProfile.Disabled);
+	LeftLegCollision->SetNotifyRigidBodyCollision(false);
+	LeftLegCollision->SetGenerateOverlapEvents(false);
+	/* Right leg Kick collisions */
+	RightLegCollision = CreateDefaultSubobject<USphereComponent>("RightLegCollisionComponent");
+	RightLegCollision->SetupAttachment(GetMesh(), "RightBall");
+	RightLegCollision->SetSphereRadius(10.f);;
+	RightLegCollision->AddLocalOffset(FVector::ZeroVector);
+	RightLegCollision->SetCollisionProfileName(MeleeCollisionProfile.Disabled);
+	RightLegCollision->SetNotifyRigidBodyCollision(false);
+	RightLegCollision->SetGenerateOverlapEvents(false);
 	/* Audio Component */
 	PunchAudioComp = CreateDefaultSubobject<UAudioComponent>("PunchAudioComponent");
 	PunchAudioComp->SetupAttachment(RootComponent);
 	WhooshAudioComp = CreateDefaultSubobject<UAudioComponent>("SwooshAudioComponent");
-	WhooshAudioComp->SetupAttachment(RootComponent);
+	WhooshAudioComp->SetupAttachment(RootComponent);	
 }
 
 void AP9PunchCharacter::SetupDefaultReferences()
@@ -114,6 +135,8 @@ void AP9PunchCharacter::CheckHardReferences()
 	check(JumpAction)
 	check(FireAction)
 	check(CrouchAction)
+	check(RunAction)
+	check(ArmAction)
 	
 	/* Check Montages */
 	check(PlayerAttackDataTable)
@@ -139,25 +162,56 @@ void AP9PunchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	auto* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 	if (!EnhancedInputComponent) return;
-	/* Default input actions */
+	/* Move & look. */
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
+	/* Jump. */
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
 	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &Super::StopJumping);
+	/* Crouch. */
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchInput, true);
 	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &ThisClass::CrouchInput, false);
-	/* Attack functionality */
+	/* Run. */
+	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &ThisClass::RunInput, true);
+	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
+	/* Attack. */
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::AttackInput);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireLineTraceInput);
+	EnhancedInputComponent->BindAction(ArmAction, ETriggerEvent::Started, this, &ThisClass::ArmInput);
 }
 
 void AP9PunchCharacter::MoveInput(const FInputActionValue& Value)
 {
 	if (!Controller) return;
+	
 	const FVector2D MovementVector = Value.Get<FVector2D>();
 	const FRotator YawRotation = FRotator(0.f, Controller->GetControlRotation().Yaw, 0.f);
 	const FVector Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	// FVector Forward;
+	// FVector Right;
+	
+	if (CharState == EP9CharState::ARMED && CharMoveState != EP9CharMoving::CROUCH)
+	{
+		if (!GetCharacterMovement()->bUseControllerDesiredRotation)
+		{
+			GetCharacterMovement()->bUseControllerDesiredRotation = true;
+			GetCharacterMovement()->bOrientRotationToMovement = false;
+		}
+		// Forward = GetActorForwardVector();
+		// Right = GetActorRightVector();
+	}
+	else
+	{
+		if (GetCharacterMovement()->bUseControllerDesiredRotation)
+		{
+			GetCharacterMovement()->bUseControllerDesiredRotation = false;
+			GetCharacterMovement()->bOrientRotationToMovement = true;
+		}
+		// Forward = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// Right = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+	}
+	
 	AddMovementInput(Forward, MovementVector.Y);
 	AddMovementInput(Right, MovementVector.X);
 }
@@ -172,8 +226,21 @@ void AP9PunchCharacter::LookInput(const FInputActionValue& Value)
 void AP9PunchCharacter::CrouchInput(const bool bEnable)
 {
 	bEnable ? Crouch() : UnCrouch();
+	CharMoveState = bEnable ? EP9CharMoving::CROUCH : EP9CharMoving::WALK;
+	ChangeMovingSpeed();
+}
 
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Emerald, FString::Printf(TEXT("%hs"), bEnable ? "Crouch" : "UnCrouch"));
+void AP9PunchCharacter::RunInput(const bool bEnable)
+{
+	if (CharState >= EP9CharState::ARMED || CharMoveState <= EP9CharMoving::ARMED) return;
+	CharMoveState = bEnable ? EP9CharMoving::RUN : EP9CharMoving::WALK;
+	ChangeMovingSpeed();
+}
+
+void AP9PunchCharacter::ArmInput()
+{
+	const bool bArmed = CharMoveState == EP9CharMoving::ARMED; 
+	ArmPlayer(!bArmed);
 }
 
 void AP9PunchCharacter::AttackInput()
@@ -217,8 +284,15 @@ void AP9PunchCharacter::FireLineTraceInput()
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params);
-	TraceDebugLine(HitResult, Start, End);
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
+	{
+		TraceDebugLine(HitResult, Start, End);
+
+		if (auto InteractInterface = Cast<IP9Interaction>(HitResult.GetActor()))
+		{
+			InteractInterface->Interact();
+		}
+	}
 }
 
 void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bool bStart)
@@ -233,12 +307,26 @@ void AP9PunchCharacter::OnPunchHandle(USkeletalMeshComponent* MeshComp, const bo
 	RightFistCollision->SetCollisionProfileName(ProfileName);
 	RightFistCollision->SetNotifyRigidBodyCollision(bStart);
 	RightFistCollision->SetGenerateOverlapEvents(bStart);
+
+	LeftLegCollision->SetCollisionProfileName(ProfileName);
+	LeftLegCollision->SetNotifyRigidBodyCollision(bStart);
+	LeftLegCollision->SetGenerateOverlapEvents(bStart);
 	
-	/* When the attack window is closed, set character state to ARMED, and after CountdownToIdle time - change state to IDLE. */
+	RightLegCollision->SetCollisionProfileName(ProfileName);
+	RightLegCollision->SetNotifyRigidBodyCollision(bStart);
+	RightLegCollision->SetGenerateOverlapEvents(bStart);
+	
+	/* When the attack window is closed, set character state to ARMED, and after ArmedToIdleDelay - change state to IDLE. */
 	if (!bStart)
 	{
-		CharState = EP9CharState::ARMED;
-		GetWorld()->GetTimerManager().SetTimer(ArmTimer, this, &ThisClass::DisarmHandle, CountdownToIdle);
+		ArmPlayer(true);
+		
+		FTimerDelegate ArmDelegate;
+		ArmDelegate.BindLambda([&]()
+		{
+			ArmPlayer(false);
+		});
+		GetWorld()->GetTimerManager().SetTimer(ArmTimer, ArmDelegate, ArmedToIdleDelay, false);
 	}
 }
 
@@ -319,6 +407,14 @@ void AP9PunchCharacter::CallbackDelegates()
 	RightFistCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
 	RightFistCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
 	RightFistCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
+
+	LeftLegCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
+	LeftLegCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
+	LeftLegCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
+	
+	RightLegCollision->OnComponentHit.AddDynamic(this, &ThisClass::OnAttackHitHandle);
+	RightLegCollision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnAttackBeginOverlapHandle);
+	RightLegCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnAttackEndOverlapHandle);
 }
 
 void AP9PunchCharacter::ResetComboHandle()
@@ -327,9 +423,31 @@ void AP9PunchCharacter::ResetComboHandle()
 	HUD->ResetCombo();
 }
 
-void AP9PunchCharacter::DisarmHandle()
+void AP9PunchCharacter::ArmPlayer(const bool bEnable)
 {
-	CharState = EP9CharState::IDLE;
+	if (bEnable)
+	{
+		CharState = EP9CharState::ARMED;
+		CharMoveState = EP9CharMoving::ARMED;
+	}
+	else
+	{
+		CharState = EP9CharState::IDLE;
+		CharMoveState = EP9CharMoving::WALK;
+	}
+	ChangeMovingSpeed();
+}
+
+void AP9PunchCharacter::ChangeMovingSpeed() const
+{
+	switch (CharMoveState)
+	{
+	case EP9CharMoving::CROUCH: GetCharacterMovement()->MaxWalkSpeed = MaxCrouchSpeed; break;
+	case EP9CharMoving::ARMED:  GetCharacterMovement()->MaxWalkSpeed = MaxArmedSpeed;  break;
+	case EP9CharMoving::WALK:   GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;   break;
+	case EP9CharMoving::RUN:    GetCharacterMovement()->MaxWalkSpeed = MaxRunSpeed;    break;
+	default:                    GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	}
 }
 
 void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message)

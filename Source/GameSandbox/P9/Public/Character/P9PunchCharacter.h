@@ -28,6 +28,7 @@ public:
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE EP9CharState GetCharState() const { return CharState; }
+	FORCEINLINE EP9CharMoving GetCharMoveState() const { return CharMoveState; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,6 +38,10 @@ protected:
 	void LookInput(const FInputActionValue& Value);
 	/*  */
 	void CrouchInput(const bool bEnable);
+	/*  */
+	void RunInput(const bool bEnable);
+	/*  */
+	void ArmInput();
 	/* Fires when the attack button is pressed. */
 	void AttackInput();
 	/* Fires when the line trace button is pressed. */
@@ -60,7 +65,8 @@ private:
 	void CallbackAnimNotifies();
 	void CallbackDelegates();
 	void ResetComboHandle();
-	void DisarmHandle();
+	void ArmPlayer(const bool bEnable);
+	void ChangeMovingSpeed() const;
 	
 	/**
 	 * Log - prints a message to all the log outputs with a specific color
@@ -87,7 +93,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USphereComponent* LeftFistCollision;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
-	USphereComponent* RightFistCollision;	
+	USphereComponent* RightFistCollision;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	USphereComponent* LeftLegCollision;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	USphereComponent* RightLegCollision;	
 #pragma endregion /* Component */
 #pragma region Input
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
@@ -101,10 +111,24 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* CrouchAction;	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* RunAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AttackAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* FireAction;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* ArmAction;		
 #pragma endregion /* Input */
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
+	float MaxWalkSpeed = 600.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
+	float MaxCrouchSpeed = 300.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
+	float MaxRunSpeed = 900.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Moving")
+	float MaxArmedSpeed = 450.f;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Punch")
 	UDataTable* PlayerAttackDataTable;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
@@ -112,7 +136,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
 	USoundBase* WhooshSound;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
-	float CountdownToIdle = 5.f;
+	float ArmedToIdleDelay = 5.f; // CountdownToIdle
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
 	EP9LineTraceType LineTraceType = EP9LineTraceType::CAMERA;
 	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
@@ -124,6 +149,7 @@ private:
 	FTimerHandle ArmTimer;
 	FP9MeleeCollisionProfile MeleeCollisionProfile = FP9MeleeCollisionProfile("Weapon", "NoCollision");
 	EP9CharState CharState = EP9CharState::IDLE;
+	EP9CharMoving CharMoveState = EP9CharMoving::WALK;
 	UPROPERTY()
 	UAudioComponent* PunchAudioComp;
 	UPROPERTY()

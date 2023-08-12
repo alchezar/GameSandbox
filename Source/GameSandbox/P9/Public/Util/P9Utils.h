@@ -39,6 +39,22 @@ enum class EP9CharState : uint8
 	PUNCHED   UMETA(DisplayName = "Punched")
 };
 
+UENUM(BlueprintType)
+enum class EP9CharMoving : uint8
+{
+	CROUCH UMETA(DisplayName = "Crouch"),
+	ARMED  UMETA(DisplayName = "Armed"),
+	WALK   UMETA(DisplayName = "Walk"),
+	RUN    UMETA(DisplayName = "Run")
+};
+
+UENUM(BlueprintType)
+enum class EP9LineTraceType : uint8
+{
+	CAMERA UMETA(DisplayName = "Single trace from Camera"),
+	PLAYER UMETA(DisplayName = "Single trace from Player")
+};
+
 USTRUCT(BlueprintType)
 struct FP9MeleeCollisionProfile
 {
@@ -70,11 +86,4 @@ struct FP9PlayerAttackMontage : public FTableRowBase
 	int32 AnimSectionCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
-};
-
-UENUM(BlueprintType)
-enum class EP9LineTraceType : uint8
-{
-	CAMERA UMETA(DisplayName = "Single trace from Camera"),
-	PLAYER UMETA(DisplayName = "Single trace from Player")
 };
