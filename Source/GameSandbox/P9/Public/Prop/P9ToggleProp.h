@@ -14,7 +14,7 @@ class GAMESANDBOX_API AP9ToggleProp : public AP9InteractedProp
 public:
 	AP9ToggleProp();
 	virtual void Tick(float DeltaTime) override;
-	virtual void Interact() override;
+	virtual void Interact(ACharacter* Causer) override;
 
 protected:
 	virtual void BeginPlay() override;

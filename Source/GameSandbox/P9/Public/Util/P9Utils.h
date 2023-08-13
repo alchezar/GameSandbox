@@ -9,18 +9,18 @@
 UENUM(BlueprintType)
 enum class EP9LogLevel : uint8
 {
-	TRACE   UMETA(DisplayName = "Trace"),
-	DEBUG   UMETA(DisplayName = "Debug"),
-	INFO    UMETA(DisplayName = "Info"),
+	TRACE UMETA(DisplayName = "Trace"),
+	DEBUG UMETA(DisplayName = "Debug"),
+	INFO UMETA(DisplayName = "Info"),
 	WARNING UMETA(DisplayName = "Warning"),
-	ERROR   UMETA(DisplayName = "Error")	
+	ERROR UMETA(DisplayName = "Error")
 };
 
 UENUM(BlueprintType)
 enum class EP9LogOutput : uint8
 {
-	ALL    UMETA(DisplayName = "All levels"),
-	LOG    UMETA(DisplayName = "Output Log"),
+	ALL UMETA(DisplayName = "All levels"),
+	LOG UMETA(DisplayName = "Output Log"),
 	SCREEN UMETA(DisplayName = "Print Screen")
 };
 
@@ -33,19 +33,19 @@ enum class EP9AttackType : uint8
 UENUM(BlueprintType)
 enum class EP9CharState : uint8
 {
-	IDLE      UMETA(DisplayName = "Idle"),
-	ARMED     UMETA(DisplayName = "Armed"),
+	IDLE UMETA(DisplayName = "Idle"),
+	ARMED UMETA(DisplayName = "Armed"),
 	ATTACKING UMETA(DisplayName = "Attaching"),
-	PUNCHED   UMETA(DisplayName = "Punched")
+	PUNCHED UMETA(DisplayName = "Punched")
 };
 
 UENUM(BlueprintType)
 enum class EP9CharMoving : uint8
 {
 	CROUCH UMETA(DisplayName = "Crouch"),
-	ARMED  UMETA(DisplayName = "Armed"),
-	WALK   UMETA(DisplayName = "Walk"),
-	RUN    UMETA(DisplayName = "Run")
+	ARMED UMETA(DisplayName = "Armed"),
+	WALK UMETA(DisplayName = "Walk"),
+	RUN UMETA(DisplayName = "Run")
 };
 
 UENUM(BlueprintType)
@@ -86,4 +86,18 @@ struct FP9PlayerAttackMontage : public FTableRowBase
 	int32 AnimSectionCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString Description;
+};
+
+USTRUCT(BlueprintType)
+struct FP9PlayerColor
+{
+	GENERATED_BODY()
+
+	FP9PlayerColor()
+		: UnPossessed(FColor::Red), Possessed(FColor::White) {}
+
+	UPROPERTY(EditAnywhere)
+	FColor UnPossessed;
+	UPROPERTY(EditAnywhere)
+	FColor Possessed;
 };

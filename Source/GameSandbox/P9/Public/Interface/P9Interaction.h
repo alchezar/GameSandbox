@@ -18,5 +18,5 @@ class GAMESANDBOX_API IP9Interaction
 	GENERATED_BODY()
 
 public:
-	virtual void Interact() = 0;
+	virtual void Interact(ACharacter* Causer) = 0;
 };

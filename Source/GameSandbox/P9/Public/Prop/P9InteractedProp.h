@@ -15,7 +15,7 @@ class GAMESANDBOX_API AP9InteractedProp : public AActor, public IP9Interaction
 public:
 	AP9InteractedProp();
 	virtual void Tick(float DeltaTime) override;
-	virtual void Interact() override;
+	virtual void Interact(ACharacter* Causer) override;
 
 protected:
 	virtual void BeginPlay() override;

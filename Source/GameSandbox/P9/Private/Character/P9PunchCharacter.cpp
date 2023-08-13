@@ -39,6 +39,7 @@ void AP9PunchCharacter::BeginPlay()
 	AddMappingContext();
 	CallbackAnimNotifies();
 	CallbackDelegates();
+	SetPossessedColor();
 }
 
 void AP9PunchCharacter::Tick(const float DeltaTime)
@@ -284,14 +285,49 @@ void AP9PunchCharacter::InteractInput()
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, Params))
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera, Params))
 	{
-		TraceDebugLine(HitResult, Start, End);
-
 		if (auto InteractInterface = Cast<IP9Interaction>(HitResult.GetActor()))
 		{
-			InteractInterface->Interact();
+			if (!SavedController) SavedController = GetController();
+			InteractInterface->Interact(this);
 		}
+	}
+	TraceDebugLine(HitResult, Start, End);
+}
+
+void AP9PunchCharacter::Interact(ACharacter* Causer)
+{
+	if (!Causer) return;
+	AP9PunchCharacter* PunchCauser = Cast<AP9PunchCharacter>(Causer);
+	if (!PunchCauser) return;
+	AController* CauserSavedController = PunchCauser->GetSavedController();
+	if (!CauserSavedController) return;
+
+	CauserSavedController->UnPossess();
+	PunchCauser->GetCharacterMovement()->SetMovementMode(MOVE_None);
+	PunchCauser->SetPossessedColor();
+	
+	CauserSavedController->Possess(this);
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	SetPossessedColor();
+}
+
+void AP9PunchCharacter::SetPossessedColor()
+{
+	bCurrentlyPosses = Cast<APlayerController>(Controller) != nullptr;
+
+	UMaterialInstanceDynamic* MaterialInstanceDynamic1 = GetMesh()->CreateAndSetMaterialInstanceDynamic(1);
+	UMaterialInstanceDynamic* MaterialInstanceDynamic2 = GetMesh()->CreateAndSetMaterialInstanceDynamic(2);
+	UMaterialInstanceDynamic* MaterialInstanceDynamic3 = GetMesh()->CreateAndSetMaterialInstanceDynamic(3);
+	if (!MaterialInstanceDynamic1 || !MaterialInstanceDynamic2 || !MaterialInstanceDynamic3) return;
+
+	const FColor NewColor = bCurrentlyPosses ? PlayerColor.Possessed : PlayerColor.UnPossessed;
+	for (const FName ColorName : PossessedColorParameterNames)
+	{
+		MaterialInstanceDynamic1->SetVectorParameterValue(ColorName, NewColor);
+		MaterialInstanceDynamic2->SetVectorParameterValue(ColorName, NewColor);
+		MaterialInstanceDynamic3->SetVectorParameterValue(ColorName, NewColor);
 	}
 }
 

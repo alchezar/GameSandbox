@@ -20,7 +20,7 @@ void AP9InteractedProp::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP9InteractedProp::Interact()
+void AP9InteractedProp::Interact(ACharacter* Causer)
 {
 	if (!bCanScale) return;
 	bBig = !bBig;

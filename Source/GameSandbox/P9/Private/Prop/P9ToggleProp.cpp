@@ -20,7 +20,7 @@ void AP9ToggleProp::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP9ToggleProp::Interact()
+void AP9ToggleProp::Interact(ACharacter* Causer)
 {
 	if (!Interfaces.IsEmpty())
 	{
@@ -29,7 +29,7 @@ void AP9ToggleProp::Interact()
 			for (IP9Interaction* Interface : Interfaces)
 			{
 				if (!Cast<AActor>(Interface)->ActorHasTag(ToggleTag)) continue;
-				Interface->Interact();
+				Interface->Interact(Causer);
 			}
 		}
 		return;

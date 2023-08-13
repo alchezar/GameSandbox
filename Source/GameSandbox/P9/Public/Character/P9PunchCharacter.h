@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "P9/Public/Interface/P9Interaction.h"
 #include "P9/Public/Util/P9Utils.h"
 #include "P9PunchCharacter.generated.h"
 
@@ -17,7 +18,7 @@ struct FInputActionValue;
 
 
 UCLASS()
-class GAMESANDBOX_API AP9PunchCharacter : public ACharacter
+class GAMESANDBOX_API AP9PunchCharacter : public ACharacter, public IP9Interaction
 {
 	GENERATED_BODY()
 
@@ -25,36 +26,31 @@ public:
 	AP9PunchCharacter();
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void Interact(ACharacter* Causer) override;
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 	FORCEINLINE EP9CharState GetCharState() const { return CharState; }
 	FORCEINLINE EP9CharMoving GetCharMoveState() const { return CharMoveState; }
+	FORCEINLINE bool GetIsCurrentlyPossesses() const { return bCurrentlyPosses; }
+	FORCEINLINE AController* GetSavedController() const { return SavedController; }
+	void SetPossessedColor();
 
 protected:
 	virtual void BeginPlay() override;
-	/* Move character. */
 	void MoveInput(const FInputActionValue& Value);
-	/* Rotate controller around the character. */
 	void LookInput(const FInputActionValue& Value);
-	/*  */
 	void CrouchInput(const bool bEnable);
-	/*  */
 	void RunInput(const bool bEnable);
-	/*  */
 	void ArmInput();
-	/* Fires when the attack button is pressed. */
 	void AttackInput();
-	/* Fires when the line trace button is pressed. */
 	void InteractInput();
-	/* The edges of the animation segment, when the fists are active and can deal damage. */
 	void OnPunchHandle(USkeletalMeshComponent* MeshComp, bool bStart);
-	/* The point on the animation, where the fists will makes whoosh sound. */
 	void OnWhooshHandle(USkeletalMeshComponent* MeshComp);
-	UFUNCTION() /* Fires when FistCollision components hits an Enemy */
+	UFUNCTION()
 	void OnAttackHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	UFUNCTION() /* Fires when FistCollision component enters an Enemy */
+	UFUNCTION()
 	void OnAttackBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION() /* Fires when FistCollision component leaves an Enemy */
+	UFUNCTION()
 	void OnAttackEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 private:
@@ -141,7 +137,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Interact")
 	EP9LineTraceType LineTraceType = EP9LineTraceType::CAMERA;
 	UPROPERTY(EditAnywhere, Category = "C++ | Interact")
-	float InteractDistance = 200.f;	
+	float InteractDistance = 200.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Interact")
+	TArray<FName> PossessedColorParameterNames = {"PaintColor", "MainColor"};
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Possession")
+	FP9PlayerColor PlayerColor;
 
 private:
 	int32 CurrentComboCount = 0;
@@ -150,10 +151,13 @@ private:
 	FP9MeleeCollisionProfile MeleeCollisionProfile = FP9MeleeCollisionProfile("Weapon", "NoCollision");
 	EP9CharState CharState = EP9CharState::IDLE;
 	EP9CharMoving CharMoveState = EP9CharMoving::WALK;
+	bool bCurrentlyPosses = false;
 	UPROPERTY()
 	UAudioComponent* PunchAudioComp;
 	UPROPERTY()
 	UAudioComponent* WhooshAudioComp;
 	UPROPERTY()
 	AP9HUD* HUD;
+	UPROPERTY()
+	AController* SavedController;
 };
