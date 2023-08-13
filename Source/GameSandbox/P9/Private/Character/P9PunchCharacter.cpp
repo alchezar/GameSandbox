@@ -133,7 +133,7 @@ void AP9PunchCharacter::CheckHardReferences()
 	check(MoveAction)
 	check(LookAction)
 	check(JumpAction)
-	check(FireAction)
+	check(InteractAction)
 	check(CrouchAction)
 	check(RunAction)
 	check(ArmAction)
@@ -176,7 +176,7 @@ void AP9PunchCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
 	/* Attack. */
 	EnhancedInputComponent->BindAction(AttackAction, ETriggerEvent::Started, this, &ThisClass::AttackInput);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireLineTraceInput);
+	EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractInput);
 	EnhancedInputComponent->BindAction(ArmAction, ETriggerEvent::Started, this, &ThisClass::ArmInput);
 }
 
@@ -267,7 +267,7 @@ void AP9PunchCharacter::AttackInput()
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Magenta, FString::Printf(TEXT("RowName: %s, Montage: %s"), *RandomKey.ToString(), *(MontageSectionName + FString::FromInt(MontageSectionIndex))));
 }
 
-void AP9PunchCharacter::FireLineTraceInput()
+void AP9PunchCharacter::InteractInput()
 {
 	FVector Start;
 	FVector End;
@@ -279,7 +279,7 @@ void AP9PunchCharacter::FireLineTraceInput()
 	{
 		Start = GetActorLocation() + FVector(0.f, 0.f, BaseEyeHeight);
 	}
-	End = Start + FollowCamera->GetForwardVector() * LineTraceDistance;
+	End = Start + FollowCamera->GetForwardVector() * InteractDistance;
 	
 	FHitResult HitResult;
 	FCollisionQueryParams Params;

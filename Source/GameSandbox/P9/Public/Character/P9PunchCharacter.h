@@ -45,7 +45,7 @@ protected:
 	/* Fires when the attack button is pressed. */
 	void AttackInput();
 	/* Fires when the line trace button is pressed. */
-	void FireLineTraceInput();
+	void InteractInput();
 	/* The edges of the animation segment, when the fists are active and can deal damage. */
 	void OnPunchHandle(USkeletalMeshComponent* MeshComp, bool bStart);
 	/* The point on the animation, where the fists will makes whoosh sound. */
@@ -67,7 +67,7 @@ private:
 	void ResetComboHandle();
 	void ArmPlayer(const bool bEnable);
 	void ChangeMovingSpeed() const;
-	
+
 	/**
 	 * Log - prints a message to all the log outputs with a specific color
 	 * @param Level affects color of log
@@ -115,7 +115,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AttackAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
-	UInputAction* FireAction;
+	UInputAction* InteractAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* ArmAction;		
 #pragma endregion /* Input */
@@ -138,10 +138,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Punch")
 	float ArmedToIdleDelay = 5.f; // CountdownToIdle
 	
-	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
+	UPROPERTY(EditAnywhere, Category = "C++ | Interact")
 	EP9LineTraceType LineTraceType = EP9LineTraceType::CAMERA;
-	UPROPERTY(EditAnywhere, Category = "C++ | Trace")
-	float LineTraceDistance = 100.f;	
+	UPROPERTY(EditAnywhere, Category = "C++ | Interact")
+	float InteractDistance = 200.f;	
 
 private:
 	int32 CurrentComboCount = 0;
