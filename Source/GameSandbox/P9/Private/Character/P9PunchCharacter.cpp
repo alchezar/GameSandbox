@@ -272,14 +272,10 @@ void AP9PunchCharacter::InteractInput()
 {
 	FVector Start;
 	FVector End;
-	if (LineTraceType == EP9LineTraceType::CAMERA)
-	{
-		Start = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * CameraBoom->TargetArmLength;
-	}
-	else if (LineTraceType == EP9LineTraceType::PLAYER)
-	{
-		Start = GetActorLocation() + FVector(0.f, 0.f, BaseEyeHeight);
-	}
+	const FVector CameraStart = FollowCamera->GetComponentLocation() + FollowCamera->GetForwardVector() * CameraBoom->TargetArmLength;
+	const FVector PlayerEyeStart = GetActorLocation() + FVector(0.f, 0.f, BaseEyeHeight);
+	
+	Start = LineTraceType == EP9LineTraceType::CAMERA ? CameraStart : PlayerEyeStart;
 	End = Start + FollowCamera->GetForwardVector() * InteractDistance;
 	
 	FHitResult HitResult;
@@ -304,10 +300,12 @@ void AP9PunchCharacter::Interact(ACharacter* Causer)
 	AController* CauserSavedController = PunchCauser->GetSavedController();
 	if (!CauserSavedController) return;
 
+	/* UnPossess previous pawn with all consequences. */
 	CauserSavedController->UnPossess();
 	PunchCauser->GetCharacterMovement()->SetMovementMode(MOVE_None);
 	PunchCauser->SetPossessedColor();
-	
+
+	/* Possess current pawn with all consequences. */
 	CauserSavedController->Possess(this);
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	SetPossessedColor();
