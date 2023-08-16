@@ -26,6 +26,7 @@ struct FMonsterInfoRow : public FTableRowBase
 		Weight = 1.f;
 		SpawnCost = 5.f;
 		KillReward = 20.f;
+		TeamColor = FLinearColor::White;
 	}
 
 public:

@@ -15,6 +15,11 @@ struct FAbilityRepData
 {
 	GENERATED_BODY()
 
+	FAbilityRepData() : bRunning(false), Instigator(nullptr) {}
+	
+	FAbilityRepData(const bool bNewRunning, AActor* NewInstigator)
+		: bRunning(bNewRunning), Instigator(NewInstigator) {}
+
 	UPROPERTY()
 	bool bRunning;
 	UPROPERTY()

@@ -39,6 +39,8 @@ struct FP8State
 {
 	GENERATED_BODY()
 
+	FP8State() : Transform(FVector::ZeroVector), Velocity(FVector::ZeroVector), LastMove(FP8Move{}) {}
+
 	UPROPERTY()
 	FTransform Transform;
 	UPROPERTY()

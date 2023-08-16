@@ -35,6 +35,8 @@ struct FSpawnActor
 {
 	GENERATED_BODY()
 
+	FSpawnActor() : Class(AActor::StaticClass()), Radius(0.f) {}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<AActor> Class;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
