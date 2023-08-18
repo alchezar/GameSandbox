@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P10Character.generated.h"
 
+class UNiagaraSystem;
 class UInputAction;
 class UInputMappingContext;
 class AP10Projectile;
@@ -24,16 +25,20 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	FORCEINLINE bool GetIsShooting() const { return bShooting; }
+	FORCEINLINE bool GetIsAiming() const { return bAiming; }
+	FORCEINLINE void SetCarryingObjective(const bool bNewCarrying) { bCarryingObjective = bNewCarrying; }
 
 protected:
 	virtual void BeginPlay() override;
-	void Fire();
+	void FireInput(bool bShoot);
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Fire();
 
 private:
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
+	void LookInput(const FInputActionValue& Value);
+	void MoveInput(const FInputActionValue& Value);
+	void AimInput(bool bAim);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -49,15 +54,13 @@ protected:
 	UInputAction* MoveAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* LookAction;
-
-protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* FireAction;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* AimAction;
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	TSubclassOf<AP10Projectile> ProjectileClass;
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	UAnimMontage* FireAnimation;
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	USoundBase* FireSound;
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "C++ | Weapon")
@@ -66,4 +69,10 @@ protected:
 	FName HandSocketName = "GripPoint";
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	FName MuzzleSocketName = "MuzzleSocket";
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
+	UNiagaraSystem* FireEffect;
+
+private:
+	bool bShooting = false;
+	bool bAiming = false;
 };

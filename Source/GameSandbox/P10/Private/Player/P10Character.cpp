@@ -4,7 +4,9 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -16,20 +18,24 @@ AP10Character::AP10Character()
 
 	ArmComponent = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	ArmComponent->SetupAttachment(RootComponent);
+	ArmComponent->bUsePawnControlRotation = true;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(ArmComponent);
 
 	GunMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("GunMeshSkeletalComponent");
 	GunMeshComponent->SetupAttachment(GetMesh(), HandSocketName);
+
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = true;
 }
 
 void AP10Character::BeginPlay()
 {
 	Super::BeginPlay();
 	check(ProjectileClass)
-	check(FireAnimation)
 	check(FireSound)
+	check(FireEffect)
 
 	const auto* PlayerController = Cast<APlayerController>(Controller);
 	if (!PlayerController) return;
@@ -54,12 +60,18 @@ void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent);
 
-	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::Move);
-	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::Look);
-	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::Fire);
+	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
+	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
+	
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput, true);
+	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
+	
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::AimInput, true);
+	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::AimInput, false);
+	
 }
 
-void AP10Character::Move(const FInputActionValue& Value)
+void AP10Character::MoveInput(const FInputActionValue& Value)
 {
 	if (!Controller) return;
 	const FVector2D MovementVector = Value.Get<FVector2D>();
@@ -71,7 +83,7 @@ void AP10Character::Move(const FInputActionValue& Value)
 	AddMovementInput(Right, MovementVector.X);
 }
 
-void AP10Character::Look(const FInputActionValue& Value)
+void AP10Character::LookInput(const FInputActionValue& Value)
 {
 	if (!Controller) return;
 	const FVector2D LookingVector = Value.Get<FVector2D>();
@@ -80,23 +92,34 @@ void AP10Character::Look(const FInputActionValue& Value)
 	AddControllerPitchInput(LookingVector.Y);
 }
 
-void AP10Character::Fire()
+void AP10Character::FireInput(const bool bShoot)
 {
+	bShooting = bShoot;
+	if (!bShoot) return;
+	
 	/* Spawn Projectile actor. */
 	const FVector MuzzleLocation = GunMeshComponent->GetSocketLocation(MuzzleSocketName);
 	const FRotator MuzzleRotation = GunMeshComponent->GetSocketRotation(MuzzleSocketName);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
-	/* Play sound and fire animation. */
+	
+	/* Play sound and effect. */
 	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, MuzzleLocation, FRotator::ZeroRotator);
-	PlayAnimMontage(FireAnimation);
+	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, GunMeshComponent, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
 }
 
 void AP10Character::Server_Fire_Implementation()
-{}
+{
+	
+}
 
 bool AP10Character::Server_Fire_Validate()
 {
 	return true;
+}
+
+void AP10Character::AimInput(const bool bAim)
+{
+	bAiming = bAim;
 }
