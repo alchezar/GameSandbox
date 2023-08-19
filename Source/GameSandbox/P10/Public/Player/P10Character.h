@@ -27,6 +27,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE bool GetIsShooting() const { return bShooting; }
 	FORCEINLINE bool GetIsAiming() const { return bAiming; }
+	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
 	FORCEINLINE void SetCarryingObjective(const bool bNewCarrying) { bCarryingObjective = bNewCarrying; }
 
 protected:

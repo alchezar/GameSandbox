@@ -10,3 +10,10 @@ AP10GameMode::AP10GameMode()
 	DefaultPawnClass = AP10Character::StaticClass();
 	HUDClass = AP10HUD::StaticClass();
 }
+
+void AP10GameMode::CompleteMission(APawn* InstigatorPawn)
+{
+	if (!InstigatorPawn) return;
+
+	InstigatorPawn->DisableInput(nullptr);
+}
