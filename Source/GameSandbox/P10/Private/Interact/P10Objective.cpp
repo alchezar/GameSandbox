@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "P10/Public/Player/P10Character.h"
 
 AP10Objective::AP10Objective()
@@ -25,6 +26,9 @@ AP10Objective::AP10Objective()
 void AP10Objective::BeginPlay()
 {
 	Super::BeginPlay();
+	check(PickupEffect)
+	check(PickupSound)
+	
 	PlayEffect();
 }
 
@@ -35,7 +39,6 @@ void AP10Objective::Tick(float DeltaTime)
 
 void AP10Objective::PlayEffect()
 {
-	if (!PickupEffect) return;
 	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, GetActorLocation());
 
 	FTimerHandle NiagaraTimer;
@@ -50,11 +53,13 @@ void AP10Objective::PlayEffect()
 void AP10Objective::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
-	PlayEffect();
 
 	AP10Character* Character = Cast<AP10Character>(OtherActor);
 	if (!Character) return;
+	
 	Character->SetCarryingObjective(true);
+	PlayEffect();
+	UGameplayStatics::SpawnSound2D(this, PickupSound);
 
 	Destroy();
 }

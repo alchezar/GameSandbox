@@ -48,7 +48,9 @@ protected:
 	UCameraComponent* CameraComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	USkeletalMeshComponent* GunMeshComponent;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UPawnNoiseEmitterComponent* NoiseEmitter;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputMappingContext* DefaultContext;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")

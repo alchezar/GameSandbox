@@ -14,4 +14,10 @@ class GAMESANDBOX_API AP10GameMode : public AGameModeBase
 public:
 	AP10GameMode();
 	void CompleteMission(APawn* InstigatorPawn);
+
+protected:
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | EndGame")
+	TSubclassOf<AActor> ViewPointClass;
 };

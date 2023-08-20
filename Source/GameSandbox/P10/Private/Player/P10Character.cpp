@@ -6,6 +6,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
+#include "Components/PawnNoiseEmitterComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -25,6 +26,8 @@ AP10Character::AP10Character()
 
 	GunMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("GunMeshSkeletalComponent");
 	GunMeshComponent->SetupAttachment(GetMesh(), HandSocketName);
+
+	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>("PawnNoiseEmitterComponent");
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -47,6 +50,11 @@ void AP10Character::BeginPlay()
 void AP10Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	// if (GetVelocity().Size() > 10.f)
+	// {
+	// 	MakeNoise(1.f, this, GetActorLocation(), 1000.f);
+	// }
 }
 
 void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -102,6 +110,7 @@ void AP10Character::FireInput(const bool bShoot)
 	const FRotator MuzzleRotation = GunMeshComponent->GetSocketRotation(MuzzleSocketName);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+	Params.Instigator = this;
 	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
 	
 	/* Play sound and effect. */

@@ -31,6 +31,8 @@ protected:
 	USphereComponent* SphereComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Effect")
 	UNiagaraSystem* PickupEffect;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Effect")
+	USoundBase* PickupSound;
 
 private:
 	UPROPERTY()

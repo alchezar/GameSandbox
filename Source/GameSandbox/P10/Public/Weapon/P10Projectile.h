@@ -30,6 +30,8 @@ protected:
 	USphereComponent* CollisionComponent;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UProjectileMovementComponent* ProjectileMovement;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UStaticMeshComponent* ProjectileMesh;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Effect")
 	UParticleSystem* ExplosionFX;

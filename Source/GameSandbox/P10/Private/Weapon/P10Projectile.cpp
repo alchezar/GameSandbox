@@ -21,6 +21,9 @@ AP10Projectile::AP10Projectile()
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
 	ProjectileMovement->InitialSpeed = 3000.f;
 	ProjectileMovement->MaxSpeed = 3000.f;
+
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>("ProjectileMeshComponent");
+	ProjectileMesh->SetupAttachment(RootComponent);
 }
 
 void AP10Projectile::BeginPlay()
@@ -46,6 +49,9 @@ void AP10Projectile::Explode()
 
 void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	/* Make some noise. */
+	MakeNoise(1.f, GetInstigator());
+	
 	if (!OtherActor || OtherActor == this || !OtherComp || !OtherComp->IsSimulatingPhysics()) return;
 
 	/* Add impulse to hit component. */
@@ -61,10 +67,11 @@ void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AAc
 	Scale.GetMin() < 0.5f ? OtherActor->Destroy() : OtherActor->SetActorScale3D(Scale);
 
 	/* Set random color on hit component. */
-	if (UMaterialInstanceDynamic* DynamicMaterialInstance = OtherComp->CreateDynamicMaterialInstance(0))
+	if (UMaterialInstanceDynamic* DynamicMaterialInstance = OtherComp->CreateAndSetMaterialInstanceDynamic(0))
 	{
 		const FLinearColor NewColor = FLinearColor::MakeRandomColor();
-		DynamicMaterialInstance->SetVectorParameterValue("Color", NewColor);
+		DynamicMaterialInstance->SetVectorParameterValue("SurfaceColor", NewColor);
 	}
+	
 	Explode();
 }
