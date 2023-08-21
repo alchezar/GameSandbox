@@ -48,6 +48,6 @@ void AP10ExtractionZone::OnBoxBeginOverlapHandle(UPrimitiveComponent* Overlapped
 	
 	if (Character->GetIsCarryingObjective())
 	{
-		GameMode->CompleteMission(Character);
+		GameMode->CompleteMission(Character, true);
 	}
 }

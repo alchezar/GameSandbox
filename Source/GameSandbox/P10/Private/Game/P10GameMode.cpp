@@ -18,7 +18,7 @@ void AP10GameMode::BeginPlay()
 	check(ViewPointClass)
 }
 
-void AP10GameMode::CompleteMission(APawn* InstigatorPawn)
+void AP10GameMode::CompleteMission(APawn* InstigatorPawn, bool bSuccess)
 {
 	if (!InstigatorPawn) return;
 
@@ -30,4 +30,8 @@ void AP10GameMode::CompleteMission(APawn* InstigatorPawn)
 	if (!TargetActor) return;
 	
 	PlayerController->SetViewTargetWithBlend(TargetActor, 0.5f, VTBlend_Cubic);
+
+	const FString PrintMsg = bSuccess ? "MISSION COMPLETE" : "MISSION FAILED";
+	const FColor MsgColor = bSuccess ? FColor::Green : FColor::Red;
+	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 10.f, MsgColor, PrintMsg);
 }

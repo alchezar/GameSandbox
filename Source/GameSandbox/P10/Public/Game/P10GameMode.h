@@ -13,7 +13,7 @@ class GAMESANDBOX_API AP10GameMode : public AGameModeBase
 
 public:
 	AP10GameMode();
-	void CompleteMission(APawn* InstigatorPawn);
+	void CompleteMission(APawn* InstigatorPawn, bool bSuccess);
 
 protected:
 	virtual void BeginPlay() override;
