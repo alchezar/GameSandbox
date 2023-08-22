@@ -9,6 +9,8 @@
 AP10Projectile::AP10Projectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetReplicates(true);
+	SetReplicatingMovement(true);
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SetRootComponent(CollisionComponent);
@@ -49,29 +51,32 @@ void AP10Projectile::Explode()
 
 void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	/* Make some noise. */
-	MakeNoise(1.f, GetInstigator());
-	
-	if (!OtherActor || OtherActor == this || !OtherComp || !OtherComp->IsSimulatingPhysics()) return;
-
-	/* Add impulse to hit component. */
-	const float RandomIntensity = FMath::RandRange(200.f, 500.f);
-	OtherComp->AddImpulseAtLocation(GetVelocity() * RandomIntensity, GetActorLocation());
-
-	/* Make hit component smaller after each bounce. */
-	const FVector Scale = OtherComp->GetComponentScale() * 0.8f;
-	if (Scale.GetMin() < 0.5f)
+	if (OtherActor && OtherActor != this && OtherComp && OtherComp->IsSimulatingPhysics())
 	{
-		OtherActor->Destroy();
-	}
-	Scale.GetMin() < 0.5f ? OtherActor->Destroy() : OtherActor->SetActorScale3D(Scale);
+		/* Add impulse to hit component. */
+		const float RandomIntensity = FMath::RandRange(200.f, 500.f);
+		OtherComp->AddImpulseAtLocation(GetVelocity() * RandomIntensity, GetActorLocation());
 
-	/* Set random color on hit component. */
-	if (UMaterialInstanceDynamic* DynamicMaterialInstance = OtherComp->CreateAndSetMaterialInstanceDynamic(0))
-	{
-		const FLinearColor NewColor = FLinearColor::MakeRandomColor();
-		DynamicMaterialInstance->SetVectorParameterValue("SurfaceColor", NewColor);
+		/* Make hit component smaller after each bounce. */
+		const FVector Scale = OtherComp->GetComponentScale() * 0.8f;
+		if (Scale.GetMin() < 0.5f)
+		{
+			OtherActor->Destroy();
+		}
+		Scale.GetMin() < 0.5f ? OtherActor->Destroy() : OtherActor->SetActorScale3D(Scale);
+
+		/* Set random color on hit component. */
+		if (UMaterialInstanceDynamic* DynamicMaterialInstance = OtherComp->CreateAndSetMaterialInstanceDynamic(0))
+		{
+			const FLinearColor NewColor = FLinearColor::MakeRandomColor();
+			DynamicMaterialInstance->SetVectorParameterValue("SurfaceColor", NewColor);
+		}
 	}
-	
 	Explode();
+
+	/* Make some noise if on server. */
+	if (HasAuthority())
+	{
+		MakeNoise(1.f, GetInstigator());
+	}
 }

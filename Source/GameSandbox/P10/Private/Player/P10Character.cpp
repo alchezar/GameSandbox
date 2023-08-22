@@ -51,10 +51,13 @@ void AP10Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	// if (GetVelocity().Size() > 10.f)
-	// {
-	// 	MakeNoise(1.f, this, GetActorLocation(), 1000.f);
-	// }
+	if (!IsLocallyControlled())
+	{
+		/* If there is no AimOffset in AnimInstance, replace mesh rotation pitch with replicated decompressed RemoteViewPitch */
+		FRotator NewRot = ArmComponent->GetRelativeRotation();
+		NewRot.Pitch = RemoteViewPitch * 360.f / 256.f;
+		ArmComponent->SetRelativeRotation(NewRot);
+	}
 }
 
 void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -104,7 +107,16 @@ void AP10Character::FireInput(const bool bShoot)
 {
 	bShooting = bShoot;
 	if (!bShoot) return;
+
+	Server_Fire();
 	
+	/* Play sound and effect. */
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GunMeshComponent->GetComponentLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, GunMeshComponent, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+}
+
+void AP10Character::Server_Fire_Implementation()
+{
 	/* Spawn Projectile actor. */
 	const FVector MuzzleLocation = GunMeshComponent->GetSocketLocation(MuzzleSocketName);
 	const FRotator MuzzleRotation = GunMeshComponent->GetSocketRotation(MuzzleSocketName);
@@ -112,15 +124,6 @@ void AP10Character::FireInput(const bool bShoot)
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	Params.Instigator = this;
 	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
-	
-	/* Play sound and effect. */
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, MuzzleLocation, FRotator::ZeroRotator);
-	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, GunMeshComponent, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
-}
-
-void AP10Character::Server_Fire_Implementation()
-{
-	
 }
 
 bool AP10Character::Server_Fire_Validate()

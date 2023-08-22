@@ -11,6 +11,7 @@
 AP10Objective::AP10Objective()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetReplicates(true);
 
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -54,13 +55,17 @@ void AP10Objective::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
-	AP10Character* Character = Cast<AP10Character>(OtherActor);
-	if (!Character) return;
-	
-	Character->SetCarryingObjective(true);
 	PlayEffect();
-	UGameplayStatics::SpawnSound2D(this, PickupSound);
 
-	Destroy();
+	if (HasAuthority())
+	{
+		AP10Character* Character = Cast<AP10Character>(OtherActor);
+		if (!Character) return;
+	
+		Character->SetCarryingObjective(true);
+		UGameplayStatics::SpawnSound2D(this, PickupSound);
+
+		Destroy();
+	}
 }
 

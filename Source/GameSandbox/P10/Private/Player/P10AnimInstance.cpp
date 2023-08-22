@@ -30,9 +30,6 @@ void UP10AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!PPCharacter) return; 
 	bShooting = PPCharacter->GetIsShooting();
 	bAiming = PPCharacter->GetIsAiming();
-
-	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Shooting %d"), bShooting));
-	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("Aiming %d"), bAiming));
 }
 
 float UP10AnimInstance::GetMovementDirectionAngle() const
