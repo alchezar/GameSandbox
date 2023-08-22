@@ -2,7 +2,13 @@
 
 #include "P10/Public/Player/P10AIGuard.h"
 
+#include "AIController.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
+#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/WidgetComponent.h"
+#include "Engine/TargetPoint.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "P10/Public/Game/P10GameMode.h"
 #include "P10/Public/Player/P10Character.h"
 #include "P10/Public/UI/P10GuardStateWidget.h"
@@ -37,8 +43,9 @@ void AP10AIGuard::BeginPlay()
 		StateWidget->SetGuard(this);
 		ChangeGuardState(GuardState);
 	}
-
 	OriginalRotation = GetActorRotation();
+
+	MoveToTarget();
 }
 
 void AP10AIGuard::Tick(float DeltaTime)
@@ -48,6 +55,7 @@ void AP10AIGuard::Tick(float DeltaTime)
 
 void AP10AIGuard::OnSeePawnHandle(APawn* Pawn)
 {
+	GetController()->StopMovement();
 	if (AP10GameMode* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode()))
 	{
 		GameMode->CompleteMission(Pawn, false);
@@ -59,6 +67,7 @@ void AP10AIGuard::OnHearNoiseHandle(APawn* NoiseInstigator, const FVector& Locat
 {
 	DrawDebugString(GetWorld(), Location, FString::Printf(TEXT("Hear")), nullptr, FColor::Blue, 2.f);
 
+	GetController()->StopMovement();
 	/* Remember original rotation only if there were no distractions before. */
 	if (GuardState == EP10AIGuardState::Idle)
 	{
@@ -80,6 +89,11 @@ void AP10AIGuard::OrientGuardHandle()
 	{
 		GetWorld()->GetTimerManager().ClearTimer(DistractionTimer);
 		TargetRotation = GetActorRotation();
+
+		if (GuardState == EP10AIGuardState::Idle)
+		{
+			MoveToTarget();
+		}
 		return;
 	}
 	/* Interpolation for smooth rotation. */
@@ -102,4 +116,28 @@ void AP10AIGuard::ChangeGuardState(const EP10AIGuardState NewState)
 	
 	GuardState = NewState;
 	OnStatusChanged.Broadcast(GuardState);
+}
+
+void AP10AIGuard::MoveToTarget()
+{
+	if (!bPatrol || Targets.IsEmpty()) return;	
+	AAIController* AIController = Cast<AAIController>(Controller);
+	if (!AIController) return;
+
+	/* Get the random goal from the targets array. */
+	int32 NextElement = FMath::RandRange(0, Targets.Num() - 1);
+	if (NextElement == CurrentTargetsElement || !Targets[NextElement])
+	{
+		NextElement = (NextElement + 1) % Targets.Num();
+	}
+	const AActor* NextGoal = Targets[NextElement];
+	CurrentTargetsElement = NextElement;
+
+	FAIMoveRequest Request;
+	Request.SetGoalActor(NextGoal);
+	Request.SetAcceptanceRadius(50.f);
+	Request.SetUsePathfinding(true);
+	Request.SetAllowPartialPath(true);
+	
+	AIController->MoveTo(Request);
 }

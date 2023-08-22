@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "P10AIGuard.generated.h"
 
+class ATargetPoint;
 class UWidgetComponent;
 class UPawnSensingComponent;
 
@@ -29,6 +30,7 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 	FORCEINLINE EP10AIGuardState GetGuardState() const { return GuardState; }
+	void MoveToTarget();
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,11 +53,17 @@ protected:
 	UPawnSensingComponent* PawnSensing;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UWidgetComponent* StatusWidget;
-
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Patrol")
+	bool bPatrol = false;
+	UPROPERTY(EditAnywhere, Category = "C++ | Patrol")
+	TArray<ATargetPoint*> Targets;
+	
 private:
 	FRotator OriginalRotation;
 	FRotator TargetRotation;
 	FTimerHandle DistractionTimer;
 	FTimerHandle ResetTimer;
 	EP10AIGuardState GuardState = EP10AIGuardState::Idle;
+	int32 CurrentTargetsElement = 0;
 };

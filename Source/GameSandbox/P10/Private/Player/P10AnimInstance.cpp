@@ -19,7 +19,7 @@ void UP10AnimInstance::NativeInitializeAnimation()
 void UP10AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
-	if (!Pawn || !MovementComponent || !PPCharacter) return; 
+	if (!Pawn || !MovementComponent) return; 
 	
 	bInAir = MovementComponent->IsFalling();
 	Speed = Pawn->GetVelocity().Size2D();
@@ -27,6 +27,7 @@ void UP10AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AimRotation.Normalize();
 	Direction = GetMovementDirectionAngle();
 
+	if (!PPCharacter) return; 
 	bShooting = PPCharacter->GetIsShooting();
 	bAiming = PPCharacter->GetIsAiming();
 
