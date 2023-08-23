@@ -29,6 +29,7 @@ public:
 	AP10AIGuard();
 	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE EP10AIGuardState GetGuardState() const { return GuardState; }
 	void MoveToTarget();
 
@@ -42,8 +43,12 @@ protected:
 
 private:
 	void OrientGuardHandle();
+
+private:
 	void ResetRotationHandle();
 	void ChangeGuardState(const EP10AIGuardState NewState);
+	UFUNCTION()
+	void OnRep_GuardState();
 
 public:	
 	FOnStatusChangedSignature OnStatusChanged;
@@ -64,6 +69,7 @@ private:
 	FRotator TargetRotation;
 	FTimerHandle DistractionTimer;
 	FTimerHandle ResetTimer;
-	EP10AIGuardState GuardState = EP10AIGuardState::Idle;
 	int32 CurrentTargetsElement = 0;
+	UPROPERTY(ReplicatedUsing = "OnRep_GuardState")
+	EP10AIGuardState GuardState = EP10AIGuardState::Idle;
 };

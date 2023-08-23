@@ -13,8 +13,7 @@ class GAMESANDBOX_API AP10AIGuardController : public AAIController
 
 public:
 	AP10AIGuardController();
-	virtual void Tick(float DeltaTime) override;
-	virtual void OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result) override;
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
 protected:
 	virtual void BeginPlay() override;

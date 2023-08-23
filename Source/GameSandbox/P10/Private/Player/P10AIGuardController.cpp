@@ -6,21 +6,14 @@
 #include "P10/Public/Player/P10AIGuard.h"
 
 AP10AIGuardController::AP10AIGuardController()
-{
-	// PrimaryActorTick.bCanEverTick = true;
-}
+{ }
 
 void AP10AIGuardController::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AP10AIGuardController::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
-void AP10AIGuardController::OnMoveCompleted(FAIRequestID RequestID, EPathFollowingResult::Type Result)
+void AP10AIGuardController::OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
 

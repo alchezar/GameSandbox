@@ -40,13 +40,12 @@ void AP10ExtractionZone::OnBoxBeginOverlapHandle(UPrimitiveComponent* Overlapped
 {
 	AP10Character* Character = Cast<AP10Character>(OtherActor);
 	if (!Character) return;
-	AP10GameMode* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode());
-	if (!GameMode) return;
 
 	USoundBase* CurrentSound = Character->GetIsCarryingObjective() ? CompleteSound : MissingSound;
 	UGameplayStatics::SpawnSound2D(this, CurrentSound);
 	
-	if (Character->GetIsCarryingObjective())
+	AP10GameMode* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode());
+	if (GameMode && Character->GetIsCarryingObjective())
 	{
 		GameMode->CompleteMission(Character, true);
 	}

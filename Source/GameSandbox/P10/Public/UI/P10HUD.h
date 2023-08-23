@@ -14,8 +14,24 @@ class GAMESANDBOX_API AP10HUD : public AHUD
 public:
 	AP10HUD();
 	virtual void DrawHUD() override;
+	void OnMissionCompleted(bool bSuccess);
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	void DrawCrosshair(const bool bDraw);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	UTexture2D* CrosshairTex;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UUserWidget> CrosshairWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UUserWidget> MissionCompletedWidgetClass;
+
+private:
+	UPROPERTY()
+	UUserWidget* CrosshairWidget;
 };

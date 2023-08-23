@@ -57,13 +57,13 @@ void AP10Objective::NotifyActorBeginOverlap(AActor* OtherActor)
 
 	PlayEffect();
 
+	UGameplayStatics::SpawnSound2D(this, PickupSound);
 	if (HasAuthority())
 	{
 		AP10Character* Character = Cast<AP10Character>(OtherActor);
 		if (!Character) return;
 	
 		Character->SetCarryingObjective(true);
-		UGameplayStatics::SpawnSound2D(this, PickupSound);
 
 		Destroy();
 	}

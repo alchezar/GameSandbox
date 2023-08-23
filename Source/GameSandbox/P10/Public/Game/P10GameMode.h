@@ -17,7 +17,4 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | EndGame")
-	TSubclassOf<AActor> ViewPointClass;
 };

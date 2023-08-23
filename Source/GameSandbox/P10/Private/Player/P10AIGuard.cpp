@@ -3,12 +3,10 @@
 #include "P10/Public/Player/P10AIGuard.h"
 
 #include "AIController.h"
-#include "NavigationPath.h"
-#include "NavigationSystem.h"
-#include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/WidgetComponent.h"
 #include "Engine/TargetPoint.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "P10/Public/Game/P10GameMode.h"
 #include "P10/Public/Player/P10Character.h"
 #include "P10/Public/UI/P10GuardStateWidget.h"
@@ -51,6 +49,12 @@ void AP10AIGuard::BeginPlay()
 void AP10AIGuard::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AP10AIGuard::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, GuardState)
 }
 
 void AP10AIGuard::OnSeePawnHandle(APawn* Pawn)
@@ -115,6 +119,12 @@ void AP10AIGuard::ChangeGuardState(const EP10AIGuardState NewState)
 	if (GuardState == NewState) return;
 	
 	GuardState = NewState;
+	OnStatusChanged.Broadcast(GuardState);
+	OnRep_GuardState();
+}
+
+void AP10AIGuard::OnRep_GuardState()
+{
 	OnStatusChanged.Broadcast(GuardState);
 }
 

@@ -64,6 +64,7 @@ void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, bCarryingObjective);
+	// DOREPLIFETIME_CONDITION(ThisClass, bCarryingObjective, COND_OwnerOnly)
 }
 
 void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
