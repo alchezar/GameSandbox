@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "P10/Public/Weapon/P10Projectile.h"
+#include "P10/Public/Weapon/P10Weapon.h"
 
 AP10Character::AP10Character()
 {
@@ -24,21 +25,22 @@ AP10Character::AP10Character()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(ArmComponent);
 
-	GunMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("GunMeshSkeletalComponent");
-	GunMeshComponent->SetupAttachment(GetMesh(), HandSocketName);
-
 	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>("PawnNoiseEmitterComponent");
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
+	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 }
 
 void AP10Character::BeginPlay()
 {
 	Super::BeginPlay();
+	check(WeaponClass)
 	check(ProjectileClass)
 	check(FireSound)
 	check(FireEffect)
+
+	SpawnWeapon();
 
 	const auto* PlayerController = Cast<APlayerController>(Controller);
 	if (!PlayerController) return;
@@ -74,6 +76,8 @@ void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 	EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
+	EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchInput);
+	EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);
 	
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput, true);
 	EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
@@ -104,6 +108,13 @@ void AP10Character::LookInput(const FInputActionValue& Value)
 	AddControllerPitchInput(LookingVector.Y);
 }
 
+void AP10Character::CrouchInput()
+{
+	bCrouch = !bCrouch;
+
+	bCrouch ? Crouch() : UnCrouch();
+}
+
 void AP10Character::FireInput(const bool bShoot)
 {
 	bShooting = bShoot;
@@ -112,15 +123,15 @@ void AP10Character::FireInput(const bool bShoot)
 	Server_Fire();
 	
 	/* Play sound and effect. */
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, GunMeshComponent->GetComponentLocation(), FRotator::ZeroRotator);
-	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, GunMeshComponent, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(), FireSound, Weapon->GetWeaponComponent()->GetComponentLocation(), FRotator::ZeroRotator);
+	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, Weapon->GetWeaponComponent(), MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
 }
 
 void AP10Character::Server_Fire_Implementation()
 {
 	/* Spawn Projectile actor. */
-	const FVector MuzzleLocation = GunMeshComponent->GetSocketLocation(MuzzleSocketName);
-	const FRotator MuzzleRotation = GunMeshComponent->GetSocketRotation(MuzzleSocketName);
+	const FVector MuzzleLocation = Weapon->GetWeaponComponent()->GetSocketLocation(MuzzleSocketName);
+	const FRotator MuzzleRotation = Weapon->GetWeaponComponent()->GetSocketRotation(MuzzleSocketName);
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 	Params.Instigator = this;
@@ -135,4 +146,18 @@ bool AP10Character::Server_Fire_Validate()
 void AP10Character::AimInput(const bool bAim)
 {
 	bAiming = bAim;
+}
+
+void AP10Character::SpawnWeapon()
+{
+	FActorSpawnParameters Parameters;
+	Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Parameters.Owner = this;
+	Parameters.Instigator = this;
+
+	Weapon = GetWorld()->SpawnActor<AP10Weapon>(WeaponClass, Parameters);
+	check(Weapon)
+
+	const FAttachmentTransformRules Rules = {EAttachmentRule::SnapToTarget, true};
+	Weapon->AttachToComponent(GetMesh(), Rules, HandSocketName);
 }

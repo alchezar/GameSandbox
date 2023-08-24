@@ -30,6 +30,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	bool bInAir = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
+	bool bCrouch = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	bool bShooting = false;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	bool bAiming = false;

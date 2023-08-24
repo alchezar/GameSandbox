@@ -22,6 +22,7 @@ void UP10AnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	if (!Pawn || !MovementComponent) return; 
 	
 	bInAir = MovementComponent->IsFalling();
+	bCrouch = MovementComponent->IsCrouching();
 	Speed = Pawn->GetVelocity().Size2D();
 	AimRotation = Pawn->GetBaseAimRotation() - Pawn->GetActorRotation();
 	AimRotation.Normalize();
