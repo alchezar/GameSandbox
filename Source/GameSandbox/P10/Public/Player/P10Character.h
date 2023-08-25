@@ -16,6 +16,18 @@ class UCameraComponent;
 class USpringArmComponent;
 struct FInputActionValue;
 
+UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
+enum class EP10CharMask : uint8
+{
+	Idle   = 0b00000000 UMETA(DisplayName = "Idle"),       // 0
+	Jump   = 0b00000001 UMETA(DisplayName = "Jumpint"),	   // 1
+	Crouch = 0b00000010 UMETA(DisplayName = "Crouching"),  // 2
+	Run    = 0b00000100 UMETA(DisplayName = "Running"),    // 4  
+	Aim    = 0b00001000 UMETA(DisplayName = "Aiming"), 	   // 8   
+	Shoot  = 0b00010000 UMETA(DisplayName = "Shooting")    // 16
+};
+ENUM_CLASS_FLAGS(EP10CharMask)
+
 UCLASS()
 class GAMESANDBOX_API AP10Character : public ACharacter
 {
@@ -26,6 +38,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void Landed(const FHitResult& Hit) override;
+	virtual FVector GetPawnViewLocation() const override;
 	FORCEINLINE bool GetIsShooting() const { return bShooting; }
 	FORCEINLINE bool GetIsAiming() const { return bAiming; }
 	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
@@ -40,16 +54,18 @@ protected:
 private:
 	void LookInput(const FInputActionValue& Value);
 	void MoveInput(const FInputActionValue& Value);
+	void JumpInput(bool bStart);
 	void CrouchInput();
 	void AimInput(bool bAim);
 	void SpawnWeapon();
+	static void PrintMaskAsString(EP10CharMask Mask);
 
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USpringArmComponent* ArmComponent;
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UCameraComponent* CameraComponent;
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UPawnNoiseEmitterComponent* NoiseEmitter;
 	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
@@ -67,25 +83,21 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AimAction;
 
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "C++ | Interact")
+	bool bCarryingObjective;
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	TSubclassOf<AP10Weapon> WeaponClass;
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	TSubclassOf<AP10Projectile> ProjectileClass;
-	UPROPERTY(Replicated, BlueprintReadOnly, Category = "C++ | Weapon")
-	bool bCarryingObjective;
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	FName HandSocketName = "GripPoint";
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	FName MuzzleSocketName = "MuzzleSocket";
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	USoundBase* FireSound;
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")
-	UNiagaraSystem* FireEffect;
 
 private:
 	bool bShooting = false;
 	bool bAiming = false;
 	bool bCrouch = false;
+	EP10CharMask CharStateMask = EP10CharMask::Idle;
 	UPROPERTY()
 	AP10Weapon* Weapon;
 };
