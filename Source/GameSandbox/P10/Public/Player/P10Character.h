@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "P10/Public/Util/P10Library.h"
 #include "P10Character.generated.h"
 
 class AP10Weapon;
@@ -17,7 +18,7 @@ class USpringArmComponent;
 struct FInputActionValue;
 
 UENUM(BlueprintType, meta = (Bitflags, UseEnumValuesAsMaskValuesInEditor = "true"))
-enum class EP10CharMask : uint8
+enum class  EP10CharMask : uint8
 {
 	Idle   = 0b00000000 UMETA(DisplayName = "Idle"),       // 0
 	Jump   = 0b00000001 UMETA(DisplayName = "Jumpint"),	   // 1
@@ -40,8 +41,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual FVector GetPawnViewLocation() const override;
-	FORCEINLINE bool GetIsShooting() const { return bShooting; }
-	FORCEINLINE bool GetIsAiming() const { return bAiming; }
+	FORCEINLINE bool GetIsShooting() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Shoot); }
+	FORCEINLINE bool GetIsAiming() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Aim); }
 	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
 	FORCEINLINE void SetCarryingObjective(const bool bNewCarrying) { bCarryingObjective = bNewCarrying; }
 
@@ -58,7 +59,7 @@ private:
 	void CrouchInput();
 	void AimInput(bool bAim);
 	void SpawnWeapon();
-	static void PrintMaskAsString(EP10CharMask Mask);
+	void ZoomSmoothlyHandle();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -89,15 +90,12 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	TSubclassOf<AP10Weapon> WeaponClass;
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	TSubclassOf<AP10Projectile> ProjectileClass;
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	FName HandSocketName = "GripPoint";
 
 private:
-	bool bShooting = false;
-	bool bAiming = false;
-	bool bCrouch = false;
-	EP10CharMask CharStateMask = EP10CharMask::Idle;
 	UPROPERTY()
 	AP10Weapon* Weapon;
+	EP10CharMask CharStateMask = EP10CharMask::Idle;
+	float TargetFOV = 0.f;
+	FTimerHandle ZoomTimer;
 };

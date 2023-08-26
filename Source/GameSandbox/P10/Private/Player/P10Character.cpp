@@ -9,7 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "P10/Public/Weapon/P10Projectile.h"
+#include "P10/Public/Util/P10Library.h"
 #include "P10/Public/Weapon/P10Weapon.h"
 
 AP10Character::AP10Character()
@@ -36,7 +36,6 @@ void AP10Character::BeginPlay()
 {
 	Super::BeginPlay();
 	check(WeaponClass)
-	check(ProjectileClass)
 
 	SpawnWeapon();
 
@@ -59,7 +58,7 @@ void AP10Character::Tick(float DeltaTime)
 		ArmComponent->SetRelativeRotation(NewRot);
 	}
 
-	PrintMaskAsString(CharStateMask);
+	UP10Library::PrintStateMask(CharStateMask);
 }
 
 void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -112,46 +111,33 @@ void AP10Character::LookInput(const FInputActionValue& Value)
 void AP10Character::JumpInput(bool bStart)
 {
 	Super::Jump();
-	if (static_cast<uint8>(CharStateMask & EP10CharMask::Crouch)) return;
-	CharStateMask |= EP10CharMask::Jump;
+	if (UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Crouch)) return;
+	UP10Library::BitflagAdd(CharStateMask, EP10CharMask::Jump);
 }
 
 void AP10Character::Landed(const FHitResult& Hit)
 {
 	Super::Landed(Hit);
-	CharStateMask &= ~EP10CharMask::Jump;
+	UP10Library::BitflagRemove(CharStateMask, EP10CharMask::Jump);
 }
 
 void AP10Character::CrouchInput()
 {
-	bCrouch = !bCrouch;
-	CharStateMask ^=  EP10CharMask::Crouch; 
-
-	bCrouch ? Crouch() : UnCrouch();
+	UP10Library::BitflagToggle(CharStateMask, EP10CharMask::Crouch);
+	UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Crouch) ? Crouch() : UnCrouch();
 }
 
 void AP10Character::FireInput(const bool bShoot)
 {
-	bShooting = bShoot;
-	CharStateMask ^= EP10CharMask::Shoot; 
+	UP10Library::BitflagFromBool(CharStateMask, EP10CharMask::Shoot, bShoot);
 	if (!bShoot) return;
 
-	// Server_Fire();
-	if (Weapon)
-	{
-		Weapon->StartFire();
-	}
+	Server_Fire();
 }
 
 void AP10Character::Server_Fire_Implementation()
 {
-	/* Spawn Projectile actor. */
-	const FVector MuzzleLocation = Weapon->GetWeaponComponent()->GetSocketLocation(Weapon->GetFirstSocketName());
-	const FRotator MuzzleRotation = Weapon->GetWeaponComponent()->GetSocketRotation(Weapon->GetFirstSocketName());
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	Params.Instigator = this;
-	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
+	Weapon->StartFire();
 }
 
 bool AP10Character::Server_Fire_Validate()
@@ -161,8 +147,23 @@ bool AP10Character::Server_Fire_Validate()
 
 void AP10Character::AimInput(const bool bAim)
 {
-	bAiming = bAim;
-	CharStateMask ^= EP10CharMask::Aim;
+	UP10Library::BitflagFromBool(CharStateMask, EP10CharMask::Aim, bAim);
+	constexpr float DefaultFieldOfView = 90.f;
+	constexpr float ZoomedFieldOfView = 45.f;
+	TargetFOV = bAim ? ZoomedFieldOfView : DefaultFieldOfView;
+	// CameraComponent->SetFieldOfView(TargetFOV);
+	GetWorld()->GetTimerManager().SetTimer(ZoomTimer, this, &ThisClass::ZoomSmoothlyHandle, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void AP10Character::ZoomSmoothlyHandle()
+{
+	const float InterFOV = FMath::FInterpTo(CameraComponent->FieldOfView, TargetFOV, GetWorld()->GetDeltaSeconds(), 10.f);
+	CameraComponent->SetFieldOfView(InterFOV);
+	
+	if (FMath::IsNearlyEqual(CameraComponent->FieldOfView, TargetFOV, 1.f))
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ZoomTimer);
+	}
 }
 
 void AP10Character::SpawnWeapon()
@@ -177,20 +178,6 @@ void AP10Character::SpawnWeapon()
 
 	const FAttachmentTransformRules Rules = {EAttachmentRule::SnapToTarget, true};
 	Weapon->AttachToComponent(GetMesh(), Rules, HandSocketName);
-}
-
-void AP10Character::PrintMaskAsString(EP10CharMask Mask)
-{
-	FString MaskString = "0b";
-	uint8 MaskInt = static_cast<uint8>(Mask);
-	int32 Block = 128;
-	for (int i = 0; i < 8; ++i)
-	{
-		MaskString.Append(MaskInt / Block == 0 ? "0" : "1");
-		MaskInt %= Block;
-		Block /= 2;
-	}
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%s"), *MaskString));
 }
 
 FVector AP10Character::GetPawnViewLocation() const

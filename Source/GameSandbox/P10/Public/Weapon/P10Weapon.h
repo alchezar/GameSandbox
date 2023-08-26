@@ -18,13 +18,12 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	FORCEINLINE USkeletalMeshComponent* GetWeaponComponent() const { return WeaponMeshComponent; }
 	FORCEINLINE FName GetFirstSocketName() const { return WeaponMeshComponent->GetAllSocketNames()[0]; }
-	void StartFire();
+	virtual void StartFire();
+	void PlayEffect() const;
+	void DrawBeam(const FHitResult& Hit, const FVector& End);
 
 protected:
 	virtual void BeginPlay() override;
-
-private:
-	void  DrawDebugShoot(const FHitResult& OutHit, const FVector& Start, const FVector& End) const; 
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
@@ -41,4 +40,9 @@ protected:
 	USoundBase* FireSound;
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UNiagaraSystem* FireEffect;
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Beam")
+	UNiagaraSystem* BeamEffect;
+	UPROPERTY(EditAnywhere, Category = "C++ | Beam")
+	FName TraceTargetName = "TraceTarget";
 };

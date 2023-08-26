@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "P10/Public/Util/P10Library.h"
 
 AP10Projectile::AP10Projectile()
 {
@@ -51,27 +52,10 @@ void AP10Projectile::Explode()
 
 void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (OtherActor && OtherActor != this && OtherComp && OtherComp->IsSimulatingPhysics())
-	{
-		/* Add impulse to hit component. */
-		const float RandomIntensity = FMath::RandRange(200.f, 500.f);
-		OtherComp->AddImpulseAtLocation(GetVelocity() * RandomIntensity, GetActorLocation());
-
-		/* Make hit component smaller after each bounce. */
-		const FVector Scale = OtherComp->GetComponentScale() * 0.8f;
-		if (Scale.GetMin() < 0.5f)
-		{
-			OtherActor->Destroy();
-		}
-		Scale.GetMin() < 0.5f ? OtherActor->Destroy() : OtherActor->SetActorScale3D(Scale);
-
-		/* Set random color on hit component. */
-		if (UMaterialInstanceDynamic* DynamicMaterialInstance = OtherComp->CreateAndSetMaterialInstanceDynamic(0))
-		{
-			const FLinearColor NewColor = FLinearColor::MakeRandomColor();
-			DynamicMaterialInstance->SetVectorParameterValue("SurfaceColor", NewColor);
-		}
-	}
+	constexpr float Radius = 200.f;
+	UP10Library::DrawDebugExplode(this, Hit, Radius);
+	UP10Library::InteractWithPhysical(OtherActor, OtherComp, this);	
+	UGameplayStatics::ApplyRadialDamage(this, 20, Hit.Location, Radius, nullptr, {}, GetOwner(), GetInstigator()->GetController());	
 	Explode();
 
 	/* Make some noise if on server. */
