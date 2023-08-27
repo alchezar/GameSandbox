@@ -4,12 +4,14 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "P10/Public/Util/P10Library.h"
+#include "P10/Public/Weapon/P10Weapon.h"
 
 AP10Projectile::AP10Projectile()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	SetReplicates(true);
 	SetReplicatingMovement(true);
 
@@ -19,6 +21,7 @@ AP10Projectile::AP10Projectile()
 	CollisionComponent->SetCollisionProfileName("Projectile");
 	CollisionComponent->SetWalkableSlopeOverride(FWalkableSlopeOverride(WalkableSlope_Unwalkable, 0.f));
 	CollisionComponent->CanCharacterStepUpOn = ECB_No;
+	CollisionComponent->bReturnMaterialOnMove = true;
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
 	ProjectileMovement->UpdatedComponent = CollisionComponent;
@@ -36,7 +39,14 @@ void AP10Projectile::BeginPlay()
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnCollisionHitHandle);
 
 	FTimerHandle ExplodeTimer;
-	GetWorld()->GetTimerManager().SetTimer(ExplodeTimer, this, &ThisClass::Explode, 3.f);
+	FTimerDelegate ExplodeDelegate;
+	
+	ExplodeDelegate.BindLambda([&]()
+	{
+		const FHitResult ExplodeHit;
+		Explode(ExplodeHit);
+	});
+	GetWorld()->GetTimerManager().SetTimer(ExplodeTimer, ExplodeDelegate, 3.f, false);
 }
 
 void AP10Projectile::Tick(float DeltaTime)
@@ -44,19 +54,24 @@ void AP10Projectile::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP10Projectile::Explode()
+void AP10Projectile::Explode(const FHitResult& Hit)
 {
-	UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionFX, GetActorLocation());
+	if (Launcher)
+	{
+		Launcher->PlayImpactEffect(Hit);
+	}
 	Destroy();
 }
 
 void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	constexpr float Radius = 200.f;
-	UP10Library::DrawDebugExplode(this, Hit, Radius);
+	
+	if (UP10Library::GetIsDrawDebugAllowed()) UP10Library::DrawDebugExplode(this, Hit, Radius);
+
 	UP10Library::InteractWithPhysical(OtherActor, OtherComp, this);	
 	UGameplayStatics::ApplyRadialDamage(this, 20, Hit.Location, Radius, nullptr, {}, GetOwner(), GetInstigator()->GetController());	
-	Explode();
+	Explode(Hit);
 
 	/* Make some noise if on server. */
 	if (HasAuthority())

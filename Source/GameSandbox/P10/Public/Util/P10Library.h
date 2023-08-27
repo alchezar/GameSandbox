@@ -12,8 +12,14 @@ class GAMESANDBOX_API UP10Library : public UBlueprintFunctionLibrary
 
 public:
 	static void InteractWithPhysical(AActor* CubeActor, UPrimitiveComponent* CubeComp, const AActor* Projectile);
+
+#pragma region DrawDebugs
+	
+	static bool GetIsDrawDebugAllowed();
 	static void DrawDebugShoot(const UObject* WorldContextObject, const FHitResult& Hit);
 	static void DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius);
+	
+#pragma endregion /* DrawDebugs */
 
 #pragma region Bitflags
 

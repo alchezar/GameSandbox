@@ -69,7 +69,10 @@ void AP10AIGuard::OnSeePawnHandle(APawn* Pawn)
 
 void AP10AIGuard::OnHearNoiseHandle(APawn* NoiseInstigator, const FVector& Location, float Volume)
 {
-	DrawDebugString(GetWorld(), Location, FString::Printf(TEXT("Hear")), nullptr, FColor::Blue, 2.f);
+	if (UP10Library::GetIsDrawDebugAllowed())
+	{
+		DrawDebugString(GetWorld(), Location, FString::Printf(TEXT("Hear")), nullptr, FColor::Blue, 2.f);
+	}
 
 	GetController()->StopMovement();
 	/* Remember original rotation only if there were no distractions before. */

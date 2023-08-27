@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "NiagaraSystem.h"
 #include "GameFramework/Actor.h"
 #include "P10Weapon.generated.h"
 
@@ -19,8 +20,9 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetWeaponComponent() const { return WeaponMeshComponent; }
 	FORCEINLINE FName GetFirstSocketName() const { return WeaponMeshComponent->GetAllSocketNames()[0]; }
 	virtual void StartFire();
-	void PlayEffect() const;
+	void PlayMuzzleEffects() const;
 	void DrawBeam(const FHitResult& Hit, const FVector& End);
+	void PlayImpactEffect(const FHitResult& Hit);
 
 protected:
 	virtual void BeginPlay() override;
@@ -40,6 +42,10 @@ protected:
 	USoundBase* FireSound;
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UNiagaraSystem* FireEffect;
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	TSubclassOf<UCameraShakeBase> ShakeClass;
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	TMap<TEnumAsByte<EPhysicalSurface>, UNiagaraSystem*> ImpactMap; 
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Beam")
 	UNiagaraSystem* BeamEffect;

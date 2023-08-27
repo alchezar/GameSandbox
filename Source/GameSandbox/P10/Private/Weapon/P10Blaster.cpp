@@ -6,7 +6,7 @@
 
 AP10Blaster::AP10Blaster()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	if (!ProjectileClass)
 	{
@@ -36,7 +36,10 @@ void AP10Blaster::StartFire()
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
 	Params.Owner = this;
 	Params.Instigator = Cast<APawn>(GetOwner());
-	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
+	
+	AP10Projectile* Bolt = GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
+	if(!Bolt) return;
+	Bolt->SetLauncher(this);
 
-	PlayEffect();
+	PlayMuzzleEffects();
 }

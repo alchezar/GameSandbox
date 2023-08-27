@@ -131,7 +131,7 @@ void AP10Character::FireInput(const bool bShoot)
 {
 	UP10Library::BitflagFromBool(CharStateMask, EP10CharMask::Shoot, bShoot);
 	if (!bShoot) return;
-
+	
 	Server_Fire();
 }
 

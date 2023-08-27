@@ -4,12 +4,15 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "P10/Public/Player/P10Character.h"
 #include "P10/Public/Util/P10Library.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 AP10Weapon::AP10Weapon()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	RootOffsetComponent = CreateDefaultSubobject<USceneComponent>("RootOffsetSceneComponent");
 	SetRootComponent(RootOffsetComponent);
@@ -61,27 +64,38 @@ void AP10Weapon::StartFire()
 	TArray<AActor*> Actors = {OwnerPawn, this};	
 	Params.AddIgnoredActors(Actors);
 	Params.bTraceComplex = true;
+	Params.bReturnPhysicalMaterial = true;
 	
-	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Visibility, Params);
-	// DrawDebugShoot(Hit, Start, End);
-	UP10Library::DrawDebugShoot(this, Hit);
+	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Camera, Params);
 	if (Hit.bBlockingHit && Hit.GetActor())
 	{
 		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), 10.f, Direction, Hit, OwnerPawn->GetInstigatorController(), this, nullptr);
 		UP10Library::InteractWithPhysical(Hit.GetActor(), Hit.GetComponent(), this);
 	}
+	if (UP10Library::GetIsDrawDebugAllowed()) UP10Library::DrawDebugShoot(this, Hit);
 
-	PlayEffect();
+	PlayMuzzleEffects();
 	DrawBeam(Hit, End);
+	PlayImpactEffect(Hit);
 }
 
-void AP10Weapon::PlayEffect() const
+void AP10Weapon::PlayMuzzleEffects() const
 {
 	const FName MuzzleSocketName = WeaponMeshComponent->GetAllSocketNames()[0];
 	const FVector MuzzleSocketLocation = WeaponMeshComponent->GetSocketLocation(MuzzleSocketName);
 	
 	UGameplayStatics::PlaySoundAtLocation(this, FireSound, MuzzleSocketLocation, FRotator::ZeroRotator);
 	UNiagaraFunctionLibrary::SpawnSystemAttached(FireEffect, WeaponMeshComponent, MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::SnapToTarget, true);
+
+	if (ShakeClass)
+	{
+		const ACharacter* Character =  Cast<ACharacter>(GetOwner());
+		if (!Character) return;
+		APlayerController* PlayerController = Character->GetLocalViewingPlayerController();
+		if (!PlayerController) return;
+
+		PlayerController->ClientStartCameraShake(ShakeClass);
+	}
 }
 
 void AP10Weapon::DrawBeam(const FHitResult& Hit, const FVector& End)
@@ -94,4 +108,18 @@ void AP10Weapon::DrawBeam(const FHitResult& Hit, const FVector& End)
 	
 	BeamNiagara->SetVariableVec3(TraceTargetName, Hit.bBlockingHit ? Hit.ImpactPoint : End);
 	BeamNiagara->SetVariableLinearColor(FName("BlasterColor"), FColor::Red);
+}
+
+void AP10Weapon::PlayImpactEffect(const FHitResult& Hit)
+{
+	if (ImpactMap.IsEmpty()) return;
+	
+	UNiagaraSystem* ImpactEffect = ImpactMap[EPhysicalSurface::SurfaceType_Default];
+	const EPhysicalSurface Surface = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+	
+	if (ImpactMap.Contains(Surface))
+	{
+		ImpactEffect = ImpactMap[Surface];
+	}
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, Hit.ImpactPoint);
 }

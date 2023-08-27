@@ -26,6 +26,17 @@ void UP10Library::InteractWithPhysical(AActor* CubeActor, UPrimitiveComponent* C
 	}
 }
 
+/** Draw debugs */
+
+/* Create ConsoleVariable with a default value of 0. */
+static TAutoConsoleVariable<int32> CVarDrawDebug(TEXT("P10.DrawDebug"), 0, TEXT("Allow to draw debug helpers."), ECVF_Cheat);
+
+/* Find the current value of the ConsoleVariable as a bool. */
+bool UP10Library::GetIsDrawDebugAllowed()
+{
+	return IConsoleManager::Get().FindConsoleVariable(TEXT("P10.DrawDebug"))->GetBool();
+}
+
 void UP10Library::DrawDebugShoot(const UObject* WorldContextObject, const FHitResult& Hit)
 {
 	const UWorld* World = WorldContextObject->GetWorld();
