@@ -22,11 +22,14 @@ public:
 	static void DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius);
 	static void DrawTargetInfo(const UObject* WorldContextObject, const FVector& Location, const FString& Text);
 	static void DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weapon* Weapon);
+	static FString StringInt(const int32 Int);
 	
 #pragma endregion /* DrawDebugs */
 
 #pragma region Bitflags
 
+public:
+	
 	/**
 	 * Add bitflag to current enum state container.\n
 	 * 0b0101 = 0b0100

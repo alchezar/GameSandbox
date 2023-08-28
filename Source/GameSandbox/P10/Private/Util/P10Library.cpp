@@ -7,7 +7,7 @@
 void UP10Library::InteractWithPhysical(AActor* CubeActor, UPrimitiveComponent* CubeComp, const AActor* Projectile)
 {
 	if (!CubeActor || CubeActor == Projectile || !CubeComp || !CubeComp->IsSimulatingPhysics()) return;
-	
+
 	/* Add impulse to hit component. */
 	const float RandomIntensity = FMath::RandRange(200.f, 500.f);
 	CubeComp->AddImpulseAtLocation(Projectile->GetVelocity() * RandomIntensity, Projectile->GetActorLocation());
@@ -42,10 +42,10 @@ bool UP10Library::GetIsDrawDebugAllowed()
 void UP10Library::DrawDebugShoot(const UObject* WorldContextObject, const FHitResult& Hit)
 {
 	if (!GetIsDrawDebugAllowed()) return;
-	
+
 	const UWorld* World = WorldContextObject->GetWorld();
 	if (!World) return;
-	
+
 	if (Hit.bBlockingHit)
 	{
 		DrawDebugLine(World, Hit.TraceStart, Hit.ImpactPoint, FColor::Red, false, 10.f);
@@ -61,7 +61,7 @@ void UP10Library::DrawDebugShoot(const UObject* WorldContextObject, const FHitRe
 void UP10Library::DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius)
 {
 	if (!GetIsDrawDebugAllowed()) return;
-	
+
 	const UWorld* World = WorldContextObject->GetWorld();
 	if (!World) return;
 
@@ -71,12 +71,11 @@ void UP10Library::DrawDebugExplode(const UObject* WorldContextObject, const FHit
 void UP10Library::DrawTargetInfo(const UObject* WorldContextObject, const FVector& Location, const FString& Text)
 {
 	if (!GetIsDrawDebugAllowed()) return;
-	
+
 	const UWorld* World = WorldContextObject->GetWorld();
 	if (!World) return;
 
 	DrawDebugString(World, Location, FString::Printf(TEXT("%s"), *Text), nullptr, FColor::Green, 10.f);
-
 }
 
 void UP10Library::DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weapon* Weapon)
@@ -84,19 +83,16 @@ void UP10Library::DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weap
 	const UWorld* World = WorldContextObject->GetWorld();
 	if (!World || !GEngine || !Weapon) return;
 
-	FString AmmoString = (Weapon->GetCurrentAmmo() / 10 == 0) ? "0" : "";
-	AmmoString += FString::FromInt(Weapon->GetCurrentAmmo());
+	const int32 CurrentAmmo = Weapon->GetCurrentAmmo();
+	const int32 AmmoInClips = Weapon->GetAmmoInClips();
+	const int32 ClipCapacity = Weapon->GetClipCapacity();
+	const int32 Clips = AmmoInClips / ClipCapacity + (AmmoInClips % ClipCapacity == 0) ? 0 : 1;
 
-	int32 Clips = Weapon->GetAmmoInClips() / Weapon->GetClipCapacity();
-	Clips += (Weapon->GetAmmoInClips() % Weapon->GetClipCapacity() == 0) ? 0 : 1;
-
-	FString ClipsString = (Clips / 10 == 0) ? "0" : "";
-	ClipsString += FString::FromInt(Clips);
-
-	FString AmmoInClipsString = (Weapon->GetAmmoInClips() / 10 == 0) ? "0" : "";
-	AmmoInClipsString += FString::FromInt(Weapon->GetAmmoInClips());
-	
-	FString AmmoInfo = "Ammo: ";
-	AmmoInfo += AmmoString + " / " + ClipsString + " ( " + AmmoInClipsString + " )";
+	const FString AmmoInfo = "Ammo: " + StringInt(CurrentAmmo) + " / " + StringInt(Clips) + " ( " + StringInt(AmmoInClips) + " )";
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, AmmoInfo);
+}
+
+FString UP10Library::StringInt(const int32 Int)
+{
+	return (Int / 10 == 0) ? "0" : "" + FString::FromInt(Int);
 }
