@@ -67,8 +67,7 @@ void AP10Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AAc
 {
 	constexpr float Radius = 200.f;
 	
-	if (UP10Library::GetIsDrawDebugAllowed()) UP10Library::DrawDebugExplode(this, Hit, Radius);
-
+	UP10Library::DrawDebugExplode(this, Hit, Radius);
 	UP10Library::InteractWithPhysical(OtherActor, OtherComp, this);	
 	UGameplayStatics::ApplyRadialDamage(this, 20, Hit.Location, Radius, nullptr, {}, GetOwner(), GetInstigator()->GetController());	
 	Explode(Hit);

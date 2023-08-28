@@ -5,6 +5,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P10Library.generated.h"
 
+class AP10Weapon;
+
 UCLASS()
 class GAMESANDBOX_API UP10Library : public UBlueprintFunctionLibrary
 {
@@ -18,6 +20,8 @@ public:
 	static bool GetIsDrawDebugAllowed();
 	static void DrawDebugShoot(const UObject* WorldContextObject, const FHitResult& Hit);
 	static void DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius);
+	static void DrawTargetInfo(const UObject* WorldContextObject, const FVector& Location, const FString& Text);
+	static void DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weapon* Weapon);
 	
 #pragma endregion /* DrawDebugs */
 

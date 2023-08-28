@@ -50,7 +50,7 @@ protected:
 	virtual void BeginPlay() override;
 	void FireInput(bool bShoot);
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_Fire();
+	void Server_Fire(const bool bStart);
 
 private:
 	void LookInput(const FInputActionValue& Value);
@@ -58,8 +58,10 @@ private:
 	void JumpInput(bool bStart);
 	void CrouchInput();
 	void AimInput(bool bAim);
+	void ReloadInput();
 	void SpawnWeapon();
 	void ZoomSmoothlyHandle();
+	void OnWeaponReloadHandle(APawn* WeaponOwner, bool bAccess);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -83,7 +85,9 @@ protected:
 	UInputAction* FireAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* AimAction;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* ReloadAction;
+	
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "C++ | Interact")
 	bool bCarryingObjective;
 	

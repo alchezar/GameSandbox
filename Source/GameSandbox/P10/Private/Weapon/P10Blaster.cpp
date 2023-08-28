@@ -28,7 +28,7 @@ void AP10Blaster::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP10Blaster::StartFire()
+void AP10Blaster::OneShot()
 {
 	const FVector MuzzleLocation = WeaponMeshComponent->GetSocketLocation(GetFirstSocketName());
 	const FRotator MuzzleRotation = WeaponMeshComponent->GetSocketRotation(GetFirstSocketName());
@@ -42,4 +42,9 @@ void AP10Blaster::StartFire()
 	Bolt->SetLauncher(this);
 
 	PlayMuzzleEffects();
+	
+	if (GetNextFireCount() >= 3 && FireMode == EP10FireMode::Brush)
+	{
+		StopFire();
+	}
 }

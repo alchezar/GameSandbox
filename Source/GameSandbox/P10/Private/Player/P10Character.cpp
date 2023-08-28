@@ -58,7 +58,11 @@ void AP10Character::Tick(float DeltaTime)
 		ArmComponent->SetRelativeRotation(NewRot);
 	}
 
-	UP10Library::PrintStateMask(CharStateMask);
+	if (Cast<APlayerController>(GetController()))
+	{
+		UP10Library::PrintStateMask(CharStateMask);
+		UP10Library::DrawAmmoInfo(this, Weapon);
+	}
 }
 
 void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -84,7 +88,8 @@ void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::AimInput, true);
 	EnhancedInputComponent->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::AimInput, false);
-	
+
+	EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Started, this, &ThisClass::ReloadInput);
 }
 
 void AP10Character::MoveInput(const FInputActionValue& Value)
@@ -130,17 +135,15 @@ void AP10Character::CrouchInput()
 void AP10Character::FireInput(const bool bShoot)
 {
 	UP10Library::BitflagFromBool(CharStateMask, EP10CharMask::Shoot, bShoot);
-	if (!bShoot) return;
-	
-	Server_Fire();
+	Server_Fire(bShoot);
 }
 
-void AP10Character::Server_Fire_Implementation()
+void AP10Character::Server_Fire_Implementation(const bool bStart)
 {
-	Weapon->StartFire();
+	bStart ? Weapon->StartFire() : Weapon->StopFire();
 }
 
-bool AP10Character::Server_Fire_Validate()
+bool AP10Character::Server_Fire_Validate(const bool bStart)
 {
 	return true;
 }
@@ -151,8 +154,12 @@ void AP10Character::AimInput(const bool bAim)
 	constexpr float DefaultFieldOfView = 90.f;
 	constexpr float ZoomedFieldOfView = 45.f;
 	TargetFOV = bAim ? ZoomedFieldOfView : DefaultFieldOfView;
-	// CameraComponent->SetFieldOfView(TargetFOV);
 	GetWorld()->GetTimerManager().SetTimer(ZoomTimer, this, &ThisClass::ZoomSmoothlyHandle, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void AP10Character::ReloadInput()
+{
+	Weapon->TryReload();
 }
 
 void AP10Character::ZoomSmoothlyHandle()
@@ -178,6 +185,12 @@ void AP10Character::SpawnWeapon()
 
 	const FAttachmentTransformRules Rules = {EAttachmentRule::SnapToTarget, true};
 	Weapon->AttachToComponent(GetMesh(), Rules, HandSocketName);
+	Weapon->OnReload.AddUObject(this, &ThisClass::OnWeaponReloadHandle);
+}
+
+void AP10Character::OnWeaponReloadHandle(APawn* WeaponOwner, bool bAccess)
+{
+	FireInput(false);
 }
 
 FVector AP10Character::GetPawnViewLocation() const

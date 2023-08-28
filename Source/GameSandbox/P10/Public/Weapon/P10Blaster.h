@@ -16,7 +16,7 @@ class GAMESANDBOX_API AP10Blaster : public AP10Weapon
 public:
 	AP10Blaster();
 	virtual void Tick(float DeltaTime) override;
-	virtual void StartFire() override;
+	virtual void OneShot() override;
 
 protected:
 	virtual void BeginPlay() override;

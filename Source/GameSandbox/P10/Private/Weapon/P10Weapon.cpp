@@ -2,6 +2,7 @@
 
 #include "P10/Public/Weapon/P10Weapon.h"
 
+#include "GameSandbox.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "HAL/IConsoleManager.h"
@@ -43,6 +44,9 @@ void AP10Weapon::BeginPlay()
 	Super::BeginPlay();
 	check(FireSound)
 	check(FireEffect)
+	
+	Ammo = ClipCapacity;
+	AmmoInClips = MaxAmmo - ClipCapacity;
 }
 
 void AP10Weapon::Tick(float DeltaTime)
@@ -52,31 +56,80 @@ void AP10Weapon::Tick(float DeltaTime)
 
 void AP10Weapon::StartFire()
 {
+	if (FireMode > EP10FireMode::Single)
+	{
+		GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ThisClass::OneShot, TimeBetweenShots, true, TimeBetweenShots);
+	}
+	OneShot();
+}
+
+void AP10Weapon::OneShot()
+{
+	if (!bInfinite && --Ammo <= 0 && !TryReload()) return;
+	
 	/* Line trace the world, from pawn eyes to crosshair location */
 	APawn* OwnerPawn = Cast<APawn>(GetOwner());
 	check(OwnerPawn)
-	const FVector Direction = OwnerPawn->GetControlRotation().Vector();
+	const float HalfRad = FMath::DegreesToRadians(Spread / 2);
+	const FVector Direction = FMath::VRandCone(OwnerPawn->GetControlRotation().Vector(), HalfRad);
 	const FVector Start = OwnerPawn->GetPawnViewLocation();
 	const FVector End = Start + Direction * 10000.f;
 		
 	FHitResult Hit;
-	FCollisionQueryParams Params;
 	TArray<AActor*> Actors = {OwnerPawn, this};	
+	FCollisionQueryParams Params;
 	Params.AddIgnoredActors(Actors);
 	Params.bTraceComplex = true;
 	Params.bReturnPhysicalMaterial = true;
 	
-	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_Camera, Params);
+	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PROJECTILE, Params);
 	if (Hit.bBlockingHit && Hit.GetActor())
 	{
-		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), 10.f, Direction, Hit, OwnerPawn->GetInstigatorController(), this, nullptr);
+		const bool bHeadshot = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get()) == SURFACE_HEAD;
+		float Damage = bHeadshot ? BaseDamage * 2.f : BaseDamage;
+		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), Damage, Direction, Hit, OwnerPawn->GetInstigatorController(), this, nullptr);
 		UP10Library::InteractWithPhysical(Hit.GetActor(), Hit.GetComponent(), this);
+		UP10Library::DrawTargetInfo(this, Hit.ImpactPoint, FString::SanitizeFloat(Damage));
 	}
-	if (UP10Library::GetIsDrawDebugAllowed()) UP10Library::DrawDebugShoot(this, Hit);
+	UP10Library::DrawDebugShoot(this, Hit);
 
 	PlayMuzzleEffects();
 	DrawBeam(Hit, End);
 	PlayImpactEffect(Hit);
+
+	/* Shot outcome */
+	OwnerPawn->AddControllerPitchInput(-ShotRecoil);
+	if (GetNextFireCount() >= 3 && FireMode == EP10FireMode::Brush)
+	{
+		StopFire();
+	}
+}
+
+void AP10Weapon::StopFire()
+{
+	if (FireMode > EP10FireMode::Single)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(FireTimer);
+	}
+	FireCount = 0;
+}
+
+bool AP10Weapon::TryReload()
+{
+	if (Ammo <= 0 && AmmoInClips <= 0)
+	{
+		Ammo = AmmoInClips = 0;
+		
+		OnReload.Broadcast(Cast<APawn>(GetOwner()), false);
+		return false;
+	}
+
+	AmmoInClips += Ammo;
+	Ammo = AmmoInClips > ClipCapacity ? ClipCapacity : AmmoInClips;
+	AmmoInClips -= Ammo;
+	
+	OnReload.Broadcast(Cast<APawn>(GetOwner()), true);
+	return true;
 }
 
 void AP10Weapon::PlayMuzzleEffects() const
