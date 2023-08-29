@@ -86,13 +86,25 @@ void UP10Library::DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weap
 	const int32 CurrentAmmo = Weapon->GetCurrentAmmo();
 	const int32 AmmoInClips = Weapon->GetAmmoInClips();
 	const int32 ClipCapacity = Weapon->GetClipCapacity();
-	const int32 Clips = AmmoInClips / ClipCapacity + (AmmoInClips % ClipCapacity == 0) ? 0 : 1;
+	const int32 Clips = AmmoInClips / ClipCapacity + (AmmoInClips % ClipCapacity == 0 ? 0 : 1);
 
-	const FString AmmoInfo = "Ammo: " + StringInt(CurrentAmmo) + " / " + StringInt(Clips) + " ( " + StringInt(AmmoInClips) + " )";
+	const FString AmmoInfo = "Ammo: " + IntToString(CurrentAmmo, 2) + " / " + IntToString(Clips, 2) + " ( " + IntToString(AmmoInClips, 3) + " )";
 	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, AmmoInfo);
 }
 
-FString UP10Library::StringInt(const int32 Int)
+FString UP10Library::IntToString(const int32 Number, const int32 DigitCount)
 {
-	return (Int / 10 == 0) ? "0" : "" + FString::FromInt(Int);
+	FString RowNumberString = FString::FromInt(Number);
+	const int32 ZeroLeadingNum = DigitCount - RowNumberString.Len();
+	
+	FString FinalString = "";
+	if (ZeroLeadingNum > 0 )
+	{
+		for (int i = 0; i < ZeroLeadingNum; ++i)
+		{
+			FinalString.Append("0");
+		}
+	}
+	FinalString.Append(RowNumberString);
+	return FinalString;
 }

@@ -5,10 +5,12 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/PawnNoiseEmitterComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "P10/Public/Component/P10HealthComponent.h"
 #include "P10/Public/Util/P10Library.h"
 #include "P10/Public/Weapon/P10Weapon.h"
 
@@ -25,11 +27,20 @@ AP10Character::AP10Character()
 
 	NoiseEmitter = CreateDefaultSubobject<UPawnNoiseEmitterComponent>("PawnNoiseEmitterComponent");
 
+	HealthComponent = CreateDefaultSubobject<UP10HealthComponent>("HealthActorComponent");
+
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->NavAgentProps.bCanCrouch = true;
 
 	JumpMaxCount = 2;
+}
+
+void AP10Character::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 }
 
 void AP10Character::BeginPlay()
@@ -200,4 +211,23 @@ FVector AP10Character::GetPawnViewLocation() const
 		return Super::GetPawnViewLocation();
 	}
 	return CameraComponent->GetComponentLocation();
+}
+
+void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	if (Health <= 0)
+	{
+		CharStateMask = EP10CharMask::Dead;
+		
+		/* Ragdoll */
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->MovementState.bCanJump = false;
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		GetMesh()->SetAllBodiesSimulatePhysics(true);
+		GetMesh()->SetCollisionProfileName("Ragdoll");
+		DetachFromControllerPendingDestroy();
+		SetLifeSpan(10.f);
+	}
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
 }

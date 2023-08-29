@@ -3,6 +3,7 @@
 #include "P10/Public/Weapon/P10Projectile.h"
 
 #include "Components/SphereComponent.h"
+#include "GameFramework/Actor.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -56,9 +57,9 @@ void AP10Projectile::Tick(float DeltaTime)
 
 void AP10Projectile::Explode(const FHitResult& Hit)
 {
-	if (Launcher)
+	if (AP10Weapon* OwnerWeapon = Cast<AP10Weapon>(GetOwner()))
 	{
-		Launcher->PlayImpactEffect(Hit);
+		OwnerWeapon->PlayImpactEffect(Hit);
 	}
 	Destroy();
 }

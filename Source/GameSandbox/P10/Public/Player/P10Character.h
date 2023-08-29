@@ -8,6 +8,7 @@
 #include "P10/Public/Util/P10Library.h"
 #include "P10Character.generated.h"
 
+class UP10HealthComponent;
 class AP10Weapon;
 class UNiagaraSystem;
 class UInputAction;
@@ -25,7 +26,8 @@ enum class  EP10CharMask : uint8
 	Crouch = 0b00000010 UMETA(DisplayName = "Crouching"),  // 2
 	Run    = 0b00000100 UMETA(DisplayName = "Running"),    // 4  
 	Aim    = 0b00001000 UMETA(DisplayName = "Aiming"), 	   // 8   
-	Shoot  = 0b00010000 UMETA(DisplayName = "Shooting")    // 16
+	Shoot  = 0b00010000 UMETA(DisplayName = "Shooting"),   // 16
+	Dead   = 0b00100000 UMETA(DisplayName = "Dead")        // 32
 };
 ENUM_CLASS_FLAGS(EP10CharMask)
 
@@ -36,6 +38,8 @@ class GAMESANDBOX_API AP10Character : public ACharacter
 
 public:
 	AP10Character();
+	void OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	virtual void PostInitializeComponents() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -70,7 +74,10 @@ protected:
 	UCameraComponent* CameraComponent;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UPawnNoiseEmitterComponent* NoiseEmitter;
-	
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UP10HealthComponent* HealthComponent;
+
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputMappingContext* DefaultContext;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")

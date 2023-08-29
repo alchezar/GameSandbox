@@ -22,7 +22,7 @@ public:
 	static void DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius);
 	static void DrawTargetInfo(const UObject* WorldContextObject, const FVector& Location, const FString& Text);
 	static void DrawAmmoInfo(const UObject* WorldContextObject, const AP10Weapon* Weapon);
-	static FString StringInt(const int32 Int);
+	static FString IntToString(const int32 Number, const int32 DigitCount);
 	
 #pragma endregion /* DrawDebugs */
 

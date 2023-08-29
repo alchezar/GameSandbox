@@ -6,15 +6,19 @@
 #include "Engine/Canvas.h"
 
 AP10HUD::AP10HUD()
-{ }
+{
+	PrimaryActorTick.bCanEverTick = false;
+}
 
 void AP10HUD::BeginPlay()
 {
 	Super::BeginPlay();
 	check(CrosshairWidgetClass)
 	check(MissionCompletedWidgetClass)
+	check(HealthIndicatorWidgetClass)
 
 	DrawCrosshair(true);
+	DrawHealthIndicator();
 }
 
 void AP10HUD::DrawHUD()
@@ -40,6 +44,13 @@ void AP10HUD::DrawCrosshair(const bool bDraw)
 		CrosshairWidget->AddToViewport();
 	}
 	CrosshairWidget->SetVisibility(bDraw ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+}
+
+void AP10HUD::DrawHealthIndicator()
+{
+	HealthIndicator = CreateWidget(GetWorld(), HealthIndicatorWidgetClass);
+	check(HealthIndicator);
+	HealthIndicator->AddToViewport();
 }
 
 void AP10HUD::OnMissionCompleted(bool bSuccess)

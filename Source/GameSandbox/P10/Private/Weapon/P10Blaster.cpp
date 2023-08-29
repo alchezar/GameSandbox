@@ -2,6 +2,7 @@
 
 #include "P10/Public/Weapon/P10Blaster.h"
 
+#include "GameFramework/Actor.h"
 #include "P10/Public/Weapon/P10Projectile.h"
 
 AP10Blaster::AP10Blaster()
@@ -37,9 +38,7 @@ void AP10Blaster::OneShot()
 	Params.Owner = this;
 	Params.Instigator = Cast<APawn>(GetOwner());
 	
-	AP10Projectile* Bolt = GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
-	if(!Bolt) return;
-	Bolt->SetLauncher(this);
+	GetWorld()->SpawnActor<AP10Projectile>(ProjectileClass, MuzzleLocation, MuzzleRotation, Params);
 
 	PlayMuzzleEffects();
 	

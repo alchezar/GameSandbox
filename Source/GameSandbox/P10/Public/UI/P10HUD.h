@@ -21,6 +21,7 @@ protected:
 
 private:
 	void DrawCrosshair(const bool bDraw);
+	void DrawHealthIndicator();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
@@ -29,9 +30,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UUserWidget> CrosshairWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UUserWidget> HealthIndicatorWidgetClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UUserWidget> MissionCompletedWidgetClass;
 
 private:
 	UPROPERTY()
 	UUserWidget* CrosshairWidget;
+	UPROPERTY()
+	UUserWidget* HealthIndicator;
 };

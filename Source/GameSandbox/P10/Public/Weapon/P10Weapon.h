@@ -17,7 +17,7 @@ enum class EP10FireMode : uint8
 	Auto    UMETA(DisplayName = "Auto mode")
 };
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP10OnReloadHandle, APawn*, bool)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP10OnReloadSignature, APawn*, bool)
 
 UCLASS()
 class GAMESANDBOX_API AP10Weapon : public AActor
@@ -46,7 +46,7 @@ protected:
 	virtual void OneShot();
 
 public:
-	FP10OnReloadHandle OnReload;
+	FP10OnReloadSignature OnReload;
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
