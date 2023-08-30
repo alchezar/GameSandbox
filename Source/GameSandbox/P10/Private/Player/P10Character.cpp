@@ -80,7 +80,7 @@ void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, bCarryingObjective);
-	// DOREPLIFETIME_CONDITION(ThisClass, bCarryingObjective, COND_OwnerOnly)
+	DOREPLIFETIME(ThisClass, Weapon);
 }
 
 void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -146,17 +146,9 @@ void AP10Character::CrouchInput()
 void AP10Character::FireInput(const bool bShoot)
 {
 	UP10Library::BitflagFromBool(CharStateMask, EP10CharMask::Shoot, bShoot);
-	Server_Fire(bShoot);
-}
 
-void AP10Character::Server_Fire_Implementation(const bool bStart)
-{
-	bStart ? Weapon->StartFire() : Weapon->StopFire();
-}
-
-bool AP10Character::Server_Fire_Validate(const bool bStart)
-{
-	return true;
+	if (!Weapon) return;
+	bShoot ? Weapon->StartFire() : Weapon->StopFire();
 }
 
 void AP10Character::AimInput(const bool bAim)
@@ -186,6 +178,8 @@ void AP10Character::ZoomSmoothlyHandle()
 
 void AP10Character::SpawnWeapon()
 {
+	if (!HasAuthority()) return;
+	
 	FActorSpawnParameters Parameters;
 	Parameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	Parameters.Owner = this;

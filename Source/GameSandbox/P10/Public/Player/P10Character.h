@@ -49,18 +49,16 @@ public:
 	FORCEINLINE bool GetIsAiming() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Aim); }
 	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
 	FORCEINLINE void SetCarryingObjective(const bool bNewCarrying) { bCarryingObjective = bNewCarrying; }
-
+	
 protected:
 	virtual void BeginPlay() override;
-	void FireInput(bool bShoot);
-	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_Fire(const bool bStart);
 
 private:
 	void LookInput(const FInputActionValue& Value);
 	void MoveInput(const FInputActionValue& Value);
 	void JumpInput(bool bStart);
 	void CrouchInput();
+	void FireInput(bool bShoot);
 	void AimInput(bool bAim);
 	void ReloadInput();
 	void SpawnWeapon();
@@ -104,7 +102,7 @@ protected:
 	FName HandSocketName = "GripPoint";
 
 private:
-	UPROPERTY()
+	UPROPERTY(Replicated)
 	AP10Weapon* Weapon;
 	EP10CharMask CharStateMask = EP10CharMask::Idle;
 	float TargetFOV = 0.f;

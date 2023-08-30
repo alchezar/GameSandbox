@@ -9,6 +9,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "P10/Public/Util/P10Library.h"
 #include "P10/Public/Weapon/P10Weapon.h"
+#include "PhysicalMaterials/PhysicalMaterial.h"
 
 AP10Projectile::AP10Projectile()
 {
@@ -59,7 +60,8 @@ void AP10Projectile::Explode(const FHitResult& Hit)
 {
 	if (AP10Weapon* OwnerWeapon = Cast<AP10Weapon>(GetOwner()))
 	{
-		OwnerWeapon->PlayImpactEffect(Hit);
+		const EPhysicalSurface Surface = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+		OwnerWeapon->PlayImpactEffect(Surface, Hit.ImpactPoint);
 	}
 	Destroy();
 }

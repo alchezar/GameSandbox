@@ -5,7 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "Engine/Canvas.h"
 
-AP10HUD::AP10HUD()
+AP10HUD::AP10HUD(): CrosshairTex(nullptr), CrosshairWidget(nullptr), HealthIndicator(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 }

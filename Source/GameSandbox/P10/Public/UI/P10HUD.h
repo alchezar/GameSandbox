@@ -6,6 +6,8 @@
 #include "GameFramework/HUD.h"
 #include "P10HUD.generated.h"
 
+class UTexture2D;
+
 UCLASS()
 class GAMESANDBOX_API AP10HUD : public AHUD
 {

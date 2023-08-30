@@ -18,7 +18,6 @@ class GAMESANDBOX_API AP10Projectile : public AActor
 public:
 	AP10Projectile();
 	virtual void Tick(float DeltaTime) override;
-	// FORCEINLINE void SetLauncher(AP10Weapon* LauncherWeapon) { Launcher = LauncherWeapon; }
 
 protected:
 	virtual void BeginPlay() override;

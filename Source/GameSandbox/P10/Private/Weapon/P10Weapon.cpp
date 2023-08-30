@@ -7,6 +7,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "P10/Public/Player/P10Character.h"
 #include "P10/Public/Util/P10Library.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
@@ -14,6 +15,9 @@
 AP10Weapon::AP10Weapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
+	SetReplicates(true);
+	NetUpdateFrequency = 60.f;
+	MinNetUpdateFrequency = 30.f;
 
 	RootOffsetComponent = CreateDefaultSubobject<USceneComponent>("RootOffsetSceneComponent");
 	SetRootComponent(RootOffsetComponent);
@@ -54,6 +58,13 @@ void AP10Weapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AP10Weapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME_CONDITION(ThisClass, HitScanTrace, COND_SkipOwner)
+}
+
+
 void AP10Weapon::StartFire()
 {
 	if (FireMode > EP10FireMode::Single)
@@ -65,6 +76,7 @@ void AP10Weapon::StartFire()
 
 void AP10Weapon::OneShot()
 {
+	/* Shoot only if there are enough ammo in the magazine. */
 	if (!bInfinite && --Ammo <= 0 && !TryReload()) return;
 	
 	/* Line trace the world, from pawn eyes to crosshair location */
@@ -74,35 +86,43 @@ void AP10Weapon::OneShot()
 	const FVector Direction = FMath::VRandCone(OwnerPawn->GetControlRotation().Vector(), HalfRad);
 	const FVector Start = OwnerPawn->GetPawnViewLocation();
 	const FVector End = Start + Direction * 10000.f;
-		
+
+	/* Init default values for effects played on the server and other clients. */
+	EPhysicalSurface Surface = EPhysicalSurface::SurfaceType_Default;
+	FVector Target = End;
+
+	/* Init params for line trace and its execution. */
 	FHitResult Hit;
-	TArray<AActor*> Actors = {OwnerPawn, this};	
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActors(Actors);
-	Params.bTraceComplex = true;
-	Params.bReturnPhysicalMaterial = true;
-	
-	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PROJECTILE, Params);
-	if (Hit.bBlockingHit && Hit.GetActor())
+	if (TryToPerformLineTrace(Hit, OwnerPawn, Start, End))
 	{
 		const bool bHeadshot = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get()) == SURFACE_HEAD;
 		float Damage = bHeadshot ? BaseDamage * 2.f : BaseDamage;
 		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), Damage, Direction, Hit, OwnerPawn->GetInstigatorController(), this, nullptr);
 		UP10Library::InteractWithPhysical(Hit.GetActor(), Hit.GetComponent(), this);
 		UP10Library::DrawTargetInfo(this, Hit.ImpactPoint, FString::SanitizeFloat(Damage));
+
+		Surface = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
+		Target = Hit.ImpactPoint;
 	}
 	UP10Library::DrawDebugShoot(this, Hit);
 
-	PlayMuzzleEffects();
-	DrawBeam(Hit, End);
-	PlayImpactEffect(Hit);
+	PlayAllEffects(Target, Surface);
+	ShotConsequences(OwnerPawn);
 
-	/* Shot outcome */
-	OwnerPawn->AddControllerPitchInput(-ShotRecoil);
-	if (GetNextFireCount() >= 3 && FireMode == EP10FireMode::Brush)
+	/* Server side. */
+	if (!HasAuthority())
 	{
-		StopFire();
+		Server_Fire();
 	}
+	else
+	{
+		HitScanTrace = {Surface, Target};
+	}
+}
+
+void AP10Weapon::Server_Fire_Implementation()
+{
+	OneShot();
 }
 
 void AP10Weapon::StopFire()
@@ -151,7 +171,7 @@ void AP10Weapon::PlayMuzzleEffects() const
 	}
 }
 
-void AP10Weapon::DrawBeam(const FHitResult& Hit, const FVector& End)
+void AP10Weapon::DrawBeam(const FVector& End)
 {
 	if (!BeamEffect) return;
 
@@ -159,20 +179,54 @@ void AP10Weapon::DrawBeam(const FHitResult& Hit, const FVector& End)
 	UNiagaraComponent* BeamNiagara = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, BeamEffect, MuzzleSocketLocation);
 	if (!BeamNiagara) return;
 	
-	BeamNiagara->SetVariableVec3(TraceTargetName, Hit.bBlockingHit ? Hit.ImpactPoint : End);
+	BeamNiagara->SetVariableVec3(TraceTargetName, End);
 	BeamNiagara->SetVariableLinearColor(FName("BlasterColor"), FColor::Red);
 }
 
-void AP10Weapon::PlayImpactEffect(const FHitResult& Hit)
+void AP10Weapon::PlayImpactEffect(const EPhysicalSurface Surface, const FVector& End)
 {
 	if (ImpactMap.IsEmpty()) return;
 	
 	UNiagaraSystem* ImpactEffect = ImpactMap[EPhysicalSurface::SurfaceType_Default];
-	const EPhysicalSurface Surface = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get());
-	
 	if (ImpactMap.Contains(Surface))
 	{
 		ImpactEffect = ImpactMap[Surface];
 	}
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, Hit.ImpactPoint);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect, End);
+}
+
+void AP10Weapon::OnRep_HitScanTrace()
+{
+	PlayMuzzleEffects();
+	DrawBeam(HitScanTrace.TraceTo);
+	PlayImpactEffect(HitScanTrace.SurfaceType, HitScanTrace.TraceTo);
+}
+
+bool AP10Weapon::TryToPerformLineTrace(FHitResult& Hit, APawn* OwnerPawn, const FVector& Start, const FVector& End)
+{
+	const TArray<AActor*> Actors = {OwnerPawn, this};	
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActors(Actors);
+	Params.bTraceComplex = true;
+	Params.bReturnPhysicalMaterial = true;
+	
+	GetWorld()->LineTraceSingleByChannel(Hit, Start, End, ECC_PROJECTILE, Params);
+	return Hit.bBlockingHit && Hit.GetActor();
+}
+
+void AP10Weapon::PlayAllEffects(const FVector& Target, const EPhysicalSurface Surface)
+{
+	PlayMuzzleEffects();
+	DrawBeam(Target);
+	PlayImpactEffect(Surface, Target);
+}
+
+void AP10Weapon::ShotConsequences(APawn* OwnerPawn)
+{
+	OwnerPawn->AddControllerPitchInput(-ShotRecoil);
+	
+	if (GetNextFireCount() >= 3 && FireMode == EP10FireMode::Brush)
+	{
+		StopFire();
+	}
 }
