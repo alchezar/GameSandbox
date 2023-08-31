@@ -40,7 +40,10 @@ void AP10Character::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
-	HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+	if (HasAuthority())
+	{
+		HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+	}
 }
 
 void AP10Character::BeginPlay()
@@ -81,6 +84,7 @@ void AP10Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME(ThisClass, bCarryingObjective);
 	DOREPLIFETIME(ThisClass, Weapon);
+	DOREPLIFETIME(ThisClass, CharStateMask)
 }
 
 void AP10Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -211,8 +215,14 @@ void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float 
 {
 	if (Health <= 0)
 	{
+		Multicast_OnDeath();
 		CharStateMask = EP10CharMask::Dead;
-		
+	}
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
+}
+
+void AP10Character::Multicast_OnDeath_Implementation()
+{
 		/* Ragdoll */
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->DisableMovement();
@@ -222,6 +232,4 @@ void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float 
 		GetMesh()->SetCollisionProfileName("Ragdoll");
 		DetachFromControllerPendingDestroy();
 		SetLifeSpan(10.f);
-	}
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
 }

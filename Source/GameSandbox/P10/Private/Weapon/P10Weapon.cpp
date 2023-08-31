@@ -64,7 +64,6 @@ void AP10Weapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 	DOREPLIFETIME_CONDITION(ThisClass, HitScanTrace, COND_SkipOwner)
 }
 
-
 void AP10Weapon::StartFire()
 {
 	if (FireMode > EP10FireMode::Single)

@@ -53,6 +53,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnDeath();
+
 private:
 	void LookInput(const FInputActionValue& Value);
 	void MoveInput(const FInputActionValue& Value);
@@ -104,6 +107,7 @@ protected:
 private:
 	UPROPERTY(Replicated)
 	AP10Weapon* Weapon;
+	UPROPERTY(Replicated)
 	EP10CharMask CharStateMask = EP10CharMask::Idle;
 	float TargetFOV = 0.f;
 	FTimerHandle ZoomTimer;

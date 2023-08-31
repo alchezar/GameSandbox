@@ -12,9 +12,9 @@ class UNiagaraSystem;
 UENUM(BlueprintType)
 enum class EP10FireMode : uint8
 {
-	Single UMETA(DisplayName = "Single mode"),
-	Brush UMETA(DisplayName = "Brush mode"),
-	Auto UMETA(DisplayName = "Auto mode")
+	Single  UMETA(DisplayName = "Single mode"),
+	Brush   UMETA(DisplayName = "Brush mode"),
+	Auto    UMETA(DisplayName = "Auto mode")
 };
 
 USTRUCT()
