@@ -41,7 +41,8 @@ void AP10Objective::Tick(float DeltaTime)
 void AP10Objective::PlayEffect()
 {
 	NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, GetActorLocation());
-
+	if (!NiagaraComponent) return;
+	
 	FTimerHandle NiagaraTimer;
 	FTimerDelegate NiagaraDelegate;
 	NiagaraDelegate.BindLambda([&]()

@@ -18,6 +18,7 @@ class GAMESANDBOX_API UP10HealthComponent : public UActorComponent
 public:
 	UP10HealthComponent();
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
+	FORCEINLINE float GetHealth() const { return Health; }
 
 protected:
 	UFUNCTION()
@@ -26,12 +27,14 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnHealthChanged(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-
+	UFUNCTION()
+	void OnRep_Health(const float OldHealth);
+	
 public:
 	FP10OnHealthChangedSignature OnHealthChanged;
 	
 protected:
-	UPROPERTY(EditDefaultsOnly, Replicated, Category = "C++ | Health")
+	UPROPERTY(ReplicatedUsing = "OnRep_Health", EditAnywhere, Category = "C++ | Health")
 	float MaxHealth = 100.f;
 
 private:

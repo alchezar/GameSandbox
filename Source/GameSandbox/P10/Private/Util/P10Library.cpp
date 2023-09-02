@@ -12,13 +12,16 @@ void UP10Library::InteractWithPhysical(AActor* CubeActor, UPrimitiveComponent* C
 	const float RandomIntensity = FMath::RandRange(200.f, 500.f);
 	CubeComp->AddImpulseAtLocation(Projectile->GetVelocity() * RandomIntensity, Projectile->GetActorLocation());
 
-	/* Make hit component smaller after each bounce. */
-	const FVector Scale = CubeComp->GetComponentScale() * 0.8f;
-	if (Scale.GetMin() < 0.5f)
+	/* Make hit component smaller after each bounce, but only if the actor is below the Pawn in the hierarchy.  */
+	if (!Cast<APawn>(CubeActor))
 	{
-		CubeActor->Destroy();
+		const FVector Scale = CubeComp->GetComponentScale() * 0.8f;
+		if (Scale.GetMin() < 0.5f)
+		{
+			CubeActor->Destroy();
+		}
+			Scale.GetMin() < 0.5f ? CubeActor->Destroy() : CubeActor->SetActorScale3D(Scale);
 	}
-	Scale.GetMin() < 0.5f ? CubeActor->Destroy() : CubeActor->SetActorScale3D(Scale);
 
 	/* Set random color on hit component. */
 	if (UMaterialInstanceDynamic* DynamicMaterialInstance = CubeComp->CreateAndSetMaterialInstanceDynamic(0))
@@ -58,14 +61,14 @@ void UP10Library::DrawDebugShoot(const UObject* WorldContextObject, const FHitRe
 	}
 }
 
-void UP10Library::DrawDebugExplode(const UObject* WorldContextObject, const FHitResult& Hit, const float Radius)
+void UP10Library::DrawDebugExplode(const UObject* WorldContextObject, const FVector& HitLocation, const float Radius)
 {
 	if (!GetIsDrawDebugAllowed()) return;
 
 	const UWorld* World = WorldContextObject->GetWorld();
 	if (!World) return;
 
-	DrawDebugCapsule(World, Hit.Location, Radius / 2, Radius, FQuat::Identity, FColor::Red, false, 10.f);
+	DrawDebugCapsule(World, HitLocation, Radius / 2, Radius, FQuat::Identity, FColor::Red, false, 10.f);
 }
 
 void UP10Library::DrawTargetInfo(const UObject* WorldContextObject, const FVector& Location, const FString& Text)

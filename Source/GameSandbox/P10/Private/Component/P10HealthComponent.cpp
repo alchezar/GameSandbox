@@ -42,3 +42,9 @@ void UP10HealthComponent::Multicast_OnHealthChanged_Implementation(AActor* Damag
 {
 	OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
 }
+
+void UP10HealthComponent::OnRep_Health(const float OldHealth)
+{
+	const float Damage = Health - OldHealth;
+	OnHealthChanged.Broadcast(this, Health, Damage, nullptr, nullptr, nullptr);
+}
