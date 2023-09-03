@@ -42,7 +42,10 @@ protected:
 	void OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstignatedBy, AActor* DamageCauser);
 	void PulseOnHitHandle(UMaterialInstanceDynamic* PulseMaterial);
 	void Suicide();
-
+	UFUNCTION(Server, Reliable)
+	void Server_Suicide();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_Suicide();
 	UFUNCTION()
 	void OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 

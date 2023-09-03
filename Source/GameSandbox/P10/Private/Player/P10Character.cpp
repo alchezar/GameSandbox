@@ -218,7 +218,7 @@ void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float 
 		Multicast_OnDeath();
 		CharStateMask = EP10CharMask::Dead;
 	}
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 10.f, FColor::Red, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
 }
 
 void AP10Character::Multicast_OnDeath_Implementation()

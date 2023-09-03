@@ -124,7 +124,7 @@ void AP10TrackerBot::OnHealthChangedHandle(UP10HealthComponent* Component, float
 	/* Explode if dead. */
 	if (Health <= 0)
 	{
-		Suicide();
+		Server_Suicide();
 	}
 
 	/* Pulse material on hit */
@@ -153,8 +153,18 @@ void AP10TrackerBot::OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedC
 	if (OtherActor == this || !Cast<APawn>(OtherActor))	return;
 
 	FTimerHandle KamikazeTimer;
-	GetWorld()->GetTimerManager().SetTimer(KamikazeTimer, this, &ThisClass::Suicide, SelfDamageInterval, false);
+	GetWorld()->GetTimerManager().SetTimer(KamikazeTimer, this, &ThisClass::Server_Suicide, SelfDamageInterval, false);
 	UGameplayStatics::SpawnSoundAtLocation(this, Sound.SelfDestruct,MeshComp->GetComponentLocation());
+}
+
+void AP10TrackerBot::Server_Suicide_Implementation()
+{
+	Multicast_Suicide();
+}
+
+void AP10TrackerBot::Multicast_Suicide_Implementation()
+{
+	Suicide();
 }
 
 void AP10TrackerBot::Suicide()
@@ -162,7 +172,6 @@ void AP10TrackerBot::Suicide()
 	const TArray<AActor*> IgnoredActors = {this};
 	UGameplayStatics::SpawnEmitterAtLocation(this, Explosion, MeshComp->GetComponentLocation(), FRotator::ZeroRotator, FVector(2.f));
 	UGameplayStatics::SpawnSoundAtLocation(this, Sound.Explode, MeshComp->GetComponentLocation());
-	// TODO: Explosion particles and sound spawns only on server now =(
 	if (AudioComponent)
 	{
 		AudioComponent->Stop();

@@ -31,7 +31,7 @@ void UP10HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void UP10HealthComponent::OnTakeDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage <= 0) return;
+	if (Damage == 0) return;
 
 	Health = FMath::Clamp(Health - Damage, 0, MaxHealth);
 	Multicast_OnHealthChanged(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
