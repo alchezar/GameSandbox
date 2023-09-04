@@ -17,10 +17,13 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void OnTickPowerup();
 	virtual void OnActivated(AActor* Target);
 	virtual void OnExpired();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnActivated(AActor* Target);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnExpired();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")

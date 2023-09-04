@@ -124,6 +124,7 @@ void AP10TrackerBot::OnHealthChangedHandle(UP10HealthComponent* Component, float
 	/* Explode if dead. */
 	if (Health <= 0)
 	{
+		GetWorld()->GetTimerManager().ClearTimer(KamikazeTimer);
 		Server_Suicide();
 	}
 
@@ -152,7 +153,6 @@ void AP10TrackerBot::OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedC
 {
 	if (OtherActor == this || !Cast<APawn>(OtherActor))	return;
 
-	FTimerHandle KamikazeTimer;
 	GetWorld()->GetTimerManager().SetTimer(KamikazeTimer, this, &ThisClass::Server_Suicide, SelfDamageInterval, false);
 	UGameplayStatics::SpawnSoundAtLocation(this, Sound.SelfDestruct,MeshComp->GetComponentLocation());
 }

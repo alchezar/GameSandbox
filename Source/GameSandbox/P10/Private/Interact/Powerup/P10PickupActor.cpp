@@ -10,6 +10,7 @@
 AP10PickupActor::AP10PickupActor()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>("RootSceneComponent");
+	SetReplicates(true);
 
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SphereComponent->SetupAttachment(RootComponent);
@@ -26,7 +27,10 @@ void AP10PickupActor::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Respawn();
+	if (HasAuthority())
+	{
+		Respawn();
+	}
 }
 
 void AP10PickupActor::Respawn()
@@ -41,11 +45,12 @@ void AP10PickupActor::Respawn()
 void AP10PickupActor::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
-
 	if (!OtherActor || !PowerupInstance) return;
 
-	PowerupInstance->ActivatePowerup(OtherActor);
-	PowerupInstance = nullptr;
-	GetWorld()->GetTimerManager().SetTimer(CooldownTimer, this, &ThisClass::Respawn, Cooldown);
-
+	if (HasAuthority())
+	{
+		PowerupInstance->ActivatePowerup(OtherActor);
+		PowerupInstance = nullptr;
+		GetWorld()->GetTimerManager().SetTimer(CooldownTimer, this, &ThisClass::Respawn, Cooldown);
+	}
 }

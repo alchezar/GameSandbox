@@ -17,10 +17,9 @@ public:
 	AP10SuperSpeed();
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void OnActivated(AActor* Target) override;
 	virtual void OnExpired() override;
-
+	
 private:
 	float DefaultMaxWalkSpeed = 0.f;
 	UPROPERTY()

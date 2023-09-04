@@ -18,11 +18,6 @@ void AP10RegenerateSmooth::ActivatePowerup(AActor* Target)
 	GetWorld()->GetTimerManager().SetTimer(PowerupTimer, this, &ThisClass::OnTickPowerup, Rate, true);
 }
 
-void AP10RegenerateSmooth::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AP10RegenerateSmooth::OnActivated(AActor* Target)
 {
 	Super::OnActivated(Target);

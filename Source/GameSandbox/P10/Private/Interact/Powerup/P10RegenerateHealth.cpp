@@ -11,11 +11,6 @@ AP10RegenerateHealth::AP10RegenerateHealth()
 	TotalTicks = 10;
 }
 
-void AP10RegenerateHealth::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AP10RegenerateHealth::OnActivated(AActor* Target)
 {
 	Super::OnActivated(Target);

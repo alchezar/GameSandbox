@@ -17,11 +17,9 @@ public:
 	AP10RegenerateHealth();
 
 protected:
-	virtual void BeginPlay() override;
 	virtual void OnActivated(AActor* Target) override;
 	virtual void OnTickPowerup() override;
 
-protected:
 	UPROPERTY()
 	AActor* TargetActor = nullptr;
 	UPROPERTY()

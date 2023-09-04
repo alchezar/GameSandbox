@@ -16,8 +16,6 @@ public:
 	virtual void ActivatePowerup(AActor* Target) override;
 
 protected:
-	virtual void BeginPlay() override;
-	
 	virtual void OnActivated(AActor* Target) override;
 	virtual void OnTickPowerup() override;
 	

@@ -5,15 +5,11 @@
 AP10Powerup::AP10Powerup()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetReplicates(true);
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	MeshComponent->SetupAttachment(RootComponent);
-}
-
-void AP10Powerup::BeginPlay()
-{
-	Super::BeginPlay();
 }
 
 void AP10Powerup::Tick(float DeltaSeconds)
@@ -25,8 +21,9 @@ void AP10Powerup::Tick(float DeltaSeconds)
 
 void AP10Powerup::ActivatePowerup(AActor* Target)
 {
-	OnActivated(Target);
-	//TODO: Play pickup effect
+	/* This method was called on the server. */
+	
+	Multicast_OnActivated(Target);
 
 	if (Interval > 0)
 	{
@@ -38,10 +35,9 @@ void AP10Powerup::ActivatePowerup(AActor* Target)
 	}
 }
 
-void AP10Powerup::OnTickPowerup()
+void AP10Powerup::Multicast_OnActivated_Implementation(AActor* Target)
 {
-	if (--TotalTicks > 0) return;
-	OnExpired();
+	OnActivated(Target);
 }
 
 void AP10Powerup::OnActivated(AActor* Target)
@@ -49,6 +45,16 @@ void AP10Powerup::OnActivated(AActor* Target)
 	MeshComponent->SetVisibility(false);
 }
 
+void AP10Powerup::OnTickPowerup()
+{
+	if (--TotalTicks > 0) return;
+	Multicast_OnExpired();
+}
+
+void AP10Powerup::Multicast_OnExpired_Implementation()
+{
+	OnExpired();
+}
 void AP10Powerup::OnExpired()
 {
 	GetWorld()->GetTimerManager().ClearTimer(PowerupTimer);

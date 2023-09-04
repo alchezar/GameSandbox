@@ -9,11 +9,6 @@ AP10SuperSpeed::AP10SuperSpeed()
 {
 }
 
-void AP10SuperSpeed::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
 void AP10SuperSpeed::OnActivated(AActor* Target)
 {
 	Super::OnActivated(Target);

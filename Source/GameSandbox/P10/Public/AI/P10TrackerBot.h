@@ -92,6 +92,7 @@ private:
 	UPROPERTY()
 	APawn* TargetPawn;
 	FTimerHandle PulseTimer;
+	FTimerHandle KamikazeTimer;
 	float Alpha = 0.f;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UAudioComponent* AudioComponent;
