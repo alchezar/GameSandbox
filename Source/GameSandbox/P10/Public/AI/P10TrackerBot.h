@@ -25,6 +25,15 @@ struct FP10TrackerBotSound
 	USoundBase* Explode;
 };
 
+UENUM(BlueprintType)
+enum class EP10TrackerBotState : uint8
+{
+	Alive,
+	Reached,
+	Countdown,
+	Dead
+};
+
 UCLASS()
 class GAMESANDBOX_API AP10TrackerBot : public APawn
 {
@@ -38,21 +47,21 @@ protected:
 	virtual void BeginPlay() override;
 	void FindNextPathPoint(AActor* Goal);
 	void MoveToNextPoint();
-
+	void OnTargetReached();
 	void OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstignatedBy, AActor* DamageCauser);
 	void PulseOnHitHandle(UMaterialInstanceDynamic* PulseMaterial);
-	void Suicide();
+	UFUNCTION()
+	void OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(Server, Reliable)
 	void Server_Suicide();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_Suicide();
-	UFUNCTION()
-	void OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	void Suicide();
 
 private:
 	void CreateRollingAudioComponent();
+	void PlayRollingSound() const;
 	void FindDefaultReferences();
-	void PlayRollingSound();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -96,5 +105,5 @@ private:
 	float Alpha = 0.f;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UAudioComponent* AudioComponent;
-	bool bDead = false;
+	EP10TrackerBotState BotState = EP10TrackerBotState::Alive;
 };

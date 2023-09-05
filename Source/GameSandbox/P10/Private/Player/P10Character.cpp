@@ -66,7 +66,7 @@ void AP10Character::Tick(float DeltaTime)
 
 	if (!IsLocallyControlled())
 	{
-		/* If there is no AimOffset in AnimInstance, replace mesh rotation pitch with replicated decompressed RemoteViewPitch */
+		/* If there is no AimOffset in AnimInstance, replace mesh rotation pitch with replicated decompressed RemoteViewPitch. */
 		FRotator NewRot = ArmComponent->GetRelativeRotation();
 		NewRot.Pitch = RemoteViewPitch * 360.f / 256.f;
 		ArmComponent->SetRelativeRotation(NewRot);
@@ -74,7 +74,7 @@ void AP10Character::Tick(float DeltaTime)
 
 	if (Cast<APlayerController>(GetController()))
 	{
-		UP10Library::PrintStateMask(CharStateMask);
+		UP10Library::PrintStateMask(CharStateMask, 8);
 		UP10Library::DrawAmmoInfo(this, Weapon);
 	}
 }

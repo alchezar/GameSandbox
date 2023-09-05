@@ -45,7 +45,7 @@ public:
 
 	/**
 	 * Remove bitflag from current enum state container.\n
-	 * 0b0001 = 0b0101
+	 * 0b0100 = 0b0101
 	 *        & 0b1110 (~0b0001)
 	 * @param  State   Current enum state container.
 	 * @param  Flag    Flag which we are trying to remove.
@@ -101,17 +101,18 @@ public:
 
 	/**
 	 * Convert enum uint8 value to binary representation and print it as debug message.
-	 * @param State Current enum state container.
+	 * @param State  Current enum state container.
+	 * @param Length The number of digits we want to print.
 	 */
 	template <class T>
-	static void PrintStateMask(const T State)
+	static void PrintStateMask(const T State, const int32 Length)
 	{
 		FString MaskString = "0b";
 		uint8 MaskInt = static_cast<uint8>(State);
-		int32 Block = 128;
-		for (int i = 0; i < 8; ++i)
+		int32 Block = FMath::Pow(2.0, Length - 1);
+		for (int i = 0; i < Length; ++i)
 		{
-			MaskString.Append(MaskInt / Block == 0 ? "0" : "1");
+			MaskString.Append(MaskInt < Block ? "0" : "1");
 			MaskInt %= Block;
 			Block /= 2;
 		}

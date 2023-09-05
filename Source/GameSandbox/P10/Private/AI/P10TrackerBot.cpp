@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "P10/Public/Component/P10HealthComponent.h" 
+#include "P10/Public/Game/P10GameMode.h"
 #include "P10/Public/Util/P10Library.h"
 #include "Particles/ParticleSystem.h"
 
@@ -61,7 +62,7 @@ void AP10TrackerBot::BeginPlay()
 void AP10TrackerBot::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (bDead) return;
+	if (BotState >= EP10TrackerBotState::Countdown) return;
 	
 	if (HasAuthority())
 	{
@@ -90,7 +91,7 @@ void AP10TrackerBot::MoveToNextPoint()
 	const float DistanceToTarget = FVector::Dist(NextPathPoint, CurrentLocation);
 	if (DistanceToTarget < AcceptableDistance)
 	{
-		UGameplayStatics::PlaySoundAtLocation(this, Sound.TargetReached, NextPathPoint);
+		OnTargetReached();
 		FindNextPathPoint(TargetPawn);
 		return;
 	}
@@ -119,12 +120,31 @@ void AP10TrackerBot::MoveToNextPoint()
 	}
 }
 
+void AP10TrackerBot::OnTargetReached()
+{
+	/* Avoid spawning multiple TargetReached sounds at the same time. Do it only once per sound duration. */
+	if (BotState >= EP10TrackerBotState::Reached) return;
+
+	UGameplayStatics::PlaySoundAtLocation(this, Sound.TargetReached, NextPathPoint);
+	BotState = EP10TrackerBotState::Reached;
+	
+	FTimerHandle ReachedTimer;
+	FTimerDelegate ReachedDelegate;
+	ReachedDelegate.BindLambda([&]()
+	{
+		if (BotState == EP10TrackerBotState::Reached)
+		{
+			BotState = EP10TrackerBotState::Alive;
+		}
+	});
+	GetWorld()->GetTimerManager().SetTimer(ReachedTimer, ReachedDelegate, Sound.TargetReached->Duration, false);
+}
+
 void AP10TrackerBot::OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstignatedBy, AActor* DamageCauser)
 {
-	/* Explode if dead. */
-	if (Health <= 0)
+	/* We can only kill bot if the countdown timer isn`t started. */
+	if (Health <= 0 && BotState < EP10TrackerBotState::Countdown)
 	{
-		GetWorld()->GetTimerManager().ClearTimer(KamikazeTimer);
 		Server_Suicide();
 	}
 
@@ -153,12 +173,19 @@ void AP10TrackerBot::OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedC
 {
 	if (OtherActor == this || !Cast<APawn>(OtherActor))	return;
 
+	BotState = EP10TrackerBotState::Countdown;
 	GetWorld()->GetTimerManager().SetTimer(KamikazeTimer, this, &ThisClass::Server_Suicide, SelfDamageInterval, false);
 	UGameplayStatics::SpawnSoundAtLocation(this, Sound.SelfDestruct,MeshComp->GetComponentLocation());
 }
 
 void AP10TrackerBot::Server_Suicide_Implementation()
 {
+	/* In multiplayer we can access game mode only on the server. */
+	if (auto* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GameMode->UntrackBot(this);
+	}
+
 	Multicast_Suicide();
 }
 
@@ -177,7 +204,7 @@ void AP10TrackerBot::Suicide()
 		AudioComponent->Stop();
 	}
 	MeshComp->SetVisibility(false);
-	bDead = true;
+	BotState = EP10TrackerBotState::Dead;
 
 	UGameplayStatics::ApplyRadialDamage(this, Damage, MeshComp->GetComponentLocation(), DamageRadius, nullptr, IgnoredActors, this, nullptr, true);
 	if (UP10Library::GetIsDrawDebugAllowed())
@@ -186,6 +213,34 @@ void AP10TrackerBot::Suicide()
 	}
 	SphereComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 	SetLifeSpan(2.f);
+}
+
+void AP10TrackerBot::CreateRollingAudioComponent()
+{
+	if (AudioComponent) return;
+	check(Sound.Rolling)
+	AudioComponent = UGameplayStatics::SpawnSoundAttached(Sound.Rolling, MeshComp);
+	if (!AudioComponent) return;
+
+	AudioComponent->bOverrideAttenuation = true;
+	AudioComponent->AttenuationOverrides.DistanceAlgorithm = EAttenuationDistanceModel::NaturalSound;
+	AudioComponent->AttenuationOverrides.AttenuationShape = EAttenuationShape::Sphere;
+	AudioComponent->AttenuationOverrides.FalloffMode = ENaturalSoundFalloffMode::Silent;
+	AudioComponent->AttenuationOverrides.AttenuationShapeExtents = FVector(200.f);
+	AudioComponent->AttenuationOverrides.FalloffDistance = 1000.f;
+}
+
+void AP10TrackerBot::PlayRollingSound() const
+{
+	if (!AudioComponent) return;
+	
+	/* Sound volume depends of component`s speed. */
+	const float CurrentVelocity = MeshComp->GetComponentVelocity().Size();
+	const float VolumeMultiplier = FMath::GetMappedRangeValueClamped(FVector2D(0.f, 600.f), FVector2D(0.01f, 1.f), CurrentVelocity);
+	AudioComponent->SetVolumeMultiplier(VolumeMultiplier);
+	
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), CurrentVelocity));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), VolumeMultiplier));
 }
 
 void AP10TrackerBot::FindDefaultReferences()
@@ -215,34 +270,6 @@ void AP10TrackerBot::FindDefaultReferences()
 		static ConstructorHelpers::FObjectFinder<USoundBase> SelfDestructSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Sound/MFX_SelfDestruct.MFX_SelfDestruct'"));
 		if (SelfDestructSoundFinder.Succeeded()) Sound.SelfDestruct = SelfDestructSoundFinder.Object;
 	}
-}
-
-void AP10TrackerBot::CreateRollingAudioComponent()
-{
-	if (AudioComponent) return;
-	check(Sound.Rolling)
-	AudioComponent = UGameplayStatics::SpawnSoundAttached(Sound.Rolling, MeshComp);
-	if (!AudioComponent) return;
-
-	AudioComponent->bOverrideAttenuation = true;
-	AudioComponent->AttenuationOverrides.DistanceAlgorithm = EAttenuationDistanceModel::NaturalSound;
-	AudioComponent->AttenuationOverrides.AttenuationShape = EAttenuationShape::Sphere;
-	AudioComponent->AttenuationOverrides.FalloffMode = ENaturalSoundFalloffMode::Silent;
-	AudioComponent->AttenuationOverrides.AttenuationShapeExtents = FVector(200.f);
-	AudioComponent->AttenuationOverrides.FalloffDistance = 1000.f;
-}
-
-void AP10TrackerBot::PlayRollingSound()
-{
-	if (!AudioComponent) return;
-	
-	/* Sound volume depends of component`s speed. */
-	const float CurrentVelocity = MeshComp->GetComponentVelocity().Size();
-	const float VolumeMultiplier = FMath::GetMappedRangeValueClamped(FVector2D(0.f, 600.f), FVector2D(0.01f, 1.f), CurrentVelocity);
-	AudioComponent->SetVolumeMultiplier(VolumeMultiplier);
-	
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), CurrentVelocity));
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), VolumeMultiplier));
 }
 
 void AP10TrackerBot::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const

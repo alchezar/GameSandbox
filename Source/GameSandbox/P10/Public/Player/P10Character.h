@@ -24,8 +24,8 @@ enum class  EP10CharMask : uint8
 	Idle   = 0b00000000 UMETA(DisplayName = "Idle"),       // 0
 	Jump   = 0b00000001 UMETA(DisplayName = "Jumpint"),	   // 1
 	Crouch = 0b00000010 UMETA(DisplayName = "Crouching"),  // 2
-	Run    = 0b00000100 UMETA(DisplayName = "Running"),    // 4  
-	Aim    = 0b00001000 UMETA(DisplayName = "Aiming"), 	   // 8   
+	Run    = 0b00000100 UMETA(DisplayName = "Running"),    // 4
+	Aim    = 0b00001000 UMETA(DisplayName = "Aiming"), 	   // 8
 	Shoot  = 0b00010000 UMETA(DisplayName = "Shooting"),   // 16
 	Dead   = 0b00100000 UMETA(DisplayName = "Dead")        // 32
 };
