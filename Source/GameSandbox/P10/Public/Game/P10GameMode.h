@@ -7,8 +7,12 @@
 #include "GameFramework/GameModeBase.h"
 #include "P10GameMode.generated.h"
 
+enum class EP10WaveState : uint8;
+class AP10Character;
 class AP10TrackerBot;
 class UEnvQuery;
+
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FP10OnActorKilledSignature, AActor* /*Victim*/, AActor* /*Killer*/, AController* /*Instigator*/)
 
 UCLASS()
 class GAMESANDBOX_API AP10GameMode : public AGameModeBase
@@ -20,6 +24,7 @@ public:
 	virtual void StartPlay() override;
 	void CompleteMission(APawn* InstigatorPawn, bool bSuccess);
 	void UntrackBot(AP10TrackerBot* Bot);
+	void CheckAnyPlayerStillAlive(AP10Character* DeadChar);
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,7 +36,12 @@ protected:
 	void SpawnBotHandle();
 	void EndWave();
 	void WaitNextWave();
+	void SetWaveState(const EP10WaveState NewState) const;
+	void OnActorKilledHandle(AActor* Victim, AActor* Killer, AController* KillerInstigator);
 
+public:
+	FP10OnActorKilledSignature OnActorKilled;
+	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | AI")
 	UEnvQuery* SpawnBotQuery = nullptr;

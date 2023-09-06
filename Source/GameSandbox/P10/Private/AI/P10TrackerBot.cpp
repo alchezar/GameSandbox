@@ -239,8 +239,8 @@ void AP10TrackerBot::PlayRollingSound() const
 	const float VolumeMultiplier = FMath::GetMappedRangeValueClamped(FVector2D(0.f, 600.f), FVector2D(0.01f, 1.f), CurrentVelocity);
 	AudioComponent->SetVolumeMultiplier(VolumeMultiplier);
 	
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), CurrentVelocity));
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), VolumeMultiplier));
+	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), CurrentVelocity));
+	// if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Printf(TEXT("%f"), VolumeMultiplier));
 }
 
 void AP10TrackerBot::FindDefaultReferences()

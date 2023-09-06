@@ -3,6 +3,7 @@
 #include "P10/Public/Game/P10GameState.h"
 
 #include "Engine/PawnIterator.h"
+#include "Net/UnrealNetwork.h"
 #include "P10/Public/Player/P10PlayerController.h"
 
 void AP10GameState::Multicast_OnMissionComplete_Implementation(APawn* InstigatorPawn, bool bSuccess)
@@ -17,4 +18,30 @@ void AP10GameState::Multicast_OnMissionComplete_Implementation(APawn* Instigator
 		Pawn->DisableInput(Controller);
 		Controller->OnMissionCompleted(InstigatorPawn, bSuccess);
 	}
+}
+
+void AP10GameState::SetWaveState(const EP10WaveState NewState)
+{
+	const EP10WaveState OldState = WaveState;
+	if (HasAuthority())
+	{
+		WaveState = NewState;
+		OnRep_WaveState(OldState);
+	}
+}
+
+void AP10GameState::OnRep_WaveState(const EP10WaveState OldState)
+{
+	WaveStateChanged(WaveState, OldState);
+}
+
+void AP10GameState::WaveStateChanged(const EP10WaveState NewState, const EP10WaveState OldState)
+{
+	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Orange, FString::Printf(TEXT("%s"), *UEnum::GetDisplayValueAsText(NewState).ToString()));
+}
+
+void AP10GameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, WaveState)
 }

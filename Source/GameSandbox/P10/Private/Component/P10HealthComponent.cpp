@@ -1,8 +1,10 @@
 // Copyright (C) 2023, IKinder
 
 #include "P10/Public/Component/P10HealthComponent.h"
+
 #include "GameFramework/Actor.h"
 #include "Net/UnrealNetwork.h"
+#include "P10/Public/Game/P10GameMode.h"
 
 UP10HealthComponent::UP10HealthComponent()
 {
@@ -12,7 +14,7 @@ UP10HealthComponent::UP10HealthComponent()
 void UP10HealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	/* Only hook when we are the server. */
 	AActor* OwnerActor = GetOwner();
 	if (OwnerActor && OwnerActor->HasAuthority())
@@ -31,11 +33,18 @@ void UP10HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void UP10HealthComponent::OnTakeDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage == 0) return;
+	if (Damage == 0 || Health == 0.f) return;
 
-	Health = FMath::Clamp(Health - Damage, 0, MaxHealth);
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	Multicast_OnHealthChanged(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
-	// OnHealthChanged.Broadcast(this, Health, Damage, DamageType, InstigatedBy, DamageCauser);
+
+	if (Health == 0.f)
+	{
+		const AP10GameMode* GameMode = GetWorld()->GetAuthGameMode<AP10GameMode>();
+		if (!GameMode) return;
+
+		GameMode->OnActorKilled.Broadcast(GetOwner(), DamageCauser->GetOwner(), DamageCauser->GetInstigatorController());
+	}
 }
 
 void UP10HealthComponent::Multicast_OnHealthChanged_Implementation(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)

@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "P10/Public/Component/P10HealthComponent.h"
+#include "P10/Public/Game/P10GameMode.h"
 #include "P10/Public/Util/P10Library.h"
 #include "P10/Public/Weapon/P10Weapon.h"
 
@@ -215,8 +216,12 @@ void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float 
 {
 	if (Health <= 0)
 	{
-		Multicast_OnDeath();
+		if (AP10GameMode* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GameMode->CheckAnyPlayerStillAlive(this);
+		}
 		CharStateMask = EP10CharMask::Dead;
+		Multicast_OnDeath();
 	}
 	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 10.f, FColor::Red, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));
 }

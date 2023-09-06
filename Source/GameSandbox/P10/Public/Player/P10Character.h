@@ -45,6 +45,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void Landed(const FHitResult& Hit) override;
 	virtual FVector GetPawnViewLocation() const override;
+	FORCEINLINE bool GetIsDead() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Dead); }
 	FORCEINLINE bool GetIsShooting() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Shoot); }
 	FORCEINLINE bool GetIsAiming() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Aim); }
 	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
