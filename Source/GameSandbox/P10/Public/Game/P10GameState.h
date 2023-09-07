@@ -23,7 +23,7 @@ class GAMESANDBOX_API AP10GameState : public AGameStateBase
 
 public:
 	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_OnMissionComplete(APawn* InstigatorPawn, bool bSuccess);
+	void Multicast_OnMissionComplete(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime);
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void SetWaveState(const EP10WaveState NewState);
 

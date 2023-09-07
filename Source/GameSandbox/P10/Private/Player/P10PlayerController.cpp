@@ -5,11 +5,11 @@
 #include "EngineUtils.h"
 #include "P10/Public/UI/P10HUD.h"
 
-void AP10PlayerController::OnMissionCompleted(APawn* InstigatorPawn, bool bSuccess)
+void AP10PlayerController::OnMissionCompleted(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime)
 {
 	if (AP10HUD* CurrentHUD = Cast<AP10HUD>(GetHUD()))
 	{
-		CurrentHUD->OnMissionCompleted(bSuccess);
+		CurrentHUD->OnMissionCompleted(bSuccess, ShowTime);
 	}
 	check(ViewPointClass)
 	if (AActor* TargetActor = *TActorIterator(GetWorld(), ViewPointClass))

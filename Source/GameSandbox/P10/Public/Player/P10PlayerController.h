@@ -12,7 +12,7 @@ class GAMESANDBOX_API AP10PlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
-	void OnMissionCompleted(APawn* InstigatorPawn, bool bSuccess);
+	void OnMissionCompleted(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | EndGame")

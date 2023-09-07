@@ -2,7 +2,6 @@
 
 #include "P10/Public/Game/P10GameMode.h"
 
-#include "EngineUtils.h"
 #include "EnvironmentQuery/EnvQueryManager.h"
 #include "P10/Public/AI/P10TrackerBot.h"
 #include "P10/Public/Game/P10GameState.h"
@@ -33,7 +32,7 @@ void AP10GameMode::StartPlay()
 	Super::StartPlay();
 }
 
-void AP10GameMode::CompleteMission(APawn* InstigatorPawn, bool bSuccess)
+void AP10GameMode::CompleteMission(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime)
 {
 	SetWaveState(EP10WaveState::GameOver);
 	if (!InstigatorPawn) return;
@@ -45,7 +44,7 @@ void AP10GameMode::CompleteMission(APawn* InstigatorPawn, bool bSuccess)
 
 	if (AP10GameState* CurrentGameState = GetGameState<AP10GameState>())
 	{
-		CurrentGameState->Multicast_OnMissionComplete(InstigatorPawn, bSuccess);
+		CurrentGameState->Multicast_OnMissionComplete(InstigatorPawn, bSuccess, ShowTime);
 	}
 }
 
@@ -83,18 +82,69 @@ void AP10GameMode::UntrackBot(AP10TrackerBot* Bot)
 	}
 }
 
-void AP10GameMode::CheckAnyPlayerStillAlive(AP10Character* DeadChar)
+void AP10GameMode::RestartAttempt(AP10Character* DeadChar)
 {
-	TArray<AP10Character*> AliveCharacters;
-	for(auto AliveCharacter : TActorRange<AP10Character>(GetWorld()))
+	/* Find the number of alive characters. */
+	int32 AliveCharactersNum = 0;
+	DeadPlayerControllers.Empty();
+	for (auto It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		if (!AliveCharacter || AliveCharacter->GetIsDead() || AliveCharacter == DeadChar) continue;
+		APlayerController* PlayerController = It->Get();
+		if (!PlayerController) continue;
+		const AP10Character* Char = Cast<AP10Character>(PlayerController->GetPawn());
+		
+		if (PlayerController->GetPawn() && Char && !Char->GetIsDead())
+		{
+			++AliveCharactersNum;
+			continue;
+		}
 
-		AliveCharacters.Add(AliveCharacter);
+		/* At this point current iterated controller has no alive pawn, so we can add it to the array. */
+		DeadPlayerControllers.Add(PlayerController);
 	}
-	if (AliveCharacters.IsEmpty())
+	if (AliveCharactersNum > 0) return;
+
+	/* At this point - all characters are dead, so we can reset values to default. */
+	constexpr float RestartDelay = 5.f;
+	WaveCount = 0;
+	BotsToSpawn = 0;
+
+	/* Kill all bots still alive. */
+	while (!SpawnedBots.IsEmpty())
 	{
-		CompleteMission(DeadChar, false);
+		SpawnedBots[0]->ForceSuicide();
+	}
+
+	/* Hide widgets and reset score for all dead characters before showing CompleteMission widget. */
+	for (const APlayerController* DeadPlayerController : DeadPlayerControllers)
+	{
+		AP10HUD* DeadPlayerHUD = Cast<AP10HUD>(DeadPlayerController->GetHUD());
+		ensure(DeadPlayerHUD);
+		AP10PlayerState* DeadPlayerState = DeadPlayerController->GetPlayerState<AP10PlayerState>();
+		ensure(DeadPlayerState);
+		
+		DeadPlayerHUD->PlayerDied();
+		DeadPlayerState->ResetScore();
+	}
+	CompleteMission(DeadChar, false, RestartDelay);
+
+	/* After widget ShowTime delay - respawn all dead characters. */
+	FTimerHandle RestartTimer;
+	FTimerDelegate RestartDelegate;
+	RestartDelegate.BindUObject(this, &ThisClass::RespawnDeadPlayers);
+	GetWorld()->GetTimerManager().SetTimer(RestartTimer, RestartDelegate, RestartDelay, false);
+}
+
+void AP10GameMode::RespawnDeadPlayers()
+{
+	for (APlayerController* DeadPlayerController : DeadPlayerControllers)
+	{
+		if (!DeadPlayerController) continue;
+		AP10HUD* PlayerHUD = Cast<AP10HUD>(DeadPlayerController->GetHUD());
+		if (!PlayerHUD) continue;;
+		
+		RestartPlayer(DeadPlayerController);
+		PlayerHUD->PlayerSpawned();
 	}
 }
 
@@ -134,7 +184,7 @@ void AP10GameMode::WaitNextWave()
 void AP10GameMode::SetWaveState(const EP10WaveState NewState) const
 {
 	AP10GameState* CurrentGameState = GetWorld()->GetGameState<AP10GameState>();
-	if (!ensure(CurrentGameState)) return;
+	if (!CurrentGameState) return;
 
 	CurrentGameState->SetWaveState(NewState);
 }
@@ -143,8 +193,7 @@ void AP10GameMode::OnActorKilledHandle(AActor* Victim, AActor* Killer, AControll
 {
 	if (!Victim || !Killer) return;
 	const APawn* VictimPawn = Cast<APawn>(Victim);
-	if (!VictimPawn || VictimPawn->IsPlayerControlled()) return;
-	// const APawn* KillerPawn = KillerInstigator->GetPawn();
+	if (!VictimPawn || VictimPawn->IsPlayerControlled()) return;	
 	const APawn* KillerPawn = Cast<APawn>(Killer);
 	if (!KillerPawn) return;
 	AP10PlayerState* KillerPlayerState = KillerPawn->GetPlayerState<AP10PlayerState>();

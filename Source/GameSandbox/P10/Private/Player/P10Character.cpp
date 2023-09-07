@@ -216,11 +216,11 @@ void AP10Character::OnHealthChangedHandle(UP10HealthComponent* Component, float 
 {
 	if (Health <= 0)
 	{
+		CharStateMask = EP10CharMask::Dead;
 		if (AP10GameMode* GameMode = Cast<AP10GameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			GameMode->CheckAnyPlayerStillAlive(this);
+			GameMode->RestartAttempt(this);
 		}
-		CharStateMask = EP10CharMask::Dead;
 		Multicast_OnDeath();
 	}
 	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 10.f, FColor::Red, FString::Printf(TEXT("%s Health: %f"), *GetName(), Health));

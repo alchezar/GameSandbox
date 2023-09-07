@@ -13,4 +13,5 @@ class GAMESANDBOX_API AP10PlayerState : public APlayerState
 
 public:
 	void AddScore(const float ScoreDelta);
+	void ResetScore();
 };

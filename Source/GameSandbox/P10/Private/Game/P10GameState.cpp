@@ -6,7 +6,7 @@
 #include "Net/UnrealNetwork.h"
 #include "P10/Public/Player/P10PlayerController.h"
 
-void AP10GameState::Multicast_OnMissionComplete_Implementation(APawn* InstigatorPawn, bool bSuccess)
+void AP10GameState::Multicast_OnMissionComplete_Implementation(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime)
 {
 	for (auto It = TActorIterator<APlayerController>(GetWorld(), APlayerController::StaticClass()); It; ++It)
 	{
@@ -16,7 +16,7 @@ void AP10GameState::Multicast_OnMissionComplete_Implementation(APawn* Instigator
 		if (!Pawn || !Pawn->IsLocallyControlled()) continue;
 
 		Pawn->DisableInput(Controller);
-		Controller->OnMissionCompleted(InstigatorPawn, bSuccess);
+		Controller->OnMissionCompleted(InstigatorPawn, bSuccess, ShowTime);
 	}
 }
 

@@ -4,8 +4,9 @@
 
 #include "Blueprint/UserWidget.h"
 #include "Engine/Canvas.h"
+#include "P10/Public/UI/P10MissionCompleteWidget.h"
 
-AP10HUD::AP10HUD(): CrosshairTex(nullptr), CrosshairWidget(nullptr), HealthIndicator(nullptr)
+AP10HUD::AP10HUD(): CrosshairTex(nullptr), CrosshairWidget(nullptr), HealthIndicator(nullptr), MissionCompletedWidget(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 }
@@ -17,8 +18,7 @@ void AP10HUD::BeginPlay()
 	check(MissionCompletedWidgetClass)
 	check(HealthIndicatorWidgetClass)
 
-	DrawCrosshair(true);
-	DrawHealthIndicator();
+	PlayerSpawned();
 }
 
 void AP10HUD::DrawHUD()
@@ -53,15 +53,42 @@ void AP10HUD::DrawHealthIndicator()
 	HealthIndicator->AddToViewport();
 }
 
-void AP10HUD::OnMissionCompleted(bool bSuccess)
+void AP10HUD::DestroyHealthIndicator() const
+{
+	if (!HealthIndicator) return;
+	HealthIndicator->RemoveFromParent();
+}
+
+void AP10HUD::OnMissionCompleted(bool bSuccess, const float ShowTime)
 {
 	if (CrosshairWidget)
 	{
 		DrawCrosshair(false);
 	}
-	if (UUserWidget* MissionCompletedWidget = CreateWidget(GetWorld(), MissionCompletedWidgetClass))
-	{
-		MissionCompletedWidget->AddToViewport();
-		// TODO: change text depends on bSuccess
-	}
+	MissionCompletedWidget = CreateWidget<UP10MissionCompleteWidget>(GetWorld(), MissionCompletedWidgetClass);
+	if (!MissionCompletedWidget) return;
+
+	MissionCompletedWidget->SetMissionText(bSuccess ? "mission completed" : "mission failed");
+	MissionCompletedWidget->AddToViewport();
+
+	FTimerHandle ShowTimer;
+	GetWorld()->GetTimerManager().SetTimer(ShowTimer, this, &ThisClass::DestroyMissionComplete, ShowTime, false);
+}
+
+void AP10HUD::DestroyMissionComplete() const
+{
+	if (!MissionCompletedWidget) return;
+	MissionCompletedWidget->RemoveFromParent();
+}
+
+void AP10HUD::PlayerDied()
+{
+	DrawCrosshair(false);
+	DestroyHealthIndicator();
+}
+
+void AP10HUD::PlayerSpawned()
+{
+	DrawCrosshair(true);
+	DrawHealthIndicator();
 }

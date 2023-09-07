@@ -42,6 +42,7 @@ class GAMESANDBOX_API AP10TrackerBot : public APawn
 public:
 	AP10TrackerBot();
 	virtual void Tick(float DeltaTime) override;
+	void ForceSuicide();
 
 protected:
 	virtual void BeginPlay() override;

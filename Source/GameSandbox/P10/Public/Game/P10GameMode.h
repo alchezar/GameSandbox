@@ -22,12 +22,14 @@ class GAMESANDBOX_API AP10GameMode : public AGameModeBase
 public:
 	AP10GameMode();
 	virtual void StartPlay() override;
-	void CompleteMission(APawn* InstigatorPawn, bool bSuccess);
+	void CompleteMission(APawn* InstigatorPawn, const bool bSuccess, const float ShowTime = 5.f);
 	void UntrackBot(AP10TrackerBot* Bot);
-	void CheckAnyPlayerStillAlive(AP10Character* DeadChar);
+	void RestartAttempt(AP10Character* DeadChar);
 
 protected:
 	virtual void BeginPlay() override;
+
+private:
 	void SpawnBot();
 	UFUNCTION()
 	void OnQueryCompletedHandle(UEnvQueryInstanceBlueprintWrapper* QueryInstance, EEnvQueryStatus::Type QueryStatus);
@@ -38,6 +40,7 @@ protected:
 	void WaitNextWave();
 	void SetWaveState(const EP10WaveState NewState) const;
 	void OnActorKilledHandle(AActor* Victim, AActor* Killer, AController* KillerInstigator);
+	void RespawnDeadPlayers();
 
 public:
 	FP10OnActorKilledSignature OnActorKilled;
@@ -57,5 +60,8 @@ private:
 	FTimerHandle SpawnTimer;
 	int32 WaveCount = 0;
 	int32 BotsToSpawn = 0;
+	UPROPERTY()
 	TArray<AP10TrackerBot*> SpawnedBots;
+	UPROPERTY()
+	TArray<APlayerController*> DeadPlayerControllers;
 };

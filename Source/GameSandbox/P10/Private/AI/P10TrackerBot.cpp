@@ -178,6 +178,11 @@ void AP10TrackerBot::OnSphereBeginOverlapHandle(UPrimitiveComponent* OverlappedC
 	UGameplayStatics::SpawnSoundAtLocation(this, Sound.SelfDestruct,MeshComp->GetComponentLocation());
 }
 
+void AP10TrackerBot::ForceSuicide()
+{
+	Server_Suicide();
+}
+
 void AP10TrackerBot::Server_Suicide_Implementation()
 {
 	/* In multiplayer we can access game mode only on the server. */
