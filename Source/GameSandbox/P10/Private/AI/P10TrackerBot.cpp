@@ -7,6 +7,7 @@
 #include "NavigationSystem.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
+#include "Engine/PawnIterator.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "P10/Public/Component/P10HealthComponent.h" 
@@ -52,9 +53,9 @@ void AP10TrackerBot::BeginPlay()
 	{
 		HealthComp->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 		SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereBeginOverlapHandle);
+		FindTargetPawn();
 		FindNextPathPoint(TargetPawn);
 	}
-	TargetPawn = UGameplayStatics::GetPlayerPawn(this, 0);
 	LastFrameLocation = MeshComp->GetComponentLocation();
 	CreateRollingAudioComponent();
 }
@@ -74,6 +75,8 @@ void AP10TrackerBot::Tick(float DeltaTime)
 void AP10TrackerBot::FindNextPathPoint(AActor* Goal)
 {
 	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToActorSynchronously(this, MeshComp->GetComponentLocation(), Goal);
+	GetWorld()->GetTimerManager().ClearTimer(RefreshPathTimer);
+	GetWorld()->GetTimerManager().SetTimer(RefreshPathTimer, this, &ThisClass::FindTargetPawn, 5.f);
 	if (!NavPath || NavPath->PathPoints.Num() < 1)
 	{
 		NextPathPoint = MeshComp->GetComponentLocation();
@@ -82,6 +85,32 @@ void AP10TrackerBot::FindNextPathPoint(AActor* Goal)
 
 	const FVector NextPoint = NavPath->PathPoints[1];
 	NextPathPoint = NextPoint;
+}
+
+void AP10TrackerBot::FindTargetPawn()
+{
+	// TargetPawn = UGameplayStatics::GetPlayerPawn(this, 0);
+	float BestDistance = FLT_MAX;
+	
+	for (auto Iterator = TActorIterator<APawn>(GetWorld()); Iterator; ++Iterator)
+	{
+		APawn* BestPawn = *Iterator;
+		if (!BestPawn || UP10HealthComponent::IsFriendly(this, BestPawn))
+		{
+			continue;
+		}
+		const UP10HealthComponent* BestHealthComp = BestPawn->FindComponentByClass<UP10HealthComponent>();
+		if (!BestHealthComp || BestHealthComp->GetHealth() <= 0.f)
+		{
+			continue;
+		}
+		const float Distance = (BestPawn->GetActorLocation() - GetActorLocation()).Size();
+		if (Distance < BestDistance)
+		{
+			TargetPawn = BestPawn;
+			BestDistance = Distance;
+		}
+	}
 }
 
 void AP10TrackerBot::MoveToNextPoint()

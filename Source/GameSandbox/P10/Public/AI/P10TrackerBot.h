@@ -47,6 +47,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	void FindNextPathPoint(AActor* Goal);
+	void FindTargetPawn();
 	void MoveToNextPoint();
 	void OnTargetReached();
 	void OnHealthChangedHandle(UP10HealthComponent* Component, float Health, float Delta, const UDamageType* DamageType, AController* InstignatedBy, AActor* DamageCauser);
@@ -103,6 +104,7 @@ private:
 	APawn* TargetPawn;
 	FTimerHandle PulseTimer;
 	FTimerHandle KamikazeTimer;
+	FTimerHandle RefreshPathTimer;
 	float Alpha = 0.f;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UAudioComponent* AudioComponent;

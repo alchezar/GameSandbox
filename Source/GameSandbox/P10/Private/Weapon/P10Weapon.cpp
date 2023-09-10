@@ -96,7 +96,7 @@ void AP10Weapon::OneShot()
 	{
 		const bool bHeadshot = UPhysicalMaterial::DetermineSurfaceType(Hit.PhysMaterial.Get()) == SURFACE_HEAD;
 		float Damage = bHeadshot ? BaseDamage * 2.f : BaseDamage;
-		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), Damage, Direction, Hit, OwnerPawn->GetInstigatorController(), this, nullptr);
+		UGameplayStatics::ApplyPointDamage(Hit.GetActor(), Damage, Direction, Hit, OwnerPawn->GetInstigatorController(), OwnerPawn, nullptr);
 		UP10Library::InteractWithPhysical(Hit.GetActor(), Hit.GetComponent(), this);
 		UP10Library::DrawTargetInfo(this, Hit.ImpactPoint, FString::SanitizeFloat(Damage));
 

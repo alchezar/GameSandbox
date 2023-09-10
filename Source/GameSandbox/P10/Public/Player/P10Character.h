@@ -50,10 +50,11 @@ public:
 	FORCEINLINE bool GetIsAiming() const { return UP10Library::BitflagIsActive(CharStateMask, EP10CharMask::Aim); }
 	FORCEINLINE bool GetIsCarryingObjective() const { return bCarryingObjective; }
 	FORCEINLINE void SetCarryingObjective(const bool bNewCarrying) { bCarryingObjective = bNewCarrying; }
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	void FireInput(bool bShoot);
 	
 protected:
 	virtual void BeginPlay() override;
-
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnDeath();
 
@@ -62,7 +63,6 @@ private:
 	void MoveInput(const FInputActionValue& Value);
 	void JumpInput(bool bStart);
 	void CrouchInput();
-	void FireInput(bool bShoot);
 	void AimInput(bool bAim);
 	void ReloadInput();
 	void SpawnWeapon();

@@ -33,16 +33,17 @@ void UP10HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 
 void UP10HealthComponent::OnTakeDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	if (Damage == 0 || Health == 0.f) return;
-
+	if (Damage == 0 || Health == 0.f)
+	{
+		return;
+	}
+	
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	Multicast_OnHealthChanged(DamagedActor, Damage, DamageType, InstigatedBy, DamageCauser);
 
-	if (Health == 0.f)
+	const AP10GameMode* GameMode = GetWorld()->GetAuthGameMode<AP10GameMode>();
+	if ( Health == 0.f && GameMode)
 	{
-		const AP10GameMode* GameMode = GetWorld()->GetAuthGameMode<AP10GameMode>();
-		if (!GameMode) return;
-
 		GameMode->OnActorKilled.Broadcast(GetOwner(), DamageCauser->GetOwner(), DamageCauser->GetInstigatorController());
 	}
 }
@@ -56,4 +57,25 @@ void UP10HealthComponent::OnRep_Health(const float OldHealth)
 {
 	const float Damage = Health - OldHealth;
 	OnHealthChanged.Broadcast(this, Health, Damage, nullptr, nullptr, nullptr);
+}
+
+bool UP10HealthComponent::IsFriendly(const AActor* ActorA, const AActor* ActorB)
+{
+	/* Allows self damage. */
+	if (ActorA == ActorB)
+	{
+		return false;
+	}
+	if (!ActorA || !ActorB)
+	{
+		return true;
+	}
+	const UP10HealthComponent* HealthCompA = ActorA->FindComponentByClass<UP10HealthComponent>();
+	const UP10HealthComponent* HealthCompB = ActorB->FindComponentByClass<UP10HealthComponent>();
+	if (!HealthCompA || !HealthCompB)
+	{
+		return true;
+	}
+
+	return HealthCompA->TeamNum == HealthCompB->TeamNum;
 }

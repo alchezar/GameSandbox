@@ -14,6 +14,13 @@ class UEnvQuery;
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP10OnActorKilledSignature, AActor* /*Victim*/, AActor* /*Killer*/, AController* /*Instigator*/)
 
+UENUM()
+enum class EP10EnemyClass : uint8
+{
+	TrackerBot,
+	AdvancedAI
+};
+
 UCLASS()
 class GAMESANDBOX_API AP10GameMode : public AGameModeBase
 {
@@ -50,7 +57,11 @@ protected:
 	UEnvQuery* SpawnBotQuery = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | AI")
 	TSubclassOf<AP10TrackerBot> TrackerBotClass;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | AI")
+	TSubclassOf<AP10Character> AdvancedAIClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | AI")
+	EP10EnemyClass EnemyClass = EP10EnemyClass::TrackerBot;
+	
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Wave")
 	int32 BotsPerWave = 2;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Wave")
@@ -61,7 +72,7 @@ private:
 	int32 WaveCount = 0;
 	int32 BotsToSpawn = 0;
 	UPROPERTY()
-	TArray<AP10TrackerBot*> SpawnedBots;
+	TArray<APawn*> SpawnedBots;
 	UPROPERTY()
 	TArray<APlayerController*> DeadPlayerControllers;
 };

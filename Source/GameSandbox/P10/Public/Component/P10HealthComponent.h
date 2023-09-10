@@ -19,6 +19,8 @@ public:
 	UP10HealthComponent();
 	FORCEINLINE float GetMaxHealth() const { return MaxHealth; }
 	FORCEINLINE float GetHealth() const { return Health; }
+	UFUNCTION(Blueprintable, BlueprintPure, Category = "C++")
+	static bool IsFriendly(const AActor* ActorA, const AActor* ActorB);
 
 protected:
 	UFUNCTION()
@@ -32,6 +34,8 @@ protected:
 	
 public:
 	FP10OnHealthChangedSignature OnHealthChanged;
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Team")
+	uint8 TeamNum;
 	
 protected:
 	UPROPERTY(ReplicatedUsing = "OnRep_Health", EditAnywhere, Category = "C++ | Health")

@@ -61,12 +61,19 @@ void AP10GameMode::OnQueryCompletedHandle(UEnvQueryInstanceBlueprintWrapper* Que
 	if (QueryStatus != EEnvQueryStatus::Success) return;
 
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if (Locations.IsEmpty() || !TrackerBotClass) return;
+	if (Locations.IsEmpty() || !TrackerBotClass || !AdvancedAIClass) return;
+
+	TSubclassOf<APawn> CurrentEnemyClass = TrackerBotClass;
+	if (EnemyClass == EP10EnemyClass::AdvancedAI)
+	{
+		CurrentEnemyClass = AdvancedAIClass;
+	}
+	// TODO: This is a bad idea as long as our enemies are not derives from the same class.
 
 	const FTransform SpawnTransform = {FRotator::ZeroRotator, Locations[0]};
 	FActorSpawnParameters Params;
 	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
-	if (AP10TrackerBot* TrackerBot = GetWorld()->SpawnActor<AP10TrackerBot>(TrackerBotClass, SpawnTransform, Params))
+	if (APawn* TrackerBot = GetWorld()->SpawnActor<APawn>(CurrentEnemyClass, SpawnTransform, Params))
 	{
 		SpawnedBots.Add(TrackerBot);
 	}
@@ -110,9 +117,15 @@ void AP10GameMode::RestartAttempt(AP10Character* DeadChar)
 	BotsToSpawn = 0;
 
 	/* Kill all bots still alive. */
-	while (!SpawnedBots.IsEmpty())
+	if (EnemyClass == EP10EnemyClass::AdvancedAI)
 	{
-		SpawnedBots[0]->ForceSuicide();
+		while (!SpawnedBots.IsEmpty())
+		{
+			AP10TrackerBot* TrackerBot = Cast<AP10TrackerBot>(SpawnedBots[0]);
+			if (!TrackerBot) continue;
+			
+			TrackerBot->ForceSuicide();
+		}
 	}
 
 	/* Hide widgets and reset score for all dead characters before showing CompleteMission widget. */
@@ -200,5 +213,5 @@ void AP10GameMode::OnActorKilledHandle(AActor* Victim, AActor* Killer, AControll
 	if (!KillerPlayerState) return;
 	
 	KillerPlayerState->AddScore(1.f);
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 6.f, FColor::Yellow, FString::Printf(TEXT("Score: %f"), KillerPlayerState->GetScore()));
+	if (GEngine) GEngine->AddOnScreenDebugMessage(2, 6.f, FColor::Yellow, FString::Printf(TEXT("Score: %s"), *FString::SanitizeFloat(KillerPlayerState->GetScore())));
 }
