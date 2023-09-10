@@ -4,3 +4,11 @@
 
 #include "CoreMinimal.h"
 
+#define SURFACE_GROUND       SurfaceType1
+#define SURFACE_BODY         SurfaceType2
+#define SURFACE_HEAD         SurfaceType3
+
+#define ECC_PROJECTILE		 ECC_GameTraceChannel3
+#define ECC_WEAPON			 ECC_GameTraceChannel5
+
+	
