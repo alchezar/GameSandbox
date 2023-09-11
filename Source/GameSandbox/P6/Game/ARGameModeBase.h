@@ -75,9 +75,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	float SpawnInterval = 2.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
-	UEnvQuery* SpawnBotQuery;
+	UEnvQuery* SpawnBotQuery = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
-	UCurveFloat* DifficultyCurve;
+	UCurveFloat* DifficultyCurve = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
 	int32 MaxBotNum = 10;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | AI")
@@ -88,10 +88,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI", meta = (EditCondition = "!bUseTable"))
 	TSubclassOf<AActor> MinionClass;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI", meta = (EditCondition = "bUseTable"))
-	UDataTable* MonsterTable;
+	UDataTable* MonsterTable = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
-	UARSaveGame* CurrentSaveGame;
+	UARSaveGame* CurrentSaveGame = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Save")
 	FString SlotName = "SaveGame01";
 

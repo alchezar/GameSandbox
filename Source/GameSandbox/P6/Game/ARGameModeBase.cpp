@@ -29,7 +29,7 @@ AARGameModeBase::AARGameModeBase()
 void AARGameModeBase::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
-	
+
 	FString SelectedSaveSlot = UGameplayStatics::ParseOption(Options, "SaveGame");
 	if (SelectedSaveSlot.Len() > 0)
 	{
@@ -86,20 +86,20 @@ void AARGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 	if (QueryStatus != EEnvQueryStatus::Success) return;
 
 	TArray<FVector> Locations = QueryInstance->GetResultsAsLocations();
-	if (Locations.IsEmpty()) return; 
-	
+	if (Locations.IsEmpty()) return;
+
 	if (bUseTable && MonsterTable)
 	{
 		TArray<FMonsterInfoRow*> Rows;
 		MonsterTable->GetAllRows("", Rows);
 		const int32 RandomRange = FMath::RandRange(0, Rows.Num() - 1);
 		const FMonsterInfoRow* SelectedRow = Rows[RandomRange];
-		
+
 		const TArray<FName> Bundles;
 		const FStreamableDelegate Delegate = FStreamableDelegate::CreateUObject(
 			this, &ThisClass::OnMonsterLoaded, SelectedRow->MonsterId, Locations[0], SelectedRow->TeamColor);
-		
-		UAssetManager* Manager = UAssetManager::GetIfValid();
+
+		UAssetManager* Manager = UAssetManager::GetIfInitialized();
 		if (!Manager) return;
 		Manager->LoadPrimaryAsset(SelectedRow->MonsterId, Bundles, Delegate);
 	}
@@ -111,15 +111,15 @@ void AARGameModeBase::OnQueryCompleted(UEnvQueryInstanceBlueprintWrapper* QueryI
 
 void AARGameModeBase::OnMonsterLoaded(const FPrimaryAssetId LoadedId, const FVector SpawnLocation, const FLinearColor Color)
 {
-	const UAssetManager* Manager = UAssetManager::GetIfValid();
+	const UAssetManager* Manager = UAssetManager::GetIfInitialized();
 	if (!Manager) return;
 	UARMonsterData* MonsterData = Manager->GetPrimaryAssetObject<UARMonsterData>(LoadedId);
 	if (!MonsterData) return;
-	
+
 	AARAICharacter* Bot = GetWorld()->SpawnActor<AARAICharacter>(MonsterData->MonsterClass, SpawnLocation, FRotator::ZeroRotator);
-	if (!Bot) return;		
+	if (!Bot) return;
 	Bot->SetTeamColor(Color);
-		
+
 	UARAbilityComponent* AbilityComp = Bot->FindComponentByClass<UARAbilityComponent>();
 	if (!AbilityComp) return;
 	for (const TSubclassOf<UARAbility> Ability : MonsterData->Abilities)
@@ -127,7 +127,6 @@ void AARGameModeBase::OnMonsterLoaded(const FPrimaryAssetId LoadedId, const FVec
 		AbilityComp->AddAbility(Bot, Ability);
 	}
 }
-
 
 void AARGameModeBase::KillAll()
 {
@@ -168,7 +167,7 @@ void AARGameModeBase::OnPlayerKilled(AActor* Victim, AActor* Killer)
 void AARGameModeBase::WriteSaveGame()
 {
 	/* Iterate all player states */
-	for (TObjectPtr<APlayerState> State : GameState->PlayerArray) 
+	for (TObjectPtr<APlayerState> State : GameState->PlayerArray)
 	{
 		if (AARPlayerState* PlayerState = Cast<AARPlayerState>(State))
 		{
@@ -178,7 +177,7 @@ void AARGameModeBase::WriteSaveGame()
 	}
 
 	/* Iterate the entire world of actors to find only "gameplay actors" */
-	CurrentSaveGame->SavedActors.Empty(); 
+	CurrentSaveGame->SavedActors.Empty();
 	for (FActorIterator It(GetWorld()); It; ++It)
 	{
 		AActor* Actor = *It;
@@ -186,11 +185,11 @@ void AARGameModeBase::WriteSaveGame()
 
 		FActorSaveData ActorData = {Actor->GetName(), Actor->GetActorTransform()};
 		FMemoryWriter MemoryWriter(ActorData.ByteData);
-		
+
 		FObjectAndNameAsStringProxyArchive Ar(MemoryWriter, true); // Pass the array to fill with data from Actor
 		Ar.ArIsSaveGame = true;                                    // Find only variables with UPROPERTY(SaveGame)
 		Actor->Serialize(Ar);                                      // Convert actors SaveGame UPROPERTY to binary array
-				
+
 		CurrentSaveGame->SavedActors.Add(ActorData);
 	}
 
