@@ -6,6 +6,8 @@
 #include "GameFramework/GameModeBase.h"
 #include "P11GameModeBase.generated.h"
 
+class AP11Character;
+
 UCLASS()
 class GAMESANDBOX_API AP11GameModeBase : public AGameModeBase
 {
@@ -13,4 +15,9 @@ class GAMESANDBOX_API AP11GameModeBase : public AGameModeBase
 
 public:
 	AP11GameModeBase();
+	void Respawn(AController* Controller);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<AP11Character> RespawnCharClass;
 };

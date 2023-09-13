@@ -6,20 +6,38 @@
 
 AP11HUD::AP11HUD()
 {
-	
+
 }
 
 void AP11HUD::BeginPlay()
 {
 	Super::BeginPlay();
+}
 
-	if (MainWidgetClass)
+void AP11HUD::DrawUI()
+{
+	if (!MainWidgetClass)
 	{
-		MainWidget = CreateWidget<UP11MainWidget>(GetWorld(), MainWidgetClass);
-		if (!MainWidget)
-		{
-			return;
-		}
-		MainWidget->AddToViewport();
+		return;
 	}
+	if (MainWidget)
+	{
+		DeleteUI();
+	}
+	MainWidget = CreateWidget<UP11MainWidget>(PlayerOwner, MainWidgetClass);
+	if (!MainWidget)
+	{
+		return;
+	}
+	MainWidget->AddToViewport();
+}
+
+void AP11HUD::DeleteUI()
+{
+	if (!MainWidget)
+	{
+		return;
+	}
+	MainWidget->RemoveFromParent();
+	MainWidget = nullptr;
 }

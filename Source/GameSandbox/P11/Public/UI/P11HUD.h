@@ -15,6 +15,8 @@ class GAMESANDBOX_API AP11HUD : public AHUD
 
 public:
 	AP11HUD();
+	void DrawUI();
+	void DeleteUI();
 	
 protected:
 	virtual void BeginPlay() override;
@@ -25,5 +27,5 @@ protected:
 
 private:
 	UPROPERTY()
-	UP11MainWidget* MainWidget;
+	UP11MainWidget* MainWidget = nullptr;
 };

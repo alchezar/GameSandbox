@@ -7,8 +7,13 @@
 #include "InputAction.h"
 #include "InputMappingContext.h"
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
+#include "P11/Public/Game/P11GameModeBase.h"
+#include "P11/Public/UI/P11HUD.h"
 
 AP11Character::AP11Character()
 {
@@ -35,11 +40,30 @@ void AP11Character::BeginPlay()
 {
 	Super::BeginPlay();
 	GetSubsystem();
+	Health = MaxHealth;
+	Ammo = MaxAmmo;
 }
 
 void AP11Character::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+void AP11Character::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	GetWorld()->GetTimerManager().SetTimer(DrawUIHandle, this, &ThisClass::ShowInterface, 1.f, false);
+}
+
+void AP11Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, MaxHealth)
+	DOREPLIFETIME(ThisClass, Health)
+	DOREPLIFETIME(ThisClass, MaxAmmo)
+	DOREPLIFETIME(ThisClass, Ammo)
 }
 
 void AP11Character::GetSubsystem()
@@ -106,6 +130,26 @@ void AP11Character::CrouchInput()
 	bCrouch ? Crouch() : UnCrouch();
 }
 
+void AP11Character::ShowInterface_Implementation()
+{
+	AP11HUD* HUD = GetPlayerHUD();
+	if (!HUD)
+	{
+		return;
+	}
+	HUD->DrawUI();
+}
+
+void AP11Character::HideInterface_Implementation()
+{
+	AP11HUD* HUD = GetPlayerHUD();
+	if (!HUD)
+	{
+		return;
+	}
+	HUD->DeleteUI();
+}
+
 void AP11Character::FireInput()
 {
 	ServerFire();
@@ -118,14 +162,68 @@ void AP11Character::ServerFire_Implementation()
 
 void AP11Character::Fire()
 {
+	if (--Ammo <= 0)
+	{
+		return;	
+	}
+	OnAmmoChanged.Broadcast(Ammo);
+	
 	const FVector Start = FollowCamera->GetComponentLocation();
 	const FVector End = Start + (FollowCamera->GetForwardVector() * 300000.f);
 
 	FHitResult HitResult;
 	FCollisionQueryParams FireParams;
 	FireParams.AddIgnoredActor(this);
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, FireParams);
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera, FireParams);
 	DrawDebugShoot(HitResult, 5.f);
+	if (HitResult.bBlockingHit)
+	{
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(), 25.f, GetController(), this, nullptr);
+	}
+}
+
+float AP11Character::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	const float OldHealth = Health;
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	OnHealthChanged.Broadcast(Health);
+	
+	if (Health == 0.f)
+	{
+		HideInterface();
+		Multicast_Ragdoll();
+
+		FTimerHandle RespawnTimer;
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &ThisClass::RespawnHandle, 5.f);
+	}
+	
+	return OldHealth - Health;
+}
+
+void AP11Character::Multicast_Ragdoll_Implementation()
+{
+	GetCapsuleComponent()->DestroyComponent();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->MovementState.bCanJump = false;
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+}
+
+void AP11Character::RespawnHandle()
+{
+	AP11GameModeBase* GameMode = Cast<AP11GameModeBase>(GetWorld()->GetAuthGameMode());
+	if (!GameMode)
+	{
+		return;
+	}
+	AController* DeadCharController = GetInstigatorController();
+	if (!DeadCharController)
+	{
+		return;
+	}
+	GameMode->Respawn(DeadCharController);
 }
 
 void AP11Character::DrawDebugShoot(const FHitResult& HitResult, const float Time) const
@@ -180,7 +278,6 @@ void AP11Character::ShiftCameraSmoothly(const EP11CameraSide NewSide, const floa
 		GetWorld()->GetTimerManager().ClearTimer(CameraShiftTimer);
 		Server_ShiftCamera(NewSide, TargetShift);
 	}
-	if (GEngine) GEngine->AddOnScreenDebugMessage(1, 1.f, FColor::Cyan, FString::Printf(TEXT("%f"), CameraBoom->SocketOffset.Y));
 }
 
 void AP11Character::FindDefaultReferences()
@@ -212,14 +309,36 @@ void AP11Character::FindDefaultReferences()
 			continue;
 		}
 		const FString DefaultPath = "/Game/Characters/Input/Actions/IA_";
-		const FString PathString = DefaultPath + ActionName;
-		const TCHAR* FullPath = *PathString;
+		const FString FullPath = DefaultPath + ActionName;
 		
-		ConstructorHelpers::FObjectFinder<UInputAction> ActionFinder(FullPath);
-		if (!ActionFinder.Succeeded())
+		ConstructorHelpers::FObjectFinder<UInputAction> ActionFinder(*FullPath);
+		if (ActionFinder.Succeeded())
 		{
-			continue;
+			*ActionReference = ActionFinder.Object;
 		}
-		*ActionReference = ActionFinder.Object;
 	}
+}
+
+AP11HUD* AP11Character::GetPlayerHUD()
+{
+	if (!GetController() || !GetController()->IsLocalController())
+	{
+		return nullptr;
+	}
+	const APlayerController* PlayerController = Cast<APlayerController>(GetController());
+	if (!PlayerController)
+	{
+		return nullptr;
+	}
+	return Cast<AP11HUD>(PlayerController->GetHUD());
+}
+
+void AP11Character::OnRep_Health()
+{
+	OnHealthChanged.Broadcast(Health);
+}
+
+void AP11Character::OnRep_Ammo()
+{
+	OnAmmoChanged.Broadcast(Ammo);
 }
