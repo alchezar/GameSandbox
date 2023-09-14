@@ -5,12 +5,14 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "P11/Public/Player/P11Character.h"
+#include "P11/Public/Player/P11PlayerController.h"
 #include "P11/Public/UI/P11HUD.h"
 
 AP11GameModeBase::AP11GameModeBase()
 {
 	DefaultPawnClass = AP11Character::StaticClass();
 	HUDClass = AP11HUD::StaticClass();
+	PlayerControllerClass = AP11PlayerController::StaticClass();
 }
 
 void AP11GameModeBase::Respawn(AController* Controller)

@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "P11HUD.generated.h"
 
+class UP11MainMenu;
 class UP11MainWidget;
 
 UCLASS()
@@ -15,8 +16,8 @@ class GAMESANDBOX_API AP11HUD : public AHUD
 
 public:
 	AP11HUD();
-	void DrawUI();
-	void DeleteUI();
+	void ShowUI(const bool bVisible);
+	void ShowMainMenu(const bool bVisible);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -24,8 +25,12 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP11MainWidget> MainWidgetClass;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UP11MainMenu> MainMenuClass;
+	
 private:
 	UPROPERTY()
 	UP11MainWidget* MainWidget = nullptr;
+	UPROPERTY()
+	UP11MainMenu* MainMenu = nullptr;
 };

@@ -16,8 +16,11 @@ class GAMESANDBOX_API AP11GameModeBase : public AGameModeBase
 public:
 	AP11GameModeBase();
 	void Respawn(AController* Controller);
+	FORCEINLINE TSoftObjectPtr<UWorld> GetStartupMap() const { return StartupMap; }
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSoftObjectPtr<UWorld> StartupMap;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<AP11Character> RespawnCharClass;
 };

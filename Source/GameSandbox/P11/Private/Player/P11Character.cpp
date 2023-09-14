@@ -136,7 +136,7 @@ void AP11Character::ShowInterface_Implementation()
 	{
 		return;
 	}
-	HUD->DrawUI();
+	HUD->ShowUI(true);
 }
 
 void AP11Character::HideInterface_Implementation()
@@ -146,7 +146,7 @@ void AP11Character::HideInterface_Implementation()
 	{
 		return;
 	}
-	HUD->DeleteUI();
+	HUD->ShowUI(false);
 }
 
 void AP11Character::FireInput()
