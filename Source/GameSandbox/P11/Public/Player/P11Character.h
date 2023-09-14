@@ -20,6 +20,14 @@ enum class EP11CameraSide : uint8
 	Right
 };
 
+UENUM()
+enum class EP11CharState : uint8
+{
+	Alive,
+	Shoot,
+	Dead
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP11OnHealthChangedSignature, float, Health);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP11OnAmmoChangedSignature, int32, Ammo);
 
@@ -52,6 +60,12 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void ServerFire();
 	void Fire();
+	UFUNCTION(Client, Reliable)
+	void Client_Trace();
+	UFUNCTION(Server, Reliable)
+	void Server_Trace();
+	void ShotTrace(FHitResult& HitResult);
+	
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_Ragdoll();
 	void RespawnHandle();
@@ -63,6 +77,11 @@ protected:
 	void Multicast_ShiftCamera(EP11CameraSide NewSide, float NewShift);
 	void ShiftCameraSmoothly(EP11CameraSide NewSide, const float TargetShift);
 
+	UFUNCTION(Server, Unreliable)
+	void Server_Audio(USoundBase* SoundToPlay);
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_Audio(USoundBase* SoundToPlay);
+
 private:
 	void FindDefaultReferences();
 	void GetSubsystem();
@@ -72,6 +91,7 @@ private:
 	void OnRep_Health();
 	UFUNCTION()
 	void OnRep_Ammo();
+	void ReturnShootAbility(const EP11CharState StateBeforeShoot);
 
 public:
 	FP11OnHealthChangedSignature OnHealthChanged;
@@ -109,18 +129,25 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Camera")
 	float CameraOffset = 75.f;
 
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Health")
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Attribute")
+	EP11CharState CharState = EP11CharState::Alive;
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Attribute")
 	float MaxHealth = 100.f;
-	UPROPERTY(ReplicatedUsing = "OnRep_Health", EditDefaultsOnly, Category = "C++ | Health")
+	UPROPERTY(ReplicatedUsing = "OnRep_Health", EditDefaultsOnly, Category = "C++ | Attribute")
 	float Health = 0.f;
-
-	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Ammo")
-	int32 MaxAmmo = 30;	
-	UPROPERTY(ReplicatedUsing = "OnRep_Ammo", EditDefaultsOnly, Category = "C++ | Ammo")
+	UPROPERTY(Replicated, EditDefaultsOnly, Category = "C++ | Attribute")
+	int32 MaxAmmo = 30;
+	UPROPERTY(ReplicatedUsing = "OnRep_Ammo", EditDefaultsOnly, Category = "C++ | Attribute")
 	int32 Ammo = 0;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Sound")
+	USoundBase* FireSound;
+	UPROPERTY(EditAnywhere, Category = "C++ | Sound")
+	USoundBase* NoAmmoSound;
 
 private:
 	bool bCrouch = false;
 	FTimerHandle DrawUIHandle;
 	FTimerHandle CameraShiftTimer;
+	FTimerHandle ShootHandle;
 };

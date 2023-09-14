@@ -52,14 +52,13 @@ void AP11Character::Tick(float DeltaTime)
 void AP11Character::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-
 	GetWorld()->GetTimerManager().SetTimer(DrawUIHandle, this, &ThisClass::ShowInterface, 1.f, false);
 }
 
 void AP11Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
+	DOREPLIFETIME(ThisClass, CharState)
 	DOREPLIFETIME(ThisClass, MaxHealth)
 	DOREPLIFETIME(ThisClass, Health)
 	DOREPLIFETIME(ThisClass, MaxAmmo)
@@ -162,24 +161,70 @@ void AP11Character::ServerFire_Implementation()
 
 void AP11Character::Fire()
 {
-	if (--Ammo <= 0)
+	/* To avoid using auto-clicker. */
+	if (CharState >= EP11CharState::Shoot)
 	{
+		return;
+	}
+	EP11CharState StateBeforeShoot = CharState;
+	CharState = EP11CharState::Shoot;
+
+	/* Play fire sound depends on ammo availability. */
+	if (Ammo <= 0)
+	{
+		Multicast_Audio(NoAmmoSound);
 		return;	
 	}
+	Multicast_Audio(FireSound);
+
+	/* Decrease ammo amount after every shoot. */
+	Ammo = FMath::Clamp(Ammo - 1, 0, MaxAmmo);
 	OnAmmoChanged.Broadcast(Ammo);
 	
+	/* Shot line trace logic. */
+	Client_Trace();
+
+	/* Return the ability to shoot. */
+	constexpr float PauseBetweenShots = 0.2f;
+	FTimerDelegate ShootDelegate;
+	ShootDelegate.BindUObject(this, &ThisClass::ReturnShootAbility, StateBeforeShoot);
+	GetWorld()->GetTimerManager().SetTimer(ShootHandle, ShootDelegate, PauseBetweenShots, false);
+}
+
+void AP11Character::Client_Trace_Implementation()
+{
+	/* First trace from the client. */
+	FHitResult HitResult;
+	ShotTrace(HitResult);
+	if (HitResult.bBlockingHit && HitResult.GetActor()->IsA(ACharacter::StaticClass()))
+	{
+		/* Only if we hit a character - trace again from the server. */
+		Server_Trace();
+	}
+}
+
+void AP11Character::Server_Trace_Implementation()
+{
+	/* Check again if we hit a character. If true - apply damage. */
+	FHitResult HitResult;
+	ShotTrace(HitResult);
+	if (HitResult.bBlockingHit && HitResult.GetActor()->IsA(ACharacter::StaticClass()))
+	{
+		constexpr float ShotDamage = 25.f;
+		UGameplayStatics::ApplyDamage(HitResult.GetActor(), ShotDamage, GetController(), this, nullptr);
+	}
+}
+
+void AP11Character::ShotTrace(FHitResult& HitResult)
+{
+	/* Line trace from selected points. */
 	const FVector Start = FollowCamera->GetComponentLocation();
 	const FVector End = Start + (FollowCamera->GetForwardVector() * 300000.f);
-
-	FHitResult HitResult;
+	
 	FCollisionQueryParams FireParams;
 	FireParams.AddIgnoredActor(this);
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera, FireParams);
 	DrawDebugShoot(HitResult, 5.f);
-	if (HitResult.bBlockingHit)
-	{
-		UGameplayStatics::ApplyDamage(HitResult.GetActor(), 25.f, GetController(), this, nullptr);
-	}
 }
 
 float AP11Character::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -192,6 +237,7 @@ float AP11Character::TakeDamage(float Damage, const FDamageEvent& DamageEvent, A
 	
 	if (Health == 0.f)
 	{
+		CharState = EP11CharState::Dead;
 		HideInterface();
 		Multicast_Ragdoll();
 
@@ -280,6 +326,16 @@ void AP11Character::ShiftCameraSmoothly(const EP11CameraSide NewSide, const floa
 	}
 }
 
+void AP11Character::Server_Audio_Implementation(USoundBase* SoundToPlay)
+{
+	Multicast_Audio(SoundToPlay);
+}
+
+void AP11Character::Multicast_Audio_Implementation(USoundBase* SoundToPlay)
+{
+	UGameplayStatics::SpawnSoundAttached(SoundToPlay, GetCapsuleComponent());
+}
+
 void AP11Character::FindDefaultReferences()
 {
 	if (!DefaultContext)
@@ -301,20 +357,34 @@ void AP11Character::FindDefaultReferences()
 	ActionsMap.Add("Aim",    &AimAction);
 	ActionsMap.Add("Reload", &ReloadAction);
 	ActionsMap.Add("Change", &ShiftCameraAction);
-	
 	for (auto& [ActionName, ActionReference] : ActionsMap)
 	{
 		if (*ActionReference)
 		{
 			continue;
 		}
-		const FString DefaultPath = "/Game/Characters/Input/Actions/IA_";
-		const FString FullPath = DefaultPath + ActionName;
-		
+		const FString FullPath = "/Game/Characters/Input/Actions/IA_" + ActionName;
 		ConstructorHelpers::FObjectFinder<UInputAction> ActionFinder(*FullPath);
 		if (ActionFinder.Succeeded())
 		{
 			*ActionReference = ActionFinder.Object;
+		}
+	}
+
+	TMap<FString, USoundBase**> SoundMap;
+	SoundMap.Add("BlasterShoot", &FireSound);
+	SoundMap.Add("OutOfAmmo", &NoAmmoSound);
+	for (auto& [SoundName, SoundReference] : SoundMap)
+	{
+		if (*SoundReference)
+		{
+			continue;
+		}
+		const FString FullPath = "/Game/Project/PP11/Audio/MFX_" + SoundName;
+		ConstructorHelpers::FObjectFinder<USoundBase> SoundFinder(*FullPath);
+		if (SoundFinder.Succeeded())
+		{
+			*SoundReference = SoundFinder.Object;
 		}
 	}
 }
@@ -341,4 +411,9 @@ void AP11Character::OnRep_Health()
 void AP11Character::OnRep_Ammo()
 {
 	OnAmmoChanged.Broadcast(Ammo);
+}
+
+void AP11Character::ReturnShootAbility(const EP11CharState StateBeforeShoot)
+{
+	CharState = StateBeforeShoot;
 }
