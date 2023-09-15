@@ -38,11 +38,12 @@ void AP11PlayerController::MainMenuInput()
 		return;
 	}
 	bMenuVisibility = !bMenuVisibility;
-	SetPause(bMenuVisibility);
+	// SetPause(bMenuVisibility);
 	HUD->ShowMainMenu(bMenuVisibility);
 	SetShowMouseCursor(bMenuVisibility);
 	
 	FInputModeGameAndUI GameAndUIMode;
 	GameAndUIMode.SetHideCursorDuringCapture(false);
 	bMenuVisibility ? SetInputMode(GameAndUIMode) : SetInputMode(FInputModeGameOnly());
+	bMenuVisibility ? GetPawn()->DisableInput(this) : GetPawn()->EnableInput(this); 
 }
