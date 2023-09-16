@@ -3,15 +3,18 @@
 #include "P11/Public/UI/P11MainMenu.h"
 
 #include "Components/Button.h"
+#include "Components/ComboBoxString.h"
 #include "Components/EditableTextBox.h"
+#include "Components/Slider.h"
 #include "Components/TextBlock.h"
+#include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "P11/Public/Game/P11GameInstance.h"
-#include "P11/Public/Game/P11GameModeBase.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
+#include "P11/Public/Player/P11PlayerController.h"
 #include "P11/Public/UI/P11CharUI.h"
-
-// DEFINE_LOG_CATEGORY_STATIC(LogP11MainMenu, All, All)
+#include "P11/Public/UI/P11MenuOption.h"
+#include "P11/Public/UI/P11MenuPopUp.h"
 
 void UP11MainMenu::NativeOnInitialized()
 {
@@ -22,29 +25,16 @@ void UP11MainMenu::NativeOnInitialized()
 void UP11MainMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	GameInstance = Cast<UP11GameInstance>(GetGameInstance());
 	check(GameInstance)
-	GameMode = Cast<AP11GameModeBase>(GetWorld()->GetAuthGameMode());
-	check(GameMode);
+	Controller = Cast<AP11PlayerController>(GetOwningPlayer());
+	check(Controller)
 	OnVisibilityChanged.AddDynamic(this, &ThisClass::OnVisibilityChangedHandle);
 
-	/* Middle section */
-	if (CreateBtn && SingleBtn && JoinBtn && QuitBtn && AddressBox)
-	{
-		CreateBtn->OnClicked.AddDynamic(this, &ThisClass::OnCreateHandle);
-		SingleBtn->OnClicked.AddDynamic(this, &ThisClass::OnSingleHandle);
-		JoinBtn->OnClicked.AddDynamic(this, &ThisClass::OnJoinHandle);
-		QuitBtn->OnClicked.AddDynamic(this, &ThisClass::OnQuitHandle);
-	}
-	
-	/* Right section */
-	if (JediBtn && SythBtn && ApplyBtn && NameBox)
-	{
-		JediBtn->OnClicked.AddDynamic(this, &ThisClass::OnJediHandle);
-		SythBtn->OnClicked.AddDynamic(this, &ThisClass::OnSythHandle);
-		ApplyBtn->OnClicked.AddDynamic(this, &ThisClass::OnApplyHandle);
-	}
+	MiddleSection();
+	RightSection();
+	LeftSection();
 }
 
 void UP11MainMenu::OnVisibilityChangedHandle(ESlateVisibility InVisibility)
@@ -74,14 +64,26 @@ void UP11MainMenu::OnVisibilityChangedHandle(ESlateVisibility InVisibility)
 	}
 }
 
+void UP11MainMenu::MiddleSection() 
+{
+	if (!CreateBtn || !SingleBtn || !JoinBtn || !QuitBtn || !AddressBox)
+	{
+		return;
+	}
+	CreateBtn->OnClicked.AddDynamic(this, &ThisClass::OnCreateHandle);
+	SingleBtn->OnClicked.AddDynamic(this, &ThisClass::OnSingleHandle);
+	JoinBtn->OnClicked.AddDynamic(this, &ThisClass::OnJoinHandle);
+	QuitBtn->OnClicked.AddDynamic(this, &ThisClass::OnQuitHandle);
+}
+
 void UP11MainMenu::OnCreateHandle()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameMode->GetStartupMap(), true, "listen");
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap(), true, "listen");
 }
 
 void UP11MainMenu::OnSingleHandle()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameMode->GetStartupMap());
+	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap());
 }
 
 void UP11MainMenu::OnJoinHandle()
@@ -96,6 +98,17 @@ void UP11MainMenu::OnQuitHandle()
 	{
 		PlayerController->ConsoleCommand("quit");
 	}
+}
+
+void UP11MainMenu::RightSection()
+{
+	if (!JediBtn || !SythBtn || !ApplyBtn || !NameBox)
+	{
+		return;
+	}
+	JediBtn->OnClicked.AddDynamic(this, &ThisClass::OnJediHandle);
+	SythBtn->OnClicked.AddDynamic(this, &ThisClass::OnSythHandle);
+	ApplyBtn->OnClicked.AddDynamic(this, &ThisClass::OnApplyHandle);
 }
 
 void UP11MainMenu::OnJediHandle()
@@ -121,7 +134,83 @@ void UP11MainMenu::OnApplyHandle()
 		SavePlayerInfo->PlayerName = NameBox->GetText();
 		SavePlayerInfo->PlayerSide = PlayerSide;
 		UGameplayStatics::SaveGameToSlot(SavePlayerInfo, GameInstance->GetSlotName(), 0);
+		/* First logical chain of changing Character color. */
+		Controller->SetCharSide(PlayerSide);
 	}
+}
+
+void UP11MainMenu::LeftSection()
+{
+	/* ShowCurrentSettings */
+	UGameUserSettings* UserSettings = UGameUserSettings::GetGameUserSettings();
+	if (!UserSettings)
+	{
+		return;
+	}
+	UserSettings->LoadSettings(false);
+	
+	/* Sliders. */
+	ShadowOption ->GetSlider()->SetValue(UserSettings->GetShadowQuality());
+	ReflectOption->GetSlider()->SetValue(UserSettings->GetReflectionQuality());
+	GiOption     ->GetSlider()->SetValue(UserSettings->GetGlobalIlluminationQuality());
+	VfxOption    ->GetSlider()->SetValue(UserSettings->GetVisualEffectQuality());
+	TextureOption->GetSlider()->SetValue(UserSettings->GetTextureQuality());
+	ShadingOption->GetSlider()->SetValue(UserSettings->GetShadingQuality());
+	FoliageOption->GetSlider()->SetValue(UserSettings->GetFoliageQuality());
+	TsrOption    ->GetSlider()->SetValue(UserSettings->GetAntiAliasingQuality());
+
+	/* Pop up Combo box. */
+	TArray<FIntPoint> Resolutions;
+	UKismetSystemLibrary::GetSupportedFullscreenResolutions(Resolutions);
+	ResolutionOption->GetComboBox()->ClearOptions();
+	for (const auto Resolution : Resolutions)
+	{
+		FString Res = FString::FromInt(Resolution.X) + " x " + FString::FromInt(Resolution.Y);
+		ResolutionOption->GetComboBox()->AddOption(Res);
+	}
+	const FIntPoint ScreenResolution = UserSettings->GetScreenResolution();
+	const FString CurrentResolution = FString::FromInt(ScreenResolution.X) + " x " + FString::FromInt(ScreenResolution.Y);
+	ResolutionOption->GetComboBox()->SetSelectedOption(CurrentResolution);
+
+	/* Buttons. */
+	SetActiveScreenModeButtons(UserSettings->GetFullscreenMode());
+	FullscreenBtn  ->OnClicked.AddDynamic(this, &ThisClass::OnFullscreenHandle);
+	WindowedFullBtn->OnClicked.AddDynamic(this, &ThisClass::OnWindowedFullHandle);
+	WindowedBtn    ->OnClicked.AddDynamic(this, &ThisClass::OnWindowedHandle);
+	DefaultBtn     ->OnClicked.AddDynamic(this, &ThisClass::OnDefaultHandle);
+	SaveBtn        ->OnClicked.AddDynamic(this, &ThisClass::OnSaveHandle);
+}
+
+void UP11MainMenu::OnFullscreenHandle() 
+{
+
+}
+
+void UP11MainMenu::OnWindowedFullHandle() 
+{
+
+}
+
+void UP11MainMenu::OnWindowedHandle() 
+{
+
+}
+
+void UP11MainMenu::OnDefaultHandle() 
+{
+
+}
+
+void UP11MainMenu::OnSaveHandle() 
+{
+
+}
+
+void UP11MainMenu::SetActiveScreenModeButtons(const EWindowMode::Type CurrentMode) const
+{
+	ActivateButton(FullscreenBtn,   CurrentMode == EWindowMode::Fullscreen);	
+	ActivateButton(WindowedFullBtn, CurrentMode == EWindowMode::WindowedFullscreen);
+	ActivateButton(WindowedBtn,     CurrentMode == EWindowMode::Windowed);
 }
 
 void UP11MainMenu::ActivateButton(UButton* Button, const bool bActive)

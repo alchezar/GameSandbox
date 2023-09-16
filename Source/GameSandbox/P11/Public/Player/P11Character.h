@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11Character.generated.h"
 
 class AP11HUD;
@@ -44,6 +45,7 @@ public:
 	virtual float TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	FORCEINLINE float GetHealth() const { return Health; }
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	void UpdateMeshOnServer(const EP11PlayerSide NewSide);
 
 protected:
 	virtual void BeginPlay() override;
@@ -92,11 +94,16 @@ private:
 	UFUNCTION()
 	void OnRep_Ammo();
 	void ReturnShootAbility(const EP11CharState StateBeforeShoot);
+	UFUNCTION()
+	void OnRep_PlayerSide();
+	void UpdateMaterials() const;
 
 public:
 	FP11OnHealthChangedSignature OnHealthChanged;
 	FP11OnAmmoChangedSignature OnAmmoChanged;
-
+	UPROPERTY(ReplicatedUsing = "OnRep_PlayerSide")
+	EP11PlayerSide PlayerSide = EP11PlayerSide::Jedi;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;

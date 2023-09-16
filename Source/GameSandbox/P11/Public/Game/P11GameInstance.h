@@ -17,8 +17,11 @@ public:
 	virtual void Init() override;
 	FORCEINLINE UP11SavePlayerInfo* GetSavePlayerInfo() const { return SavePlayerInfo; }
 	FORCEINLINE FString GetSlotName() const { return SlotName; }
+	FORCEINLINE TSoftObjectPtr<UWorld> GetStartupMap() const { return StartupMap; }
 
 private:
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSoftObjectPtr<UWorld> StartupMap;
 	UPROPERTY()
 	UP11SavePlayerInfo* SavePlayerInfo;
 	FString SlotName = "Info";

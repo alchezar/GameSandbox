@@ -7,6 +7,9 @@
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11MainMenu.generated.h"
 
+class UP11MenuPopUp;
+class UP11MenuOption;
+class AP11PlayerController;
 class AP11CharUI;
 class UP11GameInstance;
 class UEditableTextBox;
@@ -21,9 +24,12 @@ class GAMESANDBOX_API UP11MainMenu : public UUserWidget
 protected:
 	virtual void NativeOnInitialized() override;
 	virtual void NativeConstruct() override;
+
+private:
 	UFUNCTION()
 	void OnVisibilityChangedHandle(ESlateVisibility InVisibility);
 	
+	void MiddleSection();
 	UFUNCTION()
 	void OnCreateHandle();
 	UFUNCTION()
@@ -33,14 +39,27 @@ protected:
 	UFUNCTION()
 	void OnQuitHandle();
 	
+	void RightSection();
 	UFUNCTION()
 	void OnJediHandle();
 	UFUNCTION()
 	void OnSythHandle();
 	UFUNCTION()
 	void OnApplyHandle();
-
-private:
+	
+	void LeftSection();
+	UFUNCTION()
+	void OnFullscreenHandle();
+	UFUNCTION()
+	void OnWindowedFullHandle();
+	UFUNCTION()
+	void OnWindowedHandle();
+	UFUNCTION()
+	void OnDefaultHandle();
+	UFUNCTION()
+	void OnSaveHandle();
+	
+	void SetActiveScreenModeButtons(const EWindowMode::Type CurrentMode) const;
 	static void ActivateButton(UButton* Button, const bool bActive);
 
 protected:
@@ -69,13 +88,44 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<AP11CharUI> CharUIClass;
 #pragma endregion /* RightSection */
+
+#pragma region LeftSection
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* ShadowOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* ReflectOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* GiOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* VfxOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* TextureOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* ShadingOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* FoliageOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuOption* TsrOption;
+	UPROPERTY(meta = (BindWidget))
+	UP11MenuPopUp* ResolutionOption;
+	UPROPERTY(meta = (BindWidget))
+	UButton* FullscreenBtn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* WindowedFullBtn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* WindowedBtn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* DefaultBtn;
+	UPROPERTY(meta = (BindWidget))
+	UButton* SaveBtn;
+#pragma endregion /* LeftSection */
 	
 private:
 	EP11PlayerSide PlayerSide = EP11PlayerSide::Jedi;
 	UPROPERTY()
 	UP11GameInstance* GameInstance;
 	UPROPERTY()
-	AP11GameModeBase* GameMode;
+	AP11PlayerController* Controller;
 	UPROPERTY()
 	AP11CharUI* CharUI;
 };

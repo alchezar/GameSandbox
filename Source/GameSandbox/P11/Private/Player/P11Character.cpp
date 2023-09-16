@@ -13,6 +13,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "P11/Public/Game/P11GameModeBase.h"
+#include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11/Public/UI/P11HUD.h"
 
 AP11Character::AP11Character()
@@ -63,6 +64,7 @@ void AP11Character::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ThisClass, Health)
 	DOREPLIFETIME(ThisClass, MaxAmmo)
 	DOREPLIFETIME(ThisClass, Ammo)
+	DOREPLIFETIME(ThisClass, PlayerSide)
 }
 
 void AP11Character::GetSubsystem()
@@ -287,20 +289,20 @@ void AP11Character::DrawDebugShoot(const FHitResult& HitResult, const float Time
 void AP11Character::ShiftCameraInput()
 {
 	float Shift;
-	EP11CameraSide Side;
+	EP11CameraSide NewCameraSide;
 	if (CameraSide == EP11CameraSide::Right)
 	{
-		Side = EP11CameraSide::Left;
+		NewCameraSide = EP11CameraSide::Left;
 		Shift = -1.f * CameraOffset;
 	}
 	else
 	{
-		Side = EP11CameraSide::Right;
+		NewCameraSide = EP11CameraSide::Right;
 		Shift = CameraOffset;
 	}
 	
 	FTimerDelegate CameraShiftDelegate;
-	CameraShiftDelegate.BindUObject(this, &ThisClass::ShiftCameraSmoothly, Side, Shift);
+	CameraShiftDelegate.BindUObject(this, &ThisClass::ShiftCameraSmoothly, NewCameraSide, Shift);
 	GetWorld()->GetTimerManager().SetTimer(CameraShiftTimer, CameraShiftDelegate, GetWorld()->GetDeltaSeconds(), true);
 }
 
@@ -416,4 +418,33 @@ void AP11Character::OnRep_Ammo()
 void AP11Character::ReturnShootAbility(const EP11CharState StateBeforeShoot)
 {
 	CharState = StateBeforeShoot;
+}
+
+void AP11Character::UpdateMeshOnServer(const EP11PlayerSide NewSide)
+{
+	PlayerSide = NewSide;
+	/** After changing PlayerSide, OnRep function will be called on the clients (but not on the server).
+	  * We need to call OnRep here, so than changes are also applied on the server. */
+	OnRep_PlayerSide();
+}
+
+void AP11Character::OnRep_PlayerSide()
+{
+	UpdateMaterials();
+}
+
+void AP11Character::UpdateMaterials() const
+{
+	const FLinearColor NewColor = (PlayerSide == EP11PlayerSide::Jedi) ? FLinearColor::White : FLinearColor::Red;
+	
+	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
+	DynamicMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(1));
+	DynamicMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(2));
+	DynamicMaterials.Add(GetMesh()->CreateAndSetMaterialInstanceDynamic(3));
+	
+	for (const auto& DynamicMaterial : DynamicMaterials)
+	{
+		DynamicMaterial->SetVectorParameterValue("MainColor", NewColor);
+		DynamicMaterial->SetVectorParameterValue("PaintColor", NewColor);
+	}
 }
