@@ -27,4 +27,6 @@ public:
 	FText PlayerName;
 	UPROPERTY()
 	EP11PlayerSide PlayerSide;
+	UPROPERTY()
+	bool bShowFPS;
 };

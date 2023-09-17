@@ -9,6 +9,8 @@
 class UComboBoxString;
 class UTextBlock;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP11OnComboBoxSelectionChangedSignature, FString, SelectedItem);
+
 UCLASS()
 class GAMESANDBOX_API UP11MenuPopUp : public UUserWidget
 {
@@ -19,6 +21,12 @@ public:
 	
 protected:
 	virtual void NativePreConstruct() override;
+
+	UFUNCTION()
+	void OnComboBoxSelectionChangedHandle(FString SelectedItem, ESelectInfo::Type SelectionType);
+
+public:
+	FP11OnComboBoxSelectionChangedSignature OnComboBoxSelectionChanged;
 
 protected:
 	UPROPERTY(meta = (BindWidget))

@@ -5,5 +5,6 @@
 UP11SavePlayerInfo::UP11SavePlayerInfo()
 {
 	PlayerName = FText::FromString("");
-	PlayerSide = EP11PlayerSide::None; 
+	PlayerSide = EP11PlayerSide::None;
+	bShowFPS   = false;
 }

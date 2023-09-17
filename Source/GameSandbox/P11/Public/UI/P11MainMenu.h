@@ -7,6 +7,7 @@
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11MainMenu.generated.h"
 
+class UCheckBox;
 class UP11MenuPopUp;
 class UP11MenuOption;
 class AP11PlayerController;
@@ -46,8 +47,28 @@ private:
 	void OnSythHandle();
 	UFUNCTION()
 	void OnApplyHandle();
-	
+
 	void LeftSection();
+	UFUNCTION()
+	void OnShadowOptionHandle(float Value);
+	UFUNCTION()
+	void OnReflectOptionHandle(float Value);
+	UFUNCTION()
+	void OnGiOptionHandle(float Value);
+	UFUNCTION()
+	void OnVfxOptionHandle(float Value);
+	UFUNCTION()
+	void OnTextureOptionHandle(float Value);
+	UFUNCTION()
+	void OnShadingOptionHandle(float Value);
+	UFUNCTION()
+	void OnFoliageOptionHandle(float Value);
+	UFUNCTION()
+	void OnTsrOptionHandle(float Value);
+	UFUNCTION()
+	void OnResolutionOptionHandle(FString SelectedItem);
+	UFUNCTION()
+	void OnFpsCheckBoxHandle(bool bIsChecked);
 	UFUNCTION()
 	void OnFullscreenHandle();
 	UFUNCTION()
@@ -58,7 +79,8 @@ private:
 	void OnDefaultHandle();
 	UFUNCTION()
 	void OnSaveHandle();
-	
+
+	void ShowCurrentSettings() const;
 	void SetActiveScreenModeButtons(const EWindowMode::Type CurrentMode) const;
 	static void ActivateButton(UButton* Button, const bool bActive);
 
@@ -109,6 +131,8 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UP11MenuPopUp* ResolutionOption;
 	UPROPERTY(meta = (BindWidget))
+	UCheckBox* FpsCheckBox;
+	UPROPERTY(meta = (BindWidget))
 	UButton* FullscreenBtn;
 	UPROPERTY(meta = (BindWidget))
 	UButton* WindowedFullBtn;
@@ -128,4 +152,8 @@ private:
 	AP11PlayerController* Controller;
 	UPROPERTY()
 	AP11CharUI* CharUI;
+	UPROPERTY()
+	UGameUserSettings* UserSettings;
+	UPROPERTY()
+	UP11SavePlayerInfo* SavedInfo;
 };

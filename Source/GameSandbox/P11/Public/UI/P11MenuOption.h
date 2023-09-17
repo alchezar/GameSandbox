@@ -9,6 +9,8 @@
 class USlider;
 class UTextBlock;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP11OnSliderValueChangedSignature, float, Value);
+
 UCLASS()
 class GAMESANDBOX_API UP11MenuOption : public UUserWidget
 {
@@ -19,6 +21,12 @@ public:
 
 protected:
 	virtual void NativePreConstruct() override;
+
+	UFUNCTION()
+	void OnSliderValueChangedHandle(float Value);
+
+public:
+	FP11OnSliderValueChangedSignature OnSliderValueChanged;
 	
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -28,4 +36,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FText CustomName = FText::FromString("setting");
+
+private:
+	float OldValue = 0.f;
 };
