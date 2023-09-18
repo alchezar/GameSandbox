@@ -84,6 +84,7 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_Audio(USoundBase* SoundToPlay);
 
+
 private:
 	void FindDefaultReferences();
 	void GetSubsystem();
@@ -97,6 +98,7 @@ private:
 	UFUNCTION()
 	void OnRep_PlayerSide();
 	void UpdateMaterials() const;
+	void AddScore(const AController* Killer);
 
 public:
 	FP11OnHealthChangedSignature OnHealthChanged;

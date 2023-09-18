@@ -14,6 +14,7 @@
 #include "Net/UnrealNetwork.h"
 #include "P11/Public/Game/P11GameModeBase.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
+#include "P11/Public/Player/P11PlayerState.h"
 #include "P11/Public/UI/P11HUD.h"
 
 AP11Character::AP11Character()
@@ -242,6 +243,7 @@ float AP11Character::TakeDamage(float Damage, const FDamageEvent& DamageEvent, A
 		CharState = EP11CharState::Dead;
 		HideInterface();
 		Multicast_Ragdoll();
+		AddScore(EventInstigator);
 
 		FTimerHandle RespawnTimer;
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, this, &ThisClass::RespawnHandle, 5.f);
@@ -446,5 +448,21 @@ void AP11Character::UpdateMaterials() const
 	{
 		DynamicMaterial->SetVectorParameterValue("MainColor", NewColor);
 		DynamicMaterial->SetVectorParameterValue("PaintColor", NewColor);
+	}
+}
+
+void AP11Character::AddScore(const AController* Killer)
+{
+	if (AP11PlayerState* VictimPlayerState = GetPlayerState<AP11PlayerState>())
+	{
+		VictimPlayerState->AddDeath();
+	}
+	if (!Killer)
+	{
+		return;
+	}
+	if (AP11PlayerState* KillerPlayerState = Killer->GetPlayerState<AP11PlayerState>())
+	{
+		KillerPlayerState->AddKill();
 	}
 }

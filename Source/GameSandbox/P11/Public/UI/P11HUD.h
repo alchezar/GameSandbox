@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "P11HUD.generated.h"
 
+class UP11StatScoreboard;
 class UP11MenuFPS;
 class UP11MainMenu;
 class UP11MainWidget;
@@ -20,6 +21,7 @@ public:
 	void ShowUI(const bool bVisible);
 	void ShowMainMenu(const bool bVisible);
 	void ShowFPS();
+	void ShowScore(const bool bVisible);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -31,6 +33,8 @@ protected:
 	TSubclassOf<UP11MainMenu> MainMenuClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP11MenuFPS> MenuFpsClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UP11StatScoreboard> ScoreboardClass;
 	
 private:
 	UPROPERTY()
@@ -39,4 +43,6 @@ private:
 	UP11MainMenu* MainMenu = nullptr;
 	UPROPERTY()
 	UP11MenuFPS* MenuFPS = nullptr;
+	UPROPERTY()
+	UP11StatScoreboard* Scoreboard = nullptr;
 };

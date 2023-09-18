@@ -8,12 +8,19 @@
 #include "P11/Public/Game/P11GameInstance.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11/Public/Player/P11Character.h"
+#include "P11/Public/Player/P11PlayerState.h"
 #include "P11/Public/UI/P11HUD.h"
+
+// DEFINE_LOG_CATEGORY_STATIC(LogP11PlayerController, All, All)
 
 void AP11PlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-	
+
+	if (AP11PlayerState* ThisPlayerState = Cast<AP11PlayerState>(UGameplayStatics::GetPlayerState(this, 0)))
+	{
+		ThisPlayerState->SetIsDead(false);
+	}
 	if (HasAuthority())
 	{
 		Client_ChangeSide();
@@ -29,6 +36,8 @@ void AP11PlayerController::BeginPlay()
 	{
 		Subsystem->AddMappingContext(DefaultContext, 0);
 	}
+	HUD = Cast<AP11HUD>(GetHUD());
+	check(HUD);
 }
 
 void AP11PlayerController::SetupInputComponent()
@@ -41,12 +50,13 @@ void AP11PlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInput = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInput->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::MainMenuInput);
+		EnhancedInput->BindAction(ScoreboardAction, ETriggerEvent::Started, this, &ThisClass::ScoreboardInput, true);
+		EnhancedInput->BindAction(ScoreboardAction, ETriggerEvent::Completed, this, &ThisClass::ScoreboardInput, false);
 	}
 }
 
 void AP11PlayerController::MainMenuInput()
 {
-	AP11HUD* HUD = Cast<AP11HUD>(GetHUD());
 	if (!HUD)
 	{
 		return;
@@ -93,4 +103,9 @@ void AP11PlayerController::ChangeCharSide(EP11PlayerSide NewSide)
 	{
 		Char->UpdateMeshOnServer(NewSide);
 	}
+}
+
+void AP11PlayerController::ScoreboardInput(bool bVisible)
+{
+		HUD->ShowScore(bVisible);
 }

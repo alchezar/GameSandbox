@@ -8,6 +8,7 @@
 #include "P11/Public/UI/P11MainMenu.h"
 #include "P11/Public/UI/P11MainWidget.h"
 #include "P11/Public/UI/P11MenuFPS.h"
+#include "P11/Public/UI/P11StatScoreboard.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP11HUD, All, All)
 
@@ -83,4 +84,29 @@ void AP11HUD::ShowMainMenu(const bool bVisible)
 		MainMenu->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	MainMenu->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+}
+
+void AP11HUD::ShowScore(const bool bVisible)
+{
+	if (!ScoreboardClass)
+	{
+		UE_LOG(LogP11HUD, Warning, TEXT("Scoreboard class not assigned!"));
+		return;
+	}
+	if (!Scoreboard && bVisible)
+	{
+		Scoreboard = CreateWidget<UP11StatScoreboard>(PlayerOwner, ScoreboardClass);
+		if (!Scoreboard)
+		{
+			UE_LOG(LogP11HUD, Warning, TEXT("No Scoreboard widget!"))
+			return;
+		}
+		Scoreboard->AddToViewport(1);
+		Scoreboard->SetVisibility(ESlateVisibility::Collapsed);
+	}
+	// if (bVisible)
+	// {
+	// 	Scoreboard->UpdateScore();
+	// }
+	Scoreboard->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
