@@ -51,3 +51,8 @@ void AP11PlayerState::Server_SendNameToSrv_Implementation(const FText& Name)
 {
 	PlayerName = Name;
 }
+
+void AP11PlayerState::SetIsAlive()
+{
+	bDead = false;
+}

@@ -12,11 +12,15 @@
 void UP11StatScoreboard::NativeConstruct()
 {
 	Super::NativeConstruct();
-	UpdateScore();
-	GetWorld()->GetTimerManager().SetTimer(UpdateTimer, this, &ThisClass::UpdateScore, 1.f, true);
+	ShowScore();
 }
 
-void UP11StatScoreboard::UpdateScore()
+void UP11StatScoreboard::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+{
+	Super::NativeTick(MyGeometry, InDeltaTime);
+}
+
+void UP11StatScoreboard::ShowScore()
 {
 	PlayersCountText->SetText(FText::AsNumber(UGameplayStatics::GetNumPlayerStates(GetWorld())));
 	MapNameText->SetText(FText::FromString(UGameplayStatics::GetCurrentLevelName(GetWorld())));
@@ -29,7 +33,7 @@ void UP11StatScoreboard::UpdateScore()
 	}
 	for (auto PlayerState : GameState->PlayerArray)
 	{
-		const AP11PlayerState* ThisPlayerState = Cast<AP11PlayerState>(PlayerState);
+		AP11PlayerState* ThisPlayerState = Cast<AP11PlayerState>(PlayerState);
 		if (!ThisPlayerState || !PlayerScoreClass)
 		{
 			return;
@@ -39,14 +43,8 @@ void UP11StatScoreboard::UpdateScore()
 		{
 			continue;
 		}
-		PlayerScoreWidget->SetPlayerName(ThisPlayerState->GetThePlayerName());
-		PlayerScoreWidget->SetIsDead(ThisPlayerState->GetIsDead());
-		PlayerScoreWidget->SetKills(ThisPlayerState->GetKills());
-		PlayerScoreWidget->SetDeaths(ThisPlayerState->GetDeaths());
-		PlayerScoreWidget->SetPing(ThisPlayerState->GetPingInMilliseconds());
-
+		PlayerScoreWidget->SetPlayerState(ThisPlayerState);
 		PlayerScoreWidget->AddToViewport();
 		PlayersVBox->AddChild(PlayerScoreWidget);
 	}
-	
 }

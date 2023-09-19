@@ -17,7 +17,8 @@ class GAMESANDBOX_API UP11StatScoreboard : public UUserWidget
 
 public:
 	virtual void NativeConstruct() override;
-	void UpdateScore();
+	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
+	void ShowScore();
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -29,7 +30,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UP11StatPlayerScoreWidget> PlayerScoreClass;
-
-private:
-	FTimerHandle UpdateTimer;
 };

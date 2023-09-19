@@ -17,9 +17,9 @@ void AP11PlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
 
-	if (AP11PlayerState* ThisPlayerState = Cast<AP11PlayerState>(UGameplayStatics::GetPlayerState(this, 0)))
+	if (AP11PlayerState* ThisPlayerState = GetPlayerState<AP11PlayerState>())
 	{
-		ThisPlayerState->SetIsDead(false);
+		ThisPlayerState->SetIsAlive();
 	}
 	if (HasAuthority())
 	{
@@ -37,7 +37,6 @@ void AP11PlayerController::BeginPlay()
 		Subsystem->AddMappingContext(DefaultContext, 0);
 	}
 	HUD = Cast<AP11HUD>(GetHUD());
-	check(HUD);
 }
 
 void AP11PlayerController::SetupInputComponent()
@@ -97,15 +96,20 @@ void AP11PlayerController::Server_ChangeCharSide_Implementation(const EP11Player
 	ChangeCharSide(NewSide);
 }
 
-void AP11PlayerController::ChangeCharSide(EP11PlayerSide NewSide)
+void AP11PlayerController::ChangeCharSide(const EP11PlayerSide NewSide) const
 {
 	if (AP11Character* Char = Cast<AP11Character>(GetPawn()))
 	{
 		Char->UpdateMeshOnServer(NewSide);
 	}
+	
 }
 
-void AP11PlayerController::ScoreboardInput(bool bVisible)
+void AP11PlayerController::ScoreboardInput(const bool bVisible)
 {
-		HUD->ShowScore(bVisible);
+	if (!HUD)
+	{
+		return;
+	}
+	HUD->ShowScore(bVisible);
 }

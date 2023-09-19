@@ -6,6 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "P11StatPlayerScoreWidget.generated.h"
 
+class UBorder;
+class AP11PlayerState;
 class UImage;
 class UTextBlock;
 
@@ -15,14 +17,15 @@ class GAMESANDBOX_API UP11StatPlayerScoreWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void SetPlayerName(const FText& NewName);
-	void SetIsDead(const bool bNewDead);
-	void SetKills(const int32 NewKills);
-	void SetDeaths(const int32 NewDeaths);
-	void SetPing(const float NewPing);
+	void SetPlayerState(AP11PlayerState* CurrentState);
+	void UpdateScore() const;
 
 protected:
 	virtual void NativePreConstruct() override;
+	virtual void NativeDestruct() override;
+
+private:
+	void SetLocalStyle() const;
 
 protected:
 	UPROPERTY(meta = (BindWidget))
@@ -35,16 +38,14 @@ protected:
 	UTextBlock* PingText;
 	UPROPERTY(meta = (BindWidget))
 	UImage* DeadImg;
+	UPROPERTY(meta = (BindWidget))
+	UBorder* RowBorder;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FText PlayerName = FText::FromString("Name");
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	int32 Kills = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	int32 Deaths = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	int32 Ping = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	bool bDead = false;
-	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++", meta = (Units = "s"))
+	float UpdateFrequency = 0.5f;
+
+private:
+	FTimerHandle UpdateTimer;
+	UPROPERTY()
+	AP11PlayerState* PlayerState;
 };

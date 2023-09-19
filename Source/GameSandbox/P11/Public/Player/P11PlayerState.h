@@ -14,12 +14,11 @@ class GAMESANDBOX_API AP11PlayerState : public APlayerState
 public:
 	void AddKill();
 	void AddDeath();
-
 	FORCEINLINE FText GetThePlayerName() const { return PlayerName; }
 	FORCEINLINE bool GetIsDead() const { return bDead; }
 	FORCEINLINE int32 GetKills() const { return Kills; }
 	FORCEINLINE int32 GetDeaths() const { return Deaths; }
-	FORCEINLINE void SetIsDead(const bool bNewDead) { bDead = bNewDead; }
+	void SetIsAlive();
 
 protected:
 	virtual void BeginPlay() override;

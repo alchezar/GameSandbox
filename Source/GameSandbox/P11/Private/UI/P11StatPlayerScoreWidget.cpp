@@ -2,47 +2,60 @@
 
 #include "P11/Public/UI/P11StatPlayerScoreWidget.h"
 
+#include "Components/Border.h"
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 #include "Internationalization/Text.h"
+#include "P11/Public/Player/P11PlayerState.h"
 
 void UP11StatPlayerScoreWidget::NativePreConstruct()
 {
 	Super::NativePreConstruct();
-
-	PlayerNameText->SetText(PlayerName);
-	DeathText->SetText(FText::AsNumber(Deaths));
-	KillsText->SetText(FText::AsNumber(Kills));
-	PingText->SetText(FText::AsNumber(Ping));
-	DeadImg->SetVisibility(bDead ? ESlateVisibility::Hidden : ESlateVisibility::Visible);
+	GetWorld()->GetTimerManager().SetTimer(UpdateTimer, this, &ThisClass::UpdateScore, 1.f, true, 0.f);
 }
 
-void UP11StatPlayerScoreWidget::SetPlayerName(const FText& NewName)
+void UP11StatPlayerScoreWidget::NativeDestruct()
 {
-	PlayerName = NewName;
-	PlayerNameText->SetText(PlayerName);
+	Super::NativeDestruct();
+	GetWorld()->GetTimerManager().ClearTimer(UpdateTimer);
 }
 
-void UP11StatPlayerScoreWidget::SetIsDead(const bool bNewDead)
+void UP11StatPlayerScoreWidget::SetLocalStyle() const
 {
-	bDead = bNewDead;
-	DeadImg->SetColorAndOpacity(bNewDead ? FLinearColor::White : FLinearColor(1.f, 1.f, 1.f, 0.f));
+	if (!PlayerState)
+	{
+		return;
+	}
+	const APlayerController* PlayerController = PlayerState->GetPlayerController();
+	if (PlayerController && PlayerController->IsLocalController())
+	{
+		RowBorder->Background.OutlineSettings.Width = 5.f;
+		const FLinearColor FgColor = RowBorder->GetBrushColor();
+		const FLinearColor BgColor = RowBorder->Background.OutlineSettings.Color.GetSpecifiedColor();
+		RowBorder->SetBrushColor(BgColor);
+		RowBorder->Background.OutlineSettings.Color = FSlateColor(FgColor);
+		PlayerNameText->SetColorAndOpacity(FgColor);
+		KillsText->SetColorAndOpacity(FgColor);
+		DeathText->SetColorAndOpacity(FgColor);
+		PingText->SetColorAndOpacity(FgColor);
+	}
 }
 
-void UP11StatPlayerScoreWidget::SetKills(const int32 NewKills)
+void UP11StatPlayerScoreWidget::SetPlayerState(AP11PlayerState* CurrentState)
 {
-	Kills = NewKills;
-	KillsText->SetText(FText::AsNumber(Kills));
+	PlayerState = CurrentState;
+	SetLocalStyle();
 }
 
-void UP11StatPlayerScoreWidget::SetDeaths(const int32 NewDeaths)
+void UP11StatPlayerScoreWidget::UpdateScore() const
 {
-	Deaths = NewDeaths;
-	DeathText->SetText(FText::AsNumber(Deaths));
-}
-
-void UP11StatPlayerScoreWidget::SetPing(const float NewPing)
-{
-	Ping = NewPing;
-	PingText->SetText(FText::AsNumber(Ping));
+	if (!PlayerState)
+	{
+		return;
+	}
+	PlayerNameText->SetText(PlayerState->GetThePlayerName());
+	DeadImg->SetColorAndOpacity(PlayerState->GetIsDead() ? FLinearColor::White : FLinearColor(1.f, 1.f, 1.f, 0.f));
+	KillsText->SetText(FText::AsNumber(PlayerState->GetKills()));
+	DeathText->SetText(FText::AsNumber(PlayerState->GetDeaths()));
+	PingText->SetText(FText::AsNumber(FMath::TruncToInt(PlayerState->GetPingInMilliseconds())));
 }

@@ -234,6 +234,11 @@ float AP11Character::TakeDamage(float Damage, const FDamageEvent& DamageEvent, A
 {
 	Super::TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
 
+	if (CharState == EP11CharState::Dead)
+	{
+		return 0.f;	
+	}
+	
 	const float OldHealth = Health;
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	OnHealthChanged.Broadcast(Health);

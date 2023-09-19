@@ -6,10 +6,10 @@
 #include "GameFramework/PlayerController.h"
 #include "P11PlayerController.generated.h"
 
+enum class EP11PlayerSide : uint8;
 class AP11HUD;
 class UP11StatScoreboard;
 class AP11Character;
-enum class EP11PlayerSide : uint8;
 class UInputAction;
 class UInputMappingContext;
 
@@ -24,14 +24,14 @@ public:
 	UFUNCTION(Client, Reliable)
 	void Client_ChangeSide();
 	UFUNCTION(Server, Reliable)
-	void Server_ChangeCharSide(EP11PlayerSide NewSide);
-	void ChangeCharSide(EP11PlayerSide NewSide);
+	void Server_ChangeCharSide(const EP11PlayerSide NewSide);
+	void ChangeCharSide(const EP11PlayerSide NewSide) const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	void MainMenuInput();
-	void ScoreboardInput(bool bVisible);
+	void ScoreboardInput(const bool bVisible);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")

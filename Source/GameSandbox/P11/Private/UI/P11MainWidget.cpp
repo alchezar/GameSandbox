@@ -28,8 +28,6 @@ void UP11MainWidget::NativeConstruct()
 	CurrentCharacter->OnAmmoChanged.AddDynamic(this, &ThisClass::OnAmmoChangedHandle);
 	OnHealthChangedHandle(CurrentCharacter->GetHealth());
 	OnAmmoChangedHandle(CurrentCharacter->GetAmmo());
-
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Cyan, FString::Printf(TEXT("%s"), *PlayerController->GetName()));
 }
 
 void UP11MainWidget::OnHealthChangedHandle(const float Health)
