@@ -4,12 +4,16 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/EditableTextBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "P11/Public/Game/P11GameInstance.h"
+#include "P11/Public/Game/P11GameState.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11/Public/Player/P11Character.h"
 #include "P11/Public/Player/P11PlayerState.h"
 #include "P11/Public/UI/P11HUD.h"
+#include "P11/Public/UI/Chat/P11ChatBox.h"
+#include "P11/Public/UI/Chat/P11ChatOnScreen.h"
 
 // DEFINE_LOG_CATEGORY_STATIC(LogP11PlayerController, All, All)
 
@@ -51,6 +55,7 @@ void AP11PlayerController::SetupInputComponent()
 		EnhancedInput->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::MainMenuInput);
 		EnhancedInput->BindAction(ScoreboardAction, ETriggerEvent::Started, this, &ThisClass::ScoreboardInput, true);
 		EnhancedInput->BindAction(ScoreboardAction, ETriggerEvent::Completed, this, &ThisClass::ScoreboardInput, false);
+		EnhancedInput->BindAction(ChatAction, ETriggerEvent::Started, this, &ThisClass::ChatInput);
 	}
 }
 
@@ -60,15 +65,15 @@ void AP11PlayerController::MainMenuInput()
 	{
 		return;
 	}
-	bMenuVisibility = !bMenuVisibility;
+	bMenuVisible = !bMenuVisible;
 	// SetPause(bMenuVisibility);
-	HUD->ShowMainMenu(bMenuVisibility);
-	SetShowMouseCursor(bMenuVisibility);
+	HUD->ShowMainMenu(bMenuVisible);
+	SetShowMouseCursor(bMenuVisible);
 
 	FInputModeGameAndUI GameAndUIMode;
 	GameAndUIMode.SetHideCursorDuringCapture(false);
-	bMenuVisibility ? SetInputMode(GameAndUIMode) : SetInputMode(FInputModeGameOnly());
-	bMenuVisibility ? GetPawn()->DisableInput(this) : GetPawn()->EnableInput(this);
+	bMenuVisible ? SetInputMode(GameAndUIMode) : SetInputMode(FInputModeGameOnly());
+	bMenuVisible ? GetPawn()->DisableInput(this) : GetPawn()->EnableInput(this);
 }
 
 void AP11PlayerController::SetCharSide(const EP11PlayerSide NewSide)
@@ -112,4 +117,59 @@ void AP11PlayerController::ScoreboardInput(const bool bVisible)
 		return;
 	}
 	HUD->ShowScore(bVisible);
+}
+
+void AP11PlayerController::ChatInput()
+{
+	if (!HUD)
+	{
+		return;
+	}
+	const UP11ChatOnScreen* ChatOnScreen = HUD->GetChatOnScreen();
+	if (!ChatOnScreen)
+	{
+		return;
+	}
+	const UP11ChatBox* ChatBox = ChatOnScreen->GetChatBox();
+	if (!ChatBox)
+	{
+		return;
+	}
+	UEditableTextBox* MessageBox = ChatBox->GetMessageBox();
+	if (!MessageBox)
+	{
+		return;
+	}
+	APawn* ControlledPawn = GetPawn();
+	if (!ControlledPawn)
+	{
+		return;
+	}
+	const int32 SwitcherIndex = ChatBox->GetSwitcherIndex();
+	const bool bShowChat = SwitcherIndex == 0;
+	if (bShowChat)
+	{
+		FInputModeGameAndUI GameAndUIMode;
+		GameAndUIMode.SetHideCursorDuringCapture(false);
+		GameAndUIMode.SetWidgetToFocus(MessageBox->TakeWidget());
+		SetInputMode(GameAndUIMode);
+		ControlledPawn->DisableInput(this);
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly{});
+		ControlledPawn->EnableInput(this);
+	}
+	HUD->ShowChat(bShowChat);
+	SetShowMouseCursor(bShowChat);
+}
+
+void AP11PlayerController::Server_SendToPlayerControllerGameState_Implementation(const FString& Sender, const FString& Message)
+{
+	AP11GameState* GameState = Cast<AP11GameState>(GetWorld()->GetGameState());
+	if (!GameState)
+	{
+		return;
+	}
+	GameState->Multicast_MessageSendToGameState(Sender, Message);
 }

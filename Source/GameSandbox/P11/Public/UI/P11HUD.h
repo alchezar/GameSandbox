@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "P11HUD.generated.h"
 
+class UP11ChatOnScreen;
 class UP11StatScoreboard;
 class UP11MenuFPS;
 class UP11MainMenu;
@@ -18,10 +19,12 @@ class GAMESANDBOX_API AP11HUD : public AHUD
 
 public:
 	AP11HUD();
+	FORCEINLINE UP11ChatOnScreen* GetChatOnScreen() const { return ChatOnScreen; }
 	void ShowUI(const bool bVisible);
 	void ShowMainMenu(const bool bVisible);
 	void ShowFPS();
 	void ShowScore(const bool bVisible);
+	void ShowChat(const bool bVisible);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +38,8 @@ protected:
 	TSubclassOf<UP11MenuFPS> MenuFpsClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP11StatScoreboard> ScoreboardClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TSubclassOf<UP11ChatOnScreen> ChatClass;
 	
 private:
 	UPROPERTY()
@@ -45,4 +50,6 @@ private:
 	UP11MenuFPS* MenuFPS = nullptr;
 	UPROPERTY()
 	UP11StatScoreboard* Scoreboard = nullptr;
+	UPROPERTY()
+	UP11ChatOnScreen* ChatOnScreen = nullptr;
 };

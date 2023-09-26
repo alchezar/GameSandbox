@@ -25,13 +25,17 @@ public:
 	void Client_ChangeSide();
 	UFUNCTION(Server, Reliable)
 	void Server_ChangeCharSide(const EP11PlayerSide NewSide);
+	UFUNCTION()
 	void ChangeCharSide(const EP11PlayerSide NewSide) const;
+	UFUNCTION(Server, Unreliable)
+	void Server_SendToPlayerControllerGameState(const FString& Sender, const FString& Message);
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	void MainMenuInput();
 	void ScoreboardInput(const bool bVisible);
+	void ChatInput();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
@@ -40,9 +44,11 @@ protected:
 	UInputAction* MainMenuAction;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	UInputAction* ScoreboardAction;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	UInputAction* ChatAction;
+	
 private:
-	bool bMenuVisibility = false;
+	bool bMenuVisible = false;
 	UPROPERTY()
 	AP11HUD* HUD;
 };

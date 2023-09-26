@@ -9,6 +9,7 @@
 #include "P11/Public/UI/P11MainWidget.h"
 #include "P11/Public/UI/P11MenuFPS.h"
 #include "P11/Public/UI/P11StatScoreboard.h"
+#include "P11/Public/UI/Chat/P11ChatOnScreen.h"
 
 DEFINE_LOG_CATEGORY_STATIC(LogP11HUD, All, All)
 
@@ -22,6 +23,7 @@ void AP11HUD::BeginPlay()
 	Super::BeginPlay();
 	
 	ShowFPS();
+	ShowChat(false);
 }
 
 void AP11HUD::ShowFPS()
@@ -63,7 +65,7 @@ void AP11HUD::ShowUI(const bool bVisible)
 		UE_LOG(LogP11HUD, Warning, TEXT("No Main UI Widget"));
 		return;
 	}
-	MainWidget->AddToViewport();
+	MainWidget->AddToViewport(0);
 }
 
 void AP11HUD::ShowMainMenu(const bool bVisible)
@@ -80,7 +82,7 @@ void AP11HUD::ShowMainMenu(const bool bVisible)
 			UE_LOG(LogP11HUD, Warning, TEXT("No Main Menu Widget"));
 			return;
 		}
-		MainMenu->AddToViewport();
+		MainMenu->AddToViewport(2);
 		MainMenu->SetVisibility(ESlateVisibility::Collapsed);
 	}
 	MainMenu->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
@@ -104,9 +106,27 @@ void AP11HUD::ShowScore(const bool bVisible)
 		Scoreboard->AddToViewport(1);
 		Scoreboard->SetVisibility(ESlateVisibility::Collapsed);
 	}
-	// if (bVisible)
-	// {
-	// 	Scoreboard->UpdateScore();
-	// }
 	Scoreboard->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+}
+
+void AP11HUD::ShowChat(const bool bVisible)
+{
+	if (!ChatClass)
+	{
+		UE_LOG(LogP11HUD, Warning, TEXT("Chat class not assigned!"));
+		return;
+	}
+	if (!ChatOnScreen)
+	{
+		ChatOnScreen = CreateWidget<UP11ChatOnScreen>(PlayerOwner, ChatClass);
+		if (!ChatOnScreen)
+		{
+			UE_LOG(LogP11HUD, Warning, TEXT("No Chat widget!"))
+			return;
+		}
+		ChatOnScreen->AddToViewport(1);
+		ChatOnScreen->SetVisibility(ESlateVisibility::Visible);
+	}
+	// Chat->SetVisibility(bVisible ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
+	ChatOnScreen->ExtendChat(bVisible);
 }

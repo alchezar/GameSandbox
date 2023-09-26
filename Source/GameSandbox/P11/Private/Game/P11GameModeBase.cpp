@@ -4,6 +4,7 @@
 
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "P11/Public/Game/P11GameState.h"
 #include "P11/Public/Player/P11Character.h"
 #include "P11/Public/Player/P11PlayerController.h"
 #include "P11/Public/Player/P11PlayerState.h"
@@ -15,6 +16,7 @@ AP11GameModeBase::AP11GameModeBase()
 	HUDClass = AP11HUD::StaticClass();
 	PlayerControllerClass = AP11PlayerController::StaticClass();
 	PlayerStateClass = AP11PlayerState::StaticClass();
+	GameStateClass = AP11GameState::StaticClass();
 }
 
 void AP11GameModeBase::Respawn(AController* Controller)
