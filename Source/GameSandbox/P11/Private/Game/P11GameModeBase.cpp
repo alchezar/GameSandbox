@@ -9,6 +9,8 @@
 #include "P11/Public/Player/P11PlayerController.h"
 #include "P11/Public/Player/P11PlayerState.h"
 #include "P11/Public/UI/P11HUD.h"
+#include "P11/Public/UI/Chat/P11Chat.h"
+#include "P11/Public/UI/Chat/P11ChatMessage.h"
 
 AP11GameModeBase::AP11GameModeBase()
 {
@@ -45,4 +47,46 @@ void AP11GameModeBase::Respawn(AController* Controller)
 	{
 		Controller->Possess(NewChar);
 	}
+}
+
+void AP11GameModeBase::Server_SendToGameMode_Implementation(const FP11MessageInfo& MessageInfo)
+{
+	AP11GameState* P11GameState = GetGameState<AP11GameState>();
+	if (!P11GameState)
+	{
+		return;
+	}
+	for (const APlayerState* PlayerState : P11GameState->PlayerArray)
+	{
+		if (!PlayerState->GetPlayerController())
+		{
+			return;
+		}
+		AP11PlayerController* PlayerController = Cast<AP11PlayerController>(PlayerState->GetPlayerController());
+		if (!PlayerController)
+		{
+			return;
+		}
+		PlayerController->Client_MessageSendToGameMode(MessageInfo);
+	}
+}
+
+void AP11GameModeBase::OnPostLogin(AController* NewPlayer)
+{
+	Super::OnPostLogin(NewPlayer);
+	/** Here we can show message in the chat, that the player is "Connected to the server.".
+	  *	But GameMode spawn earlier than PlayerState, which contains the player`s name.
+	  *	So we will send the message from AP11PlayerState::Server_SendNameToSrv. */
+}
+
+void AP11GameModeBase::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	const AP11PlayerState* PlayerState = Exiting->GetPlayerState<AP11PlayerState>();
+	if (!PlayerState)
+	{
+		return;
+	}
+	Server_SendToGameMode({PlayerState->GetThePlayerName().ToString(), "Disconnected from the server.", EP11MessageState::Logout});
 }

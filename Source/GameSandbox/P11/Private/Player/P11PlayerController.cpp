@@ -7,6 +7,7 @@
 #include "Components/EditableTextBox.h"
 #include "Kismet/GameplayStatics.h"
 #include "P11/Public/Game/P11GameInstance.h"
+#include "P11/Public/Game/P11GameModeBase.h"
 #include "P11/Public/Game/P11GameState.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11/Public/Player/P11Character.h"
@@ -157,19 +158,49 @@ void AP11PlayerController::ChatInput()
 	}
 	else
 	{
-		SetInputMode(FInputModeGameOnly{});
-		ControlledPawn->EnableInput(this);
+		AfterCloseChat();
 	}
 	HUD->ShowChat(bShowChat);
 	SetShowMouseCursor(bShowChat);
 }
 
-void AP11PlayerController::Server_SendToPlayerControllerGameState_Implementation(const FString& Sender, const FString& Message)
+void AP11PlayerController::Server_SendToPlayerControllerGameState_Implementation(const FP11MessageInfo& MessageInfo)
 {
 	AP11GameState* GameState = Cast<AP11GameState>(GetWorld()->GetGameState());
 	if (!GameState)
 	{
 		return;
 	}
-	GameState->Multicast_MessageSendToGameState(Sender, Message);
+	GameState->Multicast_MessageSendToGameState(MessageInfo);
+}
+
+void AP11PlayerController::Server_SendToPlayerControllerGameMode_Implementation(const FP11MessageInfo& MessageInfo)
+{
+	if (!GetWorld()->GetAuthGameMode())
+	{
+		return;
+	}
+	AP11GameModeBase* GameMode = Cast<AP11GameModeBase>(GetWorld()->GetAuthGameMode());
+	if (!GameMode)
+	{
+		return;
+	}
+	GameMode->Server_SendToGameMode(MessageInfo);
+}
+
+void AP11PlayerController::AfterCloseChat()
+{
+	APawn* ControlledPawn = GetPawn();
+	if (!ControlledPawn)
+	{
+		return;
+	}
+	bShowMouseCursor = false;
+	SetInputMode(FInputModeGameOnly{});
+	ControlledPawn->EnableInput(this);
+}
+
+void AP11PlayerController::Client_MessageSendToGameMode_Implementation(const FP11MessageInfo& MessageInfo)
+{
+	OnMessageSendToGameMode.Broadcast(MessageInfo);
 }

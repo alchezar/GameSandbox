@@ -5,7 +5,10 @@
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "P11/Public/Game/P11GameInstance.h"
+#include "P11/Public/Game/P11GameModeBase.h"
 #include "P11/Public/Game/P11SavePlayerInfo.h"
+#include "P11/Public/UI/Chat/P11Chat.h"
+#include "P11/Public/UI/Chat/P11ChatMessage.h"
 
 void AP11PlayerState::BeginPlay()
 {
@@ -50,6 +53,14 @@ void AP11PlayerState::AddDeath()
 void AP11PlayerState::Server_SendNameToSrv_Implementation(const FText& Name)
 {
 	PlayerName = Name;
+
+	/* Show message in chat after player connection. */
+	AP11GameModeBase* GameMode = GetWorld()->GetAuthGameMode<AP11GameModeBase>();
+	if (!GameMode)
+	{
+		return;
+	}
+	GameMode->Server_SendToGameMode({Name.ToString(), "Connected to the server.", EP11MessageState::Login});
 }
 
 void AP11PlayerState::SetIsAlive()

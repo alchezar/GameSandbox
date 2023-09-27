@@ -1,13 +1,14 @@
 // Copyright (C) 2023, IKinder
 
 #include "P11/Public/Game/P11GameState.h"
+#include "P11/Public/UI/Chat/P11Chat.h"
 
-void AP11GameState::Multicast_MessageSendToGameState_Implementation(const FString& Sender, const FString& Message)
+void AP11GameState::Multicast_MessageSendToGameState_Implementation(const FP11MessageInfo& MessageInfo) 
 {
-	MessageSendToGameState(Sender, Message);
+	MessageSendToGameState(MessageInfo);
 }
 
-void AP11GameState::MessageSendToGameState(const FString& Sender, const FString& Message) const
+void AP11GameState::MessageSendToGameState(const FP11MessageInfo& MessageInfo) const
 {
-	OnMessageSendToGameState.Broadcast(Sender, Message);
+	OnMessageSendToGameState.Broadcast(MessageInfo);
 }

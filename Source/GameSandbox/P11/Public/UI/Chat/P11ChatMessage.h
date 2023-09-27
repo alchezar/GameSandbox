@@ -8,6 +8,14 @@
 
 class UTextBlock;
 
+UENUM(BlueprintType)
+enum class EP11MessageState : uint8
+{
+	Player UMETA(DisplayName = "From player"),
+	Login  UMETA(DisplayName = "After login"),
+	Logout UMETA(DisplayName = "After logout")
+};
+
 UCLASS()
 class GAMESANDBOX_API UP11ChatMessage : public UUserWidget
 {
@@ -21,12 +29,14 @@ protected:
 	void SetTextBlocks();
 
 public:
+	EP11MessageState MessageState = EP11MessageState::Player;
+	
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FString SenderString;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FString MessageString;
 
-protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* SenderText;
 	UPROPERTY(meta = (BindWidget))
