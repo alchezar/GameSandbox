@@ -7,6 +7,15 @@
 #include "P11/Public/Game/P11SavePlayerInfo.h"
 #include "P11MainMenu.generated.h"
 
+#define UMG_ORIGIN_INDEX 0
+#define UMG_SERVER_INDEX 1
+#define UMG_CREATE_INDEX 2
+#define UMG_SINGLE_INDEX 3
+
+class UP11ServerSingle;
+class UP11ServerCreate;
+class UP11ServerList;
+class UWidgetSwitcher;
 class UCheckBox;
 class UP11MenuPopUp;
 class UP11MenuOption;
@@ -29,7 +38,13 @@ protected:
 private:
 	UFUNCTION()
 	void OnVisibilityChangedHandle(ESlateVisibility InVisibility);
+
+	/* Switch section. */
+	void SwitchSection();
+	UFUNCTION()
+	void OnBackHandle();
 	
+	/* Middle section. */
 	void MiddleSection();
 	UFUNCTION()
 	void OnCreateHandle();
@@ -39,7 +54,10 @@ private:
 	void OnJoinHandle();
 	UFUNCTION()
 	void OnQuitHandle();
-	
+	UFUNCTION()
+	void OnServerListHandle();
+
+	/* Right section. */
 	void RightSection();
 	UFUNCTION()
 	void OnJediHandle();
@@ -48,6 +66,7 @@ private:
 	UFUNCTION()
 	void OnApplyHandle();
 
+	/* Left section. */
 	void LeftSection();
 	UFUNCTION()
 	void OnShadowOptionHandle(float Value);
@@ -85,7 +104,19 @@ private:
 	static void ActivateButton(UButton* Button, const bool bActive);
 
 protected:
-#pragma region MiddleSection
+	/* Switch section */
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* MainSwitcher;
+	UPROPERTY(meta = (BindWidget))
+	UP11ServerList* WBP_ServerList;
+	UPROPERTY(meta = (BindWidget))
+	UP11ServerCreate* WBP_CreateServer;
+	UPROPERTY(meta = (BindWidget))
+	UP11ServerSingle* WBP_CreateSingle;	
+	
+	/* Middle section */
+	UPROPERTY(meta = (BindWidget))
+	UButton* ServerListBtn;
 	UPROPERTY(meta = (BindWidget))
 	UButton* CreateBtn;
 	UPROPERTY(meta = (BindWidget))
@@ -96,9 +127,8 @@ protected:
 	UButton* QuitBtn;
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* AddressBox;
-#pragma endregion /* MiddleSection */
 
-#pragma region RightSection
+	/* Right section */
 	UPROPERTY(meta = (BindWidget))
 	UButton* JediBtn;
 	UPROPERTY(meta = (BindWidget))
@@ -109,9 +139,8 @@ protected:
 	UEditableTextBox* NameBox;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<AP11CharUI> CharUIClass;
-#pragma endregion /* RightSection */
 
-#pragma region LeftSection
+	/* Left section */
 	UPROPERTY(meta = (BindWidget))
 	UP11MenuOption* ShadowOption;
 	UPROPERTY(meta = (BindWidget))
@@ -142,7 +171,6 @@ protected:
 	UButton* DefaultBtn;
 	UPROPERTY(meta = (BindWidget))
 	UButton* SaveBtn;
-#pragma endregion /* LeftSection */
 	
 private:
 	EP11PlayerSide PlayerSide = EP11PlayerSide::Jedi;

@@ -8,6 +8,7 @@
 #include "Components/EditableTextBox.h"
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
+#include "Components/WidgetSwitcher.h"
 #include "GameFramework/GameUserSettings.h"
 #include "Kismet/GameplayStatics.h"
 #include "P11/Public/Game/P11GameInstance.h"
@@ -17,6 +18,8 @@
 #include "P11/Public/UI/P11HUD.h"
 #include "P11/Public/UI/P11MenuOption.h"
 #include "P11/Public/UI/P11MenuPopUp.h"
+#include "P11/Public/UI/ServerList/P11ServerCreate.h"
+#include "P11/Public/UI/ServerList/P11ServerList.h"
 
 void UP11MainMenu::NativeOnInitialized()
 {
@@ -67,26 +70,32 @@ void UP11MainMenu::OnVisibilityChangedHandle(ESlateVisibility InVisibility)
 	}
 }
 
+void UP11MainMenu::SwitchSection()
+{
+	WBP_ServerList->OnBackServerListBackPressed.AddUObject(this, &ThisClass::OnBackHandle);
+	WBP_CreateServer->OnCreateBackButtonPressed.AddUObject(this, &ThisClass::OnBackHandle);
+	WBP_CreateSingle->OnSingleBackBackButtonPressed.AddUObject(this, &ThisClass::OnBackHandle);
+}
+
 void UP11MainMenu::MiddleSection() 
 {
-	if (!CreateBtn || !SingleBtn || !JoinBtn || !QuitBtn || !AddressBox)
-	{
-		return;
-	}
+	ServerListBtn->OnClicked.AddDynamic(this, &ThisClass::OnServerListHandle);
 	CreateBtn->OnClicked.AddDynamic(this, &ThisClass::OnCreateHandle);
 	SingleBtn->OnClicked.AddDynamic(this, &ThisClass::OnSingleHandle);
-	JoinBtn  ->OnClicked.AddDynamic(this, &ThisClass::OnJoinHandle);
-	QuitBtn  ->OnClicked.AddDynamic(this, &ThisClass::OnQuitHandle);
+	JoinBtn->OnClicked.AddDynamic(this, &ThisClass::OnJoinHandle);
+	QuitBtn->OnClicked.AddDynamic(this, &ThisClass::OnQuitHandle);
 }
 
 void UP11MainMenu::OnCreateHandle()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap(), true, "listen");
+	// UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap(), true, "listen");
+	MainSwitcher->SetActiveWidgetIndex(UMG_CREATE_INDEX);
 }
 
 void UP11MainMenu::OnSingleHandle()
 {
-	UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap());
+	// UGameplayStatics::OpenLevelBySoftObjectPtr(GetWorld(), GameInstance->GetStartupMap());
+	MainSwitcher->SetActiveWidgetIndex(UMG_SINGLE_INDEX);
 }
 
 void UP11MainMenu::OnJoinHandle()
@@ -101,6 +110,16 @@ void UP11MainMenu::OnQuitHandle()
 	{
 		PlayerController->ConsoleCommand("quit");
 	}
+}
+
+void UP11MainMenu::OnServerListHandle()
+{
+	MainSwitcher->SetActiveWidgetIndex(UMG_SERVER_INDEX);
+}
+
+void UP11MainMenu::OnBackHandle()
+{
+	MainSwitcher->SetActiveWidgetIndex(UMG_ORIGIN_INDEX);
 }
 
 void UP11MainMenu::RightSection()
