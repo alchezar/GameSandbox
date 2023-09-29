@@ -2,23 +2,38 @@
 
 #include "P11/Public/UI/ServerList/P11ServerCreate.h"
 
+#include "Components/CheckBox.h"
+#include "Components/ComboBoxString.h"
+#include "Components/EditableTextBox.h"
+#include "P11/Public/Game/P11GameInstance.h"
+
 // #include "Components/Button.h"
 
 void UP11ServerCreate::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	// BackBtn->OnClicked.AddDynamic(this, &ThisClass::OnBackHandle);
-	// CreateBtn->OnClicked.AddDynamic(this, &ThisClass::OnCreateHandle);
 }
 
 void UP11ServerCreate::OnBackHandle()
 {
-	// Super::OnBackHandle();
 	OnCreateBackButtonPressed.Broadcast();
 }
 
 void UP11ServerCreate::OnCreateHandle()
 {
-	Super::OnCreateHandle();
+	const int32 MaxPlayers = GetMaxPlayersNum();
+	if (MaxPlayers == 0)
+	{
+		return;
+	}
+	if (ServerNameTextBox->GetText().IsEmpty())
+	{
+		ServerNameTextBox->SetError(FText::FromString("Empty"));
+		return;
+	}
+	const bool bLAN = LanCheckBox->GetCheckedState() == ECheckBoxState::Checked;
+	const FString LevelURL = LevelAddresses[ServerMapComboBox->GetSelectedIndex()];
+	const FString ServerName = ServerNameTextBox->GetText().ToString();
+	
+	GameInstance->Host(MaxPlayers, bLAN, LevelURL, ServerName);
 }

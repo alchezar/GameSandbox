@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P11ServerSingle.generated.h"
 
+class UP11GameInstance;
 class UCheckBox;
 class UComboBoxString;
 class UEditableTextBox;
@@ -25,20 +26,28 @@ protected:
 	UFUNCTION()
 	virtual void OnCreateHandle();
 
+	int32 GetMaxPlayersNum() const;
+
+private:
+	void FindAllLevels();
+
 public:
 	FP11OnServerSingleBackButtonPressedSignature OnSingleBackBackButtonPressed;
 
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* BackBtn;
-	// UPROPERTY(meta = (BindWidget))
-	// UEditableTextBox* ServerNameTextBox;
 	UPROPERTY(meta = (BindWidget))
 	UComboBoxString* ServerMapComboBox;
 	UPROPERTY(meta = (BindWidget))
 	UEditableTextBox* MaxPlayersTextBox;
-	// UPROPERTY(meta = (BindWidget))
-	// UCheckBox* LanCheckBox;
 	UPROPERTY(meta = (BindWidget))
 	UButton* CreateBtn;
+
+	UPROPERTY(EditAnywhere, Category = "C++")
+	FName SearchPath = "/Game/Project/PP11/Level";
+
+	TArray<FString> LevelAddresses;
+	UPROPERTY()
+	UP11GameInstance* GameInstance;
 };
