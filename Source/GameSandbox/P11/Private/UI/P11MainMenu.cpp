@@ -37,6 +37,7 @@ void UP11MainMenu::NativeConstruct()
 	check(Controller)
 	OnVisibilityChanged.AddDynamic(this, &ThisClass::OnVisibilityChangedHandle);
 
+	SwitchSection();
 	MiddleSection();
 	RightSection();
 	LeftSection();
