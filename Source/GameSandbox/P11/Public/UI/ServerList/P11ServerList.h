@@ -6,6 +6,12 @@
 #include "Blueprint/UserWidget.h"
 #include "P11ServerList.generated.h"
 
+#define SERVER_LIST_LOADING_INDEX 0
+#define SERVER_LIST_SUCCESS_INDEX 1
+#define SERVER_LIST_FAILURE_INDEX 2
+
+class UP11ServerInfo;
+class UP11GameInstance;
 class UWidgetSwitcher;
 class UScrollBox;
 class UButton;
@@ -24,6 +30,9 @@ protected:
 	UFUNCTION()
 	void OnRefreshHandle();
 
+	void OnFindSessionFailHandle();
+	void OnFindSessionSuccessfulHandle(const FOnlineSessionSearchResult& SessionSearchResult);
+
 public:
 	FP11OnServerListBackButtonPressedSignature OnBackServerListBackPressed;
 
@@ -36,4 +45,11 @@ protected:
 	UScrollBox* ServerListScrl;
 	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* ListSwitcher;
+
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP11ServerInfo> ServerInfoClass;
+
+private:
+	UPROPERTY()
+	UP11GameInstance* GameInstance;
 };

@@ -57,7 +57,19 @@ void UP11GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool bS
 
 void UP11GameInstance::OnFindSessionCompleteHandle(bool bSuccessful) 
 {
-
+	if (!bSuccessful || !SessionSearch || SessionSearch->SearchResults.IsEmpty())
+	{
+		OnFindSessionFail.Broadcast();
+		return;
+	}
+	for (const FOnlineSessionSearchResult& Session : SessionSearch->SearchResults)
+	{
+		if (!SessionSearch.IsValid())
+		{
+			continue;
+		}
+		OnFindSessionSuccessful.Broadcast(Session);
+	}
 }
 
 void UP11GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result) 
@@ -86,13 +98,14 @@ void UP11GameInstance::Host(const int32 MaxPlayers, const bool bLAN, const FStri
 	CreateSession(MaxPlayers, bLAN, LevelURL, ServerName);
 }
 
-void UP11GameInstance::Join(uint32 Index)
+void UP11GameInstance::Join(const FOnlineSessionSearchResult& Result)
 {
 	if (!SessionInterface || !SessionSearch)
 	{
 		return;
 	}
-	SessionInterface->JoinSession(0, CurrentSessionName, SessionSearch->SearchResults[Index]);
+	// SessionInterface->JoinSession(0, CurrentSessionName, SessionSearch->SearchResults[Index]);
+	SessionInterface->JoinSession(0, CurrentSessionName, Result);
 	/* After async success -> ThisClass::OnJoinSessionCompleteHandle. */
 }
 

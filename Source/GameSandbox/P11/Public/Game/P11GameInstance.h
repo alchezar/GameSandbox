@@ -9,6 +9,9 @@
 
 class UP11SavePlayerInfo;
 
+DECLARE_MULTICAST_DELEGATE(FP11OnFindSessionFailSignature);
+DECLARE_MULTICAST_DELEGATE_OneParam(FP11OnFindSessionSuccessfulSignature, const FOnlineSessionSearchResult& /* SessionSearchResult */);
+
 UCLASS()
 class GAMESANDBOX_API UP11GameInstance : public UGameInstance
 {
@@ -19,9 +22,10 @@ public:
 	FORCEINLINE UP11SavePlayerInfo* GetSavePlayerInfo() const { return SavePlayerInfo; }
 	FORCEINLINE FString GetSlotName() const { return SlotName; }
 	FORCEINLINE TSoftObjectPtr<UWorld> GetStartupMap() const { return StartupMap; }
+	FORCEINLINE FName GetServerNameKey() const { return ServerNameKey; }
 
 	void Host(const int32 MaxPlayers, const bool bLAN, const FString& LevelURL, const FString& ServerName);
-	void Join(uint32 Index);
+	void Join(const FOnlineSessionSearchResult& Result);
 	void RefreshServerList();
 
 private:
@@ -33,6 +37,10 @@ private:
 	void OnNetworkFailureHandle(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type Type, const FString& ErrorString);
 	void CreateSession(const int32 MaxPlayers, const bool bLAN, const FString& LevelURL, const FString& ServerName);
 
+public:
+	FP11OnFindSessionFailSignature OnFindSessionFail;
+	FP11OnFindSessionSuccessfulSignature OnFindSessionSuccessful;
+	
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSoftObjectPtr<UWorld> StartupMap;
