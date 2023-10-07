@@ -32,7 +32,7 @@ bool UP12SpiderMovementComponent::IsFalling() const
 void UP12SpiderMovementComponent::JumpStart()
 {
 	VerticalVelocity = InitJumpVelocity * FVector::UpVector;
-	bFalling = true;
+	bJump = true;
 }
 
 void UP12SpiderMovementComponent::MovePawn(const float DeltaTime)
@@ -41,12 +41,13 @@ void UP12SpiderMovementComponent::MovePawn(const float DeltaTime)
 	Velocity = PendingInput * MaxSpeed;
 	ConsumeInputVector();
 
-	FHitResult HitResult;
-	FVector StartPoint = UpdatedComponent->GetComponentLocation();
 	float TraceDepth = 1.0f;
 	float SphereRadius = 50.0f;
 	// float LineTraceLength = SphereRadius + TraceDepth;
+	FVector StartPoint = UpdatedComponent->GetComponentLocation();
 	FVector EndPoint = StartPoint - TraceDepth * FVector::UpVector;
+	
+	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());
 
@@ -60,6 +61,7 @@ void UP12SpiderMovementComponent::MovePawn(const float DeltaTime)
 	else if (bWasFalling && VerticalVelocity.Z < 0.0f)
 	{
 		VerticalVelocity = FVector::ZeroVector;
+		bJump = false;
 	}
 
 	Velocity += VerticalVelocity;

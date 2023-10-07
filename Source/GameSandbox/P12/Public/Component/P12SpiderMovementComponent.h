@@ -16,6 +16,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual bool IsFalling() const override;
 	FORCEINLINE bool GetIsFalling() const { return bFalling; }
+	FORCEINLINE bool GetIsJump() const { return bJump; }
 	void JumpStart();
 
 protected:
@@ -32,5 +33,6 @@ protected:
 
 private:
 	bool bFalling = false;
+	bool bJump = false;
 	FVector VerticalVelocity = FVector::ZeroVector;
 };

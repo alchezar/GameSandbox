@@ -6,6 +6,7 @@
 #include "Animation/AnimInstance.h"
 #include "P12SpiderAnimInstance.generated.h"
 
+class UP12SpiderMovementComponent;
 class AP12SpiderPawn;
 
 UCLASS()
@@ -25,7 +26,16 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
 	bool bInAir;
 
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++ | IK")
+	FVector RightFrontFootEffectorLocation = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++ | IK")
+	FVector RightRearFootEffectorLocation = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++ | IK")
+	FVector LeftFrontFootEffectorLocation = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++ | IK")
+	FVector LeftRearFootEffectorLocation = FVector::ZeroVector;
+
 private:
 	TWeakObjectPtr<AP12SpiderPawn> CachedPawn;
-
+	TWeakObjectPtr<UP12SpiderMovementComponent> CachedPawnMovement;
 };

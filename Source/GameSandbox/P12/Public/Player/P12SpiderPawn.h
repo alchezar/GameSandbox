@@ -39,7 +39,8 @@ protected:
 private:
 	void GetSubsystem() const;
 	void RotatePawnToMovement(const float DeltaTime);
-
+	float GetIKSocketOffset(const FName& SocketName);
+	void DrawTraceDebug(const FHitResult& HitResult);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++")
@@ -59,7 +60,7 @@ protected:
 	float CollisionSphereRadius = 50.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float RotationInterpolationSpeed = 10.f;
-
+	
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputMappingContext* DefaultContext;	
 	UPROPERTY(EditAnywhere, Category = "C++")
@@ -72,16 +73,16 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName RightFrontFootSocketName = "IK_FrontRightSocket";
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
-	FName LeftFrontFootSocketName = "IK_FrontLeftSocket";
-	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName RightRearFootSocketName = "IK_RearRightSocket";
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	FName LeftFrontFootSocketName = "IK_FrontLeftSocket";
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName LeftRearFootSocketName = "IK_RearLeftSocket";
 
 private:
 	float IKRightFrontFootOffset = 0.f;
-	float IKLeftFrontFootOffset = 0.f;
 	float IKRightRearFootOffset = 0.f;
+	float IKLeftFrontFootOffset = 0.f;
 	float IKLeftRearFootOffset = 0.f;
 
 	float InputForward = 0.f;

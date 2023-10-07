@@ -48,6 +48,12 @@ void AP12SpiderPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	RotatePawnToMovement(DeltaTime);
+
+	constexpr float IKOffsetInterp = 10.f;
+	IKRightFrontFootOffset = FMath::FInterpTo(IKRightFrontFootOffset, GetIKSocketOffset(RightFrontFootSocketName), DeltaTime, IKOffsetInterp);
+	IKRightRearFootOffset  = FMath::FInterpTo(IKRightRearFootOffset,  GetIKSocketOffset(RightRearFootSocketName),  DeltaTime, IKOffsetInterp);
+	IKLeftFrontFootOffset  = FMath::FInterpTo(IKLeftFrontFootOffset,  GetIKSocketOffset(LeftFrontFootSocketName),  DeltaTime, IKOffsetInterp);
+	IKLeftRearFootOffset   = FMath::FInterpTo(IKLeftRearFootOffset,   GetIKSocketOffset(LeftRearFootSocketName),   DeltaTime, IKOffsetInterp);
 }
 
 void AP12SpiderPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -119,6 +125,41 @@ void AP12SpiderPawn::JumpInput()
 
 void AP12SpiderPawn::RotatePawnToMovement(const float DeltaTime)
 {
+	if (FMath::IsNearlyZero(GetVelocity().Length()))
+	{
+		return;
+	}
 	const FRotator TargetRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	SphereRootComponent->SetWorldRotation(FMath::RInterpTo(SphereRootComponent->GetComponentRotation(), TargetRotation, DeltaTime, RotationInterpolationSpeed));
+}
+
+float AP12SpiderPawn::GetIKSocketOffset(const FName& SocketName)
+{
+	const FVector SocketLocation = SkeletalMeshComponent->GetSocketLocation(SocketName);
+	const FVector TraceStart = FVector(SocketLocation.X, SocketLocation.Y, GetActorLocation().Z);
+	const FVector TraceEnd = TraceStart - FVector::UpVector * GetActorScale3D().Z * CollisionSphereRadius * 2.f;
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	Params.bTraceComplex = true;
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+	DrawTraceDebug(HitResult);
+	if (HitResult.bBlockingHit)
+	{
+		return ((HitResult.TraceEnd - HitResult.Location) / GetActorScale3D()).Z + CollisionSphereRadius;  
+	}
+	return 0.f;
+}
+
+void AP12SpiderPawn::DrawTraceDebug(const FHitResult& HitResult)
+{
+	if (!HitResult.bBlockingHit)
+	{
+		DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd, FColor::Green);
+		return;
+	}
+	DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red);
+	DrawDebugLine(GetWorld(), HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green);
+	DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red);
 }
