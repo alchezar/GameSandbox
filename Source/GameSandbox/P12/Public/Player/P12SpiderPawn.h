@@ -37,7 +37,7 @@ protected:
 	void JumpInput();
 
 private:
-	void GetSubsystem() const;
+	void SubsystemDefaultMappingContext() const;
 	void RotatePawnToMovement(const float DeltaTime);
 	float GetIKSocketOffset(const FName& SocketName);
 	void DrawTraceDebug(const FHitResult& HitResult);

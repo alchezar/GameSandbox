@@ -41,7 +41,7 @@ AP12SpiderPawn::AP12SpiderPawn()
 void AP12SpiderPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	GetSubsystem();
+	SubsystemDefaultMappingContext();
 }
 
 void AP12SpiderPawn::Tick(float DeltaTime)
@@ -72,7 +72,7 @@ void AP12SpiderPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	InputComp->BindAction(JumpAction, ETriggerEvent::Started,   this, &ThisClass::JumpInput);
 }
 
-void AP12SpiderPawn::GetSubsystem() const
+void AP12SpiderPawn::SubsystemDefaultMappingContext() const
 {
 	const auto* PlayerController = Cast<APlayerController>(Controller);
 	if (!PlayerController)
