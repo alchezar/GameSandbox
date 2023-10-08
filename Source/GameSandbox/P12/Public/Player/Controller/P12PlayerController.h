@@ -27,6 +27,8 @@ protected:
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void JumpInput();
+	void CrouchInput();
+	void RunInput(const bool bRun);
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -40,7 +42,11 @@ protected:
 	UInputAction* LookAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* JumpAction = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* CrouchAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* RunAction = nullptr;
+	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 };
