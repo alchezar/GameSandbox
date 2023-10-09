@@ -28,15 +28,18 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 void AP12BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
 }
 
-void AP12BaseCharacter::Tick(float DeltaTime)
+void AP12BaseCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	LegsIKFloorAlignment();
 }
 
 void AP12BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
+{ 
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
@@ -154,4 +157,67 @@ bool AP12BaseCharacter::CanRun() const
 UP12BaseCharacterMovementComponent* AP12BaseCharacter::GetBaseCharacterMovement() const
 {
 	return BaseCharacterMovement.Get(); 
+}
+
+float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const bool bDrawDebug, const float TraceHalfDistance, const float FromBoneToBottom)
+{
+	const FVector SocketLocation = GetMesh()->GetBoneLocation(VirtualBoneName);
+	const FVector TraceStart = SocketLocation + FVector(0.f, 0.f, TraceHalfDistance);
+	const FVector TraceEnd = SocketLocation - FVector(0.f, 0.f, TraceHalfDistance);
+
+	FHitResult HitResult;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
+	if (bDrawDebug)
+	{
+		DrawTraceDebug(HitResult);
+	}
+	if (HitResult.bBlockingHit)
+	{
+		return (SocketLocation - HitResult.ImpactPoint).Z - FromBoneToBottom;
+	}
+	return 0.f;
+}
+
+void AP12BaseCharacter::LegsIKFloorAlignment()
+{
+	constexpr float MinDistanceThreshold = 12.f;
+	constexpr float IKOffsetInterp = 10.f;
+	
+	float LeftOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_l_ankle");
+	float RightOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_r_ankle");
+	float HipOffset = 0.f;
+
+	if (FMath::Abs(LeftOffset) > MinDistanceThreshold || FMath::Abs(RightOffset) > MinDistanceThreshold)
+	{
+		if (LeftOffset > RightOffset)
+		{
+			HipOffset = LeftOffset;
+			LeftOffset = 0.f;
+			RightOffset -= HipOffset;
+		}
+		else
+		{
+			HipOffset = RightOffset;
+			RightOffset = 0.f;
+			LeftOffset -= HipOffset;
+		}
+	}
+	
+	IKLeftLegOffset = FMath::FInterpTo(IKLeftLegOffset, LeftOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
+	IKRightLegOffset = FMath::FInterpTo(IKRightLegOffset, RightOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
+	IKHitOffset = FMath::FInterpTo(GetIKHipOffset(), HipOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
+}
+
+void AP12BaseCharacter::DrawTraceDebug(const FHitResult& HitResult)
+{
+	if (!HitResult.bBlockingHit)
+	{
+		DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd, FColor::Green);
+		return;
+	}
+	DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red);
+	DrawDebugLine(GetWorld(), HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green);
+	DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red);
 }

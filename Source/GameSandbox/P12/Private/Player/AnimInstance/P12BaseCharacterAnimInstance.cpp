@@ -27,6 +27,10 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Direction = GetMovementDirectionAngle();
 	bInAir = CachedCharacterMovement->IsFalling();
 	bCrouch = CachedCharacterMovement->IsCrouching();
+
+	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
+	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
+	HipOffset = FVector(0.f, CachedCharacter->GetIKHipOffset(), 0.f);
 }
 
 float UP12BaseCharacterAnimInstance::GetMovementDirectionAngle() const

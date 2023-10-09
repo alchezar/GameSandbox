@@ -31,6 +31,13 @@ protected:
 	bool bInAir;
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
 	bool bCrouch;
+
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	FVector LeftLegOffset = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	FVector RightLegOffset = FVector::ZeroVector;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	FVector HipOffset = FVector::ZeroVector;
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;

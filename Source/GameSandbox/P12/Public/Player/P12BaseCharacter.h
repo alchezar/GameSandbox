@@ -32,10 +32,13 @@ class GAMESANDBOX_API AP12BaseCharacter : public ACharacter
 
 public:
 	explicit AP12BaseCharacter(const FObjectInitializer& ObjectInitializer);
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(const float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
+	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
+	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
@@ -52,7 +55,10 @@ protected:
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength);
 	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength);
-	
+	float GetIKSocketOffset(const FName& VirtualBoneName, const bool bDrawDebug = false, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
+	void LegsIKFloorAlignment();
+	void DrawTraceDebug(const FHitResult& HitResult);
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;
@@ -68,4 +74,8 @@ private:
 	float DefaultMaxSpeed = 0.f;
 	bool bRunning = false;
 	FTimerHandle RunTimer;
+	FVector DefaultMeshLocation;
+	float IKLeftLegOffset = 0.f;
+	float IKRightLegOffset = 0.f;
+	float IKHitOffset = 0.f;
 };
