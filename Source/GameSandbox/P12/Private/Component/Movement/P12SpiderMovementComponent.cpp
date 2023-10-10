@@ -1,6 +1,6 @@
 // Copyright (C) 2023, IKinder
 
-#include "P12/Public/Component/P12SpiderMovementComponent.h"
+#include "P12/Public/Component/Movement/P12SpiderMovementComponent.h"
 
 UP12SpiderMovementComponent::UP12SpiderMovementComponent()
 {

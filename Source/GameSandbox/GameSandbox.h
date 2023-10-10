@@ -10,5 +10,5 @@
 
 #define ECC_PROJECTILE		 ECC_GameTraceChannel3
 #define ECC_WEAPON			 ECC_GameTraceChannel5
-
+#define ECC_CLIMBING         ECC_GameTraceChannel6
 	

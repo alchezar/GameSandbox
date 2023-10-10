@@ -2,7 +2,7 @@
 
 #include "P12/Public/Player/AnimInstance/P12BaseCharacterAnimInstance.h"
 
-#include "P12/Public/Component/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Component/Movement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 void UP12BaseCharacterAnimInstance::NativeBeginPlay()

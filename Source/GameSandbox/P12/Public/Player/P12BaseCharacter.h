@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class UP12LedgeDetectionComponent;
 class UP12BaseCharacterMovementComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -43,6 +44,7 @@ public:
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void JumpInput();
+	void MantleInput();
 	void CrouchInput();
 	void RunInput(const bool bRunRequest);
 
@@ -51,11 +53,11 @@ protected:
 	virtual bool CanJumpInternal_Implementation() const override;
 	virtual void OnJumped_Implementation() override;
 	bool CanRun() const;
-
+	
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength);
 	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength);
-	float GetIKSocketOffset(const FName& VirtualBoneName, const bool bDrawDebug = false, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
+	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
 	void DrawTraceDebug(const FHitResult& HitResult);
 
@@ -65,9 +67,11 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Run")
+	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	FP12CameraArmLength CameraArmLength;
-
+	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
+	UP12LedgeDetectionComponent* LedgeDetection;
+	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
 	bool bCrouch = false;

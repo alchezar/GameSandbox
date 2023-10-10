@@ -1,6 +1,6 @@
 // Copyright (C) 2023, IKinder
 
-#include "P12/Public/Component/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Component/Movement/P12BaseCharacterMovementComponent.h"
 
 UP12BaseCharacterMovementComponent::UP12BaseCharacterMovementComponent()
 {

@@ -27,6 +27,7 @@ protected:
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void JumpInput();
+	void MantleInput();
 	void CrouchInput();
 	void RunInput(const bool bRun);
 
@@ -42,6 +43,8 @@ protected:
 	UInputAction* LookAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* JumpAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* MantleAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* CrouchAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")

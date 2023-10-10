@@ -44,6 +44,7 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::MoveInput);
 	InputComp->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 	InputComp->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::JumpInput);
+	InputComp->BindAction(MantleAction, ETriggerEvent::Started, this, &ThisClass::MantleInput);
 	InputComp->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchInput);
 	InputComp->BindAction(RunAction, ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 	InputComp->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
@@ -74,6 +75,15 @@ void AP12PlayerController::JumpInput()
 		return;
 	}
 	CachedBaseCharacter->JumpInput();
+}
+
+void AP12PlayerController::MantleInput()
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->MantleInput();
 }
 
 void AP12PlayerController::CrouchInput()

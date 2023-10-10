@@ -3,7 +3,7 @@
 #include "P12/Public/Player/AnimInstance/P12SpiderAnimInstance.h"
 
 #include "GameFramework/PawnMovementComponent.h"
-#include "P12/Public/Component/P12SpiderMovementComponent.h"
+#include "P12/Public/Component/MOvement/P12SpiderMovementComponent.h"
 #include "P12/Public/Player/P12SpiderPawn.h"
 
 void UP12SpiderAnimInstance::NativeBeginPlay()

@@ -8,7 +8,8 @@
 #include "Components/ArrowComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "P12/Public/Component/P12SpiderMovementComponent.h"
+#include "P12/Public/Component/Movement/P12SpiderMovementComponent.h"
+#include "P12/Public/Util/P12Library.h"
 
 AP12SpiderPawn::AP12SpiderPawn()
 {
@@ -144,7 +145,10 @@ float AP12SpiderPawn::GetIKSocketOffset(const FName& SocketName)
 	Params.AddIgnoredActor(this);
 	Params.bTraceComplex = true;
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-	DrawTraceDebug(HitResult);
+	if (UP12Library::GetDrawDebugAllowed())
+	{
+		DrawTraceDebug(HitResult);
+	}
 	if (HitResult.bBlockingHit)
 	{
 		return ((HitResult.TraceEnd - HitResult.Location) / GetActorScale3D()).Z + CollisionSphereRadius;  

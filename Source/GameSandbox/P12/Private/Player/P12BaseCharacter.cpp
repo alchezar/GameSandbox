@@ -4,7 +4,9 @@
 
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "P12/Public/Component/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
+#include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Util/P12Library.h"
 
 AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UP12BaseCharacterMovementComponent>(Super::CharacterMovementComponentName))
@@ -23,6 +25,8 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 
 	Camera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	Camera->SetupAttachment(CameraBoom);
+
+	LedgeDetection = CreateDefaultSubobject<UP12LedgeDetectionComponent>("LedgeDetectorComponent");
 }
 
 void AP12BaseCharacter::BeginPlay()
@@ -76,6 +80,16 @@ void AP12BaseCharacter::LookInput(const FInputActionValue& Value)
 void AP12BaseCharacter::JumpInput() 
 {
 	Super::Jump();
+}
+
+void AP12BaseCharacter::MantleInput()
+{
+	FP12LedgeDescription LedgeDescription;
+	if (LedgeDetection->DetectLedge(OUT LedgeDescription))
+	{
+		
+	}
+	
 }
 
 void AP12BaseCharacter::CrouchInput()
@@ -159,7 +173,7 @@ UP12BaseCharacterMovementComponent* AP12BaseCharacter::GetBaseCharacterMovement(
 	return BaseCharacterMovement.Get(); 
 }
 
-float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const bool bDrawDebug, const float TraceHalfDistance, const float FromBoneToBottom)
+float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance, const float FromBoneToBottom)
 {
 	const FVector SocketLocation = GetMesh()->GetBoneLocation(VirtualBoneName);
 	const FVector TraceStart = SocketLocation + FVector(0.f, 0.f, TraceHalfDistance);
@@ -169,7 +183,7 @@ float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const b
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-	if (bDrawDebug)
+	if (UP12Library::GetDrawDebugAllowed())
 	{
 		DrawTraceDebug(HitResult);
 	}
