@@ -59,7 +59,6 @@ private:
 	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength);
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
-	void DrawTraceDebug(const FHitResult& HitResult);
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")

@@ -40,7 +40,6 @@ private:
 	void SubsystemDefaultMappingContext() const;
 	void RotatePawnToMovement(const float DeltaTime);
 	float GetIKSocketOffset(const FName& SocketName);
-	void DrawTraceDebug(const FHitResult& HitResult);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++")

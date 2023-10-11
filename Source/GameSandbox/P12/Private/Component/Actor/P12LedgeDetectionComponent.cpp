@@ -50,7 +50,7 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 	FHitResult ForwardHitResult;
 	FCollisionShape ForwardCapsule = FCollisionShape::MakeCapsule(ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight);
 	GetWorld()->SweepSingleByChannel(ForwardHitResult, ForwardStartLocation, ForwardEndLocation,FQuat::Identity, ECC_CLIMBING, ForwardCapsule, QueryParams);
-	DebugCapsuleTrace(ForwardHitResult, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight, FColor::Green);
+	UP12Library::DrawDebugCapsuleTrace(GetWorld(), ForwardHitResult, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight, FColor::Green, UP12Library::GetCanDrawDebugLedgeDetection());
 	if (!ForwardHitResult.bBlockingHit)
 	{
 		return false;
@@ -67,7 +67,7 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 	FHitResult DownwardHitResult;
 	FCollisionShape DownwardSphere = FCollisionShape::MakeSphere(DownwardCheckSphereRadius);
 	GetWorld()->SweepSingleByChannel(DownwardHitResult, DownwardStart, DownwardEnd,	FQuat::Identity, ECC_CLIMBING, DownwardSphere, QueryParams);
-	DebugCapsuleTrace(DownwardHitResult, DownwardCheckSphereRadius, 0.f, FColor::Blue);
+	UP12Library::DrawDebugCapsuleTrace(GetWorld(), DownwardHitResult, DownwardCheckSphereRadius, 0.f, FColor::Blue, UP12Library::GetCanDrawDebugLedgeDetection());
 	if (!DownwardHitResult.bBlockingHit)
 	{
 		return false;
@@ -87,34 +87,6 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 
 	LedgeDescription.Location = DownwardHitResult.ImpactPoint;
 	LedgeDescription.Rotation = (ForwardHitResult.ImpactNormal * FVector(-1.f, -1.f, 0.f)).ToOrientationRotator();
-
-	if (UP12Library::GetDrawDebugAllowed())
-	{
-		DrawDebugCapsule(GetWorld(), OverlapLocation, OverlapCapsuleHalfHeight, OverlapCapsuleRadius, FQuat::Identity, FColor::Red, false, 5.f, 0, 1.f);
-		DrawDebugDirectionalArrow(GetWorld(), OverlapLocation, OverlapLocation + LedgeDescription.Rotation.Vector() * 50.f, 50.f, FColor::Red, false, 5.f, 0, 1.f);
-	}
+	UP12Library::DrawDebugDirectionalCapsule(GetWorld(), LedgeDescription, OverlapCapsuleRadius, OverlapCapsuleHalfHeight, OverlapLocation, UP12Library::GetCanDrawDebugLedgeDetection());
 	return true;
-}
-
-void UP12LedgeDetectionComponent::DebugCapsuleTrace(const FHitResult& HitResult, const float Radius, const float HalfHeight, const FColor Color)
-{
-	if (!UP12Library::GetDrawDebugAllowed())
-	{
-		return;
-	}
-	
-	constexpr float DrawTime = 5.f;
-	constexpr float SuccessThickness = 1.f;
-	
-	if (HitResult.bBlockingHit)
-	{
-		DrawDebugCapsule(GetWorld(), HitResult.Location, HalfHeight, Radius, FQuat::Identity, Color, false, DrawTime, 0, SuccessThickness);
-		DrawDebugDirectionalArrow(GetWorld(), HitResult.TraceStart, HitResult.Location, Radius, Color, false, DrawTime, 0, SuccessThickness);
-	}
-	else
-	{
-		DrawDebugCapsule(GetWorld(), HitResult.TraceEnd, HalfHeight, Radius, FQuat::Identity, Color, false, DrawTime);
-		DrawDebugDirectionalArrow(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd, Radius, Color, false, DrawTime, 0, SuccessThickness);
-	}
-	DrawDebugCapsule(GetWorld(), HitResult.TraceStart, HalfHeight, Radius, FQuat::Identity, Color, false, DrawTime);
 }

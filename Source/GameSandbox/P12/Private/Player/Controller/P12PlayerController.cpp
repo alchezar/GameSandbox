@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
+#include "P12/Public/Util/P12Library.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
 
@@ -108,4 +109,22 @@ void AP12PlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 	CachedBaseCharacter = Cast<AP12BaseCharacter>(InPawn);
+}
+
+void AP12PlayerController::P12Debug_EnableAll()
+{
+	TArray<FString> ConsoleVariables = UP12Library::GetAllConsoleVariables();
+	for(const FString& ConsoleVariable : ConsoleVariables)
+	{
+		ConsoleCommand( ConsoleVariable + " 1");
+	}
+}
+
+void AP12PlayerController::P12Debug_DisableAll()
+{
+	TArray<FString> ConsoleVariables = UP12Library::GetAllConsoleVariables();
+	for(const FString& ConsoleVariable : ConsoleVariables)
+	{
+		ConsoleCommand( ConsoleVariable + " 0");
+	}
 }

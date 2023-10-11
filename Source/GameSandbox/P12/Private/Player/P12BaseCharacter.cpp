@@ -182,11 +182,9 @@ float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const f
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
+	
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-	if (UP12Library::GetDrawDebugAllowed())
-	{
-		DrawTraceDebug(HitResult);
-	}
+	UP12Library::DrawDebugLineTrace(GetWorld(), HitResult, UP12Library::GetCanDrawDebugLegAlignment());
 	if (HitResult.bBlockingHit)
 	{
 		return (SocketLocation - HitResult.ImpactPoint).Z - FromBoneToBottom;
@@ -222,16 +220,4 @@ void AP12BaseCharacter::LegsIKFloorAlignment()
 	IKLeftLegOffset = FMath::FInterpTo(IKLeftLegOffset, LeftOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKRightLegOffset = FMath::FInterpTo(IKRightLegOffset, RightOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKHitOffset = FMath::FInterpTo(GetIKHipOffset(), HipOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
-}
-
-void AP12BaseCharacter::DrawTraceDebug(const FHitResult& HitResult)
-{
-	if (!HitResult.bBlockingHit)
-	{
-		DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd, FColor::Green);
-		return;
-	}
-	DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red);
-	DrawDebugLine(GetWorld(), HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green);
-	DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red);
 }

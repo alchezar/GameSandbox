@@ -33,7 +33,11 @@ protected:
 
 private:
 	void SubsystemDefaultMappingContext() const;
-
+	UFUNCTION(Exec)
+	void P12Debug_EnableAll();
+	UFUNCTION(Exec)
+	void P12Debug_DisableAll();
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputMappingContext* DefaultContext = nullptr;

@@ -144,26 +144,12 @@ float AP12SpiderPawn::GetIKSocketOffset(const FName& SocketName)
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
 	Params.bTraceComplex = true;
+
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-	if (UP12Library::GetDrawDebugAllowed())
-	{
-		DrawTraceDebug(HitResult);
-	}
+	UP12Library::DrawDebugLineTrace(GetWorld(), HitResult, UP12Library::GetCanDrawDebugLegAlignment());
 	if (HitResult.bBlockingHit)
 	{
 		return ((HitResult.TraceEnd - HitResult.Location) / GetActorScale3D()).Z + CollisionSphereRadius;  
 	}
 	return 0.f;
-}
-
-void AP12SpiderPawn::DrawTraceDebug(const FHitResult& HitResult)
-{
-	if (!HitResult.bBlockingHit)
-	{
-		DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.TraceEnd, FColor::Green);
-		return;
-	}
-	DrawDebugLine(GetWorld(), HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red);
-	DrawDebugLine(GetWorld(), HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green);
-	DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.f, FColor::Red);
 }

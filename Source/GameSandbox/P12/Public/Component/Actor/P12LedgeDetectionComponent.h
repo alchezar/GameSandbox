@@ -30,9 +30,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-private:
-	void DebugCapsuleTrace(const FHitResult& HitResult, const float Radius, const float HalfHeight, const FColor Color);
-
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Detection", meta = (ClampMin = 0.f, UIMin = 0.f))
 	float MinLedgeHeight = 40.f;
