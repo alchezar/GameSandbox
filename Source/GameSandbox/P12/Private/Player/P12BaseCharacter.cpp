@@ -3,6 +3,7 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Curves/CurveVector.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
@@ -85,11 +86,31 @@ void AP12BaseCharacter::JumpInput()
 void AP12BaseCharacter::MantleInput()
 {
 	FP12LedgeDescription LedgeDescription;
-	if (LedgeDetection->DetectLedge(OUT LedgeDescription))
+	if (!LedgeDetection->DetectLedge(OUT LedgeDescription))
 	{
-		
+		return;
 	}
+
+	float MinRange;
+	float MaxRange;
+	MantleSettings.Curve->GetTimeRange(MinRange, MaxRange);
+	const float Duration = MaxRange - MinRange;
+
+	const FVector2D Source = {MantleSettings.MinHeight, MantleSettings.MaxHeight};
+	const FVector2D Target = {MantleSettings.MinHeightStartTime, MantleSettings.MaxHeightStartTime};
+	const float MantleHeight = (LedgeDescription.Location - GetActorLocation()).Z;
+	const float StartTime = FMath::GetMappedRangeValueUnclamped(Source, Target, MantleHeight);
 	
+	const FP12MantleMovementParams MantleParams = {GetActorLocation(), GetActorRotation(), LedgeDescription.Location, LedgeDescription.Rotation, Duration, StartTime, MantleSettings.Curve};
+	GetBaseCharacterMovement()->StartMantle(MantleParams);
+
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (!AnimInstance)
+	{
+		return;
+	}
+	AnimInstance->Montage_Play(MantleSettings.Montage, 1.f, EMontagePlayReturnType::Duration, StartTime);
+	// AnimInstance->Montage_JumpToSection("Mantle_High", MantleSettings.Montage);
 }
 
 void AP12BaseCharacter::CrouchInput()
@@ -151,7 +172,7 @@ void AP12BaseCharacter::OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeig
 
 bool AP12BaseCharacter::CanJumpInternal_Implementation() const
 {
-	return bCrouch || Super::CanJumpInternal_Implementation();
+	return bCrouch || !GetBaseCharacterMovement()->IsMantling() || Super::CanJumpInternal_Implementation();
 }
 
 void AP12BaseCharacter::OnJumped_Implementation()

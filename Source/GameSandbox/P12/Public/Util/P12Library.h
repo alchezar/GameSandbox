@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "P12CoreTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P12Library.generated.h"
-
-struct FP12LedgeDescription;
 
 UCLASS()
 class GAMESANDBOX_API UP12Library : public UBlueprintFunctionLibrary
@@ -14,7 +13,6 @@ class GAMESANDBOX_API UP12Library : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
-	
 
 	static TArray<FString>  GetAllConsoleVariables();
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "PetProjects")

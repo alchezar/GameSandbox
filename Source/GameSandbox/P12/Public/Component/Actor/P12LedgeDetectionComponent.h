@@ -6,16 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "P12LedgeDetectionComponent.generated.h"
 
-USTRUCT(BlueprintType)
-struct FP12LedgeDescription
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FVector Location;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FRotator Rotation;
-};
+struct FP12LedgeDescription;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP12LedgeDetectionComponent : public UActorComponent

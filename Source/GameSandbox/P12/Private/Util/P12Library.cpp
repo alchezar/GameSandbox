@@ -3,7 +3,6 @@
 #include "P12/Public/Util/P12Library.h"
 
 #include "HAL/IConsoleManager.h"
-#include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 
 static TAutoConsoleVariable CVarDrawDebug(TEXT("P12.Debug"), 0, TEXT("Allow to draw debug helpers and console logs."), ECVF_Cheat);
 static TAutoConsoleVariable CVarDrawDebugPrintScreen(TEXT("P12.Debug.PrintScreen"), 0, TEXT("Allow to print screen messages."), ECVF_Cheat);

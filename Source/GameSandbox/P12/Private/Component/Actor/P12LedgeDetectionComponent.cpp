@@ -5,6 +5,7 @@
 #include "GameSandbox.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
 
 UP12LedgeDetectionComponent::UP12LedgeDetectionComponent()
@@ -85,7 +86,7 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 		return false;
 	}
 
-	LedgeDescription.Location = DownwardHitResult.ImpactPoint;
+	LedgeDescription.Location = OverlapLocation;
 	LedgeDescription.Rotation = (ForwardHitResult.ImpactNormal * FVector(-1.f, -1.f, 0.f)).ToOrientationRotator();
 	UP12Library::DrawDebugDirectionalCapsule(GetWorld(), LedgeDescription, OverlapCapsuleRadius, OverlapCapsuleHalfHeight, OverlapLocation, UP12Library::GetCanDrawDebugLedgeDetection());
 	return true;

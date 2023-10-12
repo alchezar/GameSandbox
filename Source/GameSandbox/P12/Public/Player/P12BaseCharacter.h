@@ -21,9 +21,31 @@ struct FP12CameraArmLength
 
 	FP12CameraArmLength() : Crouch(150.f), Walk(200.f), Run(300.f) {}
 
+	UPROPERTY(EditAnywhere)
 	float Crouch = 0.f;
+	UPROPERTY(EditAnywhere)
 	float Walk = 0.f;
+	UPROPERTY(EditAnywhere)
 	float Run = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FP12MantleSettings
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	UAnimMontage* Montage;
+	UPROPERTY(EditAnywhere)
+	UCurveVector* Curve;
+	UPROPERTY(EditAnywhere)
+	float MinHeight = 100.f;
+	UPROPERTY(EditAnywhere)
+	float MaxHeight = 200.f;
+	UPROPERTY(EditAnywhere)
+	float MinHeightStartTime = 0.f;
+	UPROPERTY(EditAnywhere)
+	float MaxHeightStartTime = 0.5f;
 };
 
 UCLASS()
@@ -66,10 +88,13 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* Camera;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
+	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	FP12CameraArmLength CameraArmLength;
-	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
+	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	UP12LedgeDetectionComponent* LedgeDetection;
+	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	FP12MantleSettings MantleSettings;
+	
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
