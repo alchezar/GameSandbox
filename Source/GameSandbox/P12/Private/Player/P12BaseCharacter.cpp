@@ -252,3 +252,21 @@ const FP12MantleSettings& AP12BaseCharacter::GetMantleSettings(const float Ledge
 {
 	return LedgeHeight > LowMantleMaxHeight ? HighMantleSettings : LowMantleSettings;
 }
+
+void AP12BaseCharacter::RegisterInteractiveActor(AP12InteractiveActor* NewInteractiveActor)
+{
+	if (AvailableInteractiveActors.Contains(NewInteractiveActor))
+	{
+		return;
+	}
+	AvailableInteractiveActors.Add(NewInteractiveActor);
+}
+
+void AP12BaseCharacter::UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor)
+{
+	if (!AvailableInteractiveActors.Contains(OldInteractiveActor))
+	{
+		return;
+	}
+	AvailableInteractiveActors.Remove(OldInteractiveActor);
+}

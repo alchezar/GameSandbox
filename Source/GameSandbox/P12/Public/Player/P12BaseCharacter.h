@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class AP12InteractiveActor;
 class UP12LedgeDetectionComponent;
 class UP12BaseCharacterMovementComponent;
 class UCameraComponent;
@@ -73,6 +74,8 @@ public:
 	void MantleInput();
 	void CrouchInput();
 	void RunInput(const bool bRunRequest);
+	void RegisterInteractiveActor(AP12InteractiveActor* NewInteractiveActor);
+	void UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor);
 
 protected:
 	virtual void BeginPlay() override;
@@ -115,4 +118,5 @@ private:
 	float IKLeftLegOffset = 0.f;
 	float IKRightLegOffset = 0.f;
 	float IKHitOffset = 0.f;
+	TArray<AP12InteractiveActor*> AvailableInteractiveActors;
 };

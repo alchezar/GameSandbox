@@ -4,10 +4,10 @@
 
 #include "HAL/IConsoleManager.h"
 
-static TAutoConsoleVariable CVarDrawDebug(TEXT("P12.Debug"), 0, TEXT("Allow to draw debug helpers and console logs."), ECVF_Cheat);
-static TAutoConsoleVariable CVarDrawDebugPrintScreen(TEXT("P12.Debug.PrintScreen"), 0, TEXT("Allow to print screen messages."), ECVF_Cheat);
-static TAutoConsoleVariable CVarDrawDebugLegAlignment(TEXT("P12.Debug.LegAlignment"), 0, TEXT("Allow to draw leg alignment debug helpers."), ECVF_Cheat);
-static TAutoConsoleVariable CVarDrawDebugLedgeDetection(TEXT("P12.Debug.LedgeDetection"), 0, TEXT("Allow to draw ledge detection debug helpers."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebug(TEXT("P12.Debug"), 0, TEXT("Allow to draw debug helpers and console logs."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebugPrintScreen(TEXT("P12.Debug.PrintScreen"), 0, TEXT("Allow to print screen messages."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebugLegAlignment(TEXT("P12.Debug.LegAlignment"), 0, TEXT("Allow to draw leg alignment debug helpers."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebugLedgeDetection(TEXT("P12.Debug.LedgeDetection"), 0, TEXT("Allow to draw ledge detection debug helpers."), ECVF_Cheat);
 
 TArray<FString> UP12Library::GetAllConsoleVariables()
 {	
