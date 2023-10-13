@@ -38,14 +38,18 @@ struct FP12MantleSettings
 	UAnimMontage* Montage;
 	UPROPERTY(EditAnywhere)
 	UCurveVector* Curve;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
 	float MinHeight = 100.f;
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
 	float MaxHeight = 200.f;
-	UPROPERTY(EditAnywhere)
-	float MinHeightStartTime = 0.f;
-	UPROPERTY(EditAnywhere)
-	float MaxHeightStartTime = 0.5f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
+	float MinHeightStartTime = 0.5f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
+	float MaxHeightStartTime = 0.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
+	float AnimationCorrectionXY = 65.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 0.f, UIMin = 0.f))
+	float AnimationCorrectionZ = 200.f;
 };
 
 UCLASS()
@@ -81,6 +85,7 @@ private:
 	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength);
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
+	const FP12MantleSettings& GetMantleSettings(const float LedgeHeight) const;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
@@ -93,7 +98,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	UP12LedgeDetectionComponent* LedgeDetection;
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
-	FP12MantleSettings MantleSettings;
+	FP12MantleSettings HighMantleSettings;
+	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	FP12MantleSettings LowMantleSettings;
+	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	float LowMantleMaxHeight = 100.f;
 	
 	
 private:

@@ -24,8 +24,8 @@ struct FP12MaxSpeed
 struct FP12MantleMovementParams
 {
 	FP12MantleMovementParams() {};
-	FP12MantleMovementParams(const FVector& NewInitLocation, const FRotator& NewInitRotation, const FVector& NewTargetLocation, const FRotator& NewTargetRotation, const float NewDuration, const float NewStartTime, UCurveVector* NewCurve)
-		: InitLocation(NewInitLocation), InitRotation(NewInitRotation), TargetLocation(NewTargetLocation), TargetRotation(NewTargetRotation), Duration(NewDuration), StartTime(NewStartTime), Curve(NewCurve){}
+	FP12MantleMovementParams(const FVector& NewInitLocation, const FRotator& NewInitRotation, const FVector& NewTargetLocation, const FRotator& NewTargetRotation, const float NewDuration, const float NewStartTime, UCurveVector* NewCurve, const FVector& NewInitAnimLocation)
+		: InitLocation(NewInitLocation), InitRotation(NewInitRotation), TargetLocation(NewTargetLocation), TargetRotation(NewTargetRotation), Duration(NewDuration), StartTime(NewStartTime), Curve(NewCurve), InitAnimationLocation(NewInitAnimLocation) {}
 	
 	FVector InitLocation = FVector::ZeroVector;
 	FRotator InitRotation = FRotator::ZeroRotator;
@@ -37,6 +37,8 @@ struct FP12MantleMovementParams
 	float StartTime = 0.f;
 
 	UCurveVector* Curve = nullptr;
+
+	FVector InitAnimationLocation = FVector::ZeroVector;
 };
 
 UENUM(BlueprintType)
@@ -72,8 +74,5 @@ protected:
 	FP12MaxSpeed MaxSpeed;
 
 	FP12MantleMovementParams CurrentMantleParams;
-	// FP12LedgeDescription TargetLedge;
-	// FP12LedgeDescription InitialDescription;
 	FTimerHandle MantlingTimer;
-	// float TargetMantlingTime = 0.25f;
 };

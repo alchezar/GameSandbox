@@ -88,6 +88,7 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 
 	LedgeDescription.Location = OverlapLocation;
 	LedgeDescription.Rotation = (ForwardHitResult.ImpactNormal * FVector(-1.f, -1.f, 0.f)).ToOrientationRotator();
+	LedgeDescription.Normal = ForwardHitResult.ImpactNormal;
 	UP12Library::DrawDebugDirectionalCapsule(GetWorld(), LedgeDescription, OverlapCapsuleRadius, OverlapCapsuleHalfHeight, OverlapLocation, UP12Library::GetCanDrawDebugLedgeDetection());
 	return true;
 }

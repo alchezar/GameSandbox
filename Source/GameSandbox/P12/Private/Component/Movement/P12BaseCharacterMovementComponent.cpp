@@ -75,8 +75,13 @@ void UP12BaseCharacterMovementComponent::PhysCustom(const float DeltaTime, const
 		const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) + CurrentMantleParams.StartTime;
 		const FVector MantleCurveValue = CurrentMantleParams.Curve->GetVectorValue(ElapsedTime);
 		const float PositionAlpha = MantleCurveValue.X;
-
-		const FVector NewLocation = FMath::Lerp(CurrentMantleParams.InitLocation, CurrentMantleParams.TargetLocation, PositionAlpha);
+		
+		const float XYCorrectionAlpha = MantleCurveValue.Y;
+		const float ZCorrectionAlpha = MantleCurveValue.Z;
+		FVector CorrectedInitLocation = FMath::Lerp(CurrentMantleParams.InitLocation, CurrentMantleParams.InitAnimationLocation, XYCorrectionAlpha);
+		CorrectedInitLocation.Z = FMath::Lerp(CurrentMantleParams.InitLocation.Z, CurrentMantleParams.InitAnimationLocation.Z, ZCorrectionAlpha);
+		
+		const FVector NewLocation = FMath::Lerp(CorrectedInitLocation, CurrentMantleParams.TargetLocation, PositionAlpha);
 		const FRotator NewRotation = FMath::Lerp(CurrentMantleParams.InitRotation, CurrentMantleParams.TargetRotation, PositionAlpha);
 
 		const FVector Delta = NewLocation - GetActorLocation();

@@ -3,6 +3,7 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
@@ -86,10 +87,13 @@ void AP12BaseCharacter::JumpInput()
 void AP12BaseCharacter::MantleInput()
 {
 	FP12LedgeDescription LedgeDescription;
-	if (!LedgeDetection->DetectLedge(OUT LedgeDescription))
+	if (!LedgeDetection->DetectLedge(OUT LedgeDescription) || BaseCharacterMovement->IsMantling())
 	{
 		return;
 	}
+
+	const float MantleHeight = (LedgeDescription.Location - GetActorLocation()).Z;
+	const FP12MantleSettings MantleSettings = GetMantleSettings(MantleHeight);
 
 	float MinRange;
 	float MaxRange;
@@ -98,10 +102,11 @@ void AP12BaseCharacter::MantleInput()
 
 	const FVector2D Source = {MantleSettings.MinHeight, MantleSettings.MaxHeight};
 	const FVector2D Target = {MantleSettings.MinHeightStartTime, MantleSettings.MaxHeightStartTime};
-	const float MantleHeight = (LedgeDescription.Location - GetActorLocation()).Z;
 	const float StartTime = FMath::GetMappedRangeValueUnclamped(Source, Target, MantleHeight);
+
+	const FVector InitAnimLocation = LedgeDescription.Location - MantleSettings.AnimationCorrectionZ * FVector::UpVector + MantleSettings.AnimationCorrectionXY * LedgeDescription.Normal;
 	
-	const FP12MantleMovementParams MantleParams = {GetActorLocation(), GetActorRotation(), LedgeDescription.Location, LedgeDescription.Rotation, Duration, StartTime, MantleSettings.Curve};
+	const FP12MantleMovementParams MantleParams = {GetActorLocation(), GetActorRotation(), LedgeDescription.Location, LedgeDescription.Rotation, Duration, StartTime, MantleSettings.Curve, InitAnimLocation};
 	GetBaseCharacterMovement()->StartMantle(MantleParams);
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -241,4 +246,9 @@ void AP12BaseCharacter::LegsIKFloorAlignment()
 	IKLeftLegOffset = FMath::FInterpTo(IKLeftLegOffset, LeftOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKRightLegOffset = FMath::FInterpTo(IKRightLegOffset, RightOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKHitOffset = FMath::FInterpTo(GetIKHipOffset(), HipOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
+}
+
+const FP12MantleSettings& AP12BaseCharacter::GetMantleSettings(const float LedgeHeight) const
+{
+	return LedgeHeight > LowMantleMaxHeight ? HighMantleSettings : LowMantleSettings;
 }
