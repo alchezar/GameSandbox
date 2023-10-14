@@ -6,6 +6,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Util/P12Library.h"
@@ -15,10 +16,10 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationPitch = false;
-	
+
 	BaseCharacterMovement = StaticCast<UP12BaseCharacterMovementComponent*>(GetCharacterMovement());
 	BaseCharacterMovement->DefaultSetup();
-	
+
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->bUsePawnControlRotation = true;
@@ -45,11 +46,11 @@ void AP12BaseCharacter::Tick(const float DeltaTime)
 }
 
 void AP12BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{ 
+{
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AP12BaseCharacter::MoveInput(const FInputActionValue& Value) 
+void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 {
 	const FVector2D MoveVector = Value.Get<FVector2D>();
 	if (!Controller || FMath::IsNearlyZero(MoveVector.Size()))
@@ -62,13 +63,13 @@ void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 	// const FVector ForwardDirection = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::X);
 	// const FVector RightDirection   = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::Y);
 	const FVector ForwardDirection = ControllerYawRotator.RotateVector(FVector::ForwardVector);
-	const FVector RightDirection   = ControllerYawRotator.RotateVector(FVector::RightVector);
-	
+	const FVector RightDirection = ControllerYawRotator.RotateVector(FVector::RightVector);
+
 	AddMovementInput(ForwardDirection, MoveVector.Y);
 	AddMovementInput(RightDirection, MoveVector.X);
 }
 
-void AP12BaseCharacter::LookInput(const FInputActionValue& Value) 
+void AP12BaseCharacter::LookInput(const FInputActionValue& Value)
 {
 	const FVector2D LookVector = Value.Get<FVector2D>();
 	if (!Controller || FMath::IsNearlyZero(LookVector.Size()))
@@ -79,7 +80,7 @@ void AP12BaseCharacter::LookInput(const FInputActionValue& Value)
 	AddControllerPitchInput(LookVector.Y);
 }
 
-void AP12BaseCharacter::JumpInput() 
+void AP12BaseCharacter::JumpInput()
 {
 	Super::Jump();
 }
@@ -105,7 +106,7 @@ void AP12BaseCharacter::MantleInput()
 	const float StartTime = FMath::GetMappedRangeValueUnclamped(Source, Target, MantleHeight);
 
 	const FVector InitAnimLocation = LedgeDescription.Location - MantleSettings.AnimationCorrectionZ * FVector::UpVector + MantleSettings.AnimationCorrectionXY * LedgeDescription.Normal;
-	
+
 	const FP12MantleMovementParams MantleParams = {GetActorLocation(), GetActorRotation(), LedgeDescription.Location, LedgeDescription.Rotation, Duration, StartTime, MantleSettings.Curve, InitAnimLocation};
 	GetBaseCharacterMovement()->StartMantle(MantleParams);
 
@@ -122,7 +123,7 @@ void AP12BaseCharacter::CrouchInput()
 {
 	bCrouch = !bCrouch;
 	bCrouch ? Crouch() : UnCrouch();
-	
+
 	ChangeCameraArmLength(bCrouch, CameraArmLength.Crouch);
 }
 
@@ -133,7 +134,7 @@ void AP12BaseCharacter::RunInput(const bool bRunRequest)
 		bCrouch = false;
 		UnCrouch();
 	}
-	if (bRunRequest && !bRunning && !CanRun())
+	if (bRunRequest && !bRunning && !GetCanRun())
 	{
 		return;
 	}
@@ -141,6 +142,32 @@ void AP12BaseCharacter::RunInput(const bool bRunRequest)
 	BaseCharacterMovement->ToggleMaxSpeed(bRunRequest);
 
 	ChangeCameraArmLength(bRunRequest, CameraArmLength.Run);
+}
+
+void AP12BaseCharacter::LadderJumpInput()
+{
+	if (GetBaseCharacterMovement()->IsOnLadder())
+	{
+		GetBaseCharacterMovement()->DetachFromLadder();
+		return;
+	}
+	const AP12Ladder* Ladder = GetAvailableLadder();
+	if (!Ladder)
+	{
+		return;
+	}
+	GetBaseCharacterMovement()->AttachToLadder(Ladder);
+}
+
+void AP12BaseCharacter::LadderClimbInput(const FInputActionValue& Value)
+{
+	const float AxisValue = Value.Get<float>();
+	if (!GetBaseCharacterMovement()->IsOnLadder() || FMath::IsNearlyZero(AxisValue))
+	{
+		return;
+	}
+	const FVector LadderUpVector = GetBaseCharacterMovement()->GetCurrentLadder()->GetActorUpVector();
+	AddMovementInput(LadderUpVector, AxisValue);
 }
 
 void AP12BaseCharacter::ChangeCameraArmLength(const bool bStart, const float NewArmLength)
@@ -164,7 +191,7 @@ void AP12BaseCharacter::SmoothlyChangeCameraArmLength(const bool bRunStart, cons
 void AP12BaseCharacter::OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust)
 {
 	Super::OnStartCrouch(HalfHeightAdjust, ScaledHalfHeightAdjust);
-	
+
 	CameraBoom->TargetOffset = FVector(0.f, 0.f, HalfHeightAdjust);
 }
 
@@ -189,14 +216,14 @@ void AP12BaseCharacter::OnJumped_Implementation()
 	}
 }
 
-bool AP12BaseCharacter::CanRun() const
+bool AP12BaseCharacter::GetCanRun() const
 {
 	return true;
 }
 
 UP12BaseCharacterMovementComponent* AP12BaseCharacter::GetBaseCharacterMovement() const
 {
-	return BaseCharacterMovement.Get(); 
+	return BaseCharacterMovement.Get();
 }
 
 float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance, const float FromBoneToBottom)
@@ -208,7 +235,7 @@ float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const f
 	FHitResult HitResult;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(this);
-	
+
 	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
 	UP12Library::DrawDebugLineTrace(GetWorld(), HitResult, UP12Library::GetCanDrawDebugLegAlignment());
 	if (HitResult.bBlockingHit)
@@ -222,7 +249,7 @@ void AP12BaseCharacter::LegsIKFloorAlignment()
 {
 	constexpr float MinDistanceThreshold = 12.f;
 	constexpr float IKOffsetInterp = 10.f;
-	
+
 	float LeftOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_l_ankle");
 	float RightOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_r_ankle");
 	float HipOffset = 0.f;
@@ -242,7 +269,7 @@ void AP12BaseCharacter::LegsIKFloorAlignment()
 			LeftOffset -= HipOffset;
 		}
 	}
-	
+
 	IKLeftLegOffset = FMath::FInterpTo(IKLeftLegOffset, LeftOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKRightLegOffset = FMath::FInterpTo(IKRightLegOffset, RightOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
 	IKHitOffset = FMath::FInterpTo(GetIKHipOffset(), HipOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
@@ -269,4 +296,19 @@ void AP12BaseCharacter::UnregisterInteractiveActor(AP12InteractiveActor* OldInte
 		return;
 	}
 	AvailableInteractiveActors.Remove(OldInteractiveActor);
+}
+
+const AP12Ladder* AP12BaseCharacter::GetAvailableLadder() const
+{
+	const AP12Ladder* Result = nullptr;
+	for (const AP12InteractiveActor* InteractiveActor : AvailableInteractiveActors)
+	{
+		if (!InteractiveActor->IsA<AP12Ladder>())
+		{
+			continue;
+		}
+		Result = StaticCast<const AP12Ladder*>(InteractiveActor);
+		break;
+	}
+	return Result;
 }

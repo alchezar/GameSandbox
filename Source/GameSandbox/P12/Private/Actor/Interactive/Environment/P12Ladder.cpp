@@ -9,7 +9,7 @@ AP12Ladder::AP12Ladder()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	RootComponent = CreateDefaultSubobject<USceneComponent>("ScereRootComponent");
+	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	
 	RightRailMesh = CreateDefaultSubobject<UStaticMeshComponent>("RightRailStaticMeshComponent");
 	RightRailMesh->SetupAttachment(RootComponent);
@@ -20,7 +20,7 @@ AP12Ladder::AP12Ladder()
 	StepRailMesh = CreateDefaultSubobject<UInstancedStaticMeshComponent>("StepRailInstancedStaticMeshComponent");
 	StepRailMesh->SetupAttachment(RootComponent);
 
-	InteractionVolume = CreateDefaultSubobject<UBoxComponent>("BoxInterationVolumeComponent");
+	InteractionVolume = CreateDefaultSubobject<UBoxComponent>("BoxInteractionVolumeComponent");
 	InteractionVolume->SetupAttachment(RootComponent);
 }
 

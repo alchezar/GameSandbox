@@ -30,6 +30,8 @@ protected:
 	void MantleInput();
 	void CrouchInput();
 	void RunInput(const bool bRun);
+	void LadderJumpInput();
+	void LadderClimbInput(const FInputActionValue& Value);
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -48,12 +50,16 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* JumpAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
-	UInputAction* MantleAction = nullptr;
-	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* CrouchAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* RunAction = nullptr;
-	
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* MantleAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* LadderJumpAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* LadderClimbAction = nullptr;
+
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 };

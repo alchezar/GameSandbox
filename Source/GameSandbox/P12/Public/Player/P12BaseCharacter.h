@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class AP12Ladder;
 class AP12InteractiveActor;
 class UP12LedgeDetectionComponent;
 class UP12BaseCharacterMovementComponent;
@@ -74,14 +75,17 @@ public:
 	void MantleInput();
 	void CrouchInput();
 	void RunInput(const bool bRunRequest);
+	void LadderJumpInput();
+	void LadderClimbInput(const FInputActionValue& Value);
 	void RegisterInteractiveActor(AP12InteractiveActor* NewInteractiveActor);
 	void UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor);
+	const AP12Ladder* GetAvailableLadder() const;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual bool CanJumpInternal_Implementation() const override;
 	virtual void OnJumped_Implementation() override;
-	bool CanRun() const;
+	bool GetCanRun() const;
 	
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength);
@@ -110,8 +114,8 @@ protected:
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
-	bool bCrouch = false;
 	float DefaultMaxSpeed = 0.f;
+	bool bCrouch = false;
 	bool bRunning = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;

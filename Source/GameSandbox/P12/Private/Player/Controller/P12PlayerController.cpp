@@ -20,7 +20,6 @@ void AP12PlayerController::BeginPlay()
 	SubsystemDefaultMappingContext();
 }
 
-/*---------------------------------------------------------------------------*/
 
 void AP12PlayerController::SubsystemDefaultMappingContext() const
 {
@@ -45,10 +44,12 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::MoveInput);
 	InputComp->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 	InputComp->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::JumpInput);
-	InputComp->BindAction(MantleAction, ETriggerEvent::Started, this, &ThisClass::MantleInput);
 	InputComp->BindAction(CrouchAction, ETriggerEvent::Started, this, &ThisClass::CrouchInput);
 	InputComp->BindAction(RunAction, ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 	InputComp->BindAction(RunAction, ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
+	InputComp->BindAction(MantleAction, ETriggerEvent::Started, this, &ThisClass::MantleInput);
+	InputComp->BindAction(LadderJumpAction, ETriggerEvent::Started, this, &ThisClass::LadderJumpInput);
+	InputComp->BindAction(LadderClimbAction, ETriggerEvent::Triggered, this, &ThisClass::LadderClimbInput);
 }
 
 void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
@@ -110,6 +111,25 @@ void AP12PlayerController::SetPawn(APawn* InPawn)
 	Super::SetPawn(InPawn);
 	CachedBaseCharacter = Cast<AP12BaseCharacter>(InPawn);
 }
+
+void AP12PlayerController::LadderJumpInput() 
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->LadderJumpInput();
+}
+
+void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value) 
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->LadderClimbInput(Value);
+}
+
 
 void AP12PlayerController::P12Debug_EnableAll()
 {
