@@ -3,7 +3,6 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
-#include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
@@ -16,6 +15,7 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
 
 	BaseCharacterMovement = StaticCast<UP12BaseCharacterMovementComponent*>(GetCharacterMovement());
 	BaseCharacterMovement->DefaultSetup();
@@ -52,13 +52,19 @@ void AP12BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 {
+	if (!BaseCharacterMovement->GetCanWalk())
+	{
+		BaseCharacterMovement->SetRotationMode(false);
+		return;
+	}
+	
 	const FVector2D MoveVector = Value.Get<FVector2D>();
 	if (!Controller || FMath::IsNearlyZero(MoveVector.Size()))
 	{
-		BaseCharacterMovement->SetPawnRotationMode(true);
+		BaseCharacterMovement->SetRotationMode(true);
 		return;
 	}
-	BaseCharacterMovement->SetPawnRotationMode(false);
+	BaseCharacterMovement->SetRotationMode(false);
 	const FRotator ControllerYawRotator = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	// const FVector ForwardDirection = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::X);
 	// const FVector RightDirection   = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::Y);
@@ -82,11 +88,21 @@ void AP12BaseCharacter::LookInput(const FInputActionValue& Value)
 
 void AP12BaseCharacter::JumpInput()
 {
+	if (!GetBaseCharacterMovement()->GetCanJump())
+	{
+		return;
+	}
+	
 	Super::Jump();
 }
 
 void AP12BaseCharacter::MantleInput()
 {
+	if (!GetBaseCharacterMovement()->GetCanMantle())
+	{
+		return;
+	}
+	
 	FP12LedgeDescription LedgeDescription;
 	if (!LedgeDetection->DetectLedge(OUT LedgeDescription) || BaseCharacterMovement->IsMantling())
 	{

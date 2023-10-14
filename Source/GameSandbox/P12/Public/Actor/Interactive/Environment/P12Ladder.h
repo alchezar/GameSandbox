@@ -17,6 +17,7 @@ public:
 	AP12Ladder();
 	virtual void Tick(float DeltaTime) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
+	FORCEINLINE float GetLadderHeight() const { return Height; }
 	UBoxComponent* GetLadderInteractionBox() const;
 
 protected:
@@ -29,7 +30,6 @@ protected:
 	UStaticMeshComponent* LeftRailMesh;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
 	UInstancedStaticMeshComponent* StepRailMesh;
-
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Params")
 	float Height = 100.f;

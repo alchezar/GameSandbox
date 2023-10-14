@@ -2,7 +2,11 @@
 
 #include "P12/Public/Component/Movement/P12BaseCharacterMovementComponent.h"
 
+#include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
+#include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
+#include "GameFramework/Character.h"
+#include "P12/Public/Player/P12BaseCharacter.h"
 
 UP12BaseCharacterMovementComponent::UP12BaseCharacterMovementComponent()
 {
@@ -40,10 +44,10 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 void UP12BaseCharacterMovementComponent::DefaultSetup()
 {
 	NavAgentProps.bCanCrouch = true;
-	SetPawnRotationMode(true);
+	SetRotationMode(true);
 }
 
-void UP12BaseCharacterMovementComponent::SetPawnRotationMode(const bool bOrientToMovement)
+void UP12BaseCharacterMovementComponent::SetRotationMode(const bool bOrientToMovement)
 {
 	if (bOrientRotationToMovement == bOrientToMovement)
 	{
@@ -66,6 +70,11 @@ void UP12BaseCharacterMovementComponent::Run(const bool bStart)
 
 void UP12BaseCharacterMovementComponent::StartMantle(const FP12MantleMovementParams& MantleParams)
 {
+	if (bLadder)
+	{
+		return;
+	}
+	
 	CurrentMantleParams = MantleParams;
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling));
 	/* ::OnMovementModeChanged(...) -> {if (...CustomMovementMode == CMOVE_Mantling)} callback. */
@@ -85,6 +94,16 @@ bool UP12BaseCharacterMovementComponent::IsMantling()
 void UP12BaseCharacterMovementComponent::AttachToLadder(const AP12Ladder* Ladder) 
 {
 	CurrentLadder = Ladder;
+
+	const float ActorToLadderProjection = GetActorToLadderProjection(GetActorLocation());
+	const FVector TargetLocation = CurrentLadder->GetActorLocation() +  FVector(-LadderToCharacterOffset, 0.f, ActorToLadderProjection);
+	
+	FRotator TargetRotation = CurrentLadder->GetActorRightVector().ToOrientationRotator();
+	TargetRotation.Yaw += 180.f;
+
+	GetOwner()->SetActorLocation(TargetLocation);
+	GetOwner()->SetActorRotation(TargetRotation);
+	
 	SetMovementMode(MOVE_Custom, static_cast<uint8>(EP12CustomMovementMode::CMOVE_Ladder));
 	/* ::OnMovementModeChanged(...) -> {if (...CustomMovementMode == CMOVE_Ladder)} callback . */
 	/* ::PhysCustom(...) -> PhysLadder(...) tick update. */
@@ -106,17 +125,26 @@ void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Pre
 {
 	Super::OnMovementModeChanged(PreviousMovementMode, PreviousCustomMode);
 
+	/* Mantle */
 	if (MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
 	{
 		GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &ThisClass::EndMantle, CurrentMantleParams.Duration);
+		bMantle = true;
 	}
+	if (PreviousMovementMode == MOVE_Custom && PreviousCustomMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
+	{
+		bMantle = false;
+	}
+	
+	/* Ladder */
 	if (MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Ladder))
 	{
-		// do ladder
+		bLadder = true;
 	}
 	if (PreviousMovementMode == MOVE_Custom && PreviousCustomMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Ladder))
 	{
 		CurrentLadder = nullptr;
+		bLadder = false;
 	}
 }
 
@@ -158,6 +186,46 @@ void UP12BaseCharacterMovementComponent::PhysLadder(const float DeltaTime, const
 	CalcVelocity(DeltaTime, Friction, false, LadderClimbingDeceleration);
 	const FVector Delta = Velocity * DeltaTime;
 
+	const FVector NewLocation = GetActorLocation() + Delta;
+	const float NewLocationProjection = GetActorToLadderProjection(NewLocation);
+	const float MinPosition = GetCharacterOwner()->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
+	const float MaxPosition = CurrentLadder->GetLadderHeight() - MinPosition;
+	if (NewLocationProjection < MinPosition)
+	{
+		DetachFromLadder();
+		return;
+	}
+	if (NewLocationProjection > MaxPosition)
+	{
+		DetachFromLadder();
+		GetBaseCharacterOwner()->MantleInput();
+		return;
+	}
+
 	FHitResult LadderHitResult;
 	SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, LadderHitResult);
+}
+
+float UP12BaseCharacterMovementComponent::GetActorToLadderProjection(const FVector& Location)
+{
+	check(CurrentLadder)
+	
+	const FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+	const FVector LadderToCharVector = Location - CurrentLadder->GetActorLocation();
+	
+	return FVector::DotProduct(LadderUpVector, LadderToCharVector);
+}
+
+void UP12BaseCharacterMovementComponent::PhysicsRotation(float DeltaTime)
+{
+	if (IsOnLadder())
+	{
+		return;
+	}
+	Super::PhysicsRotation(DeltaTime);
+}
+
+AP12BaseCharacter* UP12BaseCharacterMovementComponent::GetBaseCharacterOwner() const
+{
+	return StaticCast<AP12BaseCharacter*>(CharacterOwner);
 }

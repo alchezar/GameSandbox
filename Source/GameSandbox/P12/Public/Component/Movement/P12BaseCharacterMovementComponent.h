@@ -6,6 +6,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P12BaseCharacterMovementComponent.generated.h"
 
+class AP12BaseCharacter;
 class AP12Ladder;
 
 USTRUCT(BlueprintType)
@@ -62,8 +63,11 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	virtual float GetMaxSpeed() const override;
 	FORCEINLINE const AP12Ladder* GetCurrentLadder() const { return CurrentLadder; }
+	FORCEINLINE bool GetCanJump() const { return !bMantle && !bLadder; }
+	FORCEINLINE bool GetCanMantle() const { return !bLadder; }
+	FORCEINLINE bool GetCanWalk() const { return !bLadder; }
 	void DefaultSetup();
-	void SetPawnRotationMode(const bool bOrientToMovement);
+	void SetRotationMode(const bool bOrientToMovement);
 	void ToggleMaxSpeed(const bool bRun);
 
 	void Run(const bool bStart);
@@ -80,10 +84,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	virtual void PhysCustom(const float DeltaTime, int32 Iterations) override;
+	virtual void PhysicsRotation(float DeltaTime) override;
+	AP12BaseCharacter* GetBaseCharacterOwner() const;
 
 private:
 	void PhysMantling(const float DeltaTime, const int32 Iterations);
 	void PhysLadder(const float DeltaTime, const int32 Iterations);
+	float GetActorToLadderProjection(const FVector& Location);
+
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
@@ -98,6 +106,8 @@ protected:
 	float LadderClimbingMaxSpeed = 200.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
 	float LadderClimbingDeceleration = 2048.f;
+	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
+	float LadderToCharacterOffset = 60.f;
 	
 private:
 	bool bRunning = false;
