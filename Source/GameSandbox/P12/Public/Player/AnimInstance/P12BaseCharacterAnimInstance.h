@@ -31,6 +31,10 @@ protected:
 	bool bInAir;
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
 	bool bCrouch;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	bool bLadder;
+	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	float LadderSpeedRatio;
 
 	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;

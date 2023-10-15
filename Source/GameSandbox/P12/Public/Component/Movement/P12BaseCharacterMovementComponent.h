@@ -79,6 +79,7 @@ public:
 	void AttachToLadder(const AP12Ladder* Ladder);
 	void DetachFromLadder();
 	bool IsOnLadder() const;
+	float GetLadderSpeedRatio() const;
 
 protected:
 	virtual void BeginPlay() override;
@@ -90,7 +91,7 @@ protected:
 private:
 	void PhysMantling(const float DeltaTime, const int32 Iterations);
 	void PhysLadder(const float DeltaTime, const int32 Iterations);
-	float GetActorToLadderProjection(const FVector& Location);
+	float GetActorToLadderProjection(const FVector& Location) const;
 
 
 protected:
@@ -103,11 +104,11 @@ protected:
 	float OutOfStaminaSpeed = 700.f;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
-	float LadderClimbingMaxSpeed = 200.f;
+	float LadderClimbingMaxSpeed = 100.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
 	float LadderClimbingDeceleration = 2048.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
-	float LadderToCharacterOffset = 60.f;
+	float LadderToCharacterOffset = 55.f;
 	
 private:
 	bool bRunning = false;

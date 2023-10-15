@@ -4,6 +4,7 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "P12/Public/Actor/Interactive/P12InteractiveActor.h"
 
 AP12Ladder::AP12Ladder()
 {
@@ -22,6 +23,9 @@ AP12Ladder::AP12Ladder()
 
 	InteractionVolume = CreateDefaultSubobject<UBoxComponent>("BoxInteractionVolumeComponent");
 	InteractionVolume->SetupAttachment(RootComponent);
+
+	TopInteractionVolume = CreateDefaultSubobject<UBoxComponent>("BoxTopInterationVolumeComponent");
+	TopInteractionVolume->SetupAttachment(RootComponent);
 }
 
 void AP12Ladder::OnConstruction(const FTransform& Transform)
@@ -63,11 +67,18 @@ void AP12Ladder::OnConstruction(const FTransform& Transform)
 	const float BoxDepth = GetLadderInteractionBox()->GetUnscaledBoxExtent().X;
 	GetLadderInteractionBox()->SetBoxExtent(FVector(BoxDepth, Width / 2.f, Height / 2.f));
 	GetLadderInteractionBox()->SetRelativeLocation(FVector(0.f, BoxDepth, Height / 2.f));
+
+	const FVector TopBoxExtent = TopInteractionVolume->GetUnscaledBoxExtent();
+	TopInteractionVolume->SetBoxExtent(FVector(Width / 2.f, TopBoxExtent.X, TopBoxExtent.Z));
+	TopInteractionVolume->SetRelativeLocation(FVector(0.f, -BoxDepth, Height + TopBoxExtent.Z));
 }
 
 void AP12Ladder::BeginPlay()
 {
 	Super::BeginPlay();
+
+	TopInteractionVolume->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnInteractionVolumeBeginOverlap);
+	TopInteractionVolume->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnInteractionVolumeEndOverlap);
 }
 
 void AP12Ladder::Tick(float DeltaTime)
@@ -80,3 +91,39 @@ UBoxComponent* AP12Ladder::GetLadderInteractionBox() const
 	return StaticCast<UBoxComponent*>(InteractionVolume);
 }
 
+FVector AP12Ladder::GetAttachFromTopStartLocation() const
+{
+	const FRotator OrientRotation = GetActorForwardVector().ToOrientationRotator();
+	const FVector Offset = OrientRotation.RotateVector(AttachFromTopInitOffset);
+
+	const FVector LadderTop = GetActorLocation() + GetActorUpVector() * Height;
+	return LadderTop + Offset;
+}
+
+void AP12Ladder::OnInteractionVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::OnInteractionVolumeBeginOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	if (!IsOverlappingCharacterCapsule(OtherActor, OtherComp))
+	{
+		return;
+	}
+	if (OverlappedComponent == TopInteractionVolume)
+	{
+		bOnTop = true;
+	}
+}
+
+void AP12Ladder::OnInteractionVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
+{
+	Super::OnInteractionVolumeEndOverlap(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+
+	if (!IsOverlappingCharacterCapsule(OtherActor, OtherComp))
+	{
+		return;
+	}
+	if (OverlappedComponent == TopInteractionVolume)
+	{
+		bOnTop = false;
+	}
+}

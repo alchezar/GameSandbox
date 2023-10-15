@@ -68,11 +68,12 @@ public:
 	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
+	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void JumpInput();
-	void MantleInput();
+	void MantleInput(const bool bForce = false);
 	void CrouchInput();
 	void RunInput(const bool bRunRequest);
 	void LadderJumpInput();
@@ -110,7 +111,9 @@ protected:
 	FP12MantleSettings LowMantleSettings;
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	float LowMantleMaxHeight = 100.f;
-	
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
+	UAnimMontage* AttachFromTopMontage;
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;

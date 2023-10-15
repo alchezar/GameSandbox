@@ -23,10 +23,12 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	{
 		return;
 	}
-	Speed = CachedCharacter->GetVelocity().Size2D();
+	Speed = CachedCharacter->GetVelocity().Size();
 	Direction = GetMovementDirectionAngle();
 	bInAir = CachedCharacterMovement->IsFalling();
 	bCrouch = CachedCharacterMovement->IsCrouching();
+	bLadder = CachedCharacterMovement->IsOnLadder();
+	LadderSpeedRatio = CachedCharacterMovement->GetLadderSpeedRatio();
 
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);

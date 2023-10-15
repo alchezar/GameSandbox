@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "P12InteractiveActor.generated.h"
 
+class AP12BaseCharacter;
+
 UCLASS(Abstract, NotBlueprintable)
 class GAMESANDBOX_API AP12InteractiveActor : public AActor
 {
@@ -16,11 +18,12 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	bool IsOverlappingCharacterCapsule(AActor* OtherActor, UPrimitiveComponent* OtherComp);
 	UFUNCTION()
-	void OnInteractionVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnInteractionVolumeBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
-	void OnInteractionVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
-
+	virtual void OnInteractionVolumeEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UPrimitiveComponent* InteractionVolume = nullptr;

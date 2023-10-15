@@ -96,9 +96,9 @@ void AP12BaseCharacter::JumpInput()
 	Super::Jump();
 }
 
-void AP12BaseCharacter::MantleInput()
+void AP12BaseCharacter::MantleInput(const bool bForce)
 {
-	if (!GetBaseCharacterMovement()->GetCanMantle())
+	if (!GetBaseCharacterMovement()->GetCanMantle() && !bForce)
 	{
 		return;
 	}
@@ -171,6 +171,10 @@ void AP12BaseCharacter::LadderJumpInput()
 	if (!Ladder)
 	{
 		return;
+	}
+	if (Ladder->GetIsOnTop() && AttachFromTopMontage)
+	{
+		PlayAnimMontage(AttachFromTopMontage);
 	}
 	GetBaseCharacterMovement()->AttachToLadder(Ladder);
 }
@@ -302,7 +306,7 @@ void AP12BaseCharacter::RegisterInteractiveActor(AP12InteractiveActor* NewIntera
 	{
 		return;
 	}
-	AvailableInteractiveActors.Add(NewInteractiveActor);
+	AvailableInteractiveActors.AddUnique(NewInteractiveActor);
 }
 
 void AP12BaseCharacter::UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor)
@@ -311,7 +315,7 @@ void AP12BaseCharacter::UnregisterInteractiveActor(AP12InteractiveActor* OldInte
 	{
 		return;
 	}
-	AvailableInteractiveActors.Remove(OldInteractiveActor);
+	AvailableInteractiveActors.RemoveSingleSwap(OldInteractiveActor);
 }
 
 const AP12Ladder* AP12BaseCharacter::GetAvailableLadder() const

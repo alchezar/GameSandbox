@@ -96,10 +96,15 @@ void UP12BaseCharacterMovementComponent::AttachToLadder(const AP12Ladder* Ladder
 	CurrentLadder = Ladder;
 
 	const float ActorToLadderProjection = GetActorToLadderProjection(GetActorLocation());
-	const FVector TargetLocation = CurrentLadder->GetActorLocation() +  FVector(-LadderToCharacterOffset, 0.f, ActorToLadderProjection);
+	FVector TargetLocation = CurrentLadder->GetActorLocation() +  FVector(-LadderToCharacterOffset, 0.f, ActorToLadderProjection);
 	
 	FRotator TargetRotation = CurrentLadder->GetActorRightVector().ToOrientationRotator();
 	TargetRotation.Yaw += 180.f;
+
+	if (CurrentLadder->GetIsOnTop())
+	{
+		TargetLocation = CurrentLadder->GetAttachFromTopStartLocation();
+	}
 
 	GetOwner()->SetActorLocation(TargetLocation);
 	GetOwner()->SetActorRotation(TargetRotation);
@@ -120,6 +125,15 @@ bool UP12BaseCharacterMovementComponent::IsOnLadder() const
 	return UpdatedComponent && MovementMode == MOVE_Custom && CustomMovementMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Ladder);
 }
 
+float UP12BaseCharacterMovementComponent::GetLadderSpeedRatio() const
+{
+	if (!CurrentLadder)
+	{
+		return 0.f;
+	}
+	const FVector LadderUpVector = CurrentLadder->GetActorUpVector();
+	return LadderUpVector.Dot(Velocity) / LadderClimbingMaxSpeed;
+}
 
 void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)
 {
@@ -186,19 +200,28 @@ void UP12BaseCharacterMovementComponent::PhysLadder(const float DeltaTime, const
 	CalcVelocity(DeltaTime, Friction, false, LadderClimbingDeceleration);
 	const FVector Delta = Velocity * DeltaTime;
 
+	if (HasAnimRootMotion())
+	{
+		FHitResult LadderHitResult;
+		SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), false, LadderHitResult);
+		return;
+	}
+
 	const FVector NewLocation = GetActorLocation() + Delta;
 	const float NewLocationProjection = GetActorToLadderProjection(NewLocation);
 	const float MinPosition = GetCharacterOwner()->GetCapsuleComponent()->GetUnscaledCapsuleHalfHeight();
-	const float MaxPosition = CurrentLadder->GetLadderHeight() - MinPosition;
+	const float MaxPosition = CurrentLadder->GetLadderHeight() - MinPosition / 2.f;
 	if (NewLocationProjection < MinPosition)
 	{
+		bLadder = false;
 		DetachFromLadder();
 		return;
 	}
 	if (NewLocationProjection > MaxPosition)
 	{
+		bLadder = false;
 		DetachFromLadder();
-		GetBaseCharacterOwner()->MantleInput();
+		GetBaseCharacterOwner()->MantleInput(true);
 		return;
 	}
 
@@ -206,7 +229,7 @@ void UP12BaseCharacterMovementComponent::PhysLadder(const float DeltaTime, const
 	SafeMoveUpdatedComponent(Delta, GetOwner()->GetActorRotation(), true, LadderHitResult);
 }
 
-float UP12BaseCharacterMovementComponent::GetActorToLadderProjection(const FVector& Location)
+float UP12BaseCharacterMovementComponent::GetActorToLadderProjection(const FVector& Location) const
 {
 	check(CurrentLadder)
 	

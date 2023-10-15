@@ -81,11 +81,11 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 	const FName CollisionProfileName = CapsuleComponent->GetCollisionProfileName();
 	
 	FCollisionShape OverlapCapsule = FCollisionShape::MakeCapsule(OverlapCapsuleRadius, OverlapCapsuleHalfHeight);
-	if (GetWorld()->OverlapAnyTestByProfile(OverlapLocation, FQuat::Identity, CollisionProfileName, OverlapCapsule, QueryParams))
+	if (GetWorld()->OverlapBlockingTestByProfile(OverlapLocation, FQuat::Identity, CollisionProfileName, OverlapCapsule, QueryParams))
 	{
 		return false;
 	}
-
+	
 	LedgeDescription.Location = OverlapLocation;
 	LedgeDescription.Rotation = (ForwardHitResult.ImpactNormal * FVector(-1.f, -1.f, 0.f)).ToOrientationRotator();
 	LedgeDescription.Normal = ForwardHitResult.ImpactNormal;
