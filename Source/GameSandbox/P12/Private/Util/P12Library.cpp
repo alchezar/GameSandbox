@@ -87,3 +87,22 @@ void UP12Library::DrawDebugDirectionalCapsule(const UWorld* World, FP12LedgeDesc
 	DrawDebugCapsule(World, Location, HalfHeight, Radius, FQuat::Identity, FColor::Red, false, 5.f, 0, 1.f);
 	DrawDebugDirectionalArrow(World, Location, Location + LedgeDescription.Rotation.Vector() * 50.f, 50.f, FColor::Red, false, 5.f, 0, 1.f);
 }
+
+void UP12Library::FixedTurn(FRotator& DesiredRotation, const FRotator& CurrentRotation, const FRotator& DeltaRot)
+{
+	/* PITCH */ 
+	if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, DesiredRotation.Pitch))
+	{
+		DesiredRotation.Pitch = FMath::FixedTurn(CurrentRotation.Pitch, DesiredRotation.Pitch, DeltaRot.Pitch);
+	}
+	/* YAW */
+	if (!FMath::IsNearlyEqual(CurrentRotation.Yaw, DesiredRotation.Yaw))
+	{
+		DesiredRotation.Yaw = FMath::FixedTurn(CurrentRotation.Yaw, DesiredRotation.Yaw, DeltaRot.Yaw);
+	}
+	/* ROLL */
+	if (!FMath::IsNearlyEqual(CurrentRotation.Roll, DesiredRotation.Roll))
+	{
+		DesiredRotation.Roll = FMath::FixedTurn(CurrentRotation.Roll, DesiredRotation.Roll, DeltaRot.Roll);
+	}
+}

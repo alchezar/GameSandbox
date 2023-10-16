@@ -54,6 +54,8 @@ struct FP12MantleSettings
 	float AnimationCorrectionZ = 200.f;
 };
 
+typedef TArray<AP12InteractiveActor*, TInlineAllocator<8>> TInteractiveActorsArray;
+
 UCLASS()
 class GAMESANDBOX_API AP12BaseCharacter : public ACharacter
 {
@@ -125,5 +127,5 @@ private:
 	float IKLeftLegOffset = 0.f;
 	float IKRightLegOffset = 0.f;
 	float IKHitOffset = 0.f;
-	TArray<AP12InteractiveActor*> AvailableInteractiveActors;
+	TInteractiveActorsArray AvailableInteractiveActors;
 };

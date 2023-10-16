@@ -64,7 +64,7 @@ void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 		BaseCharacterMovement->SetRotationMode(true);
 		return;
 	}
-	BaseCharacterMovement->SetRotationMode(false);
+	BaseCharacterMovement->SetRotationMode(true);
 	const FRotator ControllerYawRotator = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	// const FVector ForwardDirection = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::X);
 	// const FVector RightDirection   = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::Y);
@@ -164,7 +164,7 @@ void AP12BaseCharacter::LadderJumpInput()
 {
 	if (GetBaseCharacterMovement()->IsOnLadder())
 	{
-		GetBaseCharacterMovement()->DetachFromLadder();
+		GetBaseCharacterMovement()->DetachFromLadder(EP12DetachFromLadderMethod::JumpOff);
 		return;
 	}
 	const AP12Ladder* Ladder = GetAvailableLadder();

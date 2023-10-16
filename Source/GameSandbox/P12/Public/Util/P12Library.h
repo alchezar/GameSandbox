@@ -31,4 +31,5 @@ public:
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "PetProjects")
 	static void DrawDebugDirectionalCapsule(const UWorld* World, FP12LedgeDescription& LedgeDescription, const  float Radius, const float HalfHeight, const FVector& Location, const bool bDraw);
 
+	static void FixedTurn(FRotator& DesiredRotation, const FRotator& CurrentRotation, const FRotator& DeltaRot);
 };

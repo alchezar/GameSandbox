@@ -53,6 +53,15 @@ enum class EP12CustomMovementMode : uint8
 	CMOVE_Max      UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class EP12DetachFromLadderMethod : uint8
+{
+	Fall = 0,
+	ReachingTheTop,
+	ReachingTheBottom,
+	JumpOff
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP12BaseCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -70,14 +79,12 @@ public:
 	void SetRotationMode(const bool bOrientToMovement);
 	void ToggleMaxSpeed(const bool bRun);
 
-	void Run(const bool bStart);
-	
 	void StartMantle(const FP12MantleMovementParams& MantleParams);
 	void EndMantle();
 	bool IsMantling();
 
 	void AttachToLadder(const AP12Ladder* Ladder);
-	void DetachFromLadder();
+	void DetachFromLadder(EP12DetachFromLadderMethod DetachFromLadderMethod = EP12DetachFromLadderMethod::Fall);
 	bool IsOnLadder() const;
 	float GetLadderSpeedRatio() const;
 
@@ -85,14 +92,14 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode) override;
 	virtual void PhysCustom(const float DeltaTime, int32 Iterations) override;
-	virtual void PhysicsRotation(float DeltaTime) override;
+	virtual void PhysicsRotation(const float DeltaTime) override;
 	AP12BaseCharacter* GetBaseCharacterOwner() const;
 
 private:
 	void PhysMantling(const float DeltaTime, const int32 Iterations);
 	void PhysLadder(const float DeltaTime, const int32 Iterations);
 	float GetActorToLadderProjection(const FVector& Location) const;
-
+	void SwitchForceRotation(const bool bEnable, const FRotator& TargetRotation = FRotator::ZeroRotator);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
@@ -109,7 +116,9 @@ protected:
 	float LadderClimbingDeceleration = 2048.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
 	float LadderToCharacterOffset = 55.f;
-	
+	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
+	float JumpOffFromLadderSpeed = 500.f;
+
 private:
 	bool bRunning = false;
 	bool bOutOfStamina = false;
@@ -119,4 +128,6 @@ private:
 	FTimerHandle MantlingTimer;
 	UPROPERTY()
 	const AP12Ladder* CurrentLadder = nullptr;
+	FRotator ForceTargetRotation = FRotator::ZeroRotator;
+	bool bForceRotation = false;
 };
