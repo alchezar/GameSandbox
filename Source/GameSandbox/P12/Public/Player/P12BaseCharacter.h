@@ -72,7 +72,7 @@ public:
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
-	void MoveInput(const FInputActionValue& Value);
+	virtual void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void JumpInput();
 	void MantleInput(const bool bForce = false);

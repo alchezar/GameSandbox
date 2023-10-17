@@ -19,28 +19,31 @@ public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
+protected:
+	FORCEINLINE TWeakObjectPtr<AP12BaseCharacter> GetCachedCharacter() const { return CachedCharacter; }
+
 private:
 	float GetMovementDirectionAngle() const;
 	
 protected:
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float Speed;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float Direction;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	bool bInAir;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	bool bCrouch;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	bool bLadder;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float LadderSpeedRatio;
 
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector RightLegOffset = FVector::ZeroVector;
-	UPROPERTY(BlueprintReadOnly, Transient, Category = "C++")
+	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector HipOffset = FVector::ZeroVector;
 	
 private:
