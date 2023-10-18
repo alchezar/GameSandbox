@@ -3,6 +3,7 @@
 #include "P12/Public/Player/AnimInstance/P12FirstPersonCharacterAnimInstance.h"
 
 #include "P12/Public/Player/P12BaseCharacter.h"
+#include "P12/Public/Player/Controller/P12PlayerController.h"
 
 void UP12FirstPersonCharacterAnimInstance::NativeBeginPlay()
 {
@@ -16,10 +17,16 @@ void UP12FirstPersonCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeco
 	{
 		return;
 	}
-	const APlayerController* Controller = GetCachedCharacter()->GetController<APlayerController>();
-	if (!Controller)
+	
+	PlayerCameraPitchAngle = CalculateCameraPitchAngle();
+}
+
+float UP12FirstPersonCharacterAnimInstance::CalculateCameraPitchAngle() const
+{
+	const AP12PlayerController* Controller = GetCachedCharacter()->GetController<AP12PlayerController>();
+	if (!Controller || Controller->GetIsIgnoreCameraPitch())
 	{
-		return;
+		return 0.f;
 	}
-	PlayerCameraPitchAngle = 0.f - Controller->GetControlRotation().Pitch;
+	return 0.f - Controller->GetControlRotation().Pitch;
 }

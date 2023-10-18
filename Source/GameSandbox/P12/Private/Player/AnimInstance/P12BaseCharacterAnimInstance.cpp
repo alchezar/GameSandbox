@@ -2,6 +2,7 @@
 
 #include "P12/Public/Player/AnimInstance/P12BaseCharacterAnimInstance.h"
 
+#include "KismetAnimationLibrary.h"
 #include "P12/Public/Component/Movement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
@@ -24,7 +25,8 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		return;
 	}
 	Speed = CachedCharacter->GetVelocity().Size();
-	Direction = GetMovementDirectionAngle();
+	// Direction = GetMovementDirectionAngle();
+	Direction = UKismetAnimationLibrary::CalculateDirection(CachedCharacterMovement->Velocity, CachedCharacter->GetActorRotation());
 	bInAir = CachedCharacterMovement->IsFalling();
 	bCrouch = CachedCharacterMovement->IsCrouching();
 	bLadder = CachedCharacterMovement->IsOnLadder();

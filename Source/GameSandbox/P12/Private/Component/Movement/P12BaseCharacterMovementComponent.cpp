@@ -161,6 +161,7 @@ void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Pre
 	{
 		GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &ThisClass::EndMantle, CurrentMantleParams.Duration);
 		bMantle = true;
+		
 	}
 	if (PreviousMovementMode == MOVE_Custom && PreviousCustomMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
 	{

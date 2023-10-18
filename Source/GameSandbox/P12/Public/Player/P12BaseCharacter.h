@@ -73,7 +73,7 @@ public:
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
 	virtual void MoveInput(const FInputActionValue& Value);
-	void LookInput(const FInputActionValue& Value);
+	virtual void LookInput(const FInputActionValue& Value);
 	void JumpInput();
 	void MantleInput(const bool bForce = false);
 	void CrouchInput();
@@ -88,6 +88,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual bool CanJumpInternal_Implementation() const override;
 	virtual void OnJumped_Implementation() override;
+	virtual void OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime);
 	bool GetCanRun() const;
 	
 private:

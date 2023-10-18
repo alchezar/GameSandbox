@@ -133,12 +133,15 @@ void AP12BaseCharacter::MantleInput(const bool bForce)
 	}
 	AnimInstance->Montage_Play(MantleSettings.Montage, 1.f, EMontagePlayReturnType::Duration, StartTime);
 	// AnimInstance->Montage_JumpToSection("Mantle_High", MantleSettings.Montage);
+	OnMantleHandle(MantleSettings, StartTime);
 }
 
 void AP12BaseCharacter::CrouchInput()
 {
 	bCrouch = !bCrouch;
 	bCrouch ? Crouch() : UnCrouch();
+	/*              ↓            ↓ 
+	 * ::OnStartCrouch(...) || ::OnEndCrouch(...) */
 
 	ChangeCameraArmLength(bCrouch, CameraArmLength.Crouch);
 }
@@ -234,6 +237,11 @@ void AP12BaseCharacter::OnJumped_Implementation()
 		bCrouch = false;
 		UnCrouch();
 	}
+}
+
+void AP12BaseCharacter::OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime)
+{
+	
 }
 
 bool AP12BaseCharacter::GetCanRun() const

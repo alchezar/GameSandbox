@@ -19,6 +19,8 @@ class GAMESANDBOX_API AP12PlayerController : public APlayerController
 public:
 	AP12PlayerController();
 	virtual void SetPawn(APawn* InPawn) override;
+	FORCEINLINE bool GetIsIgnoreCameraPitch() const { return bIgnoreCameraPitch; }
+	void SetIsIgnoreCameraPitch(const bool bIgnore) { bIgnoreCameraPitch = bIgnore; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,4 +64,5 @@ protected:
 
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
+	bool bIgnoreCameraPitch = false;
 };
