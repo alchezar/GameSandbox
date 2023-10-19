@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class UP12AttributeComponent;
 class AP12Ladder;
 class AP12InteractiveActor;
 class UP12LedgeDetectionComponent;
@@ -67,6 +68,9 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void OnStartCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
 	virtual void OnEndCrouch(float HalfHeightAdjust, float ScaledHalfHeightAdjust) override;
+	virtual void Falling() override;
+	virtual void NotifyJumpApex() override;
+	virtual void Landed(const FHitResult& Hit) override;
 	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
@@ -90,6 +94,7 @@ protected:
 	virtual void OnJumped_Implementation() override;
 	virtual void OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime);
 	bool GetCanRun() const;
+	void OnDeath();
 	
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength);
@@ -97,17 +102,22 @@ private:
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
 	const FP12MantleSettings& GetMantleSettings(const float LedgeHeight) const;
+	void InitAnimNotify();
+	void OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+	void EnableRagdoll();
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* Camera;
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UP12LedgeDetectionComponent* LedgeDetection;
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UP12AttributeComponent* CharacterAttribute;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	FP12CameraArmLength CameraArmLength;
-	UPROPERTY(EditAnywhere, Category = "C++ | Move")
-	UP12LedgeDetectionComponent* LedgeDetection;
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
 	FP12MantleSettings HighMantleSettings;
 	UPROPERTY(EditAnywhere, Category = "C++ | Move")
@@ -117,6 +127,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
 	UAnimMontage* AttachFromTopMontage;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
+	UCurveFloat* FallDamageCurve;
+	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
+	UAnimMontage* DeathMontage;
+
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
@@ -129,4 +145,5 @@ private:
 	float IKRightLegOffset = 0.f;
 	float IKHitOffset = 0.f;
 	TInteractiveActorsArray AvailableInteractiveActors;
+	FVector CurrentFallApex = FVector::ZeroVector;
 };

@@ -262,13 +262,14 @@ void UP12BaseCharacterMovementComponent::PhysicsRotation(const float DeltaTime)
 	{
 		const FRotator CurrentRotation = UpdatedComponent->GetComponentRotation(); // Normalized
 		const FRotator DeltaRot = GetDeltaRotation(DeltaTime);
+		FRotator TargetRotation = ForceTargetRotation;
 
 		/* Set the new rotation. */
-		UP12Library::FixedTurn(ForceTargetRotation, CurrentRotation, DeltaRot);
+		UP12Library::FixedTurn(TargetRotation, CurrentRotation, DeltaRot);
 		FHitResult RotateHit;
-		SafeMoveUpdatedComponent(FVector::ZeroVector, ForceTargetRotation, false, RotateHit);
+		SafeMoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, RotateHit);
 		
-		if (CurrentRotation.Equals(ForceTargetRotation, 1.f))
+		if (CurrentRotation.Equals(TargetRotation))
 		{
 			SwitchForceRotation(false);
 			return;
@@ -289,5 +290,6 @@ AP12BaseCharacter* UP12BaseCharacterMovementComponent::GetBaseCharacterOwner() c
 void UP12BaseCharacterMovementComponent::SwitchForceRotation(const bool bEnable, const FRotator& TargetRotation)
 {
 	bForceRotation = bEnable;
-	ForceTargetRotation = TargetRotation; 
+	ForceTargetRotation = TargetRotation;
+	/* ::PhysicsRotation(...) tick update. */
 }

@@ -3,11 +3,16 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
+#include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
 
 AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer)
@@ -30,12 +35,15 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 	Camera->SetupAttachment(CameraBoom);
 
 	LedgeDetection = CreateDefaultSubobject<UP12LedgeDetectionComponent>("LedgeDetectorComponent");
+	CharacterAttribute = CreateDefaultSubobject<UP12AttributeComponent>("CharacterAttributeComponent");
 }
 
 void AP12BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
+	CharacterAttribute->OnDeath.AddUObject(this, &ThisClass::OnDeath);
+	InitAnimNotify();
 }
 
 void AP12BaseCharacter::Tick(const float DeltaTime)
@@ -275,6 +283,14 @@ float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const f
 
 void AP12BaseCharacter::LegsIKFloorAlignment()
 {
+	if (!CharacterAttribute->GetIsAlive())
+	{
+		IKLeftLegOffset = 0.f; 
+		IKRightLegOffset = 0.f; 
+		IKHitOffset = 0.f;
+		return;
+	}
+	
 	constexpr float MinDistanceThreshold = 12.f;
 	constexpr float IKOffsetInterp = 10.f;
 
@@ -339,4 +355,76 @@ const AP12Ladder* AP12BaseCharacter::GetAvailableLadder() const
 		break;
 	}
 	return Result;
+}
+
+void AP12BaseCharacter::InitAnimNotify()
+{
+	TArray<FAnimNotifyEvent> AnimNotifies = DeathMontage->Notifies;
+	for (const auto AnimNotify : AnimNotifies)
+	{
+		if (UP12AnimNotify_EnableRagdoll* EnableRagdollNotify = Cast<UP12AnimNotify_EnableRagdoll>(AnimNotify.Notify))
+		{
+			StopAnimMontage(DeathMontage);
+			EnableRagdollNotify->OnEnableRagdoll.AddUObject(this, &ThisClass::OnEnableRagdollHandle);
+		}
+	}
+}
+
+void AP12BaseCharacter::OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMeshComponent)
+{
+	if (SkeletalMeshComponent != GetMesh())
+	{
+		return;
+	}
+	EnableRagdoll();
+}
+
+void AP12BaseCharacter::OnDeath()
+{
+	GetCharacterMovement()->StopMovementImmediately();
+	GetCharacterMovement()->DisableMovement();
+	GetCharacterMovement()->MovementState.bCanJump = false;
+	
+	if (DeathMontage)
+	{
+		PlayAnimMontage(DeathMontage);
+	}
+	else
+	{
+		EnableRagdoll();
+	}
+}
+
+void AP12BaseCharacter::EnableRagdoll()
+{
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	DetachFromControllerPendingDestroy();
+	SetLifeSpan(10.f);
+}
+
+
+void AP12BaseCharacter::Falling()
+{
+	Super::Falling();
+	GetBaseCharacterMovement()->bNotifyApex = true;
+}
+
+void AP12BaseCharacter::NotifyJumpApex()
+{
+	Super::NotifyJumpApex();
+	CurrentFallApex = GetActorLocation();
+}
+
+void AP12BaseCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+
+	const float FallHeight = (CurrentFallApex - GetActorLocation()).Z;
+	if (FallDamageCurve)
+	{
+		const float DamageAmount = FallDamageCurve->GetFloatValue(FallHeight);
+		TakeDamage(DamageAmount, FDamageEvent{}, GetController(), Hit.GetActor());
+	}
 }

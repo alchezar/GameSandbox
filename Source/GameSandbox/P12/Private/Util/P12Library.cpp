@@ -2,20 +2,23 @@
 
 #include "P12/Public/Util/P12Library.h"
 
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "HAL/IConsoleManager.h"
 
 static TAutoConsoleVariable CVarP12DrawDebug(TEXT("P12.Debug"), 0, TEXT("Allow to draw debug helpers and console logs."), ECVF_Cheat);
 static TAutoConsoleVariable CVarP12DrawDebugPrintScreen(TEXT("P12.Debug.PrintScreen"), 0, TEXT("Allow to print screen messages."), ECVF_Cheat);
 static TAutoConsoleVariable CVarP12DrawDebugLegAlignment(TEXT("P12.Debug.LegAlignment"), 0, TEXT("Allow to draw leg alignment debug helpers."), ECVF_Cheat);
 static TAutoConsoleVariable CVarP12DrawDebugLedgeDetection(TEXT("P12.Debug.LedgeDetection"), 0, TEXT("Allow to draw ledge detection debug helpers."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebugText(TEXT("P12.Debug.Text"), 0, TEXT("Allow to draw debug text helpers."), ECVF_Cheat);
 
 TArray<FString> UP12Library::GetAllConsoleVariables()
-{	
+{
 	TArray<FString> ConsoleVariables;
 	ConsoleVariables.Add("P12.Debug");
 	ConsoleVariables.Add("P12.Debug.PrintScreen");
 	ConsoleVariables.Add("P12.Debug.LegAlignment");
 	ConsoleVariables.Add("P12.Debug.LedgeDetection");
+	ConsoleVariables.Add("P12.Debug.Text");
 	return ConsoleVariables;
 }
 
@@ -37,6 +40,11 @@ bool UP12Library::GetCanDrawDebugLegAlignment()
 bool UP12Library::GetCanDrawDebugLedgeDetection()
 {
 	return GetCanDrawDebug() && IConsoleManager::Get().FindConsoleVariable(TEXT("P12.Debug.LedgeDetection"))->GetBool();
+}
+
+bool UP12Library::GetCanDrawDebugText()
+{
+	return GetCanDrawDebug() && IConsoleManager::Get().FindConsoleVariable(TEXT("P12.Debug.Text"))->GetBool();
 }
 
 void UP12Library::DrawDebugLineTrace(const UWorld* World, const FHitResult& HitResult, const bool bDraw)
@@ -64,7 +72,7 @@ void UP12Library::DrawDebugCapsuleTrace(const UWorld* World, const FHitResult& H
 
 	constexpr float DrawTime = 5.f;
 	constexpr float SuccessThickness = 1.f;
-	
+
 	if (HitResult.bBlockingHit)
 	{
 		DrawDebugCapsule(World, HitResult.Location, HalfHeight, Radius, FQuat::Identity, Color, false, DrawTime, 0, SuccessThickness);
@@ -88,9 +96,28 @@ void UP12Library::DrawDebugDirectionalCapsule(const UWorld* World, FP12LedgeDesc
 	DrawDebugDirectionalArrow(World, Location, Location + LedgeDescription.Rotation.Vector() * 50.f, 50.f, FColor::Red, false, 5.f, 0, 1.f);
 }
 
+void UP12Library::DrawDebugText(const UWorld* World, const FVector& Location, const FString& Text, const bool bDraw, const bool bOnTick)
+{
+	if (!bDraw || !World)
+	{
+		return;
+	}
+	DrawDebugString(World, Location, Text, nullptr, FColor::Green, bOnTick ? 0.f : 5.f, true);
+}
+
+void UP12Library::DrawPrintString(const UWorld* World, const FString& Text, const bool bDraw, const bool bOnTick)
+{
+	if (!bDraw || !World)
+	{
+		return;
+	}
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, bOnTick ? 0.f : 5.f, FColor::Cyan, Text);
+
+}
+
 void UP12Library::FixedTurn(FRotator& DesiredRotation, const FRotator& CurrentRotation, const FRotator& DeltaRot)
 {
-	/* PITCH */ 
+	/* PITCH */
 	if (!FMath::IsNearlyEqual(CurrentRotation.Pitch, DesiredRotation.Pitch))
 	{
 		DesiredRotation.Pitch = FMath::FixedTurn(CurrentRotation.Pitch, DesiredRotation.Pitch, DeltaRot.Pitch);
