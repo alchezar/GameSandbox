@@ -29,7 +29,7 @@ AP12FirstPersonCharacter::AP12FirstPersonCharacter(const FObjectInitializer& Obj
 	
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCameraComponent");
 	FirstPersonCamera->SetupAttachment(FirstPersonMesh, SocketName);
-	FirstPersonCamera->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
+	// FirstPersonCamera->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
 	FirstPersonCamera->bUsePawnControlRotation = true;
 }
 

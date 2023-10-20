@@ -73,7 +73,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	FName SocketName = FName("CamSocketNeck");
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ladder")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement | Ladder")
 	FP12LadderCameraLimits LadderCameraLimits;
 	
 private:

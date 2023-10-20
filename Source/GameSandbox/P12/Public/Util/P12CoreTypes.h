@@ -21,3 +21,10 @@ struct FP12LedgeDescription
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Normal;
 };
+
+UENUM(BlueprintType)
+enum class EP12EquipablItemType : uint8
+{
+	None,
+	Pistol
+};

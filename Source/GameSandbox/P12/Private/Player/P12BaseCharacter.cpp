@@ -9,6 +9,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
+#include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
@@ -36,6 +37,7 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 
 	LedgeDetection = CreateDefaultSubobject<UP12LedgeDetectionComponent>("LedgeDetectorComponent");
 	CharacterAttribute = CreateDefaultSubobject<UP12AttributeComponent>("CharacterAttributeComponent");
+	Equipment = CreateDefaultSubobject<UP12EquipmentComponent>("EquipmentComponent");
 }
 
 void AP12BaseCharacter::BeginPlay()
@@ -72,7 +74,7 @@ void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 		BaseCharacterMovement->SetRotationMode(true);
 		return;
 	}
-	BaseCharacterMovement->SetRotationMode(true);
+	BaseCharacterMovement->SetRotationMode(false);
 	const FRotator ControllerYawRotator = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	// const FVector ForwardDirection = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::X);
 	// const FVector RightDirection   = FRotationMatrix(ControllerYawRotator).GetUnitAxis(EAxis::Y);

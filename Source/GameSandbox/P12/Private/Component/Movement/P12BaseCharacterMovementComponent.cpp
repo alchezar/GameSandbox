@@ -29,15 +29,15 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 	float Result = Super::GetMaxSpeed();
 	if (bRunning)
 	{
-		Result = RunSpeed;
+		Result = MaxSpeed.Run;
 	}
 	else if (bOutOfStamina)
 	{
-		Result = OutOfStaminaSpeed;
+		Result = MaxSpeed.OutOfStaminaRun;
 	}
 	else if (IsOnLadder())
 	{
-		Result = LadderClimbingMaxSpeed;
+		Result = MaxSpeed.LadderClimbing;
 	}
 	return Result;
 }
@@ -56,6 +56,10 @@ void UP12BaseCharacterMovementComponent::SetRotationMode(const bool bOrientToMov
 	}
 	bUseControllerDesiredRotation = !bOrientToMovement;
 	bOrientRotationToMovement = bOrientToMovement;
+	if (GetCharacterOwner())
+	{
+		GetCharacterOwner()->bUseControllerRotationYaw = !bOrientToMovement;
+	}
 }
 
 void UP12BaseCharacterMovementComponent::ToggleMaxSpeed(const bool bRun)
@@ -149,7 +153,7 @@ float UP12BaseCharacterMovementComponent::GetLadderSpeedRatio() const
 		return 0.f;
 	}
 	const FVector LadderUpVector = CurrentLadder->GetActorUpVector();
-	return LadderUpVector.Dot(Velocity) / LadderClimbingMaxSpeed;
+	return LadderUpVector.Dot(Velocity) / MaxSpeed.LadderClimbing;
 }
 
 void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode PreviousMovementMode, uint8 PreviousCustomMode)

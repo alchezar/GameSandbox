@@ -7,6 +7,8 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class UP12WeaponBarrelComponent;
+class UP12EquipmentComponent;
 class UP12AttributeComponent;
 class AP12Ladder;
 class AP12InteractiveActor;
@@ -75,6 +77,7 @@ public:
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
+	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
 	virtual void MoveInput(const FInputActionValue& Value);
 	virtual void LookInput(const FInputActionValue& Value);
@@ -115,23 +118,26 @@ protected:
 	UP12LedgeDetectionComponent* LedgeDetection;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UP12AttributeComponent* CharacterAttribute;
-
-	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UP12EquipmentComponent* Equipment;
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	FP12CameraArmLength CameraArmLength;
-	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Mantle")
 	FP12MantleSettings HighMantleSettings;
-	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	UPROPERTY(EditAnywhere, Category = "C++ | Mantle")
 	FP12MantleSettings LowMantleSettings;
-	UPROPERTY(EditAnywhere, Category = "C++ | Move")
+	UPROPERTY(EditAnywhere, Category = "C++ | Mantle")
 	float LowMantleMaxHeight = 100.f;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
+	UPROPERTY(EditAnywhere, Category = "C++ | Montage")
 	UAnimMontage* AttachFromTopMontage;
+	UPROPERTY(EditAnywhere, Category = "C++ | Montage")
+	UAnimMontage* DeathMontage;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
 	UCurveFloat* FallDamageCurve;
-	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
-	UAnimMontage* DeathMontage;
 
 	
 private:

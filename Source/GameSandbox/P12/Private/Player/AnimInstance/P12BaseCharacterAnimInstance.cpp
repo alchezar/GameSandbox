@@ -3,6 +3,7 @@
 #include "P12/Public/Player/AnimInstance/P12BaseCharacterAnimInstance.h"
 
 #include "KismetAnimationLibrary.h"
+#include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Component/Movement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
@@ -14,6 +15,8 @@ void UP12BaseCharacterAnimInstance::NativeBeginPlay()
 	CachedCharacter = StaticCast<AP12BaseCharacter*>(TryGetPawnOwner());
 	CachedCharacterMovement = CachedCharacter->GetBaseCharacterMovement();
 	check(CachedCharacterMovement.IsValid())
+	CachedEquipmentComponent = CachedCharacter->GetEquipmentComponent();
+	check(CachedEquipmentComponent.IsValid())
 }
 
 void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -31,7 +34,9 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bCrouch = CachedCharacterMovement->IsCrouching();
 	bLadder = CachedCharacterMovement->IsOnLadder();
 	LadderSpeedRatio = CachedCharacterMovement->GetLadderSpeedRatio();
-
+	ItemType = CachedEquipmentComponent->GetCurrentEquippedItemType();
+	AimRotation = (CachedCharacter->GetBaseAimRotation() - CachedCharacter->GetActorRotation()).GetNormalized();
+	
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
 	HipOffset = FVector(0.f, CachedCharacter->GetIKHipOffset(), 0.f);

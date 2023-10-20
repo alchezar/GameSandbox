@@ -14,14 +14,19 @@ struct FP12MaxSpeed
 {
 	GENERATED_BODY()
 
-	FP12MaxSpeed() : Crouch(350.f), Walk(600.f), Run(900.f) {}
+	FP12MaxSpeed() {}
 
-	UPROPERTY(EditAnywhere)
-	float Crouch = 0.f;
-	UPROPERTY(EditAnywhere)
-	float Walk = 0.f;
-	UPROPERTY(EditAnywhere)
-	float Run = 0.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float Crouch = 350.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float Walk = 600.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float Run = 900.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float OutOfStaminaRun = 700.f;
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float LadderClimbing = 100.f;
+
 };
 
 struct FP12MantleMovementParams
@@ -105,13 +110,6 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	FP12MaxSpeed MaxSpeed;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Run", meta = (ClampMin = 1.f, UIMin = 1.f))
-	float RunSpeed = 900.f;
-	UPROPERTY(EditAnywhere, Category = "C++ | Run", meta = (ClampMin = 1.f, UIMin = 1.f))
-	float OutOfStaminaSpeed = 700.f;
-
-	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
-	float LadderClimbingMaxSpeed = 100.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")
 	float LadderClimbingDeceleration = 2048.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Ladder")

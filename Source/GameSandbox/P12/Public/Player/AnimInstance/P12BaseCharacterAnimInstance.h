@@ -4,8 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacterAnimInstance.generated.h"
 
+class UP12EquipmentComponent;
 class UP12BaseCharacterMovementComponent;
 class UCharacterMovementComponent;
 class AP12BaseCharacter;
@@ -38,7 +40,11 @@ protected:
 	bool bLadder;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float LadderSpeedRatio;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	EP12EquipablItemType ItemType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	FRotator AimRotation;
+	
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
@@ -49,4 +55,5 @@ protected:
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	TWeakObjectPtr<UP12BaseCharacterMovementComponent> CachedCharacterMovement;
+	TWeakObjectPtr<UP12EquipmentComponent> CachedEquipmentComponent;
 };
