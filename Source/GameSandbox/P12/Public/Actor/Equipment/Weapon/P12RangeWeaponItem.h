@@ -16,18 +16,32 @@ class GAMESANDBOX_API AP12RangeWeaponItem : public AP12EquipableItem
 public:
 	AP12RangeWeaponItem();
 	virtual void Tick(float DeltaTime) override;
+	UP12WeaponBarrelComponent* GetBarrelComponent() const { return WeaponBarrel; }
+	void FireInput();
 
 protected:
 	virtual void BeginPlay() override;
 
+private:
+	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None) const;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USkeletalMeshComponent* WeaponMesh;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UP12WeaponBarrelComponent* WeaponBarrel;
 
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Alignment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
 	FName MuzzleSocketName = "Muzzle_Socket";
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Alignment")
-	FVector WeaponMeshOffset = FVector(0.f, 0.f, 0.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
+	FVector WeaponMeshOffset = FVector(-1.f, -2.f, -3.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
+	FRotator WeaponMeshOrientation = FRotator(20.f, 0.f, 0.f);
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Weapon")
+	UAnimMontage* WeaponFireMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
+	UAnimMontage* CharacterFireMontage;
+	
+
 };

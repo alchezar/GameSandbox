@@ -90,6 +90,7 @@ public:
 	void RegisterInteractiveActor(AP12InteractiveActor* NewInteractiveActor);
 	void UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor);
 	const AP12Ladder* GetAvailableLadder() const;
+	void FireInput();
 
 protected:
 	virtual void BeginPlay() override;

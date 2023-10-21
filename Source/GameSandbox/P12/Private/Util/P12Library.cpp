@@ -10,6 +10,7 @@ static TAutoConsoleVariable CVarP12DrawDebugPrintScreen(TEXT("P12.Debug.PrintScr
 static TAutoConsoleVariable CVarP12DrawDebugLegAlignment(TEXT("P12.Debug.LegAlignment"), 0, TEXT("Allow to draw leg alignment debug helpers."), ECVF_Cheat);
 static TAutoConsoleVariable CVarP12DrawDebugLedgeDetection(TEXT("P12.Debug.LedgeDetection"), 0, TEXT("Allow to draw ledge detection debug helpers."), ECVF_Cheat);
 static TAutoConsoleVariable CVarP12DrawDebugText(TEXT("P12.Debug.Text"), 0, TEXT("Allow to draw debug text helpers."), ECVF_Cheat);
+static TAutoConsoleVariable CVarP12DrawDebugFire(TEXT("P12.Debug.Fire"), 0, TEXT("Allow to draw fire debug helpers."), ECVF_Cheat);
 
 TArray<FString> UP12Library::GetAllConsoleVariables()
 {
@@ -19,6 +20,7 @@ TArray<FString> UP12Library::GetAllConsoleVariables()
 	ConsoleVariables.Add("P12.Debug.LegAlignment");
 	ConsoleVariables.Add("P12.Debug.LedgeDetection");
 	ConsoleVariables.Add("P12.Debug.Text");
+	ConsoleVariables.Add("P12.Debug.Fire");
 	return ConsoleVariables;
 }
 
@@ -47,7 +49,12 @@ bool UP12Library::GetCanDrawDebugText()
 	return GetCanDrawDebug() && IConsoleManager::Get().FindConsoleVariable(TEXT("P12.Debug.Text"))->GetBool();
 }
 
-void UP12Library::DrawDebugLineTrace(const UWorld* World, const FHitResult& HitResult, const bool bDraw)
+bool UP12Library::GetCanDrawDebugFire()
+{
+	return GetCanDrawDebug() && IConsoleManager::Get().FindConsoleVariable(TEXT("P12.Debug.Fire"))->GetBool();
+}
+
+void UP12Library::DrawDebugLineTrace(const UWorld* World, const FHitResult& HitResult, const bool bDraw, const bool bOnTick)
 {
 	if (!bDraw || !World)
 	{
@@ -55,12 +62,12 @@ void UP12Library::DrawDebugLineTrace(const UWorld* World, const FHitResult& HitR
 	}
 	if (!HitResult.bBlockingHit)
 	{
-		DrawDebugLine(World, HitResult.TraceStart, HitResult.TraceEnd, FColor::Green);
+		DrawDebugLine(World, HitResult.TraceStart, HitResult.TraceEnd, FColor::Green, false, bOnTick ? 0.f : 5.f);
 		return;
 	}
-	DrawDebugLine(World, HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red);
-	DrawDebugLine(World, HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green);
-	DrawDebugPoint(World, HitResult.ImpactPoint, 10.f, FColor::Red);
+	DrawDebugLine(World, HitResult.TraceStart, HitResult.ImpactPoint, FColor::Red, false, bOnTick ? 0.f : 5.f);
+	DrawDebugLine(World, HitResult.ImpactPoint, HitResult.TraceEnd, FColor::Green, false, bOnTick ? 0.f : 5.f);
+	DrawDebugPoint(World, HitResult.ImpactPoint, 10.f, FColor::Red, false, bOnTick ? 0.f : 5.f);
 }
 
 void UP12Library::DrawDebugCapsuleTrace(const UWorld* World, const FHitResult& HitResult, const float Radius, const float HalfHeight, const FColor Color, const bool bDraw)

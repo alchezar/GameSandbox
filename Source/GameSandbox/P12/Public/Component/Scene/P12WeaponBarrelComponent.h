@@ -14,7 +14,14 @@ class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 public:
 	UP12WeaponBarrelComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	void Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator);
 
 protected:
 	virtual void BeginPlay() override;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
+	float FiringRange = 5000.f;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
+	float DamageAmount = 20.f;
 };

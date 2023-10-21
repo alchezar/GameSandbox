@@ -24,9 +24,11 @@ public:
 	static bool GetCanDrawDebugLedgeDetection();
 	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "PetProjects")
 	static bool GetCanDrawDebugText();
+	UFUNCTION(BlueprintPure, BlueprintCallable, Category = "PetProjects")
+	static bool GetCanDrawDebugFire();
 	
 	UFUNCTION(BlueprintCallable, Category = "PetProjects")
-	static void DrawDebugLineTrace(const UWorld* World, const FHitResult& HitResult, const bool bDraw);
+	static void DrawDebugLineTrace(const UWorld* World, const FHitResult& HitResult, const bool bDraw, const bool bOnTick = true);
 	UFUNCTION(BlueprintCallable, Category = "PetProjects")
 	static void DrawDebugCapsuleTrace(const UWorld* World, const FHitResult& HitResult, const float Radius, const float HalfHeight, const FColor Color, const bool bDraw);
 	UFUNCTION(BlueprintCallable, Category = "PetProjects")

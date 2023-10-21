@@ -26,15 +26,25 @@ void UP12EquipmentComponent::CreateLoadout()
 	{
 		return;
 	}
-	CurrentEquippedItem = GetWorld()->SpawnActor<AP12RangeWeaponItem>(SideArmClass);
-	CurrentEquippedItem->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
+	CurrentEquippedWeapon = GetWorld()->SpawnActor<AP12RangeWeaponItem>(SideArmClass);
+	CurrentEquippedWeapon->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
+	CurrentEquippedWeapon->SetOwner(CachedCharacter.Get());
 }
 
 EP12EquipablItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
 {
-	if (!CurrentEquippedItem)
+	if (!CurrentEquippedWeapon)
 	{
 		return EP12EquipablItemType::None;
 	}
-	return CurrentEquippedItem->GetItemType();
+	return CurrentEquippedWeapon->GetItemType();
+}
+
+void UP12EquipmentComponent::FireInput()
+{
+	if (!CurrentEquippedWeapon)
+	{
+		return;
+	}
+	CurrentEquippedWeapon->FireInput();
 }

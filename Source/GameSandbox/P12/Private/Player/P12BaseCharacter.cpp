@@ -430,3 +430,8 @@ void AP12BaseCharacter::Landed(const FHitResult& Hit)
 		TakeDamage(DamageAmount, FDamageEvent{}, GetController(), Hit.GetActor());
 	}
 }
+
+void AP12BaseCharacter::FireInput()
+{
+	Equipment->FireInput();
+}

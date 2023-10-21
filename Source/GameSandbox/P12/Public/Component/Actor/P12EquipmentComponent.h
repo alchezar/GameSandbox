@@ -19,6 +19,7 @@ class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
 public:
 	UP12EquipmentComponent();
 	EP12EquipablItemType GetCurrentEquippedItemType() const;
+	void FireInput();
 
 protected:
 	virtual void BeginPlay() override;
@@ -35,5 +36,5 @@ protected:
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	UPROPERTY()
-	AP12RangeWeaponItem* CurrentEquippedItem = nullptr;
+	AP12RangeWeaponItem* CurrentEquippedWeapon = nullptr;
 };

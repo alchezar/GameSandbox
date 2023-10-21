@@ -35,6 +35,8 @@ protected:
 	void LadderJumpInput();
 	void LadderClimbInput(const FInputActionValue& Value);
 
+	void FireInput();
+
 private:
 	void SubsystemDefaultMappingContext() const;
 	UFUNCTION(Exec)
@@ -61,7 +63,9 @@ protected:
 	UInputAction* LadderJumpAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* LadderClimbAction = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* FireAction = nullptr;
+	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;
