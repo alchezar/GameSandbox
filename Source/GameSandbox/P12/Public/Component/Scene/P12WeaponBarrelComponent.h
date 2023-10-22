@@ -6,6 +6,8 @@
 #include "Components/SceneComponent.h"
 #include "P12WeaponBarrelComponent.generated.h"
 
+class UNiagaraSystem;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 {
@@ -24,4 +26,7 @@ protected:
 	float FiringRange = 5000.f;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	float DamageAmount = 20.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
+	UNiagaraSystem* TraceNiagara = nullptr;
 };

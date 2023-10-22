@@ -41,9 +41,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float LadderSpeedRatio;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
-	EP12EquipablItemType ItemType;
+	EP12EquipableItemType ItemType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	FRotator AimRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	FTransform GripSocketTransform;
 	
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;

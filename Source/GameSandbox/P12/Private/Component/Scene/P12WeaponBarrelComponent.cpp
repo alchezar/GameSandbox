@@ -3,6 +3,8 @@
 #include "P12/Public/Component/Scene/P12WeaponBarrelComponent.h"
 
 #include "GameSandbox.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Engine/DamageEvents.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -37,5 +39,16 @@ void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& Sh
 			return;
 		}
 		HitActor->TakeDamage(DamageAmount, FDamageEvent(), Instigator, GetOwner());
+	}
+
+	if (TraceNiagara)
+	{
+		const FVector NiagaraLocation = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd;
+		UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
+		if (!TraceNiagaraComp)
+		{
+			return;
+		}
+		TraceNiagaraComp->SetVectorParameter("TraceEnd", NiagaraLocation);
 	}
 }

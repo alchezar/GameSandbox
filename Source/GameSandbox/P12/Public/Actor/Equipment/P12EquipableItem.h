@@ -14,9 +14,9 @@ class GAMESANDBOX_API AP12EquipableItem : public AActor
 	GENERATED_BODY()
 
 public:
-	EP12EquipablItemType GetItemType() const { return ItemType; };
+	EP12EquipableItemType GetItemType() const { return ItemType; };
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
-	EP12EquipablItemType ItemType = EP12EquipablItemType::None;
+	EP12EquipableItemType ItemType = EP12EquipableItemType::None;
 };

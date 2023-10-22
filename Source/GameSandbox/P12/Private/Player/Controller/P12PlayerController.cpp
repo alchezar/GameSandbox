@@ -51,7 +51,8 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(LadderJumpAction, ETriggerEvent::Started, this, &ThisClass::LadderJumpInput);
 	InputComp->BindAction(LadderClimbAction, ETriggerEvent::Triggered, this, &ThisClass::LadderClimbInput);
 
-	InputComp->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput);
+	InputComp->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput, true);
+	InputComp->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
 
 }
 
@@ -133,13 +134,13 @@ void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value)
 	CachedBaseCharacter->LadderClimbInput(Value);
 }
 
-void AP12PlayerController::FireInput()
+void AP12PlayerController::FireInput(const bool bStart)
 {
 	if (CachedBaseCharacter.IsNull())
 	{
 		return;
 	}
-	CachedBaseCharacter->FireInput();
+	CachedBaseCharacter->FireInput(bStart);
 }
 
 void AP12PlayerController::P12Debug_EnableAll()

@@ -35,7 +35,7 @@ protected:
 	void LadderJumpInput();
 	void LadderClimbInput(const FInputActionValue& Value);
 
-	void FireInput();
+	void FireInput(const bool bStart);
 
 private:
 	void SubsystemDefaultMappingContext() const;

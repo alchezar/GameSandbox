@@ -7,6 +7,7 @@
 #include "Curves/CurveVector.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
@@ -431,7 +432,12 @@ void AP12BaseCharacter::Landed(const FHitResult& Hit)
 	}
 }
 
-void AP12BaseCharacter::FireInput()
+void AP12BaseCharacter::FireInput(const bool bStart)
 {
-	Equipment->FireInput();
+	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
+	if (!CurrentWeapon)
+	{
+		return;
+	}
+	CurrentWeapon->FireInput(bStart);
 }

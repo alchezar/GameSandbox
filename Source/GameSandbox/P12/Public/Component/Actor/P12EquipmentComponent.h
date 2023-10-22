@@ -18,8 +18,8 @@ class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
 
 public:
 	UP12EquipmentComponent();
-	EP12EquipablItemType GetCurrentEquippedItemType() const;
-	void FireInput();
+	FORCEINLINE AP12RangeWeaponItem* GetCurrentEquippedWeapon() const { return CurrentEquippedWeapon; }
+	EP12EquipableItemType GetCurrentEquippedItemType() const;
 
 protected:
 	virtual void BeginPlay() override;

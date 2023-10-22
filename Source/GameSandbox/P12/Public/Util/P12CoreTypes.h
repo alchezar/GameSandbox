@@ -23,8 +23,9 @@ struct FP12LedgeDescription
 };
 
 UENUM(BlueprintType)
-enum class EP12EquipablItemType : uint8
+enum class EP12EquipableItemType : uint8
 {
 	None,
-	Pistol
+	Pistol,
+	Rifle
 };

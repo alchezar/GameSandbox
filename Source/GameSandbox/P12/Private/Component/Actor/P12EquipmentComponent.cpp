@@ -31,20 +31,11 @@ void UP12EquipmentComponent::CreateLoadout()
 	CurrentEquippedWeapon->SetOwner(CachedCharacter.Get());
 }
 
-EP12EquipablItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
+EP12EquipableItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
 {
 	if (!CurrentEquippedWeapon)
 	{
-		return EP12EquipablItemType::None;
+		return EP12EquipableItemType::None;
 	}
 	return CurrentEquippedWeapon->GetItemType();
-}
-
-void UP12EquipmentComponent::FireInput()
-{
-	if (!CurrentEquippedWeapon)
-	{
-		return;
-	}
-	CurrentEquippedWeapon->FireInput();
 }

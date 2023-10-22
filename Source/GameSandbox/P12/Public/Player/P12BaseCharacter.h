@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P12BaseCharacter.generated.h"
 
+class AP12RangeWeaponItem;
 class UP12WeaponBarrelComponent;
 class UP12EquipmentComponent;
 class UP12AttributeComponent;
@@ -90,7 +91,7 @@ public:
 	void RegisterInteractiveActor(AP12InteractiveActor* NewInteractiveActor);
 	void UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor);
 	const AP12Ladder* GetAvailableLadder() const;
-	void FireInput();
+	void FireInput(const bool bStart);
 
 protected:
 	virtual void BeginPlay() override;
