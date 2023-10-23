@@ -34,6 +34,7 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bInAir = CachedCharacterMovement->IsFalling();
 	bCrouch = CachedCharacterMovement->IsCrouching();
 	bLadder = CachedCharacterMovement->IsOnLadder();
+	bAim = CachedCharacter->GetIsAiming();
 	LadderSpeedRatio = CachedCharacterMovement->GetLadderSpeedRatio();
 	ItemType = CachedEquipmentComponent->GetCurrentEquippedItemType();
 	AimRotation = (CachedCharacter->GetBaseAimRotation() - CachedCharacter->GetActorRotation()).GetNormalized();

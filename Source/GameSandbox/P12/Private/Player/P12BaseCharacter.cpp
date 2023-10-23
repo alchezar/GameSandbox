@@ -206,8 +206,8 @@ void AP12BaseCharacter::LadderClimbInput(const FInputActionValue& Value)
 
 void AP12BaseCharacter::ChangeCameraArmLength(const bool bStart, const float NewArmLength)
 {
+	const float TargetLength = bStart ? NewArmLength : GetDefaultCameraArmLength();
 	FTimerDelegate RunDelegate;
-	const float TargetLength = bStart ? NewArmLength : CameraArmLength.Walk;
 	RunDelegate.BindUObject(this, &ThisClass::SmoothlyChangeCameraArmLength, bStart, TargetLength);
 	GetWorld()->GetTimerManager().SetTimer(RunTimer, RunDelegate, GetWorld()->GetDeltaSeconds(), true);
 }
@@ -407,7 +407,6 @@ void AP12BaseCharacter::EnableRagdoll()
 	SetLifeSpan(10.f);
 }
 
-
 void AP12BaseCharacter::Falling()
 {
 	Super::Falling();
@@ -440,4 +439,32 @@ void AP12BaseCharacter::FireInput(const bool bStart)
 		return;
 	}
 	CurrentWeapon->FireInput(bStart);
+}
+
+void AP12BaseCharacter::AimInput(const bool bStart)
+{
+	bAiming = bStart;
+	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
+	if (!CurrentWeapon)
+	{
+		return;
+	}
+	CurrentWeapon->AimInput(bAiming);
+	ChangeCameraArmLength(bAiming, CameraArmLength.Aim);
+}
+
+float AP12BaseCharacter::GetDefaultCameraArmLength() const
+{
+	if (bAiming)
+	{
+		if (bCrouch)
+		{
+			return CameraArmLength.Crouch;
+		}
+		if(bRunning)
+		{
+			return CameraArmLength.Run;
+		}
+	}
+	return CameraArmLength.Walk;
 }

@@ -44,6 +44,11 @@ void AP12RangeWeaponItem::FireInput(const bool bStart)
 	}
 }
 
+void AP12RangeWeaponItem::AimInput(const bool bStart)
+{
+	bAiming = bStart;
+}
+
 float AP12RangeWeaponItem::PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate, const FName StartSectionName) const
 {
 	UAnimInstance* WeaponAnimInstance = WeaponMesh->GetAnimInstance();
@@ -86,8 +91,12 @@ void AP12RangeWeaponItem::MakeShot()
 	FRotator PlayerRotation;
 	Controller->GetPlayerViewPoint(PlayerLocation, PlayerRotation);
 	const FVector PlayerDirection = PlayerRotation.RotateVector(FVector::ForwardVector);
+
+	CurrentBulletSpread = OwnerCharacter->GetIsAiming() ? AimBulletSpread : BulletSpread;
+	const float HalfAngleRad = FMath::DegreesToRadians(CurrentBulletSpread / 2.f);
+	const FVector SpreadDirection = FMath::VRandCone(PlayerDirection, HalfAngleRad);
 	
-	WeaponBarrel->Shot(PlayerLocation, PlayerDirection, Controller);
+	WeaponBarrel->Shot(PlayerLocation, SpreadDirection, Controller);
 
 	OwnerCharacter->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);

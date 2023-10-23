@@ -26,7 +26,8 @@ struct FP12MaxSpeed
 	float OutOfStaminaRun = 700.f;
 	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
 	float LadderClimbing = 100.f;
-
+	UPROPERTY(EditAnywhere, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float Aim = 200.f;
 };
 
 struct FP12MantleMovementParams

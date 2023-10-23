@@ -6,6 +6,8 @@
 #include "Curves/CurveVector.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "GameFramework/Character.h"
+#include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
+#include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -38,6 +40,10 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 	else if (IsOnLadder())
 	{
 		Result = MaxSpeed.LadderClimbing;
+	}
+	else if (GetBaseCharacterOwner()->GetIsAiming())
+	{
+		Result = GetBaseCharacterOwner()->GetEquipmentComponent()->GetCurrentEquippedWeapon()->GetAimSpeed();
 	}
 	return Result;
 }

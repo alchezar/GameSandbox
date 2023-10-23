@@ -36,6 +36,7 @@ protected:
 	void LadderClimbInput(const FInputActionValue& Value);
 
 	void FireInput(const bool bStart);
+	void AimInput(const bool bStart);
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -65,6 +66,8 @@ protected:
 	UInputAction* LadderClimbAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* FireAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* AimAction = nullptr;
 	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;

@@ -53,7 +53,8 @@ void AP12PlayerController::SetupInputComponent()
 
 	InputComp->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput, true);
 	InputComp->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
-
+	InputComp->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::AimInput, true);
+	InputComp->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::AimInput, false);
 }
 
 void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
@@ -141,6 +142,15 @@ void AP12PlayerController::FireInput(const bool bStart)
 		return;
 	}
 	CachedBaseCharacter->FireInput(bStart);
+}
+
+void AP12PlayerController::AimInput(const bool bStart)
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->AimInput(bStart);
 }
 
 void AP12PlayerController::P12Debug_EnableAll()

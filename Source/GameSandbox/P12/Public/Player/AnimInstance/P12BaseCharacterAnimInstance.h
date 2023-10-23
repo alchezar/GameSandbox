@@ -39,6 +39,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	bool bLadder;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	bool bAim;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float LadderSpeedRatio;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	EP12EquipableItemType ItemType;

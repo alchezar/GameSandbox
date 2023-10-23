@@ -8,6 +8,23 @@
 
 class UNiagaraSystem;
 
+USTRUCT(BlueprintType)
+struct FP12DecalInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UMaterialInterface* Decal = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FVector Size = FVector(4.f);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Lifetime = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FadeOutTime = 5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float FadeScreenSize = 0.002f;	
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 {
@@ -29,4 +46,7 @@ protected:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
 	UNiagaraSystem* TraceNiagara = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Decal")
+	FP12DecalInfo DecalInfo;
 };

@@ -25,14 +25,16 @@ struct FP12CameraArmLength
 {
 	GENERATED_BODY()
 
-	FP12CameraArmLength() : Crouch(150.f), Walk(200.f), Run(300.f) {}
+	FP12CameraArmLength() {}
 
 	UPROPERTY(EditAnywhere)
-	float Crouch = 0.f;
+	float Crouch = 150.f;
 	UPROPERTY(EditAnywhere)
-	float Walk = 0.f;
+	float Walk = 200.f;
 	UPROPERTY(EditAnywhere)
-	float Run = 0.f;
+	float Run = 300.f;
+	UPROPERTY(EditAnywhere)
+	float Aim = 100.f;
 };
 
 USTRUCT(BlueprintType)
@@ -77,6 +79,7 @@ public:
 	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
+	FORCEINLINE bool GetIsAiming() const { return bAiming; }
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
@@ -92,6 +95,7 @@ public:
 	void UnregisterInteractiveActor(AP12InteractiveActor* OldInteractiveActor);
 	const AP12Ladder* GetAvailableLadder() const;
 	void FireInput(const bool bStart);
+	void AimInput(const bool bStart);
 
 protected:
 	virtual void BeginPlay() override;
@@ -110,6 +114,7 @@ private:
 	void InitAnimNotify();
 	void OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	void EnableRagdoll();
+	float GetDefaultCameraArmLength() const;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
@@ -140,13 +145,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
 	UCurveFloat* FallDamageCurve;
-
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
-	float DefaultMaxSpeed = 0.f;
 	bool bCrouch = false;
 	bool bRunning = false;
+	bool bAiming = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;
 	float IKLeftLegOffset = 0.f;
