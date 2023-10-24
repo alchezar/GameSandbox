@@ -30,6 +30,10 @@ public:
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
 
+	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	void SetAmmo(const int32 NewAmmo);
+	bool GetCanShoot() const;
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -66,9 +70,13 @@ protected:
 	float AimBulletSpread = 2.f;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	float AimSpeed = 200.f;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
+	int32 MaxAmmo = 30;
+	
 private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;
 	bool bAiming = false;
+	int32 Ammo = 0;
+	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 };

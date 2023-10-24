@@ -3,7 +3,6 @@
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 
 #include "P12/Public/Player/P12BaseCharacter.h"
-#include "P12/Public/Subsystem/P12DebugSubsystem.h"
 #include "P12/Public/Util/P12Library.h"
 
 UP12AttributeComponent::UP12AttributeComponent()
@@ -15,10 +14,12 @@ void UP12AttributeComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Health = MaxHealth;
 	check(GetOwner()->IsA<AP12BaseCharacter>())
 	CachedCharacterOwner = StaticCast<AP12BaseCharacter*>(GetOwner());
 	CachedCharacterOwner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnTakeAnyDamage);
+	
+	Health = MaxHealth;
+	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
 }
 
 void UP12AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -39,6 +40,7 @@ void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 	}
 	
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
 	UP12Library::DrawPrintString(GetWorld(), FString::Printf(TEXT("AP12BaseCharacter %s received %.2f amount of damage from %s"), *CachedCharacterOwner->GetName(), Damage, *DamageCauser->GetName()), UP12Library::GetCanDrawDebugPrintScreen());
 
 	if (FMath::IsNearlyZero(Health) && OnDeath.IsBound())
@@ -59,3 +61,11 @@ void UP12AttributeComponent::DebugDrawAttributes()
 }
 #endif
 
+float UP12AttributeComponent::GetHealthPercent()
+{
+	if (FMath::IsNearlyZero(MaxHealth))
+	{
+		return 0.f;
+	}
+	return Health / MaxHealth;
+}

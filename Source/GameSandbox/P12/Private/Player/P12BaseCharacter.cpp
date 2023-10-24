@@ -257,6 +257,10 @@ void AP12BaseCharacter::OnMantleHandle(const FP12MantleSettings& Settings, const
 
 bool AP12BaseCharacter::GetCanRun() const
 {
+	if (bAiming)
+	{
+		return false;
+	}
 	return true;
 }
 
@@ -444,6 +448,7 @@ void AP12BaseCharacter::FireInput(const bool bStart)
 void AP12BaseCharacter::AimInput(const bool bStart)
 {
 	bAiming = bStart;
+	OnAimingStateChanged.Broadcast(bStart);
 	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
 	if (!CurrentWeapon)
 	{
@@ -467,4 +472,9 @@ float AP12BaseCharacter::GetDefaultCameraArmLength() const
 		}
 	}
 	return CameraArmLength.Walk;
+}
+
+float AP12BaseCharacter::GetHeathPercent()
+{
+	return CharacterAttribute->GetHealthPercent();
 }

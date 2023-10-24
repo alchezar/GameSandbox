@@ -23,6 +23,11 @@ AP12RangeWeaponItem::AP12RangeWeaponItem()
 void AP12RangeWeaponItem::BeginPlay()
 {
 	Super::BeginPlay();
+
+	check(GetOwner()->IsA<AP12BaseCharacter>())
+	CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
+	
+	SetAmmo(MaxAmmo);
 }
 
 void AP12RangeWeaponItem::Tick(float DeltaTime)
@@ -80,6 +85,11 @@ float AP12RangeWeaponItem::GetShotTimeInterval()
 
 void AP12RangeWeaponItem::MakeShot()
 {
+	if (!GetCanShoot())
+	{
+		FireInput(false);
+		return;
+	}
 	check(GetOwner()->IsA<AP12BaseCharacter>())
 	AP12BaseCharacter* OwnerCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
 	AController* Controller = OwnerCharacter->GetController();
@@ -95,9 +105,21 @@ void AP12RangeWeaponItem::MakeShot()
 	CurrentBulletSpread = OwnerCharacter->GetIsAiming() ? AimBulletSpread : BulletSpread;
 	const float HalfAngleRad = FMath::DegreesToRadians(CurrentBulletSpread / 2.f);
 	const FVector SpreadDirection = FMath::VRandCone(PlayerDirection, HalfAngleRad);
-	
+
+	SetAmmo(--Ammo);
 	WeaponBarrel->Shot(PlayerLocation, SpreadDirection, Controller);
 
 	OwnerCharacter->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);
+}
+
+void AP12RangeWeaponItem::SetAmmo(const int32 NewAmmo) 
+{
+	Ammo = FMath::Clamp(NewAmmo, 0, MaxAmmo);
+	CachedCharacter->OnAmmoCountChanged.Broadcast(Ammo);
+}
+
+bool AP12RangeWeaponItem::GetCanShoot() const 
+{
+	return Ammo > 0;
 }

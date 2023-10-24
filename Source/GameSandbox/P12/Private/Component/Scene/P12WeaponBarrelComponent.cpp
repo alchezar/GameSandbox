@@ -31,7 +31,7 @@ void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& Sh
 	const FVector ShotEnd = ShotStart + FiringRange * ShotDirection;
 	
 	FHitResult ShotHitResult;
-	GetWorld()->LineTraceSingleByChannel(ShotHitResult, MuzzleLocation, ShotEnd, ECC_BULLET);
+	GetWorld()->LineTraceSingleByChannel(ShotHitResult, ShotStart, ShotEnd, ECC_BULLET);
 	UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
 	if (ShotHitResult.bBlockingHit)
 	{

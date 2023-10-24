@@ -26,9 +26,11 @@ void UP12EquipmentComponent::CreateLoadout()
 	{
 		return;
 	}
-	CurrentEquippedWeapon = GetWorld()->SpawnActor<AP12RangeWeaponItem>(SideArmClass);
+	// CurrentEquippedWeapon = GetWorld()->SpawnActor<AP12RangeWeaponItem>(SideArmClass);
+	// CurrentEquippedWeapon->SetOwner(CachedCharacter.Get());
+	CurrentEquippedWeapon = GetWorld()->SpawnActorDeferred<AP12RangeWeaponItem>(SideArmClass, FTransform::Identity, CachedCharacter.Get());
 	CurrentEquippedWeapon->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
-	CurrentEquippedWeapon->SetOwner(CachedCharacter.Get());
+	CurrentEquippedWeapon->FinishSpawning(FTransform::Identity);
 }
 
 EP12EquipableItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const

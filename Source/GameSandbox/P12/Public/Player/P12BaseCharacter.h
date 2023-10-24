@@ -62,6 +62,10 @@ struct FP12MantleSettings
 
 typedef TArray<AP12InteractiveActor*, TInlineAllocator<8>> TInteractiveActorsArray;
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnHealthChangeSignature, float /*Health*/, float /*MaxHealth*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAimingStateChangedSignature, bool /*bStart*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAmmoCountChangedSignature, int32 /*AmmoCount*/)
+
 UCLASS()
 class GAMESANDBOX_API AP12BaseCharacter : public ACharacter
 {
@@ -83,6 +87,7 @@ public:
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
+	float GetHeathPercent();
 	virtual void MoveInput(const FInputActionValue& Value);
 	virtual void LookInput(const FInputActionValue& Value);
 	void JumpInput();
@@ -115,6 +120,11 @@ private:
 	void OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	void EnableRagdoll();
 	float GetDefaultCameraArmLength() const;
+
+public:
+	FP12OnHealthChangeSignature OnHealthChange;
+	FP12OnAimingStateChangedSignature OnAimingStateChanged;
+	FP12OnAmmoCountChangedSignature OnAmmoCountChanged;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")

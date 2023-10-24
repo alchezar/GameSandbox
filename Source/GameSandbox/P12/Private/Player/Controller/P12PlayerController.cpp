@@ -14,12 +14,17 @@ AP12PlayerController::AP12PlayerController()
 	
 }
 
+void AP12PlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+	CachedBaseCharacter = Cast<AP12BaseCharacter>(InPawn);
+}
+
 void AP12PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	SubsystemDefaultMappingContext();
 }
-
 
 void AP12PlayerController::SubsystemDefaultMappingContext() const
 {
@@ -109,12 +114,6 @@ void AP12PlayerController::RunInput(const bool bRun)
 		return;
 	}
 	CachedBaseCharacter->RunInput(bRun);
-}
-
-void AP12PlayerController::SetPawn(APawn* InPawn)
-{
-	Super::SetPawn(InPawn);
-	CachedBaseCharacter = Cast<AP12BaseCharacter>(InPawn);
 }
 
 void AP12PlayerController::LadderJumpInput() 

@@ -19,6 +19,7 @@ public:
 	UP12AttributeComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; }
+	float GetHealthPercent();
 
 protected:
 	virtual void BeginPlay() override;
