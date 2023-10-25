@@ -29,3 +29,12 @@ enum class EP12EquipableItemType : uint8
 	Pistol,
 	Rifle
 };
+
+UENUM(BlueprintType)
+enum class EP12AmmunitionType : uint8
+{
+	None,
+	Pistol,
+	Rifle,
+	MAX UMETA(Hidden)
+};

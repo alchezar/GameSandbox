@@ -64,7 +64,8 @@ typedef TArray<AP12InteractiveActor*, TInlineAllocator<8>> TInteractiveActorsArr
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnHealthChangeSignature, float /*Health*/, float /*MaxHealth*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAimingStateChangedSignature, bool /*bStart*/)
-DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAmmoCountChangedSignature, int32 /*AmmoCount*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnAmmoCountChangedSignature, int32 /*AmmoCount*/, int32 /*TotalAmmo*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnReloadCompleteSignature, bool /*bReloaded*/)
 
 UCLASS()
 class GAMESANDBOX_API AP12BaseCharacter : public ACharacter
@@ -101,6 +102,7 @@ public:
 	const AP12Ladder* GetAvailableLadder() const;
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
+	void ReloadInput();
 
 protected:
 	virtual void BeginPlay() override;
@@ -125,6 +127,7 @@ public:
 	FP12OnHealthChangeSignature OnHealthChange;
 	FP12OnAimingStateChangedSignature OnAimingStateChanged;
 	FP12OnAmmoCountChangedSignature OnAmmoCountChanged;
+	FP12OnReloadCompleteSignature OnReloadComplete;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")

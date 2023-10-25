@@ -33,14 +33,17 @@ public:
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
 	void SetAmmo(const int32 NewAmmo);
 	bool GetCanShoot() const;
+	void Reload();
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	void InitAnimNotify();
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None) const;
 	float GetShotTimeInterval();
 	void MakeShot();
+	void OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -57,8 +60,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Weapon")
 	UAnimMontage* WeaponFireMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Weapon")
+	UAnimMontage* WeaponReloadMontage;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
 	UAnimMontage* CharacterFireMontage;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
+	UAnimMontage* CharacterReloadMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	EP12FireMode FireMode = EP12FireMode::Single;
@@ -71,6 +78,10 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	float AimSpeed = 200.f;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
+	EP12AmmunitionType AmmoType = EP12AmmunitionType::None;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
+	bool bAutoReload = true;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	int32 MaxAmmo = 30;
 	
 private:
@@ -79,4 +90,5 @@ private:
 	bool bAiming = false;
 	int32 Ammo = 0;
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
+	bool bReloading = false;
 };

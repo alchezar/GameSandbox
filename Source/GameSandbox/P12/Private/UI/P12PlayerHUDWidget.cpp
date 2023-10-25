@@ -31,7 +31,8 @@ void UP12PlayerHUDWidget::OnAimStateChangedHandle(const bool bStart)
 	PlayAnimation(ReticleAiming, 0.f, 1, bStart ? EUMGSequencePlayMode::Forward : EUMGSequencePlayMode::Reverse);
 }
 
-void UP12PlayerHUDWidget::OnAmmoCountChangedHandle(const int32 Ammo)
+void UP12PlayerHUDWidget::OnAmmoCountChangedHandle(const int32 Ammo, const int32 TotalAmmo)
 {
 	AmmoText->SetText(FText::AsNumber(Ammo));
+	TotalAmmoText->SetText(FText::AsNumber(TotalAmmo));
 }

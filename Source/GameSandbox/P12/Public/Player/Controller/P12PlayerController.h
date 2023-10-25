@@ -37,6 +37,7 @@ protected:
 
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
+	void ReloadInput();
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -68,6 +69,8 @@ protected:
 	UInputAction* FireAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* AimAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* ReloadAction = nullptr;
 	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;

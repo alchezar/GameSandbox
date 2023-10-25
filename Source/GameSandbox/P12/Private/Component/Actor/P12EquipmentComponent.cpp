@@ -22,6 +22,12 @@ void UP12EquipmentComponent::BeginPlay()
 
 void UP12EquipmentComponent::CreateLoadout()
 {
+	AmmunitionArray.AddZeroed(static_cast<uint32>(EP12AmmunitionType::MAX));
+	for (const TPair<EP12AmmunitionType, int32>& AmmoPair : MaxAmmunitionAmount)
+	{
+		AmmunitionArray[static_cast<uint32>(AmmoPair.Key)] = FMath::Max(AmmoPair.Value, 0);
+	}
+	
 	if (!SideArmClass)
 	{
 		return;
@@ -40,4 +46,14 @@ EP12EquipableItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
 		return EP12EquipableItemType::None;
 	}
 	return CurrentEquippedWeapon->GetItemType();
+}
+
+int32 UP12EquipmentComponent::GetMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType)
+{
+	return AmmunitionArray[static_cast<uint32>(AmmoType)];
+}
+
+void UP12EquipmentComponent::DecreaseMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType, const int32 AmmoToDecrease)
+{
+	AmmunitionArray[static_cast<uint32>(AmmoType)] -= AmmoToDecrease ;
 }

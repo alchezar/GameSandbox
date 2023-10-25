@@ -458,6 +458,16 @@ void AP12BaseCharacter::AimInput(const bool bStart)
 	ChangeCameraArmLength(bAiming, CameraArmLength.Aim);
 }
 
+void AP12BaseCharacter::ReloadInput()
+{
+	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
+	if (!CurrentWeapon)
+	{
+		return;
+	}
+	CurrentWeapon->Reload();
+}
+
 float AP12BaseCharacter::GetDefaultCameraArmLength() const
 {
 	if (bAiming)
