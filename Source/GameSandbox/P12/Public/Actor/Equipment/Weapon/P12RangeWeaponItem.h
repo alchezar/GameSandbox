@@ -34,16 +34,18 @@ public:
 	void SetAmmo(const int32 NewAmmo);
 	bool GetCanShoot() const;
 	void Reload();
+	void OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+
+	virtual void AttachItem(const FName AttachSocketName) override;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void InitAnimNotify() override;
 
 private:
-	void InitAnimNotify();
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None) const;
 	float GetShotTimeInterval();
 	void MakeShot();
-	void OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -89,6 +91,5 @@ private:
 	float CurrentBulletSpread = 0.f;
 	bool bAiming = false;
 	int32 Ammo = 0;
-	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	bool bReloading = false;
 };

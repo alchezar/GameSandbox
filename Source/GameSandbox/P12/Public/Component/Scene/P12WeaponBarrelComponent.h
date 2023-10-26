@@ -44,7 +44,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	float DamageAmount = 20.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Alignment")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* TraceNiagara = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Decal")

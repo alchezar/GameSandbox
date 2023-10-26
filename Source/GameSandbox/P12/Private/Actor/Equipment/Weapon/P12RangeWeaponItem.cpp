@@ -20,15 +20,17 @@ AP12RangeWeaponItem::AP12RangeWeaponItem()
 	
 	WeaponBarrel = CreateDefaultSubobject<UP12WeaponBarrelComponent>("WeaponBarrelSceneComponent");
 	WeaponBarrel->SetupAttachment(WeaponMesh, MuzzleSocketName);
+
+	EquippedSocketName = SocketCharacterWeapon;
 }
 
 void AP12RangeWeaponItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	check(GetOwner()->IsA<AP12BaseCharacter>())
-	CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
-	InitAnimNotify();
+	// check(GetOwner()->IsA<AP12BaseCharacter>())
+	// CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
+	// InitAnimNotify();
 	
 	SetAmmo(MaxAmmo);
 }
@@ -59,6 +61,12 @@ void AP12RangeWeaponItem::AimInput(const bool bStart)
 
 void AP12RangeWeaponItem::InitAnimNotify()
 {
+	Super::InitAnimNotify();
+	
+	if (!CharacterReloadMontage)
+	{
+		return;
+	}
 	TArray<FAnimNotifyEvent> NotifyEvents = CharacterReloadMontage->Notifies;
 	for (const FAnimNotifyEvent NotifyEvent : NotifyEvents)
 	{
@@ -109,9 +117,9 @@ void AP12RangeWeaponItem::MakeShot()
 		}
 		return;
 	}
-	check(CachedCharacter.IsValid())
-	CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
-	AController* Controller = CachedCharacter->GetController();
+	check(GetCachedCharacter().IsValid())
+	GetCachedCharacter() = StaticCast<AP12BaseCharacter*>(GetOwner());
+	AController* Controller = GetCachedCharacter()->GetController();
 	if (!Controller)
 	{
 		return;
@@ -121,32 +129,32 @@ void AP12RangeWeaponItem::MakeShot()
 	Controller->GetPlayerViewPoint(PlayerLocation, PlayerRotation);
 	const FVector PlayerDirection = PlayerRotation.RotateVector(FVector::ForwardVector);
 
-	CurrentBulletSpread = CachedCharacter->GetIsAiming() ? AimBulletSpread : BulletSpread;
+	CurrentBulletSpread = GetCachedCharacter()->GetIsAiming() ? AimBulletSpread : BulletSpread;
 	const float HalfAngleRad = FMath::DegreesToRadians(CurrentBulletSpread / 2.f);
 	const FVector SpreadDirection = FMath::VRandCone(PlayerDirection, HalfAngleRad);
 
 	SetAmmo(--Ammo);
 	WeaponBarrel->Shot(PlayerLocation, SpreadDirection, Controller);
 
-	CachedCharacter->PlayAnimMontage(CharacterFireMontage);
+	GetCachedCharacter()->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);
 }
 
 void AP12RangeWeaponItem::SetAmmo(const int32 NewAmmo) 
 {
 	Ammo = FMath::Clamp(NewAmmo, 0, MaxAmmo);
-	const int32 AvailableAmmoCount = CachedCharacter->GetEquipmentComponent()->GetMaxAvailableAmmoAmount(AmmoType);
-	CachedCharacter->OnAmmoCountChanged.Broadcast(Ammo, AvailableAmmoCount);
+	const int32 AvailableAmmoCount = GetCachedCharacter()->GetEquipmentComponent()->GetMaxAvailableAmmoAmount(AmmoType);
+	GetCachedCharacter()->OnAmmoCountChanged.Broadcast(Ammo, AvailableAmmoCount);
 }
 
 bool AP12RangeWeaponItem::GetCanShoot() const 
 {
-	return Ammo > 0 && !bReloading;
+	return Ammo > 0 && !bReloading && !GetCachedCharacter()->GetIsEquipping();
 }
 
 void AP12RangeWeaponItem::Reload()
 {
-	const bool bAmmoEmpty = CachedCharacter->GetEquipmentComponent()->GetMaxAvailableAmmoAmount(AmmoType) <= 0;
+	const bool bAmmoEmpty = GetCachedCharacter()->GetEquipmentComponent()->GetMaxAvailableAmmoAmount(AmmoType) <= 0;
 	if (bReloading || bAmmoEmpty)
 	{
 		return;
@@ -154,21 +162,21 @@ void AP12RangeWeaponItem::Reload()
 	bReloading = true;
 	if (!CharacterReloadMontage)
 	{
-		OnReloadedHandle(CachedCharacter->GetMesh());
+		OnReloadedHandle(GetCachedCharacter()->GetMesh());
 		return;
 	}
-	CachedCharacter->PlayAnimMontage(CharacterReloadMontage);
+	GetCachedCharacter()->PlayAnimMontage(CharacterReloadMontage);
 	PlayAnimMontage(WeaponReloadMontage);
 }
 
 void AP12RangeWeaponItem::OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
-	if (CachedCharacter->GetMesh() != SkeletalMeshComponent || !bReloading)
+	if (GetCachedCharacter()->GetMesh() != SkeletalMeshComponent || !bReloading)
 	{
 		return;
 	}
 	bReloading = false;
-	UP12EquipmentComponent* EquipmentComponent = CachedCharacter->GetEquipmentComponent();
+	UP12EquipmentComponent* EquipmentComponent = GetCachedCharacter()->GetEquipmentComponent();
 	check(EquipmentComponent)
 	
 	const int32 AvailableAmmoCount = EquipmentComponent->GetMaxAvailableAmmoAmount(AmmoType);
@@ -177,5 +185,13 @@ void AP12RangeWeaponItem::OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshC
 	EquipmentComponent->DecreaseMaxAvailableAmmoAmount(AmmoType, ReloadedAmmo);
 	
 	SetAmmo(Ammo + ReloadedAmmo);
-	CachedCharacter->OnReloadComplete.Broadcast(true);
+	GetCachedCharacter()->OnReloadComplete.Broadcast(true);
+}
+
+void AP12RangeWeaponItem::AttachItem(const FName AttachSocketName)
+{
+	Super::AttachItem(AttachSocketName);
+
+	const int32 AvailableAmmoCount = GetCachedEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
+	GetCachedCharacter()->OnAmmoCountChanged.Broadcast(Ammo, AvailableAmmoCount);
 }

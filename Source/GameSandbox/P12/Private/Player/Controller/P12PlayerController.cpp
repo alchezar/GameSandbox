@@ -61,6 +61,9 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::AimInput, true);
 	InputComp->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::AimInput, false);
 	InputComp->BindAction(ReloadAction, ETriggerEvent::Started, this, &ThisClass::ReloadInput);
+	InputComp->BindAction(NextItemAction, ETriggerEvent::Started, this, &ThisClass::EquipItemInput, true);
+	InputComp->BindAction(PreviousItemAction, ETriggerEvent::Started, this, &ThisClass::EquipItemInput, false);
+	
 }
 
 void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
@@ -160,6 +163,15 @@ void AP12PlayerController::ReloadInput()
 		return;
 	}
 	CachedBaseCharacter->ReloadInput();
+}
+
+void AP12PlayerController::EquipItemInput(const bool bNext)
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->EquipItemInput(bNext);
 }
 
 void AP12PlayerController::P12Debug_EnableAll()

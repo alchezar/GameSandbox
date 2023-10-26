@@ -85,6 +85,7 @@ public:
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE bool GetIsAiming() const { return bAiming; }
+	FORCEINLINE bool GetIsEquipping() const { return bEquipping; }
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
@@ -103,6 +104,10 @@ public:
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
 	void ReloadInput();
+	void EquipItemInput(const bool bNext);
+	void SetIsEquipping(const bool bEquip) { bEquipping = bEquip; }
+	float PlayEquippingItem(UAnimMontage* EquipMontage);
+	void EndEquippingItem();
 
 protected:
 	virtual void BeginPlay() override;
@@ -164,6 +169,7 @@ private:
 	bool bCrouch = false;
 	bool bRunning = false;
 	bool bAiming = false;
+	bool bEquipping = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;
 	float IKLeftLegOffset = 0.f;

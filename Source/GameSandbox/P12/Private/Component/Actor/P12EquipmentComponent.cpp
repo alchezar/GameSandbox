@@ -27,16 +27,24 @@ void UP12EquipmentComponent::CreateLoadout()
 	{
 		AmmunitionArray[static_cast<uint32>(AmmoPair.Key)] = FMath::Max(AmmoPair.Value, 0);
 	}
-	
-	if (!SideArmClass)
+
+	ItemsArray.AddZeroed(static_cast<uint32>(EP12EquipmentSlot::MAX));
+	for (const TPair<EP12EquipmentSlot, TSubclassOf<AP12EquipableItem>>& ItemPair : ItemsLoadout)
 	{
-		return;
+		if (!ItemPair.Value)
+		{
+			continue;
+		}
+		AP12EquipableItem* Item = GetWorld()->SpawnActorDeferred<AP12EquipableItem>(ItemPair.Value, FTransform::Identity, CachedCharacter.Get());
+		Item->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Item->GetUnEquippedSocketName());
+		Item->CacheEquipmentComponent(this);
+		Item->FinishSpawning(FTransform::Identity);
+		ItemsArray[static_cast<uint32>(ItemPair.Key)] = Item;
 	}
-	// CurrentEquippedWeapon = GetWorld()->SpawnActor<AP12RangeWeaponItem>(SideArmClass);
-	// CurrentEquippedWeapon->SetOwner(CachedCharacter.Get());
-	CurrentEquippedWeapon = GetWorld()->SpawnActorDeferred<AP12RangeWeaponItem>(SideArmClass, FTransform::Identity, CachedCharacter.Get());
-	CurrentEquippedWeapon->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
-	CurrentEquippedWeapon->FinishSpawning(FTransform::Identity);
+	
+	// CurrentEquippedWeapon = GetWorld()->SpawnActorDeferred<AP12RangeWeaponItem>(SideArmClass, FTransform::Identity, CachedCharacter.Get());
+	// CurrentEquippedWeapon->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
+	// CurrentEquippedWeapon->FinishSpawning(FTransform::Identity);
 }
 
 EP12EquipableItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
@@ -56,4 +64,87 @@ int32 UP12EquipmentComponent::GetMaxAvailableAmmoAmount(const EP12AmmunitionType
 void UP12EquipmentComponent::DecreaseMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType, const int32 AmmoToDecrease)
 {
 	AmmunitionArray[static_cast<uint32>(AmmoType)] -= AmmoToDecrease ;
+}
+
+void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
+{
+	if (CachedCharacter->GetIsEquipping())
+	{
+		return;
+	}
+	
+	UnEquipCurrentItem();
+
+	/* Equip new weapon */
+	CurrentEquippedItem = ItemsArray[static_cast<uint32>(Slot)];
+	CurrentEquippedWeapon = Cast<AP12RangeWeaponItem>(CurrentEquippedItem);
+	check(CurrentEquippedItem)
+
+	if (UAnimMontage* EquipMontage = CurrentEquippedItem->GetCharacterEquipAnimMontage())
+	{
+		CachedCharacter->PlayEquippingItem(EquipMontage);
+		/* ::EquipCurrentItem()                  On notify window begin.
+		 * ::CachedCharacter->EndEquippingItem() On notify window end.   */
+	}
+	else
+	{
+		EquipCurrentItem();
+	}
+	CurrentEquippedSlot = Slot;
+}
+
+void UP12EquipmentComponent::EquipNextItem() 
+{
+	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
+	for (int i = 1; i <= ItemsArray.Num(); ++i)
+	{
+		const uint32 NextIndex = (CurrentSlotIndex + i) % ItemsArray.Num();
+		if (!ItemsArray[NextIndex])
+		{
+			continue;
+		}
+		EquipItemInSlot(static_cast<EP12EquipmentSlot>(NextIndex));
+		break;
+	}
+}
+
+void UP12EquipmentComponent::EquipPreviousItem() 
+{
+	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
+	for (int i = 1; i < ItemsArray.Num(); ++i)
+	{
+		const int32 StepBack = CurrentSlotIndex - i;
+		const uint32 PrevIndex = StepBack > 0 ? StepBack : StepBack + ItemsArray.Num() - 1;
+		if (!ItemsArray[PrevIndex])
+		{
+			continue;
+		}
+		EquipItemInSlot(static_cast<EP12EquipmentSlot>(PrevIndex));
+		break;
+	}
+}
+
+void UP12EquipmentComponent::UnEquipCurrentItem()
+{
+	if (!CurrentEquippedItem)
+	{
+		return;
+	}
+	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetUnEquippedSocketName());
+	CurrentEquippedSlot = EP12EquipmentSlot::None;
+	if (!CurrentEquippedWeapon)
+	{
+		return;
+	}
+	CurrentEquippedWeapon->FireInput(false);
+	CurrentEquippedWeapon->OnReloadedHandle(CachedCharacter->GetMesh());
+}
+
+void UP12EquipmentComponent::EquipCurrentItem()
+{
+	if (!CurrentEquippedItem)
+	{
+		return;
+	}
+	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
 }

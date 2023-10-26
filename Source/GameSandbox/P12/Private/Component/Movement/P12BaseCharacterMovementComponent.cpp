@@ -41,7 +41,7 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 	{
 		Result = MaxSpeed.LadderClimbing;
 	}
-	else if (GetBaseCharacterOwner()->GetIsAiming())
+	else if (GetBaseCharacterOwner()->GetIsAiming() && GetBaseCharacterOwner()->GetEquipmentComponent()->GetCurrentEquippedWeapon())
 	{
 		Result = GetBaseCharacterOwner()->GetEquipmentComponent()->GetCurrentEquippedWeapon()->GetAimSpeed();
 	}

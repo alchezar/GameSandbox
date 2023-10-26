@@ -468,6 +468,11 @@ void AP12BaseCharacter::ReloadInput()
 	CurrentWeapon->Reload();
 }
 
+void AP12BaseCharacter::EquipItemInput(const bool bNext)
+{
+	bNext ? Equipment->EquipNextItem() : Equipment->EquipPreviousItem();
+}
+
 float AP12BaseCharacter::GetDefaultCameraArmLength() const
 {
 	if (bAiming)
@@ -487,4 +492,16 @@ float AP12BaseCharacter::GetDefaultCameraArmLength() const
 float AP12BaseCharacter::GetHeathPercent()
 {
 	return CharacterAttribute->GetHealthPercent();
+}
+
+float AP12BaseCharacter::PlayEquippingItem(UAnimMontage* EquipMontage)
+{
+	bEquipping = true;
+	return PlayAnimMontage(EquipMontage);
+}
+
+void AP12BaseCharacter::EndEquippingItem()
+{
+	bEquipping = false;
+	
 }

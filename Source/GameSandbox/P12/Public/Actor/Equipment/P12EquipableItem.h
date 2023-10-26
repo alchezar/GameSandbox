@@ -7,6 +7,8 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipableItem.generated.h"
 
+class AP12BaseCharacter;
+class UP12EquipmentComponent;
 
 UCLASS(Abstract, NotBlueprintable)
 class GAMESANDBOX_API AP12EquipableItem : public AActor
@@ -15,8 +17,33 @@ class GAMESANDBOX_API AP12EquipableItem : public AActor
 
 public:
 	EP12EquipableItemType GetItemType() const { return ItemType; };
+	FORCEINLINE FName GetUnEquippedSocketName() const { return UnEquippedSocketName; }
+	FORCEINLINE FName GetEquippedSocketName() const { return EquippedSocketName; }
+	FORCEINLINE UAnimMontage* GetCharacterEquipAnimMontage() const { return CharacterEquipAnimMontage; }
+	FORCEINLINE TSoftObjectPtr<UP12EquipmentComponent> GetCachedEquipment() const { return CachedEquipment; }
+	FORCEINLINE TWeakObjectPtr<AP12BaseCharacter> GetCachedCharacter() const { return CachedCharacter; }
+	void CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp);
+	virtual void AttachItem(const FName AttachSocketName);
+
+protected:
+	virtual void InitAnimNotify();
+	virtual void BeginPlay() override;
+	virtual void OnEquippingStartedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+	virtual void OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	EP12EquipableItemType ItemType = EP12EquipableItemType::None;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	FName UnEquippedSocketName = NAME_None;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	FName EquippedSocketName = NAME_None;
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
+	UAnimMontage* CharacterEquipAnimMontage = nullptr;
+
+private:
+	TSoftObjectPtr<UP12EquipmentComponent> CachedEquipment;
+	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
+
 };

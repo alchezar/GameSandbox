@@ -4,6 +4,8 @@
 
 #include "P12CoreTypes.generated.h"
 
+const FName SocketCharacterWeapon = "GripPoint";
+
 USTRUCT(BlueprintType)
 struct FP12LedgeDescription
 {
@@ -25,16 +27,26 @@ struct FP12LedgeDescription
 UENUM(BlueprintType)
 enum class EP12EquipableItemType : uint8
 {
-	None,
+	None = 0,
 	Pistol,
-	Rifle
+	Rifle,
+	MAX UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
 enum class EP12AmmunitionType : uint8
 {
-	None,
+	None = 0,
 	Pistol,
 	Rifle,
+	MAX UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EP12EquipmentSlot : uint8
+{
+	None = 0,
+	SideArm,
+	PrimaryWeapon,
 	MAX UMETA(Hidden)
 };
