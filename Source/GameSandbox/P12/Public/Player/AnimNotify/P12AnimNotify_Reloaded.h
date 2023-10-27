@@ -17,5 +17,5 @@ protected:
 	virtual void Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference) override;
 
 public:
-	FP12AnimNotifyOnReloadedSignature OnReloaded;
+	FP12AnimNotifyOnReloadedSignature OnFullReloaded;
 };

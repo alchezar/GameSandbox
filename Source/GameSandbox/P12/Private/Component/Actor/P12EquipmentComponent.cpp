@@ -137,7 +137,7 @@ void UP12EquipmentComponent::UnEquipCurrentItem()
 		return;
 	}
 	CurrentEquippedWeapon->FireInput(false);
-	CurrentEquippedWeapon->OnReloadedHandle(CachedCharacter->GetMesh());
+	CurrentEquippedWeapon->OnFullReloadedHandle(CachedCharacter->GetMesh());
 }
 
 void UP12EquipmentComponent::EquipCurrentItem()

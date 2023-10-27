@@ -32,9 +32,13 @@ public:
 
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
 	void SetAmmo(const int32 NewAmmo);
-	bool GetCanShoot() const;
-	void Reload();
-	void OnReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+	bool GetCanShoot();
+
+	void StartReloading();
+	void OnFullReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+	void OnOneReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent, int32 NumberOfAmmo);
+	void Reload(const bool bByOne = false, const int32 NumberOfAmmo = 1);
+	void FinishReload(const bool bJumpToEnd = true);
 
 	virtual void AttachItem(const FName AttachSocketName) override;
 
@@ -44,9 +48,11 @@ protected:
 
 private:
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None) const;
+	void StopAnimMontage(UAnimMontage* AnimMontage);
 	float GetShotTimeInterval();
 	void MakeShot();
-	
+	void RefreshAmmoCount() const;
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USkeletalMeshComponent* WeaponMesh;
@@ -85,11 +91,12 @@ protected:
 	bool bAutoReload = true;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	int32 MaxAmmo = 30;
-	
+
 private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;
 	bool bAiming = false;
 	int32 Ammo = 0;
 	bool bReloading = false;
+	float LastShotTime = 0.f;
 };

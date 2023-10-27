@@ -170,6 +170,7 @@ private:
 	bool bRunning = false;
 	bool bAiming = false;
 	bool bEquipping = false;
+	bool bFiring = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;
 	float IKLeftLegOffset = 0.f;

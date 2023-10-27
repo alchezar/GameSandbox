@@ -5,6 +5,7 @@
 #include "P12CoreTypes.generated.h"
 
 const FName SocketCharacterWeapon = "GripPoint";
+const FName MontageSectionName_ReloadEnd = "ReloadEnd";
 
 USTRUCT(BlueprintType)
 struct FP12LedgeDescription
@@ -39,6 +40,7 @@ enum class EP12AmmunitionType : uint8
 	None = 0,
 	Pistol,
 	Rifle,
+	Shotgun,
 	MAX UMETA(Hidden)
 };
 
@@ -48,5 +50,6 @@ enum class EP12EquipmentSlot : uint8
 	None = 0,
 	SideArm,
 	PrimaryWeapon,
+	SecondaryWeapon,
 	MAX UMETA(Hidden)
 };

@@ -465,7 +465,7 @@ void AP12BaseCharacter::ReloadInput()
 	{
 		return;
 	}
-	CurrentWeapon->Reload();
+	CurrentWeapon->StartReloading();
 }
 
 void AP12BaseCharacter::EquipItemInput(const bool bNext)

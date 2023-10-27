@@ -25,42 +25,52 @@ void UP12WeaponBarrelComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator)
+void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator, const float SpreadAngle)
 {
-	const FVector MuzzleLocation = GetComponentLocation();
-	const FVector ShotEnd = ShotStart + FiringRange * ShotDirection;
+	for (int i = 0; i < BulletsPerShot; ++i)
+	{
+		const float HalfAngleRad = FMath::DegreesToRadians(SpreadAngle / 2.f);
+		const FVector SpreadDirection = FMath::VRandCone(ShotDirection, HalfAngleRad);
 	
-	FHitResult ShotHitResult;
-	GetWorld()->LineTraceSingleByChannel(ShotHitResult, ShotStart, ShotEnd, ECC_BULLET);
-	UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
-	if (ShotHitResult.bBlockingHit)
-	{
-		/* Take Damage. */
-		AActor* HitActor = ShotHitResult.GetActor();
-		if (!HitActor)
+		const FVector MuzzleLocation = GetComponentLocation();
+		const FVector ShotEnd = ShotStart + FiringRange * SpreadDirection;
+	
+		FHitResult ShotHitResult;
+		GetWorld()->LineTraceSingleByChannel(ShotHitResult, ShotStart, ShotEnd, ECC_BULLET);
+		UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
+		if (ShotHitResult.bBlockingHit)
 		{
-			return;
-		}
-		HitActor->TakeDamage(DamageAmount, FDamageEvent(), Instigator, GetOwner());
+			/* Take Damage. */
+			AActor* HitActor = ShotHitResult.GetActor();
+			if (!HitActor)
+			{
+				return;
+			}
+			FPointDamageEvent DamageEvent;
+			DamageEvent.HitInfo = ShotHitResult;
+			DamageEvent.ShotDirection = ShotDirection;
+			DamageEvent.DamageTypeClass = DamageTypeClass;
+			HitActor->TakeDamage(DamageAmount, DamageEvent, Instigator, GetOwner());
 		
-		/* Draw decal. */
-		if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, ShotHitResult.ImpactPoint, ShotHitResult.ImpactNormal.ToOrientationRotator()))
-		{
-			BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
-			BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
-		}
+			/* Draw decal. */
+			if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, ShotHitResult.ImpactPoint, ShotHitResult.ImpactNormal.ToOrientationRotator()))
+			{
+				BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
+				BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
+			}
 		
-	}
+		}
 
-	/* Trace tale Niagara. */
-	if (TraceNiagara)
-	{
-		const FVector NiagaraLocation = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd;
-		UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
-		if (!TraceNiagaraComp)
+		/* Trace tale Niagara. */
+		if (TraceNiagara)
 		{
-			return;
+			const FVector NiagaraLocation = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd;
+			UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
+			if (!TraceNiagaraComp)
+			{
+				return;
+			}
+			TraceNiagaraComp->SetVectorParameter("TraceEnd", NiagaraLocation);
 		}
-		TraceNiagaraComp->SetVectorParameter("TraceEnd", NiagaraLocation);
 	}
 }

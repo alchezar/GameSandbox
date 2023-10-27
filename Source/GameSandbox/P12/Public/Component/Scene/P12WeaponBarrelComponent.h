@@ -33,7 +33,7 @@ class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 public:
 	UP12WeaponBarrelComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator);
+	void Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator, const float SpreadAngle);
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,6 +43,10 @@ protected:
 	float FiringRange = 5000.f;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	float DamageAmount = 20.f;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel", meta = (ClampMin = 1, UIMin = 1))
+	int32 BulletsPerShot = 1;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
+	TSubclassOf<UDamageType> DamageTypeClass;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* TraceNiagara = nullptr;

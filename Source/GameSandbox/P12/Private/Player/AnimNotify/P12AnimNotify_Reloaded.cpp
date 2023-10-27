@@ -5,5 +5,5 @@
 void UP12AnimNotify_Reloaded::Notify(USkeletalMeshComponent* MeshComp, UAnimSequenceBase* Animation, const FAnimNotifyEventReference& EventReference)
 {
 	Super::Notify(MeshComp, Animation, EventReference);
-	OnReloaded.Broadcast(MeshComp);
+	OnFullReloaded.Broadcast(MeshComp);
 }
