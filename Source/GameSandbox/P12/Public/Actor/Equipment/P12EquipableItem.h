@@ -10,6 +10,8 @@
 class AP12BaseCharacter;
 class UP12EquipmentComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnEquipmentStateChangedSignature, bool);
+
 UCLASS(Abstract, NotBlueprintable)
 class GAMESANDBOX_API AP12EquipableItem : public AActor
 {
@@ -25,11 +27,17 @@ public:
 	void CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp);
 	virtual void AttachItem(const FName AttachSocketName);
 
+	void Equip();
+	void Unequip();
+
 protected:
 	virtual void InitAnimNotify();
 	virtual void BeginPlay() override;
 	virtual void OnEquippingStartedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	virtual void OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
+
+public:
+	FP12OnEquipmentStateChangedSignature OnEquipmentStateChanged; 
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")

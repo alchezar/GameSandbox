@@ -27,7 +27,7 @@ public class GameSandbox : ModuleRules
 			"ChaosSolverEngine",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
-			"OnlineSubsystemSteam"
+			"OnlineSubsystemSteam", "AnimGraphRuntime"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]

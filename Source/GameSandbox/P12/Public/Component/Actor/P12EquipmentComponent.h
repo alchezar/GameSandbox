@@ -7,6 +7,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipmentComponent.generated.h"
 
+class AP12ThrowableItem;
 class AP12EquipableItem;
 class AP12BaseCharacter;
 class AP12RangeWeaponItem;
@@ -31,7 +32,10 @@ public:
 	void EquipPreviousItem();
 	void UnEquipCurrentItem();
 	void EquipCurrentItem();
-	
+
+	void TakeCurrentThrowableItem();
+	void LaunchCurrentThrowableItem();
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -40,20 +44,22 @@ private:
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
-	FName SideArmSocketName = "GripPoint";
-	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
 	TMap<EP12AmmunitionType, int32> MaxAmmunitionAmount;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
 	TMap<EP12EquipmentSlot, TSubclassOf<AP12EquipableItem>> ItemsLoadout;
-	
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
+	TSet<EP12EquipmentSlot> IgnoredSlotsWhileSwitching;
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
+	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
+	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
+	UPROPERTY()
+	AP12EquipableItem* CurrentEquippedItem = nullptr;
 	UPROPERTY()
 	AP12RangeWeaponItem* CurrentEquippedWeapon = nullptr;
 	UPROPERTY()
-	AP12EquipableItem* CurrentEquippedItem = nullptr;
-	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
+	AP12ThrowableItem* CurrentThrowableItem = nullptr;	
 	TP12AmmunitionArray AmmunitionArray;
 	TP12ItemsArray ItemsArray;
 };

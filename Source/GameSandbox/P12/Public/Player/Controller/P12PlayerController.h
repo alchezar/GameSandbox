@@ -39,6 +39,7 @@ protected:
 	void AimInput(const bool bStart);
 	void ReloadInput();
 	void EquipItemInput(const bool bNext);
+	void EquipThrowableInput();
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -76,6 +77,8 @@ protected:
 	UInputAction* NextItemAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* PreviousItemAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* EquipProjectileAction = nullptr;
 	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;

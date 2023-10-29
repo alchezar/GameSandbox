@@ -108,6 +108,7 @@ public:
 	void SetIsEquipping(const bool bEquip) { bEquipping = bEquip; }
 	float PlayEquippingItem(UAnimMontage* EquipMontage);
 	void EndEquippingItem();
+	void EquipThrowableInput();
 
 protected:
 	virtual void BeginPlay() override;

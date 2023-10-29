@@ -51,3 +51,15 @@ void AP12EquipableItem::AttachItem(const FName AttachSocketName)
 {
 	AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachSocketName);
 }
+
+void AP12EquipableItem::Equip() 
+{
+	OnEquipmentStateChanged.Broadcast(true);
+}
+
+void AP12EquipableItem::Unequip() 
+{
+	OnEquipmentStateChanged.Broadcast(false);
+
+}
+

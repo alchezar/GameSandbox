@@ -503,5 +503,9 @@ float AP12BaseCharacter::PlayEquippingItem(UAnimMontage* EquipMontage)
 void AP12BaseCharacter::EndEquippingItem()
 {
 	bEquipping = false;
-	
+}
+
+void AP12BaseCharacter::EquipThrowableInput()
+{
+	Equipment->EquipItemInSlot(EP12EquipmentSlot::ThrowableSlot);
 }

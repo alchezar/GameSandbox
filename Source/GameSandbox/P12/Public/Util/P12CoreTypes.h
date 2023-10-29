@@ -31,6 +31,7 @@ enum class EP12EquipableItemType : uint8
 	None = 0,
 	Pistol,
 	Rifle,
+	Throwable,
 	MAX UMETA(Hidden)
 };
 
@@ -51,5 +52,6 @@ enum class EP12EquipmentSlot : uint8
 	SideArm,
 	PrimaryWeapon,
 	SecondaryWeapon,
+	ThrowableSlot,
 	MAX UMETA(Hidden)
 };

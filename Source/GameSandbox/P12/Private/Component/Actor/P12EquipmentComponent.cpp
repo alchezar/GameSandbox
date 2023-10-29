@@ -2,6 +2,7 @@
 
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 
+#include "P12/Public/Actor/Equipment/Throwable/P12ThrowableItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
@@ -38,6 +39,7 @@ void UP12EquipmentComponent::CreateLoadout()
 		AP12EquipableItem* Item = GetWorld()->SpawnActorDeferred<AP12EquipableItem>(ItemPair.Value, FTransform::Identity, CachedCharacter.Get());
 		Item->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Item->GetUnEquippedSocketName());
 		Item->CacheEquipmentComponent(this);
+		Item->Unequip();
 		Item->FinishSpawning(FTransform::Identity);
 		ItemsArray[static_cast<uint32>(ItemPair.Key)] = Item;
 	}
@@ -67,19 +69,22 @@ void UP12EquipmentComponent::DecreaseMaxAvailableAmmoAmount(const EP12Ammunition
 }
 
 void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
-{
+{	
 	if (CachedCharacter->GetIsEquipping())
 	{
 		return;
 	}
-	
-	UnEquipCurrentItem();
 
+	UnEquipCurrentItem();
+	
 	/* Equip new weapon */
 	CurrentEquippedItem = ItemsArray[static_cast<uint32>(Slot)];
 	CurrentEquippedWeapon = Cast<AP12RangeWeaponItem>(CurrentEquippedItem);
-	check(CurrentEquippedItem)
-
+	CurrentThrowableItem  = Cast<AP12ThrowableItem>(CurrentEquippedItem);
+	if (!CurrentEquippedItem)
+	{
+		return;
+	}
 	if (UAnimMontage* EquipMontage = CurrentEquippedItem->GetCharacterEquipAnimMontage())
 	{
 		CachedCharacter->PlayEquippingItem(EquipMontage);
@@ -91,6 +96,7 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 		EquipCurrentItem();
 	}
 	CurrentEquippedSlot = Slot;
+	CurrentEquippedItem->Equip();
 }
 
 void UP12EquipmentComponent::EquipNextItem() 
@@ -99,7 +105,7 @@ void UP12EquipmentComponent::EquipNextItem()
 	for (int i = 1; i <= ItemsArray.Num(); ++i)
 	{
 		const uint32 NextIndex = (CurrentSlotIndex + i) % ItemsArray.Num();
-		if (!ItemsArray[NextIndex])
+		if (!ItemsArray[NextIndex] || IgnoredSlotsWhileSwitching.Contains(static_cast<EP12EquipmentSlot>(NextIndex)))
 		{
 			continue;
 		}
@@ -115,7 +121,7 @@ void UP12EquipmentComponent::EquipPreviousItem()
 	{
 		const int32 StepBack = CurrentSlotIndex - i;
 		const uint32 PrevIndex = StepBack > 0 ? StepBack : StepBack + ItemsArray.Num() - 1;
-		if (!ItemsArray[PrevIndex])
+		if (!ItemsArray[PrevIndex] || IgnoredSlotsWhileSwitching.Contains(static_cast<EP12EquipmentSlot>(PrevIndex)))
 		{
 			continue;
 		}
@@ -130,7 +136,15 @@ void UP12EquipmentComponent::UnEquipCurrentItem()
 	{
 		return;
 	}
+
+	if (!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot))
+	{
+		PreviousEquippedSlot = CurrentEquippedSlot;
+	}
+	
 	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetUnEquippedSocketName());
+	CurrentEquippedItem->Unequip();
+	
 	CurrentEquippedSlot = EP12EquipmentSlot::None;
 	if (!CurrentEquippedWeapon)
 	{
@@ -147,4 +161,23 @@ void UP12EquipmentComponent::EquipCurrentItem()
 		return;
 	}
 	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
+}
+
+void UP12EquipmentComponent::TakeCurrentThrowableItem()
+{
+	check(CurrentThrowableItem)
+	
+	CachedCharacter->SetIsEquipping(true);
+
+	CurrentThrowableItem->TakeThrowable();
+}
+
+void UP12EquipmentComponent::LaunchCurrentThrowableItem()
+{
+	check(CurrentThrowableItem)
+
+	CurrentThrowableItem->Throw();
+	
+	CachedCharacter->SetIsEquipping(false);
+	EquipItemInSlot(PreviousEquippedSlot);
 }
