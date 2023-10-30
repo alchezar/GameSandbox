@@ -23,10 +23,10 @@ AP12Projectile::AP12Projectile()
 	MovementComponent->Friction = 0.5f;
 }
 
-void AP12Projectile::LaunchProjectile(const FVector& Direction,  AP12ThrowableItem* ThrowableItem)
+void AP12Projectile::LaunchProjectile(const FVector& Direction,  AActor* LaunchedFrom)
 {
 	CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
-	CollisionComponent->IgnoreActorWhenMoving(ThrowableItem, true);
+	CollisionComponent->IgnoreActorWhenMoving(LaunchedFrom, true);
 
 	// const FRotator ViewRotation = Cast<APawn>(GetOwner())->GetControlRotation();
 	// const FVector ViewForwardVector = Direction.GetSafeNormal();

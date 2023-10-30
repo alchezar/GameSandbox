@@ -11,9 +11,9 @@ AP12ExplosiveProjectile::AP12ExplosiveProjectile()
 	// ExplosionComponent->SetupAttachment(RootComponent);
 }
 
-void AP12ExplosiveProjectile::LaunchProjectile(const FVector& Direction, AP12ThrowableItem* ThrowableItem)
+void AP12ExplosiveProjectile::LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom)
 {
-	Super::LaunchProjectile(Direction, ThrowableItem);
+	Super::LaunchProjectile(Direction, LaunchedFrom);
 
 	ExplosionComponent->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 	GetWorld()->GetTimerManager().SetTimer(DetonationHandle, this, &ThisClass::Detonate, DetonationTime);

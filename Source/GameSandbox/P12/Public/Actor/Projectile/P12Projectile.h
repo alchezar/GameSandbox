@@ -18,7 +18,7 @@ class GAMESANDBOX_API AP12Projectile : public AActor
 public:
 	AP12Projectile();
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return MovementComponent; }
-	virtual void LaunchProjectile(const FVector& Direction, AP12ThrowableItem* ThrowableItem);
+	virtual void LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom);
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")

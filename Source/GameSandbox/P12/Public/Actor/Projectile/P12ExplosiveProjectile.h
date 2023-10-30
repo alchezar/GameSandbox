@@ -15,7 +15,7 @@ class GAMESANDBOX_API AP12ExplosiveProjectile : public AP12Projectile
 
 public:
 	AP12ExplosiveProjectile();
-	virtual void LaunchProjectile(const FVector& Direction, AP12ThrowableItem* ThrowableItem) override;
+	virtual void LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom) override;
 
 protected:
 	void Detonate();
