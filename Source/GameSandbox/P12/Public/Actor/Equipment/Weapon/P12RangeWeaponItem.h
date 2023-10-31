@@ -26,6 +26,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	FORCEINLINE float GetAimSpeed() const { return AimSpeed; }
 	FORCEINLINE UP12WeaponBarrelComponent* GetBarrelComponent() const { return WeaponBarrel; }
+	FORCEINLINE float GetAimingFOV() const { return AimingFOV; };
 	FTransform GetGripTransform() const;
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
@@ -91,7 +92,9 @@ protected:
 	bool bAutoReload = true;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	int32 MaxAmmo = 30;
-
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
+	float AimingFOV = 90.f;
+	
 private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;

@@ -156,11 +156,11 @@ void UP12EquipmentComponent::UnEquipCurrentItem()
 
 void UP12EquipmentComponent::EquipCurrentItem()
 {
-	if (!CurrentEquippedItem)
+	if (CurrentEquippedItem)
 	{
-		return;
+		CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
+		CurrentEquippedWeapon->ToggleReticle(!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot));
 	}
-	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
 }
 
 void UP12EquipmentComponent::TakeCurrentThrowableItem()

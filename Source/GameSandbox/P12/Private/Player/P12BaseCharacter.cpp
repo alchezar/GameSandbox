@@ -204,18 +204,20 @@ void AP12BaseCharacter::LadderClimbInput(const FInputActionValue& Value)
 	AddMovementInput(LadderUpVector, AxisValue);
 }
 
-void AP12BaseCharacter::ChangeCameraArmLength(const bool bStart, const float NewArmLength)
+void AP12BaseCharacter::ChangeCameraArmLength(const bool bStart, const float NewArmLength, const float NewFOV)
 {
 	const float TargetLength = bStart ? NewArmLength : GetDefaultCameraArmLength();
+	const float TargetFOV = bStart ? NewFOV : GetDefaultCameraFOV();
 	FTimerDelegate RunDelegate;
-	RunDelegate.BindUObject(this, &ThisClass::SmoothlyChangeCameraArmLength, bStart, TargetLength);
+	RunDelegate.BindUObject(this, &ThisClass::SmoothlyChangeCameraArmLength, bStart, TargetLength, TargetFOV);
 	GetWorld()->GetTimerManager().SetTimer(RunTimer, RunDelegate, GetWorld()->GetDeltaSeconds(), true);
 }
 
-void AP12BaseCharacter::SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength)
+void AP12BaseCharacter::SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength, const float TargetFOV)
 {
 	constexpr float InterpSpeed = 2.f;
 	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, TargetLength, GetWorld()->GetDeltaSeconds(), InterpSpeed);
+	Camera->FieldOfView = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, GetWorld()->GetDeltaSeconds(), InterpSpeed);
 	if (FMath::IsNearlyEqual(CameraBoom->TargetArmLength, TargetLength))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(RunTimer);
@@ -455,7 +457,7 @@ void AP12BaseCharacter::AimInput(const bool bStart)
 		return;
 	}
 	CurrentWeapon->AimInput(bAiming);
-	ChangeCameraArmLength(bAiming, CameraArmLength.Aim);
+	ChangeCameraArmLength(bAiming, CameraArmLength.Aim, CurrentWeapon->GetAimingFOV());
 }
 
 void AP12BaseCharacter::ReloadInput()
@@ -487,6 +489,16 @@ float AP12BaseCharacter::GetDefaultCameraArmLength() const
 		}
 	}
 	return CameraArmLength.Walk;
+}
+
+float AP12BaseCharacter::GetDefaultCameraFOV() const
+{
+	const UCameraComponent* DefaultCamera = Camera->GetClass()->GetDefaultObject<UCameraComponent>();
+	if (!DefaultCamera)
+	{
+		return 90.f ;
+	}
+	return DefaultCamera->FieldOfView;
 }
 
 float AP12BaseCharacter::GetHeathPercent()

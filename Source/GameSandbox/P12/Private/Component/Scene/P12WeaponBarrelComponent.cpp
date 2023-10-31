@@ -26,7 +26,7 @@ void UP12WeaponBarrelComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator, const float SpreadAngle)
+void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, const float SpreadAngle)
 {
 	for (int i = 0; i < BulletsPerShot; ++i)
 	{
@@ -37,56 +37,41 @@ void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& Sh
 		if (HitRegistrationType == EP12HitRegistrationType::HitScan)
 		{
 			FHitResult ShotHitResult;
-			ShotHitResult = HitScan(ShotStart, ShotEnd, ShotDirection);
-			UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
+			HitScan(ShotStart, ShotEnd, SpreadDirection, ShotHitResult);
 			
-			/* Trace tale Niagara. */
-			const FVector MuzzleLocation = GetComponentLocation();
-			if (TraceNiagara)
-			{
-				const FVector NiagaraLocation = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd;
-				UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
-				if (!TraceNiagaraComp)
-				{
-					continue;
-				}
-				TraceNiagaraComp->SetVectorParameter("TraceEnd", NiagaraLocation);
-			}
+			const FVector EndPoint = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd; 
+			DrawNiagaraTale(EndPoint);
+			
+			UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
 		}
 		if (HitRegistrationType == EP12HitRegistrationType::Projectile)
 		{
-			ProjectileLaunch(ShotStart, ShotDirection);
+			ProjectileLaunch(ShotStart, SpreadDirection);
 		}
 	}
 }
 
-FHitResult UP12WeaponBarrelComponent::HitScan(const FVector& Start, const FVector& End, const FVector& Direction)
+void UP12WeaponBarrelComponent::DrawNiagaraTale(const FVector& EndPoint)
 {
-	FHitResult HitScanResult;
-	GetWorld()->LineTraceSingleByChannel(HitScanResult, Start, End, ECC_BULLET);
-	if (HitScanResult.bBlockingHit)
+	const FVector MuzzleLocation = GetComponentLocation();
+	if (TraceNiagara)
 	{
-		/* Take Damage. */
-		AActor* HitActor = HitScanResult.GetActor();
-		if (!HitActor)
+		UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
+		if (!TraceNiagaraComp)
 		{
-			return HitScanResult;
+			return;
 		}
-
-		FPointDamageEvent DamageEvent;
-		DamageEvent.HitInfo = HitScanResult;
-		DamageEvent.ShotDirection = Direction;
-		DamageEvent.DamageTypeClass = DamageTypeClass;
-		HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
-
-		/* Draw decal. */
-		if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, HitScanResult.ImpactPoint, HitScanResult.ImpactNormal.ToOrientationRotator()))
-		{
-			BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
-			BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
-		}
+		TraceNiagaraComp->SetVectorParameter("TraceEnd", EndPoint);
 	}
-	return HitScanResult;
+}
+
+void UP12WeaponBarrelComponent::HitScan(const FVector& Start, const FVector& End, const FVector& Direction, FHitResult& Out_HitResult)
+{
+	GetWorld()->LineTraceSingleByChannel(Out_HitResult, Start, End, ECC_BULLET);
+	if (Out_HitResult.bBlockingHit)
+	{
+		ProcessHit(Out_HitResult, Direction);
+	}
 }
 
 void UP12WeaponBarrelComponent::ProjectileLaunch(const FVector& Start, const FVector& Direction)
@@ -95,6 +80,7 @@ void UP12WeaponBarrelComponent::ProjectileLaunch(const FVector& Start, const FVe
 	{
 		Projectile->SetOwner(GetOwningPawn());
 		Projectile->LaunchProjectile(Direction.GetSafeNormal(), GetOwner());
+		Projectile->OnProjectileHit.AddUObject(this, &ThisClass::ProcessHit);
 	}
 }
 
@@ -120,4 +106,26 @@ AController* UP12WeaponBarrelComponent::GetOwningController() const
 		return nullptr;
 	}
 	return GetOwningPawn()->Controller;
+}
+
+void UP12WeaponBarrelComponent::ProcessHit(const FHitResult& HitResult, const FVector& Direction)
+{
+	/* Take Damage. */
+	AActor* HitActor = HitResult.GetActor();
+	if (!HitActor)
+	{
+		return;
+	}
+	FPointDamageEvent DamageEvent;
+	DamageEvent.HitInfo = HitResult;
+	DamageEvent.ShotDirection = Direction;
+	DamageEvent.DamageTypeClass = DamageTypeClass;
+	HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
+
+	/* Draw decal. */
+	if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, HitResult.ImpactPoint, HitResult.ImpactNormal.ToOrientationRotator()))
+	{
+		BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
+		BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
+	}
 }

@@ -41,16 +41,18 @@ class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 public:
 	UP12WeaponBarrelComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	void Shot(const FVector& ShotStart, const FVector& ShotDirection, AController* Instigator, const float SpreadAngle);
+	void Shot(const FVector& ShotStart, const FVector& ShotDirection, const float SpreadAngle);
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	FHitResult HitScan(const FVector& Start, const FVector& End, const FVector& Direction);
+	void DrawNiagaraTale(const FVector& EndPoint);
+	void HitScan(const FVector& Start, const FVector& End, const FVector& Direction, FHitResult& Out_HitResult);
 	void ProjectileLaunch(const FVector& Start, const FVector& Direction);
 	APawn* GetOwningPawn() const;
 	AController* GetOwningController() const;
+	void ProcessHit(const FHitResult& HitResult, const FVector& Direction);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")

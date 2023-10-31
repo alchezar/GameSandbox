@@ -119,8 +119,8 @@ protected:
 	void OnDeath();
 	
 private:
-	void ChangeCameraArmLength(const bool bStart, const float NewArmLength);
-	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength);
+	void ChangeCameraArmLength(const bool bStart, const float NewArmLength, const float NewFOV = 90.f);
+	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength, const float TargetFOV);
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
 	const FP12MantleSettings& GetMantleSettings(const float LedgeHeight) const;
@@ -128,6 +128,7 @@ private:
 	void OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	void EnableRagdoll();
 	float GetDefaultCameraArmLength() const;
+	float GetDefaultCameraFOV() const;
 
 public:
 	FP12OnHealthChangeSignature OnHealthChange;

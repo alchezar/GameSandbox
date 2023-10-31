@@ -7,6 +7,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipableItem.generated.h"
 
+class UP12ReticleWidget;
 class AP12BaseCharacter;
 class UP12EquipmentComponent;
 
@@ -30,6 +31,8 @@ public:
 	void Equip();
 	void Unequip();
 
+	void ToggleReticle(const bool bShow) const;
+
 protected:
 	virtual void InitAnimNotify();
 	virtual void BeginPlay() override;
@@ -50,6 +53,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
 	UAnimMontage* CharacterEquipAnimMontage = nullptr;
 
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Reticle")
+	EP12ReticleType ReticleType = EP12ReticleType::Default;
+	
 private:
 	TSoftObjectPtr<UP12EquipmentComponent> CachedEquipment;
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;

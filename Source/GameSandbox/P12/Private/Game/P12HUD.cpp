@@ -25,5 +25,31 @@ void AP12HUD::ShowGameScreen()
 	{
 		return;
 	}
-	GameScreenWidget->AddToViewport();
+	GameScreenWidget->AddToViewport(1);
+}
+
+void AP12HUD::ToggleReticle(const bool bShow, const EP12ReticleType ReticleType)
+{
+	/* HireReticle */
+	if (!bShow && ReticleWidget)
+	{
+		ReticleWidget->RemoveFromParent();
+		ReticleWidget = nullptr;
+		return;
+	}
+	
+	/* Remove previous reticle */
+	if (ReticleWidget)
+	{
+		ReticleWidget->RemoveFromParent();
+		ReticleWidget = nullptr;
+	}
+	if (!ReticlesMap[ReticleType])
+	{
+		return;
+	}
+	/* Create new reticle */
+	ReticleWidget = CreateWidget<UP12ReticleWidget>(GetWorld(), ReticlesMap[ReticleType]);
+	check(ReticleWidget)
+	ReticleWidget->AddToViewport(0);
 }

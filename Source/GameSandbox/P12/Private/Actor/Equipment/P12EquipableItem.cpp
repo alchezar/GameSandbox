@@ -3,6 +3,7 @@
 #include "P12/Public/Actor/Equipment/P12EquipableItem.h"
 
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
+#include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotifyWindow_Equipping.h"
 
@@ -61,5 +62,20 @@ void AP12EquipableItem::Unequip()
 {
 	OnEquipmentStateChanged.Broadcast(false);
 
+}
+
+void AP12EquipableItem::ToggleReticle(const bool bShow) const
+{
+	const APlayerController* PlayerController = Cast<APlayerController>(GetCachedCharacter()->Controller);
+	if (!PlayerController)
+	{
+		return;
+	}
+	AP12HUD* HUD = PlayerController->GetHUD<AP12HUD>();
+	if(!HUD)
+	{
+		return;
+	}
+	HUD->ToggleReticle(bShow, ReticleType);
 }
 

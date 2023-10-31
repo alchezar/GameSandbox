@@ -55,3 +55,12 @@ enum class EP12EquipmentSlot : uint8
 	ThrowableSlot,
 	MAX UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class EP12ReticleType : uint8
+{
+	None = 0,
+	Default,
+	Sniper,
+	MAX UMETA(Hidden)
+};

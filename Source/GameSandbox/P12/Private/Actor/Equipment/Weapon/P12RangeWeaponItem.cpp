@@ -18,7 +18,7 @@ AP12RangeWeaponItem::AP12RangeWeaponItem()
 	WeaponMesh->SetupAttachment(RootComponent);
 	WeaponMesh->SetRelativeLocation(WeaponMeshOffset);
 	WeaponMesh->SetRelativeRotation(WeaponMeshOrientation);
-	
+
 	WeaponBarrel = CreateDefaultSubobject<UP12WeaponBarrelComponent>("WeaponBarrelSceneComponent");
 	WeaponBarrel->SetupAttachment(WeaponMesh, MuzzleSocketName);
 
@@ -32,7 +32,7 @@ void AP12RangeWeaponItem::BeginPlay()
 	// check(GetOwner()->IsA<AP12BaseCharacter>())
 	// CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
 	// InitAnimNotify();
-	
+
 	SetAmmo(MaxAmmo);
 }
 
@@ -48,11 +48,11 @@ void AP12RangeWeaponItem::FireInput(const bool bStart)
 		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 		return;
 	}
-		
+
 	MakeShot();
 	if (FireMode < EP12FireMode::FullAuto)
 	{
-		return;	
+		return;
 	}
 	GetWorld()->GetTimerManager().SetTimer(ShotTimer, this, &ThisClass::MakeShot, GetShotTimeInterval(), true);
 }
@@ -65,7 +65,7 @@ void AP12RangeWeaponItem::AimInput(const bool bStart)
 void AP12RangeWeaponItem::InitAnimNotify()
 {
 	Super::InitAnimNotify();
-	
+
 	if (!CharacterReloadMontage)
 	{
 		return;
@@ -96,7 +96,7 @@ float AP12RangeWeaponItem::PlayAnimMontage(UAnimMontage* AnimMontage, const floa
 	{
 		return 0.f;
 	}
-	if( StartSectionName != NAME_None )
+	if (StartSectionName != NAME_None)
 	{
 		WeaponAnimInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
 	}
@@ -136,7 +136,7 @@ void AP12RangeWeaponItem::MakeShot()
 	}
 	check(GetCachedCharacter().IsValid())
 	GetCachedCharacter() = StaticCast<AP12BaseCharacter*>(GetOwner());
-	AController* Controller = GetCachedCharacter()->GetController();
+	const AController* Controller = GetCachedCharacter()->GetController();
 	if (!Controller)
 	{
 		return;
@@ -147,23 +147,21 @@ void AP12RangeWeaponItem::MakeShot()
 	const FVector PlayerDirection = PlayerRotation.RotateVector(FVector::ForwardVector);
 
 	CurrentBulletSpread = GetCachedCharacter()->GetIsAiming() ? AimBulletSpread : BulletSpread;
-	// const float HalfAngleRad = FMath::DegreesToRadians(CurrentBulletSpread / 2.f);
-	// const FVector SpreadDirection = FMath::VRandCone(PlayerDirection, HalfAngleRad);
 
 	SetAmmo(--Ammo);
-	WeaponBarrel->Shot(PlayerLocation, PlayerDirection, Controller, CurrentBulletSpread);
+	WeaponBarrel->Shot(PlayerLocation, PlayerDirection, CurrentBulletSpread);
 
 	GetCachedCharacter()->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);
 }
 
-void AP12RangeWeaponItem::SetAmmo(const int32 NewAmmo) 
+void AP12RangeWeaponItem::SetAmmo(const int32 NewAmmo)
 {
 	Ammo = FMath::Clamp(NewAmmo, 0, MaxAmmo);
 	RefreshAmmoCount();
 }
 
-bool AP12RangeWeaponItem::GetCanShoot() 
+bool AP12RangeWeaponItem::GetCanShoot()
 {
 	bool bResult = true;
 	bResult &= Ammo > 0;
@@ -172,7 +170,7 @@ bool AP12RangeWeaponItem::GetCanShoot()
 
 	if (FireMode < EP12FireMode::FullAuto)
 	{
-		const float CurrentTime = GetWorld()->GetRealTimeSeconds(); 
+		const float CurrentTime = GetWorld()->GetRealTimeSeconds();
 		bResult &= (CurrentTime - LastShotTime) >= GetShotTimeInterval();
 		if (bResult)
 		{
@@ -227,12 +225,12 @@ void AP12RangeWeaponItem::OnOneReloadedHandle(USkeletalMeshComponent* SkeletalMe
 void AP12RangeWeaponItem::Reload(const bool bByOne, const int32 NumberOfAmmo)
 {
 	bReloading = false;
-	
+
 	const int32 AvailableAmmoCount = GetCachedEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
 	const int32 AmmoToReload = bByOne ? NumberOfAmmo : MaxAmmo - Ammo;
 	const int32 ReloadedAmmo = FMath::Min(AvailableAmmoCount, AmmoToReload);
 	GetCachedEquipment()->DecreaseMaxAvailableAmmoAmount(AmmoType, ReloadedAmmo);
-	
+
 	SetAmmo(Ammo + ReloadedAmmo);
 	GetCachedCharacter()->OnReloadComplete.Broadcast(true);
 }
@@ -241,7 +239,7 @@ void AP12RangeWeaponItem::FinishReload(const bool bJumpToEnd)
 {
 	GetCachedCharacter()->StopAnimMontage(CharacterReloadMontage);
 	StopAnimMontage(WeaponReloadMontage);
-	
+
 	if (!bJumpToEnd)
 	{
 		GetCachedCharacter()->PlayAnimMontage(CharacterReloadMontage, 1, MontageSectionName_ReloadEnd);
