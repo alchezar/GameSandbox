@@ -41,6 +41,9 @@ protected:
 	void EquipItemInput(const bool bNext);
 	void EquipThrowableInput();
 
+	void PrimaryMeleeInput();
+	void SecondaryMeleeInput();
+
 private:
 	void SubsystemDefaultMappingContext() const;
 	UFUNCTION(Exec)
@@ -79,7 +82,10 @@ protected:
 	UInputAction* PreviousItemAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* EquipProjectileAction = nullptr;
-	
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* PrimaryMeleeAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* SecondaryMeleeAction = nullptr;
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;

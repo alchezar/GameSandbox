@@ -109,6 +109,8 @@ public:
 	float PlayEquippingItem(UAnimMontage* EquipMontage);
 	void EndEquippingItem();
 	void EquipThrowableInput();
+	void PrimaryMeleeInput();
+	void SecondaryMeleeInput();
 
 protected:
 	virtual void BeginPlay() override;

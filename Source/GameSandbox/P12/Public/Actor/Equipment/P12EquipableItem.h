@@ -19,6 +19,7 @@ class GAMESANDBOX_API AP12EquipableItem : public AActor
 	GENERATED_BODY()
 
 public:
+	virtual void SetOwner(AActor* NewOwner) override;
 	EP12EquipableItemType GetItemType() const { return ItemType; };
 	FORCEINLINE FName GetUnEquippedSocketName() const { return UnEquippedSocketName; }
 	FORCEINLINE FName GetEquippedSocketName() const { return EquippedSocketName; }

@@ -7,6 +7,17 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotifyWindow_Equipping.h"
 
+void AP12EquipableItem::SetOwner(AActor* NewOwner)
+{
+	Super::SetOwner(NewOwner);
+
+	if (NewOwner)
+	{
+		check(NewOwner->IsA<AP12BaseCharacter>())
+		CachedCharacter = StaticCast<AP12BaseCharacter*>(NewOwner);
+	}
+}
+
 void AP12EquipableItem::CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp)
 {
 	CachedEquipment = EquipmentComp;
@@ -17,8 +28,8 @@ void AP12EquipableItem::BeginPlay()
 	Super::BeginPlay();
 	InitAnimNotify();
 	
-	check(GetOwner()->IsA<AP12BaseCharacter>())
-	CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
+	// check(GetOwner()->IsA<AP12BaseCharacter>())
+	// CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
 }
 
 void AP12EquipableItem::InitAnimNotify()

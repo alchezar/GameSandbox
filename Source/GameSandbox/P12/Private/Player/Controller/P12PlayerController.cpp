@@ -64,7 +64,8 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(NextItemAction, ETriggerEvent::Started, this, &ThisClass::EquipItemInput, true);
 	InputComp->BindAction(PreviousItemAction, ETriggerEvent::Started, this, &ThisClass::EquipItemInput, false);
 	InputComp->BindAction(EquipProjectileAction, ETriggerEvent::Started, this, &ThisClass::EquipThrowableInput);
-
+	InputComp->BindAction(PrimaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::PrimaryMeleeInput);
+	InputComp->BindAction(SecondaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::SecondaryMeleeInput);
 }
 
 void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
@@ -182,6 +183,24 @@ void AP12PlayerController::EquipThrowableInput()
 		return;
 	}
 	CachedBaseCharacter->EquipThrowableInput();
+}
+
+void AP12PlayerController::PrimaryMeleeInput() 
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->PrimaryMeleeInput();
+}
+
+void AP12PlayerController::SecondaryMeleeInput() 
+{
+	if (CachedBaseCharacter.IsNull())
+	{
+		return;
+	}
+	CachedBaseCharacter->SecondaryMeleeInput();
 }
 
 void AP12PlayerController::P12Debug_EnableAll()

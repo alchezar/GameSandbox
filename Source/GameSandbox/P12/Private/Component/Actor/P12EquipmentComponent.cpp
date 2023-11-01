@@ -3,6 +3,7 @@
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 
 #include "P12/Public/Actor/Equipment/Throwable/P12ThrowableItem.h"
+#include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
@@ -81,10 +82,14 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 	CurrentEquippedItem = ItemsArray[static_cast<uint32>(Slot)];
 	CurrentEquippedWeapon = Cast<AP12RangeWeaponItem>(CurrentEquippedItem);
 	CurrentThrowableItem  = Cast<AP12ThrowableItem>(CurrentEquippedItem);
+	CurrentMeleeWeapon    = Cast<AP12MeleeWeaponItem>(CurrentEquippedItem);
+	
 	if (!CurrentEquippedItem)
 	{
 		return;
 	}
+	CurrentEquippedSlot = Slot;
+	
 	if (UAnimMontage* EquipMontage = CurrentEquippedItem->GetCharacterEquipAnimMontage())
 	{
 		CachedCharacter->PlayEquippingItem(EquipMontage);
@@ -95,7 +100,6 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 	{
 		EquipCurrentItem();
 	}
-	CurrentEquippedSlot = Slot;
 	CurrentEquippedItem->Equip();
 }
 
@@ -159,7 +163,11 @@ void UP12EquipmentComponent::EquipCurrentItem()
 	if (CurrentEquippedItem)
 	{
 		CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
-		CurrentEquippedWeapon->ToggleReticle(!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot));
+		CurrentEquippedItem->ToggleReticle(!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot));
+	}
+	if (CurrentMeleeWeapon)
+	{
+		CurrentMeleeWeapon->ToggleReticle(false);
 	}
 }
 

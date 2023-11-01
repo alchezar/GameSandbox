@@ -7,6 +7,7 @@
 #include "Curves/CurveVector.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
@@ -520,4 +521,24 @@ void AP12BaseCharacter::EndEquippingItem()
 void AP12BaseCharacter::EquipThrowableInput()
 {
 	Equipment->EquipItemInSlot(EP12EquipmentSlot::ThrowableSlot);
+}
+
+void AP12BaseCharacter::PrimaryMeleeInput()
+{
+	AP12MeleeWeaponItem* MeleeWeapon = Equipment->GetCurrentMeleeWeapon();
+	if (!MeleeWeapon)
+	{
+		return;
+	}
+	MeleeWeapon->StartAttack(EP12MeleeAttackType::Primary);
+}
+
+void AP12BaseCharacter::SecondaryMeleeInput()
+{
+	AP12MeleeWeaponItem* MeleeWeapon = Equipment->GetCurrentMeleeWeapon();
+	if (!MeleeWeapon)
+	{
+		return;
+	}
+	MeleeWeapon->StartAttack(EP12MeleeAttackType::Secondary);
 }

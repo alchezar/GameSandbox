@@ -32,6 +32,7 @@ enum class EP12EquipableItemType : uint8
 	Pistol,
 	Rifle,
 	Throwable,
+	Melee,
 	MAX UMETA(Hidden)
 };
 
@@ -53,6 +54,7 @@ enum class EP12EquipmentSlot : uint8
 	PrimaryWeapon,
 	SecondaryWeapon,
 	ThrowableSlot,
+	MeleeWeapon,
 	MAX UMETA(Hidden)
 };
 
@@ -62,5 +64,14 @@ enum class EP12ReticleType : uint8
 	None = 0,
 	Default,
 	Sniper,
+	MAX UMETA(Hidden)
+};
+
+UENUM(BlueprintType)
+enum class EP12MeleeAttackType : uint8
+{
+	None = 0,
+	Primary,
+	Secondary,
 	MAX UMETA(Hidden)
 };

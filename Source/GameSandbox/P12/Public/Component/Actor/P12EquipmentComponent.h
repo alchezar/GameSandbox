@@ -7,6 +7,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipmentComponent.generated.h"
 
+class AP12MeleeWeaponItem;
 class AP12ThrowableItem;
 class AP12EquipableItem;
 class AP12BaseCharacter;
@@ -23,6 +24,7 @@ class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
 public:
 	UP12EquipmentComponent();
 	FORCEINLINE AP12RangeWeaponItem* GetCurrentEquippedWeapon() const { return CurrentEquippedWeapon; }
+	FORCEINLINE AP12MeleeWeaponItem* GetCurrentMeleeWeapon() const { return CurrentMeleeWeapon; }
 	EP12EquipableItemType GetCurrentEquippedItemType() const;
 	int32 GetMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType);
 	void DecreaseMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType, const int32 AmmoToDecrease);
@@ -54,12 +56,14 @@ private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
 	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
+	TP12AmmunitionArray AmmunitionArray;
+	TP12ItemsArray ItemsArray;
 	UPROPERTY()
 	AP12EquipableItem* CurrentEquippedItem = nullptr;
 	UPROPERTY()
 	AP12RangeWeaponItem* CurrentEquippedWeapon = nullptr;
 	UPROPERTY()
-	AP12ThrowableItem* CurrentThrowableItem = nullptr;	
-	TP12AmmunitionArray AmmunitionArray;
-	TP12ItemsArray ItemsArray;
+	AP12ThrowableItem* CurrentThrowableItem = nullptr;
+	UPROPERTY()
+	AP12MeleeWeaponItem* CurrentMeleeWeapon = nullptr;
 };
