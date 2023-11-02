@@ -2,6 +2,8 @@
 
 #include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 
+#include "Engine/DamageEvents.h"
+#include "P12/Public/Component/Scene/P12MeleeHitRegistration.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotifyWindow_MeleeAttack.h"
 
@@ -23,6 +25,12 @@ void AP12MeleeWeaponItem::BeginPlay()
 
 	WeaponMesh->SetVisibility(false);
 	OnEquipmentStateChanged.AddUObject(this, &ThisClass::OnEquipmentStateChangedHandle);
+
+	GetComponents<UP12MeleeHitRegistration>(HitRegistrators);
+	for (UP12MeleeHitRegistration* HitRegistrator : HitRegistrators)
+	{
+		HitRegistrator->OnMeleeRegistered.AddUObject(this, &ThisClass::ProcessHit);
+	}
 }
 
 void AP12MeleeWeaponItem::Tick(const float DeltaTime)
@@ -64,22 +72,24 @@ void AP12MeleeWeaponItem::StartAttack(EP12MeleeAttackType AttackType)
 void AP12MeleeWeaponItem::OnMeleeAttackStartHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
 {
 	const AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
-	if (CharacterOwner && CharacterOwner->GetMesh() == SkeletalMeshComponent)
+	if (CharacterOwner && CharacterOwner->GetMesh() != SkeletalMeshComponent)
 	{
 		return;
 	}
-	// TODO: start attack
+	/* Start attack window */
+	ToggleHitRegistration(true);
 }
 
 void AP12MeleeWeaponItem::OnMeleeAttackEndHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
 {
 	const AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
-	if (CharacterOwner && CharacterOwner->GetMesh() == SkeletalMeshComponent)
+	if (CharacterOwner && CharacterOwner->GetMesh() != SkeletalMeshComponent)
 	{
 		return;
 	}
 
-	// TODO: end attack
+	/* End attack window */
+	ToggleHitRegistration(false);
 	
 	CurrentAttack = nullptr;
 }
@@ -87,4 +97,29 @@ void AP12MeleeWeaponItem::OnMeleeAttackEndHandle(USkeletalMeshComponent* Skeleta
 void AP12MeleeWeaponItem::OnEquipmentStateChangedHandle(const bool bEquipped)
 {
 	WeaponMesh->SetVisibility(bEquipped);
+}
+
+void AP12MeleeWeaponItem::ProcessHit(const FHitResult& HitResult, const FVector& HitDirection)
+{
+	AActor* ActorToHit = HitResult.GetActor();
+	if (!ActorToHit || ActorsToHit.Contains(ActorToHit) || !CurrentAttack)
+	{
+		return;
+	}
+	FPointDamageEvent DamageEvent;
+	DamageEvent.HitInfo = HitResult;
+	DamageEvent.ShotDirection = HitDirection;
+	DamageEvent.DamageTypeClass = CurrentAttack->DamageType;
+	AController* HitInstigator = GetCachedCharacter().Get() ? GetCachedCharacter()->Controller : nullptr;
+	ActorToHit->TakeDamage(CurrentAttack->Damage, DamageEvent, HitInstigator, GetOwner());
+	ActorsToHit.Add(ActorToHit);
+}
+
+void AP12MeleeWeaponItem::ToggleHitRegistration(const bool bEnable)
+{
+	ActorsToHit.Empty();
+	for (UP12MeleeHitRegistration* HitRegistrator : HitRegistrators)
+	{
+		HitRegistrator->SetIsHitRegistration(bEnable);
+	}
 }

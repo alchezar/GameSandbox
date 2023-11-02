@@ -122,6 +122,23 @@ void UP12Library::DrawPrintString(const UWorld* World, const FString& Text, cons
 
 }
 
+void UP12Library::DrawDebugSphereTrace(const UWorld* World, const FHitResult& HitResult, const float Radius, const FVector& Start, const FVector& End, const bool bDraw, const bool bOnTick)
+{
+	if (!bDraw || !World)
+	{
+		return;
+	}
+	const FVector Middle = Start + (End - Start) / 2.f;
+	const float HalfHeight = FVector::Dist(Start, Middle) + Radius;
+	const FRotator Rotation = (Start - End).ToOrientationRotator() + FRotator(90.f, 0.f, 0.f);
+	DrawDebugCapsule(World, Middle, HalfHeight, Radius, Rotation.Quaternion(), FColor::Orange, false, bOnTick ? 0.f : 5.f);
+
+	if (HitResult.bBlockingHit)
+	{
+		DrawDebugCapsule(World, HitResult.Location, Radius, Radius, FQuat::Identity, FColor::Orange, false, bOnTick ? 0.f : 5.f, 0, 1.f);
+	}
+}
+
 void UP12Library::FixedTurn(FRotator& DesiredRotation, const FRotator& CurrentRotation, const FRotator& DeltaRot)
 {
 	/* PITCH */

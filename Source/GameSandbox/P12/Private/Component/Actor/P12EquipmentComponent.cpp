@@ -44,19 +44,15 @@ void UP12EquipmentComponent::CreateLoadout()
 		Item->FinishSpawning(FTransform::Identity);
 		ItemsArray[static_cast<uint32>(ItemPair.Key)] = Item;
 	}
-	
-	// CurrentEquippedWeapon = GetWorld()->SpawnActorDeferred<AP12RangeWeaponItem>(SideArmClass, FTransform::Identity, CachedCharacter.Get());
-	// CurrentEquippedWeapon->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, SideArmSocketName);
-	// CurrentEquippedWeapon->FinishSpawning(FTransform::Identity);
 }
 
 EP12EquipableItemType UP12EquipmentComponent::GetCurrentEquippedItemType() const
 {
-	if (!CurrentEquippedWeapon)
+	if (!CurrentEquippedItem)
 	{
 		return EP12EquipableItemType::None;
 	}
-	return CurrentEquippedWeapon->GetItemType();
+	return CurrentEquippedItem->GetItemType();
 }
 
 int32 UP12EquipmentComponent::GetMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType)

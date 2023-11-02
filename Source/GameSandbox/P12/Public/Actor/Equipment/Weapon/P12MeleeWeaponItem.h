@@ -6,6 +6,8 @@
 #include "P12/Public/Actor/Equipment/P12EquipableItem.h"
 #include "P12MeleeWeaponItem.generated.h"
 
+class UP12MeleeHitRegistration;
+
 USTRUCT(BlueprintType)
 struct FP12MeleeAttackDescription
 {
@@ -28,6 +30,7 @@ public:
 	AP12MeleeWeaponItem();
 	virtual void Tick(const float DeltaTime) override;
 	void StartAttack(EP12MeleeAttackType AttackType);
+	void ToggleHitRegistration(const bool bEnable);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -35,6 +38,9 @@ protected:
 	void OnMeleeAttackStartHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	void OnMeleeAttackEndHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 	void OnEquipmentStateChangedHandle(const bool bEquipped);
+
+private:
+	void ProcessHit(const FHitResult& HitResult, const FVector& HitDirection);
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -45,4 +51,7 @@ protected:
 
 private:
 	FP12MeleeAttackDescription* CurrentAttack;
+	TArray<UP12MeleeHitRegistration*> HitRegistrators;
+	UPROPERTY()
+	TSet<AActor*> ActorsToHit;
 };

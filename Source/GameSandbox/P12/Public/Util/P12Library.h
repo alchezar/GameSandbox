@@ -37,6 +37,8 @@ public:
 	static void DrawDebugText(const UWorld* World, const FVector& Location, const FString& Text, const bool bDraw, const bool bOnTick = false);
 	UFUNCTION(BlueprintCallable, Category = "PetProjects")
 	static void DrawPrintString(const UWorld* World, const FString& Text, const bool bDraw, const bool bOnTick = false);
+	UFUNCTION(BlueprintCallable, Category = "PetProjects")
+	static void DrawDebugSphereTrace(const UWorld* World, const FHitResult& HitResult, const float Radius, const FVector& Start, const FVector& End, const bool bDraw, const bool bOnTick = false);
 	
 	static void FixedTurn(FRotator& DesiredRotation, const FRotator& CurrentRotation, const FRotator& DeltaRot);
 };
