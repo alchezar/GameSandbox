@@ -4,24 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "P12ExplosionComponent.generated.h"
-
-USTRUCT(BlueprintType)
-struct FP12Diapason
-{
-	GENERATED_BODY()
-
-	FP12Diapason()
-		{}
-	FP12Diapason(const float NewMin, const float NewMax)
-		: Min(NewMin), Max(NewMax) {}
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Min = 0.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Max = 1.f;
-	
-};
 
 DECLARE_MULTICAST_DELEGATE(FP12OnExplosionSignature)
 

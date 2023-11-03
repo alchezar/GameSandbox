@@ -25,6 +25,23 @@ struct FP12LedgeDescription
 	FVector Normal;
 };
 
+USTRUCT(BlueprintType)
+struct FP12Diapason
+{
+	GENERATED_BODY()
+
+	FP12Diapason()
+	{}
+	FP12Diapason(const float NewMin, const float NewMax)
+		: Min(NewMin), Max(NewMax) {}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Min = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Max = 1.f;
+	
+};
+
 UENUM(BlueprintType)
 enum class EP12EquipableItemType : uint8
 {
