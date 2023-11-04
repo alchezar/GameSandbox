@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
 class AP12RangeWeaponItem;
@@ -68,7 +70,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnAmmoCountChangedSignature, int32 /*Am
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnReloadCompleteSignature, bool /*bReloaded*/)
 
 UCLASS()
-class GAMESANDBOX_API AP12BaseCharacter : public ACharacter
+class GAMESANDBOX_API AP12BaseCharacter : public ACharacter, public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -88,6 +90,7 @@ public:
 	FORCEINLINE bool GetIsEquipping() const { return bEquipping; }
 	FORCEINLINE UAnimMontage* GetAttachFromTopMontage() const { return AttachFromTopMontage; }
 	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
+	FORCEINLINE UP12AttributeComponent* GetAttributeComponent() const { return CharacterAttribute; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
 	float GetHeathPercent();
 	virtual void MoveInput(const FInputActionValue& Value);
@@ -111,6 +114,10 @@ public:
 	void EquipThrowableInput();
 	void PrimaryMeleeInput();
 	void SecondaryMeleeInput();
+	virtual void PossessedBy(AController* NewController) override;
+
+	/* IGenericTeamInterface */
+	virtual FGenericTeamId GetGenericTeamId() const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -167,6 +174,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
 	UCurveFloat* FallDamageCurve;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Team")
+	EP12Teams Team = EP12Teams::Player;
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;

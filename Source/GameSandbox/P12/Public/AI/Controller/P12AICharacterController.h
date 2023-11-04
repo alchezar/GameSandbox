@@ -4,24 +4,24 @@
 
 #include "CoreMinimal.h"
 #include "P12AIController.h"
-#include "P12AITurretController.generated.h"
+#include "P12AICharacterController.generated.h"
 
-class AP12Turret;
+class AP12AICharacter;
 
 UCLASS()
-class GAMESANDBOX_API AP12AITurretController : public AP12AIController
+class GAMESANDBOX_API AP12AICharacterController : public AP12AIController
 {
 	GENERATED_BODY()
 
 public:
-	AP12AITurretController();
+	AP12AICharacterController();
 	virtual void SetPawn(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors) override;
-	
+
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	TWeakObjectPtr<AP12Turret> CachedTurret;
+	TWeakObjectPtr<AP12AICharacter> CachedAICharacter;
 };

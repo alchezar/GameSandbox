@@ -27,12 +27,17 @@ public:
 	virtual void Tick(const float DeltaTime) override;
 	virtual FVector GetPawnViewLocation() const override;
 	virtual FRotator GetViewRotation() const override;
+	virtual void PossessedBy(AController* NewController) override;
 	void SetCurrentTarget(AActor* NewTarget);
 	
 private:
 	void SetCurrentTurretState(const EP12TurretState NewState);
 	void SearchingMovement(const float DeltaTime);
 	void FiringMovement(const float DeltaTime);
+	float GetFireInterval() const;
+	void MakeShot();
+	void BindOnTargetHealthChanged(AActor* Target, const bool bBind);
+	void OnTargetHealthChangedHandle(float Health, float MaxHealth);
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
@@ -51,11 +56,22 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Turret")
 	FP12Diapason BarrelPitchAngle = {-30.f, 30.f};
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Fire", meta = (ClampMin = 1.f, UIMin = 1.f))
+	float RateOfFire = 300.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Fire")
+	float BulletSpread = 2.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Fire")
+	float FireDelayTime = 3.f;	
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* MuzzleNiagara = nullptr;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Team")
+	EP12Teams Team = EP12Teams::Enemy;
 	
 private:
 	EP12TurretState TurretState = EP12TurretState::Searching;
 	UPROPERTY()
 	AActor* CurrentTarget = nullptr;
+	FTimerHandle ShotTimer;
 };

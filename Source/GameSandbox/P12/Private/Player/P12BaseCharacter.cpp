@@ -2,6 +2,7 @@
 
 #include "P12/Public/Player/P12BaseCharacter.h"
 
+#include "AIController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveVector.h"
@@ -369,6 +370,7 @@ const AP12Ladder* AP12BaseCharacter::GetAvailableLadder() const
 
 void AP12BaseCharacter::InitAnimNotify()
 {
+	check(DeathMontage)
 	TArray<FAnimNotifyEvent> AnimNotifies = DeathMontage->Notifies;
 	for (const auto AnimNotify : AnimNotifies)
 	{
@@ -391,6 +393,7 @@ void AP12BaseCharacter::OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMe
 
 void AP12BaseCharacter::OnDeath()
 {
+	StopAnimMontage();
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
 	GetCharacterMovement()->MovementState.bCanJump = false;
@@ -541,4 +544,21 @@ void AP12BaseCharacter::SecondaryMeleeInput()
 		return;
 	}
 	MeleeWeapon->StartAttack(EP12MeleeAttackType::Secondary);
+}
+
+void AP12BaseCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AAIController* AIController = Cast<AAIController>(NewController))
+	{
+		const FGenericTeamId TeamID = {static_cast<uint8>(Team)};
+		AIController->SetGenericTeamId(TeamID);
+	}
+}
+
+FGenericTeamId AP12BaseCharacter::GetGenericTeamId() const
+{
+	// return IGenericTeamAgentInterface::GetGenericTeamId()
+	return FGenericTeamId(static_cast<uint8>(Team));
 }

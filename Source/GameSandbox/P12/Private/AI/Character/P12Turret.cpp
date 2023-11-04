@@ -2,7 +2,10 @@
 
 #include "P12/Public/AI/Character/P12Turret.h"
 
+#include "AIController.h"
+#include "NiagaraFunctionLibrary.h"
 #include "P12/Public/Component/Scene/P12WeaponBarrelComponent.h"
+#include "P12/Public/Player/P12BaseCharacter.h"
 
 AP12Turret::AP12Turret()
 {
@@ -50,14 +53,35 @@ FRotator AP12Turret::GetViewRotation() const
 
 void AP12Turret::SetCurrentTarget(AActor* NewTarget)
 {
+	if (CurrentTarget != NewTarget)
+	{
+		BindOnTargetHealthChanged(CurrentTarget, false);
+	}
 	CurrentTarget = NewTarget;
+	BindOnTargetHealthChanged(CurrentTarget, true);
+	
 	const EP12TurretState NewState = CurrentTarget ? EP12TurretState::Firing : EP12TurretState::Searching;
 	SetCurrentTurretState(NewState);
 }
 
 void AP12Turret::SetCurrentTurretState(const EP12TurretState NewState)
 {
+	const bool bStateChanged = TurretState != NewState;
 	TurretState = NewState;
+	
+	if (!bStateChanged)
+	{
+		return;
+	}
+	
+	if (TurretState == EP12TurretState::Searching)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
+	}
+	if (TurretState == EP12TurretState::Firing)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ShotTimer, this, &ThisClass::MakeShot, GetFireInterval(), true, FireDelayTime);
+	}
 }
 
 void AP12Turret::SearchingMovement(const float DeltaTime) 
@@ -83,4 +107,54 @@ void AP12Turret::FiringMovement(const float DeltaTime)
 	const float ClampedPitch = FMath::RInterpTo(TurretBarrelComponent->GetComponentRotation(), LookAtRotation, DeltaTime, BaseFiringInterpSpeed).Pitch;
 	const FRotator ClampedRotation = FRotator(FMath::Clamp(ClampedPitch, BarrelPitchAngle.Min, BarrelPitchAngle.Max), 0.f, 0.f);
 	TurretBarrelComponent->SetRelativeRotation(ClampedRotation);
+}
+
+float AP12Turret::GetFireInterval() const
+{
+	return 60.f / RateOfFire;
+}
+
+void AP12Turret::MakeShot()
+{
+	const FVector BarrelLocation = BarrelComponent->GetComponentLocation();
+	if (MuzzleNiagara)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MuzzleNiagara, BarrelLocation);
+	}
+	BarrelComponent->Shot(BarrelLocation, BarrelComponent->GetForwardVector(), BulletSpread);
+}
+
+void AP12Turret::BindOnTargetHealthChanged(AActor* Target, const bool bBind)
+{
+	AP12BaseCharacter* BaseChar = Cast<AP12BaseCharacter>(Target);
+	if (!BaseChar)
+	{
+		return;
+	}
+	if (!bBind && BaseChar->OnHealthChange.IsBound())
+	{
+		BaseChar->OnHealthChange.RemoveAll(this);
+		return;
+	}
+	BaseChar->OnHealthChange.AddUObject(this, &ThisClass::OnTargetHealthChangedHandle);
+}
+
+void AP12Turret::OnTargetHealthChangedHandle(float Health, float MaxHealth)
+{
+	if (Health <= 0.f)
+	{
+		SetCurrentTurretState(EP12TurretState::Searching);
+		SetCurrentTarget(nullptr);
+	}
+}
+
+void AP12Turret::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AAIController* AIController = Cast<AAIController>(NewController))
+	{
+		const FGenericTeamId TeamID = {static_cast<uint8>(Team)};
+		AIController->SetGenericTeamId(TeamID);
+	}
 }

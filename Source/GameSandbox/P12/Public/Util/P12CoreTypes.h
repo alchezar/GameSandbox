@@ -92,3 +92,10 @@ enum class EP12MeleeAttackType : uint8
 	Secondary,
 	MAX UMETA(Hidden)
 };
+
+UENUM(BlueprintType)
+enum class EP12Teams : uint8
+{
+	Player,
+	Enemy,
+};

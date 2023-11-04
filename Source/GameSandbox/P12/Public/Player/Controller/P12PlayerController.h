@@ -46,6 +46,7 @@ protected:
 
 private:
 	void SubsystemDefaultMappingContext() const;
+	bool GetCharacterCanProcessInput() const;
 	UFUNCTION(Exec)
 	void P12Debug_EnableAll();
 	UFUNCTION(Exec)

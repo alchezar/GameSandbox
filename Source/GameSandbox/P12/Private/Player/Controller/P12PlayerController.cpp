@@ -4,6 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -68,9 +69,16 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(SecondaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::SecondaryMeleeInput);
 }
 
+bool AP12PlayerController::GetCharacterCanProcessInput() const
+{
+	return !CachedBaseCharacter.IsNull()
+		&& CachedBaseCharacter->GetAttributeComponent()
+		&& CachedBaseCharacter->GetAttributeComponent()->GetIsAlive();
+}
+
 void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -79,7 +87,7 @@ void AP12PlayerController::MoveInput(const FInputActionValue& Value)
 
 void AP12PlayerController::LookInput(const FInputActionValue& Value) 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -88,7 +96,7 @@ void AP12PlayerController::LookInput(const FInputActionValue& Value)
 
 void AP12PlayerController::JumpInput() 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -97,7 +105,7 @@ void AP12PlayerController::JumpInput()
 
 void AP12PlayerController::MantleInput()
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -106,7 +114,7 @@ void AP12PlayerController::MantleInput()
 
 void AP12PlayerController::CrouchInput()
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -115,7 +123,7 @@ void AP12PlayerController::CrouchInput()
 
 void AP12PlayerController::RunInput(const bool bRun)
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -124,7 +132,7 @@ void AP12PlayerController::RunInput(const bool bRun)
 
 void AP12PlayerController::LadderJumpInput() 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -133,7 +141,7 @@ void AP12PlayerController::LadderJumpInput()
 
 void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value) 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -142,7 +150,7 @@ void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value)
 
 void AP12PlayerController::FireInput(const bool bStart)
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -151,7 +159,7 @@ void AP12PlayerController::FireInput(const bool bStart)
 
 void AP12PlayerController::AimInput(const bool bStart)
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -160,7 +168,7 @@ void AP12PlayerController::AimInput(const bool bStart)
 
 void AP12PlayerController::ReloadInput()
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -169,7 +177,7 @@ void AP12PlayerController::ReloadInput()
 
 void AP12PlayerController::EquipItemInput(const bool bNext)
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -178,7 +186,7 @@ void AP12PlayerController::EquipItemInput(const bool bNext)
 
 void AP12PlayerController::EquipThrowableInput()
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -187,7 +195,7 @@ void AP12PlayerController::EquipThrowableInput()
 
 void AP12PlayerController::PrimaryMeleeInput() 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}
@@ -196,7 +204,7 @@ void AP12PlayerController::PrimaryMeleeInput()
 
 void AP12PlayerController::SecondaryMeleeInput() 
 {
-	if (CachedBaseCharacter.IsNull())
+	if (!GetCharacterCanProcessInput())
 	{
 		return;
 	}

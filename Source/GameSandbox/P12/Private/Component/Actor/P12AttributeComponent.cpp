@@ -54,7 +54,10 @@ void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 void UP12AttributeComponent::DebugDrawAttributes()
 {
 	// UP12DebugSubsystem* DebugSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UP12DebugSubsystem>();
-
+	if (!CachedCharacterOwner.IsValid())
+	{
+		return;
+	}
 	const FVector TextLocation = CachedCharacterOwner->GetActorLocation() + 100.f * FVector::UpVector;
 	const FString Text = "Health: " + FString::SanitizeFloat(Health);
 	UP12Library::DrawDebugText(GetWorld(), TextLocation, Text, UP12Library::GetCanDrawDebugText(), true);
