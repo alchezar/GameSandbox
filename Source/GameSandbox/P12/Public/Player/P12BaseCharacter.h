@@ -96,6 +96,7 @@ public:
 	virtual void MoveInput(const FInputActionValue& Value);
 	virtual void LookInput(const FInputActionValue& Value);
 	void JumpInput();
+	UFUNCTION(BlueprintCallable)
 	void MantleInput(const bool bForce = false);
 	void CrouchInput();
 	void RunInput(const bool bRunRequest);

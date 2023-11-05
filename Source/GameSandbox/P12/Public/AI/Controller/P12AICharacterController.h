@@ -18,10 +18,20 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors) override;
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 
 protected:
 	virtual void BeginPlay() override;
 
 private:
+	void MoveToNextTarget();
+	bool GetIsTargetReached(const FVector& TargetLocation);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
+	float TargetReachRadius = 100.f;
+	
+private:
 	TWeakObjectPtr<AP12AICharacter> CachedAICharacter;
+	bool bPatrolling = false;
 };
