@@ -7,6 +7,9 @@
 const FName SocketCharacterWeapon = "GripPoint";
 const FName MontageSectionName_ReloadEnd = "ReloadEnd";
 
+const FName BB_CurrentTarget = "CurrentTarget";
+const FName BB_NextLocation = "NextLocation";
+
 USTRUCT(BlueprintType)
 struct FP12LedgeDescription
 {

@@ -2,6 +2,7 @@
 
 #include "P12/Public/AI/Controller/P12AICharacterController.h"
 
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "P12/Public/AI/Character/P12AICharacter.h"
 #include "P12/Public/Component/Actor/P12AIPatrollingComponent.h"
@@ -16,14 +17,21 @@ void AP12AICharacterController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent();
-	if (!PatrollingComponent || !PatrollingComponent->GetCanPatrol())
+	if (UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent())
 	{
-		return;
+		if (!PatrollingComponent->GetCanPatrol())
+		{
+			return;
+		}
+		const FVector& ClosestWayPoint = PatrollingComponent->SelectClosestWayPoint();
+		// MoveToLocation(ClosestWayPoint);
+		if (Blackboard)
+		{
+			Blackboard->SetValueAsObject(BB_CurrentTarget, nullptr);
+			Blackboard->SetValueAsVector(BB_NextLocation, ClosestWayPoint);
+		}
 	}
 	bPatrolling = true;
-	const FVector& ClosestWayPoint = PatrollingComponent->SelectClosestWayPoint();
-	MoveToLocation(ClosestWayPoint);
 }
 
 void AP12AICharacterController::SetPawn(APawn* InPawn)
@@ -38,6 +46,7 @@ void AP12AICharacterController::SetPawn(APawn* InPawn)
 
 	check(InPawn->IsA<AP12AICharacter>())
 	CachedAICharacter = StaticCast<AP12AICharacter*>(InPawn);
+	RunBehaviorTree(CachedAICharacter->GetBehaviorTree());
 }
 
 void AP12AICharacterController::Tick(float DeltaTime)
@@ -68,29 +77,41 @@ void AP12AICharacterController::OnMoveCompleted(FAIRequestID RequestID, const FP
 }
 
 void AP12AICharacterController::MoveToNextTarget()
-{
+{		
 	/* Firstly try to go to the actor if had seen it. */
-	AActor* ClosestActor = GetClosestSensedActor(UAISense_Sight::StaticClass());
-	if (ClosestActor  && !GetIsTargetReached(ClosestActor->GetActorLocation()))
+	if (AActor* ClosestActor = GetClosestSensedActor(UAISense_Sight::StaticClass()))
 	{
+		// if (!GetIsTargetReached(ClosestActor->GetActorLocation()))
+		// {
+		// 	MoveToActor(ClosestActor);
+		// }
+		if (Blackboard)
+		{
+			Blackboard->SetValueAsObject(BB_CurrentTarget, ClosestActor);
+		}
 		bPatrolling = false;
-		MoveToActor(ClosestActor);
 		return;
 	}
 
 	/* Return to the patrolling or keep it going if there are no seen actors. */
-	UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent();
-	if (!PatrollingComponent || !PatrollingComponent->GetCanPatrol())
+	if (UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent())
 	{
-		return;
+		if (!PatrollingComponent->GetCanPatrol())
+		{
+			return;
+		}
+		const FVector& WayPoint = bPatrolling ? PatrollingComponent->SelectNextWayPoint() : PatrollingComponent->SelectClosestWayPoint();
+		// if (!GetIsTargetReached(WayPoint))
+		// {
+		// 	MoveToLocation(WayPoint);
+		// }
+		if (Blackboard)
+		{
+			Blackboard->SetValueAsObject(BB_CurrentTarget, nullptr);
+			Blackboard->SetValueAsVector(BB_NextLocation, WayPoint);
+		}
+		bPatrolling = true;
 	}
-	const FVector& WayPoint = bPatrolling ? PatrollingComponent->SelectNextWayPoint() : PatrollingComponent->SelectClosestWayPoint();
-	bPatrolling = true;
-	if (GetIsTargetReached(WayPoint))
-	{
-		return;	
-	}
-	MoveToLocation(WayPoint);
 }
 
 bool AP12AICharacterController::GetIsTargetReached(const FVector& TargetLocation)
