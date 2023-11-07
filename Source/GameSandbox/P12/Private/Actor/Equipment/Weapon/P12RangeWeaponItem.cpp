@@ -54,6 +54,7 @@ void AP12RangeWeaponItem::FireInput(const bool bStart)
 	{
 		return;
 	}
+	GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 	GetWorld()->GetTimerManager().SetTimer(ShotTimer, this, &ThisClass::MakeShot, GetShotTimeInterval(), true);
 }
 
@@ -136,20 +137,30 @@ void AP12RangeWeaponItem::MakeShot()
 	}
 	check(GetCachedCharacter().IsValid())
 	GetCachedCharacter() = StaticCast<AP12BaseCharacter*>(GetOwner());
-	const AController* Controller = GetCachedCharacter()->GetController();
-	if (!Controller)
+	
+	
+	FVector ShotLocation;
+	FRotator ShotRotation;
+	if (GetCachedCharacter()->IsPlayerControlled())
 	{
-		return;
+		const AController* Controller = GetCachedCharacter()->GetController();
+		if (!Controller)
+		{
+			return;
+		}
+		Controller->GetPlayerViewPoint(ShotLocation, ShotRotation);
 	}
-	FVector PlayerLocation;
-	FRotator PlayerRotation;
-	Controller->GetPlayerViewPoint(PlayerLocation, PlayerRotation);
-	const FVector PlayerDirection = PlayerRotation.RotateVector(FVector::ForwardVector);
+	else
+	{
+		ShotLocation = WeaponBarrel->GetComponentLocation();
+		ShotRotation = GetCachedCharacter()->GetBaseAimRotation();
+	}
+	const FVector ShotDirection = ShotRotation.RotateVector(FVector::ForwardVector);
 
 	CurrentBulletSpread = GetCachedCharacter()->GetIsAiming() ? AimBulletSpread : BulletSpread;
 
 	SetAmmo(--Ammo);
-	WeaponBarrel->Shot(PlayerLocation, PlayerDirection, CurrentBulletSpread);
+	WeaponBarrel->Shot(ShotLocation, ShotDirection, CurrentBulletSpread);
 
 	GetCachedCharacter()->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);
@@ -196,6 +207,7 @@ void AP12RangeWeaponItem::StartReloading()
 	}
 	GetCachedCharacter()->PlayAnimMontage(CharacterReloadMontage);
 	PlayAnimMontage(WeaponReloadMontage);
+	/* ::OnFullReloadedHandle */
 }
 
 void AP12RangeWeaponItem::OnFullReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent)

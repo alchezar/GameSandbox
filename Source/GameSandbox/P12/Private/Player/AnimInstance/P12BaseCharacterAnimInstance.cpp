@@ -12,11 +12,21 @@ void UP12BaseCharacterAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 
-	check(TryGetPawnOwner()->IsA<AP12BaseCharacter>())
-	CachedCharacter = StaticCast<AP12BaseCharacter*>(TryGetPawnOwner());
+	// check(TryGetPawnOwner()->IsA<AP12BaseCharacter>())
+	// CachedCharacter = StaticCast<AP12BaseCharacter*>(TryGetPawnOwner());
+	CachedCharacter = Cast<AP12BaseCharacter>(TryGetPawnOwner());
+	check(CachedCharacter.IsValid())
 	CachedCharacterMovement = CachedCharacter->GetBaseCharacterMovement();
 	check(CachedCharacterMovement.IsValid())
 	CachedEquipmentComponent = CachedCharacter->GetEquipmentComponent();
+	check(CachedEquipmentComponent.IsValid())
+
+	CachedCharacter->OnLoadoutCreated.AddUObject(this, &ThisClass::OnLoadoutCreatedHandle);
+}
+
+void UP12BaseCharacterAnimInstance::OnLoadoutCreatedHandle(UP12EquipmentComponent* Equipment)
+{
+	CachedEquipmentComponent = Equipment;
 	check(CachedEquipmentComponent.IsValid())
 }
 

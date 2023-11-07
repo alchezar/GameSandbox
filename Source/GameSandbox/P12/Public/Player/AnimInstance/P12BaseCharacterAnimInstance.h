@@ -20,6 +20,7 @@ class GAMESANDBOX_API UP12BaseCharacterAnimInstance : public UAnimInstance
 public:
 	virtual void NativeBeginPlay() override;
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
+	void OnLoadoutCreatedHandle(UP12EquipmentComponent* Equipment);
 
 protected:
 	FORCEINLINE TWeakObjectPtr<AP12BaseCharacter> GetCachedCharacter() const { return CachedCharacter; }

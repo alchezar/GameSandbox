@@ -88,6 +88,7 @@ void AP12AICharacterController::MoveToNextTarget()
 		if (Blackboard)
 		{
 			Blackboard->SetValueAsObject(BB_CurrentTarget, ClosestActor);
+			SetFocus(ClosestActor, EAIFocusPriority::Gameplay);
 		}
 		bPatrolling = false;
 		return;
@@ -109,6 +110,7 @@ void AP12AICharacterController::MoveToNextTarget()
 		{
 			Blackboard->SetValueAsObject(BB_CurrentTarget, nullptr);
 			Blackboard->SetValueAsVector(BB_NextLocation, WayPoint);
+			ClearFocus(EAIFocusPriority::Gameplay);
 		}
 		bPatrolling = true;
 	}

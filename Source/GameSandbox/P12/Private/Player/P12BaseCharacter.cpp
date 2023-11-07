@@ -49,6 +49,7 @@ void AP12BaseCharacter::BeginPlay()
 	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
 	CharacterAttribute->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 	InitAnimNotify();
+	OnReloadComplete.AddUObject(this, &ThisClass::OnReloadCompleteHandle);
 }
 
 void AP12BaseCharacter::Tick(const float DeltaTime)
@@ -394,9 +395,12 @@ void AP12BaseCharacter::OnEnableRagdollHandle(USkeletalMeshComponent* SkeletalMe
 void AP12BaseCharacter::OnDeath()
 {
 	StopAnimMontage();
-	GetCharacterMovement()->StopMovementImmediately();
-	GetCharacterMovement()->DisableMovement();
-	GetCharacterMovement()->MovementState.bCanJump = false;
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->MovementState.bCanJump = false;
+	}
 	
 	if (DeathMontage)
 	{
@@ -443,9 +447,11 @@ void AP12BaseCharacter::Landed(const FHitResult& Hit)
 
 void AP12BaseCharacter::FireInput(const bool bStart)
 {
+	bFiring = bStart;
 	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
 	if (!CurrentWeapon)
 	{
+		bFiring = false;
 		return;
 	}
 	CurrentWeapon->FireInput(bStart);
@@ -458,6 +464,7 @@ void AP12BaseCharacter::AimInput(const bool bStart)
 	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
 	if (!CurrentWeapon)
 	{
+		bAiming = false;
 		return;
 	}
 	CurrentWeapon->AimInput(bAiming);
@@ -471,7 +478,13 @@ void AP12BaseCharacter::ReloadInput()
 	{
 		return;
 	}
+	bReloading = true;
 	CurrentWeapon->StartReloading();
+}
+
+void AP12BaseCharacter::OnReloadCompleteHandle(bool bReloaded)
+{
+	bReloading = false;
 }
 
 void AP12BaseCharacter::EquipItemInput(const bool bNext)

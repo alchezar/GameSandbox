@@ -68,6 +68,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnHealthChangeSignature, float /*Health
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAimingStateChangedSignature, bool /*bStart*/)
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnAmmoCountChangedSignature, int32 /*AmmoCount*/, int32 /*TotalAmmo*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnReloadCompleteSignature, bool /*bReloaded*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnLoadoutCreatedSignature, UP12EquipmentComponent* /*Equipment*/)
 
 UCLASS()
 class GAMESANDBOX_API AP12BaseCharacter : public ACharacter, public IGenericTeamAgentInterface
@@ -108,6 +109,7 @@ public:
 	void FireInput(const bool bStart);
 	void AimInput(const bool bStart);
 	void ReloadInput();
+	void OnReloadCompleteHandle(bool bReloaded);
 	void EquipItemInput(const bool bNext);
 	void SetIsEquipping(const bool bEquip) { bEquipping = bEquip; }
 	float PlayEquippingItem(UAnimMontage* EquipMontage);
@@ -145,6 +147,7 @@ public:
 	FP12OnAimingStateChangedSignature OnAimingStateChanged;
 	FP12OnAmmoCountChangedSignature OnAmmoCountChanged;
 	FP12OnReloadCompleteSignature OnReloadComplete;
+	FP12OnLoadoutCreatedSignature OnLoadoutCreated;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
@@ -186,6 +189,7 @@ private:
 	bool bAiming = false;
 	bool bEquipping = false;
 	bool bFiring = false;
+	bool bReloading = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;
 	float IKLeftLegOffset = 0.f;

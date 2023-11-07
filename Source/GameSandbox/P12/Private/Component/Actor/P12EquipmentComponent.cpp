@@ -9,7 +9,14 @@
 
 UP12EquipmentComponent::UP12EquipmentComponent()
 {
-	
+	PrimaryComponentTick.bCanEverTick = true;
+}
+
+void UP12EquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("Pawn: %s, item: %s"), *GetOwner()->GetActorNameOrLabel(), *CurrentEquippedItem->GetActorNameOrLabel()));
 }
 
 void UP12EquipmentComponent::BeginPlay()
@@ -20,6 +27,8 @@ void UP12EquipmentComponent::BeginPlay()
 	CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
 
 	CreateLoadout();
+	AutoEquip();
+	CachedCharacter->OnLoadoutCreated.Broadcast(this);
 }
 
 void UP12EquipmentComponent::CreateLoadout()
@@ -184,4 +193,13 @@ void UP12EquipmentComponent::LaunchCurrentThrowableItem()
 	
 	CachedCharacter->SetIsEquipping(false);
 	EquipItemInSlot(PreviousEquippedSlot);
+}
+
+void UP12EquipmentComponent::AutoEquip()
+{
+	if (AutoEquipItemInSlot == EP12EquipmentSlot::None || !ItemsLoadout.Contains(AutoEquipItemInSlot))
+	{
+		return;
+	}
+	EquipItemInSlot(AutoEquipItemInSlot);
 }

@@ -23,6 +23,7 @@ class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
 
 public:
 	UP12EquipmentComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FORCEINLINE AP12RangeWeaponItem* GetCurrentEquippedWeapon() const { return CurrentEquippedWeapon; }
 	FORCEINLINE AP12MeleeWeaponItem* GetCurrentMeleeWeapon() const { return CurrentMeleeWeapon; }
 	EP12EquipableItemType GetCurrentEquippedItemType() const;
@@ -43,6 +44,7 @@ protected:
 
 private:
 	void CreateLoadout();
+	void AutoEquip();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
@@ -51,6 +53,8 @@ protected:
 	TMap<EP12EquipmentSlot, TSubclassOf<AP12EquipableItem>> ItemsLoadout;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
 	TSet<EP12EquipmentSlot> IgnoredSlotsWhileSwitching;
+	UPROPERTY(EditAnywhere, Category = "C++ | Loadout")
+	EP12EquipmentSlot AutoEquipItemInSlot = EP12EquipmentSlot::None;
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
