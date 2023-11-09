@@ -205,6 +205,10 @@ void UP12BaseCharacterMovementComponent::PhysCustom(const float DeltaTime, const
 
 void UP12BaseCharacterMovementComponent::PhysMantling(const float DeltaTime, const int32 Iterations)
 {
+	if (!CurrentMantleParams.Curve)
+	{
+		return;
+	}
 	const float ElapsedTime = GetWorld()->GetTimerManager().GetTimerElapsed(MantlingTimer) + CurrentMantleParams.StartTime;
 	const FVector MantleCurveValue = CurrentMantleParams.Curve->GetVectorValue(ElapsedTime);
 	const float PositionAlpha = MantleCurveValue.X;

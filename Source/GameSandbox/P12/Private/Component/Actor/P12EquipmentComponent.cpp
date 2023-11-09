@@ -15,8 +15,6 @@ UP12EquipmentComponent::UP12EquipmentComponent()
 void UP12EquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Red, FString::Printf(TEXT("Pawn: %s, item: %s"), *GetOwner()->GetActorNameOrLabel(), *CurrentEquippedItem->GetActorNameOrLabel()));
 }
 
 void UP12EquipmentComponent::BeginPlay()

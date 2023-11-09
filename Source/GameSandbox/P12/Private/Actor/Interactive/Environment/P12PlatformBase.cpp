@@ -7,6 +7,8 @@
 AP12PlatformBase::AP12PlatformBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
+	SetReplicatingMovement(true);
 
 	PlatformMesh = CreateDefaultSubobject<UStaticMeshComponent>("PlatformStaticMeshComponent");
 	SetRootComponent(PlatformMesh);

@@ -16,6 +16,7 @@ struct FP12PlatformAppearance
 	GENERATED_BODY()
 
 	FP12PlatformAppearance() {}
+
 	FP12PlatformAppearance(const FLinearColor NewColor, const FLinearColor NewEmission)
 		: Color(NewColor), Emission(NewEmission) {}
 
@@ -33,6 +34,7 @@ class GAMESANDBOX_API AP12PlatformTrigger : public AActor
 public:
 	AP12PlatformTrigger();
 	virtual void Tick(float DeltaTime) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -44,10 +46,13 @@ protected:
 private:
 	void SetIsActivated(const bool bNewActive);
 	void SaveInactiveAppearance(const UMaterialInstanceDynamic* CurrentDynamicMaterial);
+
+	UFUNCTION()
+	void OnRep_IsActivated(bool bWasActivated);
 	
 public:
 	FP12OnTriggerActivatedSignature OnTriggerActivated;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	UStaticMeshComponent* TriggerBase;
@@ -55,8 +60,9 @@ protected:
 	UBoxComponent* PlatformTrigger;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FP12PlatformAppearance ActiveAppearance;
-	
+
 private:
+	UPROPERTY(ReplicatedUsing = "OnRep_IsActivated")
 	bool bActive = false;
 	UPROPERTY()
 	TArray<APawn*> OverlappedPawns;
