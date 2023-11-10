@@ -93,6 +93,7 @@ public:
 	FORCEINLINE UP12EquipmentComponent* GetEquipmentComponent() const { return Equipment; }
 	FORCEINLINE UP12AttributeComponent* GetAttributeComponent() const { return CharacterAttribute; }
 	UP12BaseCharacterMovementComponent* GetBaseCharacterMovement() const;
+	FRotator GetLocalAimOffset();
 	float GetHeathPercent();
 	virtual void MoveInput(const FInputActionValue& Value);
 	virtual void LookInput(const FInputActionValue& Value);
@@ -190,6 +191,7 @@ private:
 	bool bEquipping = false;
 	bool bFiring = false;
 	bool bReloading = false;
+	// bool bMantling = false;
 	FTimerHandle RunTimer;
 	FVector DefaultMeshLocation;
 	float IKLeftLegOffset = 0.f;

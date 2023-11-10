@@ -138,7 +138,14 @@ void AP12BaseCharacter::MantleInput(const bool bForce)
 	const FVector InitAnimLocation = LedgeDescription.Location - MantleSettings.AnimationCorrectionZ * FVector::UpVector + MantleSettings.AnimationCorrectionXY * LedgeDescription.Normal;
 
 	const FP12MantleMovementParams MantleParams = {GetActorLocation(), GetActorRotation(), LedgeDescription.Location, LedgeDescription.Rotation, Duration, StartTime, MantleSettings.Curve, InitAnimLocation};
-	GetBaseCharacterMovement()->StartMantle(MantleParams);
+
+	GetBaseCharacterMovement()->SetMantle(true);
+
+	if (IsLocallyControlled() || HasAuthority())
+	{
+		GetBaseCharacterMovement()->StartMantle(MantleParams);
+
+	}
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (!AnimInstance)
@@ -272,6 +279,15 @@ bool AP12BaseCharacter::GetCanRun() const
 UP12BaseCharacterMovementComponent* AP12BaseCharacter::GetBaseCharacterMovement() const
 {
 	return BaseCharacterMovement.Get();
+}
+
+FRotator AP12BaseCharacter::GetLocalAimOffset()
+{
+	const FVector AimDirectionWorld = GetBaseAimRotation().Vector();
+	const FVector AimDirectionLocal = GetTransform().InverseTransformVectorNoScale(AimDirectionWorld);
+	const FRotator AimRotation = AimDirectionLocal.ToOrientationRotator();
+
+	return AimRotation;
 }
 
 float AP12BaseCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance, const float FromBoneToBottom)

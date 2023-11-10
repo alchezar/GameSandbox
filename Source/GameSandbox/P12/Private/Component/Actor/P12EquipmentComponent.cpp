@@ -2,6 +2,7 @@
 
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "P12/Public/Actor/Equipment/Throwable/P12ThrowableItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
@@ -10,11 +11,19 @@
 UP12EquipmentComponent::UP12EquipmentComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UP12EquipmentComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UP12EquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, CurrentEquippedSlot);
 }
 
 void UP12EquipmentComponent::BeginPlay()
@@ -74,7 +83,7 @@ void UP12EquipmentComponent::DecreaseMaxAvailableAmmoAmount(const EP12Ammunition
 
 void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 {	
-	if (CachedCharacter->GetIsEquipping())
+	if (!CachedCharacter.IsValid() || CachedCharacter->GetIsEquipping())
 	{
 		return;
 	}
@@ -104,6 +113,11 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 		EquipCurrentItem();
 	}
 	CurrentEquippedItem->Equip();
+
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		Server_EquipItemInSlot(CurrentEquippedSlot);
+	}
 }
 
 void UP12EquipmentComponent::EquipNextItem() 
@@ -200,4 +214,14 @@ void UP12EquipmentComponent::AutoEquip()
 		return;
 	}
 	EquipItemInSlot(AutoEquipItemInSlot);
+}
+
+void UP12EquipmentComponent::Server_EquipItemInSlot_Implementation(EP12EquipmentSlot Slot)
+{
+	EquipItemInSlot(Slot);
+}
+
+void UP12EquipmentComponent::OnRep_CurrentEquippedSlot(EP12EquipmentSlot OldCurrentSlot)
+{
+	EquipItemInSlot(CurrentEquippedSlot);
 }

@@ -47,7 +47,8 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bAim = CachedCharacter->GetIsAiming();
 	LadderSpeedRatio = CachedCharacterMovement->GetLadderSpeedRatio();
 	ItemType = CachedEquipmentComponent->GetCurrentEquippedItemType();
-	AimRotation = (CachedCharacter->GetBaseAimRotation() - CachedCharacter->GetActorRotation()).GetNormalized();
+	// AimRotation = (CachedCharacter->GetBaseAimRotation() - CachedCharacter->GetActorRotation()).GetNormalized();
+	AimRotation = CachedCharacter->GetLocalAimOffset();
 	
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);

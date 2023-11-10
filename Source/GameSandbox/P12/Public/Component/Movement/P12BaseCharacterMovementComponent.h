@@ -73,14 +73,20 @@ class GAMESANDBOX_API UP12BaseCharacterMovementComponent : public UCharacterMove
 {
 	GENERATED_BODY()
 
+	friend class FP12SavedMove_BaseCharacter;
+
 public:
 	UP12BaseCharacterMovementComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual float GetMaxSpeed() const override;
+	virtual void UpdateFromCompressedFlags(uint8 Flags) override;
+	virtual FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 	FORCEINLINE const AP12Ladder* GetCurrentLadder() const { return CurrentLadder; }
 	FORCEINLINE bool GetCanJump() const { return !bMantle && !bLadder; }
 	FORCEINLINE bool GetCanMantle() const { return !bLadder; }
 	FORCEINLINE bool GetCanWalk() const { return !bLadder; }
+	void SetMantle(const bool bNewMantle) { bMantle = bNewMantle; }
 	void DefaultSetup();
 	void SetRotationMode(const bool bOrientToMovement);
 	void ToggleMaxSpeed(const bool bRun);
@@ -106,6 +112,8 @@ private:
 	void PhysLadder(const float DeltaTime, const int32 Iterations);
 	float GetActorToLadderProjection(const FVector& Location) const;
 	void SwitchForceRotation(const bool bEnable, const FRotator& TargetRotation = FRotator::ZeroRotator);
+	UFUNCTION()
+	void OnRep_IsMantling(bool bWasMantling);
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
@@ -121,6 +129,7 @@ protected:
 private:
 	bool bRunning = false;
 	bool bOutOfStamina = false;
+	UPROPERTY(ReplicatedUsing = "OnRep_IsMantling")
 	bool bMantle = false;
 	bool bLadder = false;
 	FP12MantleMovementParams CurrentMantleParams;
@@ -130,3 +139,30 @@ private:
 	FRotator ForceTargetRotation = FRotator::ZeroRotator;
 	bool bForceRotation = false;
 };
+
+class FP12SavedMove_BaseCharacter : public FSavedMove_Character
+{
+	typedef FSavedMove_Character Super;
+
+public:
+	FP12SavedMove_BaseCharacter();
+	virtual void Clear() override;
+	virtual uint8 GetCompressedFlags() const override;
+	virtual bool CanCombineWith(const FSavedMovePtr& NewMovePtr, ACharacter* InCharacter, float MaxDelta) const override;
+	virtual void SetMoveFor(ACharacter* InCharacter, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData) override;
+	virtual void PrepMoveFor(ACharacter* Character) override;	
+	
+private:
+	uint8 bSavedIsRunning : 1;
+	uint8 bSavedIsMantling : 1;
+};
+
+class FP12NetworkPredictionData_Client_BaseCharacter : public FNetworkPredictionData_Client_Character
+{
+	typedef FNetworkPredictionData_Client_Character Super;
+
+public:
+	explicit FP12NetworkPredictionData_Client_BaseCharacter(const UCharacterMovementComponent& ClientMovement);
+	virtual FSavedMovePtr AllocateNewMove() override;
+};
+

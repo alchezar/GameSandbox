@@ -24,6 +24,7 @@ class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
 public:
 	UP12EquipmentComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE AP12RangeWeaponItem* GetCurrentEquippedWeapon() const { return CurrentEquippedWeapon; }
 	FORCEINLINE AP12MeleeWeaponItem* GetCurrentMeleeWeapon() const { return CurrentMeleeWeapon; }
 	EP12EquipableItemType GetCurrentEquippedItemType() const;
@@ -45,6 +46,11 @@ protected:
 private:
 	void CreateLoadout();
 	void AutoEquip();
+
+	UFUNCTION(Server, Reliable)
+	void Server_EquipItemInSlot(EP12EquipmentSlot Slot);
+	UFUNCTION()
+	void OnRep_CurrentEquippedSlot(EP12EquipmentSlot OldCurrentSlot);
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
@@ -58,6 +64,7 @@ protected:
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
+	UPROPERTY(ReplicatedUsing = "OnRep_CurrentEquippedSlot")
 	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
 	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
 	TP12AmmunitionArray AmmunitionArray;

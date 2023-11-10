@@ -6,6 +6,7 @@
 #include "Curves/CurveVector.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
 #include "GameFramework/Character.h"
+#include "Net/UnrealNetwork.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
@@ -24,6 +25,13 @@ void UP12BaseCharacterMovementComponent::BeginPlay()
 void UP12BaseCharacterMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UP12BaseCharacterMovementComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, bMantle);
 }
 
 float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
@@ -48,6 +56,40 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 	return Result;
 }
 
+void UP12BaseCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
+{
+	Super::UpdateFromCompressedFlags(Flags);
+	
+	/* FLAG_Reserved_1		= 0x04,	// Reserved for future use
+	 * FLAG_Reserved_2		= 0x08,	// Reserved for future use
+	 * // Remaining bit masks are available for custom flags.
+	 * FLAG_Custom_0		= 0x10, - Running flag
+	 * FLAG_Custom_1		= 0x20, - Mantling flag
+	 * FLAG_Custom_2		= 0x40,
+	 * FLAG_Custom_3		= 0x80,
+	 */
+	
+	bRunning = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
+
+	const bool bWasMantle = bMantle;
+	const bool bIsMantle = (Flags &= FSavedMove_Character::FLAG_Custom_1) != 0;
+	if (GetBaseCharacterOwner()->HasAuthority() && !bWasMantle && bIsMantle)
+	{
+		GetBaseCharacterOwner()->MantleInput(true);
+	}
+}
+
+FNetworkPredictionData_Client* UP12BaseCharacterMovementComponent::GetPredictionData_Client() const
+{
+	if (!ClientPredictionData)
+	{
+		UP12BaseCharacterMovementComponent* MutableThis = const_cast<UP12BaseCharacterMovementComponent*>(this);
+		MutableThis->ClientPredictionData = new FP12NetworkPredictionData_Client_BaseCharacter(*this);
+	}
+
+	return ClientPredictionData;
+}
+
 void UP12BaseCharacterMovementComponent::DefaultSetup()
 {
 	NavAgentProps.bCanCrouch = true;
@@ -70,11 +112,13 @@ void UP12BaseCharacterMovementComponent::SetRotationMode(const bool bOrientToMov
 
 void UP12BaseCharacterMovementComponent::ToggleMaxSpeed(const bool bRun)
 {
+	bRunning = bRun;
 	MaxWalkSpeed = bRun ? MaxSpeed.Run : MaxSpeed.Walk;
 }
 
 void UP12BaseCharacterMovementComponent::StartMantle(const FP12MantleMovementParams& MantleParams)
 {
+	bMantle = true;
 	if (bLadder)
 	{
 		return;
@@ -88,6 +132,7 @@ void UP12BaseCharacterMovementComponent::StartMantle(const FP12MantleMovementPar
 
 void UP12BaseCharacterMovementComponent::EndMantle()
 {
+	bMantle = false;
 	SetMovementMode(MOVE_Walking);
 }
 
@@ -192,6 +237,11 @@ void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Pre
 
 void UP12BaseCharacterMovementComponent::PhysCustom(const float DeltaTime, const int32 Iterations)
 {
+	if (GetBaseCharacterOwner()->GetLocalRole() == ROLE_SimulatedProxy)
+	{
+		return;
+	}
+	
 	if (CustomMovementMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
 	{
 		PhysMantling(DeltaTime, Iterations);
@@ -222,6 +272,7 @@ void UP12BaseCharacterMovementComponent::PhysMantling(const float DeltaTime, con
 	const FRotator NewRotation = FMath::Lerp(CurrentMantleParams.InitRotation, CurrentMantleParams.TargetRotation, PositionAlpha);
 
 	const FVector Delta = NewLocation - GetActorLocation();
+	Velocity = Delta / DeltaTime;
 	FHitResult MantlingHitResult;
 	SafeMoveUpdatedComponent(Delta, NewRotation, false, MantlingHitResult);
 }
@@ -306,4 +357,96 @@ void UP12BaseCharacterMovementComponent::SwitchForceRotation(const bool bEnable,
 	bForceRotation = bEnable;
 	ForceTargetRotation = TargetRotation;
 	/* ::PhysicsRotation(...) tick update. */
+}
+
+void UP12BaseCharacterMovementComponent::OnRep_IsMantling(bool bWasMantling)
+{
+	if (GetBaseCharacterOwner()->GetLocalRole() == ROLE_SimulatedProxy && bWasMantling && bMantle)
+	{
+		GetBaseCharacterOwner()->MantleInput(true);
+	}
+}
+
+/* FP12SavedMove_BaseCharacter */
+
+FP12SavedMove_BaseCharacter::FP12SavedMove_BaseCharacter()
+{
+	bSavedIsRunning = 0;
+	bSavedIsMantling = 0;
+}
+
+void FP12SavedMove_BaseCharacter::Clear()
+{
+	Super::Clear();
+	bSavedIsRunning = 0;
+	bSavedIsMantling = 0;
+}
+
+uint8 FP12SavedMove_BaseCharacter::GetCompressedFlags() const
+{
+	uint8 Result = Super::GetCompressedFlags();
+
+	/* FLAG_Reserved_1		= 0x04,	// Reserved for future use
+	 * FLAG_Reserved_2		= 0x08,	// Reserved for future use
+	 * // Remaining bit masks are available for custom flags.
+	 * FLAG_Custom_0		= 0x10, - Running flag
+	 * FLAG_Custom_1		= 0x20, - Mantling flag
+	 * FLAG_Custom_2		= 0x40,
+	 * FLAG_Custom_3		= 0x80,
+	 */
+
+	if (bSavedIsRunning)
+	{
+		Result |= FLAG_Custom_0;
+	}
+	if (bSavedIsMantling)
+	{
+		Result &= ~FLAG_Custom_0;
+		Result |= FLAG_Custom_1;
+	}
+	
+	return Result;
+}
+
+bool FP12SavedMove_BaseCharacter::CanCombineWith(const FSavedMovePtr& NewMovePtr, ACharacter* InCharacter, float MaxDelta) const
+{
+	auto* NewMove = StaticCast<const FP12SavedMove_BaseCharacter*>(NewMovePtr.Get());
+	if (bSavedIsRunning != NewMove->bSavedIsRunning ||
+		bSavedIsMantling != NewMove->bSavedIsMantling)
+	{
+		return false;
+	}
+
+	return Super::CanCombineWith(NewMovePtr, InCharacter, MaxDelta);
+}
+
+void FP12SavedMove_BaseCharacter::SetMoveFor(ACharacter* InCharacter, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData)
+{
+	Super::SetMoveFor(InCharacter, InDeltaTime, NewAccel, ClientData);
+
+	auto* MovementComp = StaticCast<const UP12BaseCharacterMovementComponent*>(InCharacter->GetMovementComponent());
+	bSavedIsRunning = MovementComp->bRunning;
+	bSavedIsMantling = MovementComp->bMantle;
+}
+
+void FP12SavedMove_BaseCharacter::PrepMoveFor(ACharacter* Character)
+{
+	Super::PrepMoveFor(Character);
+
+	auto* MovementComp = StaticCast<UP12BaseCharacterMovementComponent*>(Character->GetMovementComponent());
+	MovementComp->bRunning = bSavedIsRunning;
+}
+
+FP12NetworkPredictionData_Client_BaseCharacter::FP12NetworkPredictionData_Client_BaseCharacter(const UCharacterMovementComponent& ClientMovement)
+	: Super(ClientMovement)
+{
+	
+}
+
+FSavedMovePtr FP12NetworkPredictionData_Client_BaseCharacter::AllocateNewMove()
+{
+	/* typedef TSharedPtr<class FSavedMove_Character> FSavedMovePtr; */
+	// return FSavedMovePtr(new FP12SavedMove_BaseCharacter());
+	
+	return MakeShared<FP12SavedMove_BaseCharacter>();
 }
