@@ -33,6 +33,33 @@ enum class EP12HitRegistrationType : uint8
 	Projectile
 };
 
+USTRUCT(BlueprintType)
+struct FP12ShotInfo
+{
+	GENERATED_BODY()
+
+	FP12ShotInfo()
+		: Location10(FVector_NetQuantize100::ZeroVector), Direction(FVector_NetQuantizeNormal::ZeroVector) {}
+	
+	FP12ShotInfo(const FVector& Location, const FVector& Direction)
+		: Location10(Location * 10.f), Direction(Direction) {}
+
+	FORCEINLINE FVector GetLocation() const
+	{
+		return Location10 * 0.1f;
+	}
+
+	FORCEINLINE FVector GetDirection() const
+	{
+		return Direction;
+	}
+	
+	UPROPERTY()
+	FVector_NetQuantize100 Location10;
+	UPROPERTY()
+	FVector_NetQuantizeNormal Direction;
+};
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 {
@@ -41,6 +68,7 @@ class GAMESANDBOX_API UP12WeaponBarrelComponent : public USceneComponent
 public:
 	UP12WeaponBarrelComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	void Shot(const FVector& ShotStart, const FVector& ShotDirection, const float SpreadAngle);
 
 protected:
@@ -53,6 +81,12 @@ private:
 	APawn* GetOwningPawn() const;
 	AController* GetOwningController() const;
 	void ProcessHit(const FHitResult& HitResult, const FVector& Direction);
+
+	void ShotInternal(const TArray<FP12ShotInfo>& ShotsInfo);
+	UFUNCTION(Server, Reliable)
+	void Server_Shot(const TArray<FP12ShotInfo>& ShotsInfo);
+	UFUNCTION()
+	void OnRep_LastShotsInfo();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
@@ -74,4 +108,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Decal")
 	FP12DecalInfo DecalInfo;
+
+private:
+	UPROPERTY(ReplicatedUsing = "OnRep_LastShotsInfo")
+	TArray<FP12ShotInfo> LastShotsInfo;
 };

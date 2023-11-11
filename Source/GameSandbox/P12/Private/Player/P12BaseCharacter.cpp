@@ -15,6 +15,7 @@
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
+#include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
@@ -584,10 +585,33 @@ void AP12BaseCharacter::PossessedBy(AController* NewController)
 		const FGenericTeamId TeamID = {static_cast<uint8>(Team)};
 		AIController->SetGenericTeamId(TeamID);
 	}
+
+	Client_ShowInterface();
 }
 
 FGenericTeamId AP12BaseCharacter::GetGenericTeamId() const
 {
 	// return IGenericTeamAgentInterface::GetGenericTeamId()
 	return FGenericTeamId(static_cast<uint8>(Team));
+}
+
+void AP12BaseCharacter::Client_ShowInterface_Implementation()
+{
+	/* Get HUD */
+	AController* CurrentController = GetController();
+	if (!CurrentController || CurrentController->GetLocalRole() < ROLE_AutonomousProxy)
+	{
+		return;
+	}
+	const APlayerController* PlayerController = Cast<APlayerController>(CurrentController);
+	if (!PlayerController)
+	{
+		return;
+	}
+	AP12HUD* HUD = PlayerController->GetHUD<AP12HUD>();
+	if (!HUD)
+	{
+		return;
+	}
+	HUD->ShowGameScreenFor(this);
 }

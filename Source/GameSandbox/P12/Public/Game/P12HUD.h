@@ -19,12 +19,10 @@ class GAMESANDBOX_API AP12HUD : public AHUD
 public:
 	AP12HUD();
 	void ToggleReticle(const bool bShow, const EP12ReticleType ReticleType);
+	void ShowGameScreenFor(AP12BaseCharacter* OwnerChar);
 
 protected:
 	virtual void BeginPlay() override;
-
-private:
-	void ShowGameScreen();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")

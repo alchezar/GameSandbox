@@ -51,6 +51,8 @@ private:
 	void Server_EquipItemInSlot(EP12EquipmentSlot Slot);
 	UFUNCTION()
 	void OnRep_CurrentEquippedSlot(EP12EquipmentSlot OldCurrentSlot);
+	UFUNCTION()
+	void OnRep_ItemsArray();
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
@@ -67,8 +69,12 @@ private:
 	UPROPERTY(ReplicatedUsing = "OnRep_CurrentEquippedSlot")
 	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
 	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
-	TP12AmmunitionArray AmmunitionArray;
-	TP12ItemsArray ItemsArray;
+	
+	UPROPERTY(Replicated)
+	TArray<int32> AmmunitionArray;
+	UPROPERTY(ReplicatedUsing = "OnRep_ItemsArray")
+	TArray<AP12EquipableItem*> ItemsArray;
+	
 	UPROPERTY()
 	AP12EquipableItem* CurrentEquippedItem = nullptr;
 	UPROPERTY()

@@ -53,6 +53,7 @@ private:
 	float GetShotTimeInterval();
 	void MakeShot();
 	void RefreshAmmoCount() const;
+	UP12EquipmentComponent* GetEquipment() const;
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")

@@ -15,10 +15,12 @@ class GAMESANDBOX_API UP12PlayerHUDWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	void SetCachedCharacter(AP12BaseCharacter* NewCharacter);
+
 protected:
 	virtual void NativeConstruct() override;
 	void OnHealthChangeHandle(const float Health, const float MaxHealth);
-	// void OnAimStateChangedHandle(const bool bStart);
 	void OnAmmoCountChangedHandle(const int32 Ammo, const int32 TotalAmmo);
 
 protected:
@@ -28,9 +30,6 @@ protected:
 	UTextBlock* AmmoText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* TotalAmmoText;
-
-	// UPROPERTY(meta = (BindWidgetAnim), Transient)
-	// UWidgetAnimation* ReticleAiming;
 
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;	

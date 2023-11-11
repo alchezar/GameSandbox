@@ -2,6 +2,7 @@
 
 #include "P12/Public/Game/P12HUD.h"
 
+#include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/UI/P12PlayerHUDWidget.h"
 
 AP12HUD::AP12HUD()
@@ -11,10 +12,10 @@ AP12HUD::AP12HUD()
 void AP12HUD::BeginPlay()
 {
 	Super::BeginPlay();
-	ShowGameScreen();
+	// ShowGameScreen();
 }
 
-void AP12HUD::ShowGameScreen()
+void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar)
 {
 	if (!GameScreenClass)
 	{
@@ -25,6 +26,7 @@ void AP12HUD::ShowGameScreen()
 	{
 		return;
 	}
+	GameScreenWidget->SetCachedCharacter(OwnerChar);
 	GameScreenWidget->AddToViewport(1);
 }
 

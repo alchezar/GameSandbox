@@ -8,12 +8,14 @@
 #include "Components/DecalComponent.h"
 #include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "P12/Public/Actor/Projectile/P12Projectile.h"
 #include "P12/Public/Util/P12Library.h"
 
 UP12WeaponBarrelComponent::UP12WeaponBarrelComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UP12WeaponBarrelComponent::BeginPlay()
@@ -26,29 +28,33 @@ void UP12WeaponBarrelComponent::TickComponent(float DeltaTime, ELevelTick TickTy
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
+void UP12WeaponBarrelComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	FDoRepLifetimeParams RepParams;
+	RepParams.Condition = COND_SimulatedOnly;
+	RepParams.RepNotifyCondition = REPNOTIFY_Always;
+	DOREPLIFETIME_WITH_PARAMS(ThisClass, LastShotsInfo, RepParams);
+}
+
 void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, const float SpreadAngle)
 {
+	TArray<FP12ShotInfo> ShotInfos;
 	for (int i = 0; i < BulletsPerShot; ++i)
 	{
 		const float HalfAngleRad = FMath::DegreesToRadians(SpreadAngle / 2.f);
 		const FVector SpreadDirection = FMath::VRandCone(ShotDirection, HalfAngleRad);
-		const FVector ShotEnd = ShotStart + FiringRange * SpreadDirection;
 
-		if (HitRegistrationType == EP12HitRegistrationType::HitScan)
-		{
-			FHitResult ShotHitResult;
-			HitScan(ShotStart, ShotEnd, SpreadDirection, ShotHitResult);
-			
-			const FVector EndPoint = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd; 
-			DrawNiagaraTale(EndPoint);
-			
-			UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
-		}
-		if (HitRegistrationType == EP12HitRegistrationType::Projectile)
-		{
-			ProjectileLaunch(ShotStart, SpreadDirection);
-		}
+		// ShotInfos.Add({ShotStart, SpreadDirection});
+		ShotInfos.Emplace(ShotStart, SpreadDirection);
 	}
+
+	if (GetOwner()->GetLocalRole() == ROLE_AutonomousProxy)
+	{
+		Server_Shot(ShotInfos);
+	}
+	ShotInternal(ShotInfos);
 }
 
 void UP12WeaponBarrelComponent::DrawNiagaraTale(const FVector& EndPoint)
@@ -128,4 +134,45 @@ void UP12WeaponBarrelComponent::ProcessHit(const FHitResult& HitResult, const FV
 		BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
 		BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
 	}
+}
+
+void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsInfo)
+{
+	if (GetOwner()->HasAuthority())
+	{
+		LastShotsInfo = ShotsInfo;
+	}
+	
+	for (const FP12ShotInfo ShotInfo : ShotsInfo)
+	{
+		const FVector ShotStart = ShotInfo.GetLocation();
+		const FVector ShotDirection = ShotInfo.GetDirection();
+		const FVector ShotEnd = ShotStart + FiringRange * ShotDirection;
+
+		if (HitRegistrationType == EP12HitRegistrationType::HitScan)
+		{
+			FHitResult ShotHitResult;
+			HitScan(ShotStart, ShotEnd, ShotDirection, ShotHitResult);
+			
+			const FVector EndPoint = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd; 
+			DrawNiagaraTale(EndPoint);
+			
+			UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
+		}
+		if (HitRegistrationType == EP12HitRegistrationType::Projectile)
+		{
+			ProjectileLaunch(ShotStart, ShotDirection);
+		}
+	}
+}
+
+
+void UP12WeaponBarrelComponent::Server_Shot_Implementation(const TArray<FP12ShotInfo>& ShotsInfo)
+{
+	ShotInternal(ShotsInfo);
+}
+
+void UP12WeaponBarrelComponent::OnRep_LastShotsInfo()
+{
+	ShotInternal(LastShotsInfo);
 }

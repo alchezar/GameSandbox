@@ -24,6 +24,8 @@ void UP12EquipmentComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, CurrentEquippedSlot);
+	DOREPLIFETIME(ThisClass, AmmunitionArray);
+	DOREPLIFETIME(ThisClass, ItemsArray);
 }
 
 void UP12EquipmentComponent::BeginPlay()
@@ -40,6 +42,11 @@ void UP12EquipmentComponent::BeginPlay()
 
 void UP12EquipmentComponent::CreateLoadout()
 {
+	if (GetOwner()->GetLocalRole() < ROLE_Authority)
+	{
+		return;
+	}
+	
 	AmmunitionArray.AddZeroed(static_cast<uint32>(EP12AmmunitionType::MAX));
 	for (const TPair<EP12AmmunitionType, int32>& AmmoPair : MaxAmmunitionAmount)
 	{
@@ -89,6 +96,11 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 	}
 
 	UnEquipCurrentItem();
+
+	if (ItemsArray.IsEmpty())
+	{
+		return;
+	}
 	
 	/* Equip new weapon */
 	CurrentEquippedItem = ItemsArray[static_cast<uint32>(Slot)];
@@ -224,4 +236,16 @@ void UP12EquipmentComponent::Server_EquipItemInSlot_Implementation(EP12Equipment
 void UP12EquipmentComponent::OnRep_CurrentEquippedSlot(EP12EquipmentSlot OldCurrentSlot)
 {
 	EquipItemInSlot(CurrentEquippedSlot);
+}
+
+void UP12EquipmentComponent::OnRep_ItemsArray()
+{
+	for (AP12EquipableItem* Item : ItemsArray)
+	{
+		if (!Item)
+		{
+			continue;
+		}
+		Item->Unequip();
+	}
 }

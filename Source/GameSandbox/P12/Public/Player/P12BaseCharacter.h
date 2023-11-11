@@ -9,6 +9,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
+class AP12HUD;
 class AP12RangeWeaponItem;
 class UP12WeaponBarrelComponent;
 class UP12EquipmentComponent;
@@ -142,6 +143,9 @@ private:
 	void EnableRagdoll();
 	float GetDefaultCameraArmLength() const;
 	float GetDefaultCameraFOV() const;
+	
+	UFUNCTION(Client, Reliable)
+	void Client_ShowInterface();
 
 public:
 	FP12OnHealthChangeSignature OnHealthChange;

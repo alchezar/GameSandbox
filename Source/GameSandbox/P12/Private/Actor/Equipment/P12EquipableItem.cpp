@@ -7,6 +7,11 @@
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotifyWindow_Equipping.h"
 
+AP12EquipableItem::AP12EquipableItem()
+{
+	SetReplicates(true);
+}
+
 void AP12EquipableItem::SetOwner(AActor* NewOwner)
 {
 	Super::SetOwner(NewOwner);
@@ -15,6 +20,11 @@ void AP12EquipableItem::SetOwner(AActor* NewOwner)
 	{
 		check(NewOwner->IsA<AP12BaseCharacter>())
 		CachedCharacter = StaticCast<AP12BaseCharacter*>(NewOwner);
+
+		if(GetLocalRole() == ROLE_Authority)
+		{
+			SetAutonomousProxy(true);
+		}
 	}
 }
 
@@ -51,11 +61,19 @@ void AP12EquipableItem::InitAnimNotify()
 
 void AP12EquipableItem::OnEquippingStartedHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
 {
+	if (!CachedEquipment.IsValid())
+	{
+		return;
+	}
 	CachedEquipment->EquipCurrentItem();
 }
 
 void AP12EquipableItem::OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
 {
+	if (!CachedCharacter.IsValid())
+	{
+		return;
+	}
 	CachedCharacter->EndEquippingItem();
 }
 

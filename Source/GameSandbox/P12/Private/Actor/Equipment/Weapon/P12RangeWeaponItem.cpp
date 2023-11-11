@@ -237,11 +237,11 @@ void AP12RangeWeaponItem::OnOneReloadedHandle(USkeletalMeshComponent* SkeletalMe
 void AP12RangeWeaponItem::Reload(const bool bByOne, const int32 NumberOfAmmo)
 {
 	bReloading = false;
-
-	const int32 AvailableAmmoCount = GetCachedEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
+	
+	const int32 AvailableAmmoCount = GetEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
 	const int32 AmmoToReload = bByOne ? NumberOfAmmo : MaxAmmo - Ammo;
 	const int32 ReloadedAmmo = FMath::Min(AvailableAmmoCount, AmmoToReload);
-	GetCachedEquipment()->DecreaseMaxAvailableAmmoAmount(AmmoType, ReloadedAmmo);
+	GetEquipment()->DecreaseMaxAvailableAmmoAmount(AmmoType, ReloadedAmmo);
 
 	SetAmmo(Ammo + ReloadedAmmo);
 	GetCachedCharacter()->OnReloadComplete.Broadcast(true);
@@ -267,6 +267,17 @@ void AP12RangeWeaponItem::AttachItem(const FName AttachSocketName)
 
 void AP12RangeWeaponItem::RefreshAmmoCount() const
 {
-	const int32 AvailableAmmoCount = GetCachedEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
+	const int32 AvailableAmmoCount = GetEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
 	GetCachedCharacter()->OnAmmoCountChanged.Broadcast(Ammo, AvailableAmmoCount);
+}
+
+UP12EquipmentComponent* AP12RangeWeaponItem::GetEquipment() const
+{
+	UP12EquipmentComponent* Equipment = GetCachedEquipment().Get();
+	if (!Equipment)
+	{
+		/* For some reason in multiplayer EquipmentComponent does`n cache. So we need to get it from our owner. */
+		Equipment = GetOwner<AP12BaseCharacter>()->GetEquipmentComponent();
+	}
+	return Equipment;
 }
