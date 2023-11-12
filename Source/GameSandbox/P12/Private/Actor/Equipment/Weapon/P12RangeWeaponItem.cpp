@@ -277,7 +277,15 @@ UP12EquipmentComponent* AP12RangeWeaponItem::GetEquipment() const
 	if (!Equipment)
 	{
 		/* For some reason in multiplayer EquipmentComponent does`n cache. So we need to get it from our owner. */
-		Equipment = GetOwner<AP12BaseCharacter>()->GetEquipmentComponent();
+		AActor* CurrentOwner = GetOwner();
+		check(CurrentOwner)
+		if (!CurrentOwner->IsA<APawn>())
+		{
+			CurrentOwner = GetOwner()->GetOwner();
+		}
+		const AP12BaseCharacter* BaseCharacter = Cast<AP12BaseCharacter>(CurrentOwner);
+		check(BaseCharacter)
+		Equipment = BaseCharacter->GetEquipmentComponent();
 	}
 	return Equipment;
 }

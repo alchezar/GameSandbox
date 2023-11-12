@@ -120,6 +120,7 @@ public:
 	void PrimaryMeleeInput();
 	void SecondaryMeleeInput();
 	virtual void PossessedBy(AController* NewController) override;
+	AP12HUD* GetHUD() const;
 
 	/* IGenericTeamInterface */
 	virtual FGenericTeamId GetGenericTeamId() const override;

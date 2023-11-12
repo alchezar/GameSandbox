@@ -18,6 +18,7 @@ class GAMESANDBOX_API UP12AttributeComponent : public UActorComponent
 public:
 	UP12AttributeComponent();
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; }
 	float GetHealthPercent();
 
@@ -27,6 +28,9 @@ protected:
 private:
 	UFUNCTION()
 	void OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+	void CheckIfDead();
+	UFUNCTION()
+	void OnRep_Health(float LastHealth);
 	
 #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
 	void DebugDrawAttributes();
@@ -41,5 +45,6 @@ protected:
 
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacterOwner;
+	UPROPERTY(ReplicatedUsing = "OnRep_Health")
 	float Health = 0.f;
 };

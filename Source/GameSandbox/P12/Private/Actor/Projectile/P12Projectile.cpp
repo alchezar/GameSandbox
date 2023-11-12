@@ -4,10 +4,12 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
-// #include "P12/Public/Actor/Equipment/Throwable/P12ThrowableItem.h"
 
 AP12Projectile::AP12Projectile()
 {
+	SetReplicates(true);
+	SetReplicatingMovement(true);
+	
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	CollisionComponent->InitSphereRadius(5.f);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -21,6 +23,7 @@ AP12Projectile::AP12Projectile()
 	MovementComponent->InitialSpeed = 1000.f;
 	MovementComponent->bShouldBounce = true;
 	MovementComponent->Friction = 0.5f;
+	MovementComponent->bAutoActivate = false;
 }
 
 void AP12Projectile::BeginPlay()
@@ -28,22 +31,30 @@ void AP12Projectile::BeginPlay()
 	Super::BeginPlay();
 
 	CollisionComponent->OnComponentHit.AddDynamic(this, &ThisClass::OnCollisionHitHandle);
-	OnProjectileHit.AddUObject(this, &ThisClass::OnProjectileHitHandle);
 }
 
-void AP12Projectile::LaunchProjectile(const FVector& Direction,  AActor* LaunchedFrom)
+void AP12Projectile::LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom)
 {
-	CollisionComponent->IgnoreActorWhenMoving(GetOwner(), true);
+	AActor* TestActor = LaunchedFrom->GetOwner();
 	CollisionComponent->IgnoreActorWhenMoving(LaunchedFrom, true);
+	CollisionComponent->IgnoreActorWhenMoving(LaunchedFrom->GetOwner(), true);
 }
 
 void AP12Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	OnProjectileHit.Broadcast(Hit, MovementComponent->Velocity.GetSafeNormal());	
+	OnProjectileHit.Broadcast(Hit, MovementComponent->Velocity.GetSafeNormal(), this);
 }
 
-void AP12Projectile::OnProjectileHitHandle(const FHitResult& HitResult, const FVector& Vector)
+void AP12Projectile::ToggleActive(const bool bActive, const FVector& Location, const FVector& Direction, AActor* LaunchedFrom)
 {
-	MeshComponent->SetVisibility(false);
-	SetLifeSpan(2.f);
+	MovementComponent->SetActive(bActive);
+	MeshComponent->SetVisibility(bActive);
+	
+	SetActorLocation(Location);
+	SetActorRotation(Direction.ToOrientationRotator());
+
+	if (bActive && LaunchedFrom)
+	{
+		LaunchProjectile(Direction.GetSafeNormal(), LaunchedFrom);
+	}
 }

@@ -32,8 +32,8 @@ public:
 
 	void Equip();
 	void Unequip();
-
-	void ToggleReticle(const bool bShow) const;
+	UFUNCTION(Client, Reliable)
+	void Client_ToggleReticle(const bool bShow) const;
 
 protected:
 	virtual void InitAnimNotify();

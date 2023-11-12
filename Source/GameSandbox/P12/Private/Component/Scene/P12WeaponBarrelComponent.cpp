@@ -21,6 +21,23 @@ UP12WeaponBarrelComponent::UP12WeaponBarrelComponent()
 void UP12WeaponBarrelComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (!GetOwner()->HasAuthority() || !ProjectileClass)
+	{
+		return;
+	}
+
+	ProjectilePool.Reserve(ProjectilePoolSize);
+	for (int i = 0; i < ProjectilePoolSize; ++i)
+	{
+		// AP12Projectile* Projectile = GetWorld()->SpawnActor<AP12Projectile>(ProjectileClass, ProjectilePoolLocation, FRotator::ZeroRotator);
+		AP12Projectile* Projectile = GetWorld()->SpawnActor<AP12Projectile>(ProjectileClass);
+		check(Projectile)
+
+		Projectile->SetOwner(GetOwningPawn());
+		Projectile->ToggleActive(false, ProjectilePoolLocation);
+		ProjectilePool.Add(Projectile);
+	}
 }
 
 void UP12WeaponBarrelComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -36,6 +53,9 @@ void UP12WeaponBarrelComponent::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	RepParams.Condition = COND_SimulatedOnly;
 	RepParams.RepNotifyCondition = REPNOTIFY_Always;
 	DOREPLIFETIME_WITH_PARAMS(ThisClass, LastShotsInfo, RepParams);
+
+	DOREPLIFETIME(ThisClass, ProjectilePool);
+	DOREPLIFETIME(ThisClass, CurrentProjectileIndex);
 }
 
 void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& ShotDirection, const float SpreadAngle)
@@ -60,15 +80,16 @@ void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& Sh
 void UP12WeaponBarrelComponent::DrawNiagaraTale(const FVector& EndPoint)
 {
 	const FVector MuzzleLocation = GetComponentLocation();
-	if (TraceNiagara)
+	if (!TraceNiagara)
 	{
-		UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
-		if (!TraceNiagaraComp)
-		{
-			return;
-		}
-		TraceNiagaraComp->SetVectorParameter("TraceEnd", EndPoint);
+		return;
 	}
+	UNiagaraComponent* TraceNiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), TraceNiagara, MuzzleLocation);
+	if (!TraceNiagaraComp)
+	{
+		return;
+	}
+	TraceNiagaraComp->SetVectorParameter("TraceEnd", EndPoint);
 }
 
 void UP12WeaponBarrelComponent::HitScan(const FVector& Start, const FVector& End, const FVector& Direction, FHitResult& Out_HitResult)
@@ -82,11 +103,15 @@ void UP12WeaponBarrelComponent::HitScan(const FVector& Start, const FVector& End
 
 void UP12WeaponBarrelComponent::ProjectileLaunch(const FVector& Start, const FVector& Direction)
 {
-	if (AP12Projectile* Projectile = GetWorld()->SpawnActor<AP12Projectile>(ProjectileClass, Start, Direction.ToOrientationRotator()))
+	// AP12Projectile* Projectile = GetWorld()->SpawnActor<AP12Projectile>(ProjectileClass, Start, Direction.ToOrientationRotator());
+	AP12Projectile* Projectile = ProjectilePool[CurrentProjectileIndex];
+	check(Projectile)
+	Projectile->OnProjectileHit.AddUObject(this, &ThisClass::ProcessProjectileHit);
+	Projectile->ToggleActive(true, Start, Direction, GetOwner());
+
+	if (++CurrentProjectileIndex == ProjectilePool.Num())
 	{
-		Projectile->SetOwner(GetOwningPawn());
-		Projectile->LaunchProjectile(Direction.GetSafeNormal(), GetOwner());
-		Projectile->OnProjectileHit.AddUObject(this, &ThisClass::ProcessHit);
+		CurrentProjectileIndex = 0;
 	}
 }
 
@@ -122,11 +147,14 @@ void UP12WeaponBarrelComponent::ProcessHit(const FHitResult& HitResult, const FV
 	{
 		return;
 	}
-	FPointDamageEvent DamageEvent;
-	DamageEvent.HitInfo = HitResult;
-	DamageEvent.ShotDirection = Direction;
-	DamageEvent.DamageTypeClass = DamageTypeClass;
-	HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
+	if (GetOwner()->HasAuthority())
+	{
+		FPointDamageEvent DamageEvent;
+		DamageEvent.HitInfo = HitResult;
+		DamageEvent.ShotDirection = Direction;
+		DamageEvent.DamageTypeClass = DamageTypeClass;
+		HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
+	}
 
 	/* Draw decal. */
 	if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, HitResult.ImpactPoint, HitResult.ImpactNormal.ToOrientationRotator()))
@@ -175,4 +203,13 @@ void UP12WeaponBarrelComponent::Server_Shot_Implementation(const TArray<FP12Shot
 void UP12WeaponBarrelComponent::OnRep_LastShotsInfo()
 {
 	ShotInternal(LastShotsInfo);
+}
+
+void UP12WeaponBarrelComponent::ProcessProjectileHit(const FHitResult& HitResult, const FVector& Direction, AP12Projectile* Projectile)
+{
+	/* Deactivate projectile */
+	Projectile->OnProjectileHit.RemoveAll(this);
+	Projectile->ToggleActive(false, ProjectilePoolLocation);
+	
+	ProcessHit(HitResult, Direction);	
 }

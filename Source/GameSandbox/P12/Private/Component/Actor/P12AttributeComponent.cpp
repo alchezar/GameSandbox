@@ -2,12 +2,14 @@
 
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Util/P12Library.h"
 
 UP12AttributeComponent::UP12AttributeComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UP12AttributeComponent::BeginPlay()
@@ -19,7 +21,10 @@ void UP12AttributeComponent::BeginPlay()
 	CachedCharacterOwner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnTakeAnyDamage);
 	
 	Health = MaxHealth;
-	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+	if (GetOwner()->HasAuthority())
+	{
+		CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+	}
 }
 
 void UP12AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -32,6 +37,13 @@ void UP12AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 
 }
 
+void UP12AttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Health);
+}
+
 void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	if (!GetIsAlive())
@@ -41,13 +53,8 @@ void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 	
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
-	UP12Library::DrawPrintString(GetWorld(), FString::Printf(TEXT("AP12BaseCharacter %s received %.2f amount of damage from %s"), *CachedCharacterOwner->GetName(), Damage, *DamageCauser->GetName()), UP12Library::GetCanDrawDebugPrintScreen());
 
-	if (FMath::IsNearlyZero(Health) && OnDeath.IsBound())
-	{
-		OnDeath.Broadcast();
-		UP12Library::DrawPrintString(GetWorld(), FString::Printf(TEXT("AP12BaseCharacter %s killed by %s"), *CachedCharacterOwner->GetName(), *DamageCauser->GetName()), UP12Library::GetCanDrawDebugPrintScreen());
-	}
+	CheckIfDead();
 }
 
 #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
@@ -71,4 +78,24 @@ float UP12AttributeComponent::GetHealthPercent()
 		return 0.f;
 	}
 	return Health / MaxHealth;
+}
+
+void UP12AttributeComponent::CheckIfDead()
+{
+	if (FMath::IsNearlyZero(Health) && OnDeath.IsBound())
+	{
+		OnDeath.Broadcast();
+	}
+}
+
+void UP12AttributeComponent::OnRep_Health(float LastHealth)
+{
+	if (!CachedCharacterOwner.IsValid())
+	{
+		CachedCharacterOwner = Cast<AP12BaseCharacter>(GetOwner());
+		check(CachedCharacterOwner.Get());
+	}
+	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+
+	CheckIfDead();
 }

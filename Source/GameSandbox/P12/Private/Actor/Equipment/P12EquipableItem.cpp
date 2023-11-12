@@ -93,15 +93,15 @@ void AP12EquipableItem::Unequip()
 
 }
 
-void AP12EquipableItem::ToggleReticle(const bool bShow) const
+void AP12EquipableItem::Client_ToggleReticle_Implementation(const bool bShow) const
 {
-	const APlayerController* PlayerController = Cast<APlayerController>(GetCachedCharacter()->Controller);
-	if (!PlayerController)
+	const AP12BaseCharacter* BaseCharacter = GetCachedCharacter().Get();
+	if (!BaseCharacter)
 	{
-		return;
+		BaseCharacter = Cast<AP12BaseCharacter>(GetOwner());
 	}
-	AP12HUD* HUD = PlayerController->GetHUD<AP12HUD>();
-	if(!HUD)
+	AP12HUD* HUD = BaseCharacter->GetHUD();
+	if (!HUD)
 	{
 		return;
 	}

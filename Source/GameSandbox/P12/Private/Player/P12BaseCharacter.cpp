@@ -589,6 +589,21 @@ void AP12BaseCharacter::PossessedBy(AController* NewController)
 	Client_ShowInterface();
 }
 
+AP12HUD* AP12BaseCharacter::GetHUD() const
+{
+	AController* CurrentController = GetController();
+	if (!CurrentController || CurrentController->GetLocalRole() < ROLE_AutonomousProxy)
+	{
+		return nullptr;
+	}
+	const APlayerController* PlayerController = Cast<APlayerController>(CurrentController);
+	if (!PlayerController)
+	{
+		return nullptr;
+	}
+	return PlayerController->GetHUD<AP12HUD>();
+}
+
 FGenericTeamId AP12BaseCharacter::GetGenericTeamId() const
 {
 	// return IGenericTeamAgentInterface::GetGenericTeamId()
@@ -597,18 +612,7 @@ FGenericTeamId AP12BaseCharacter::GetGenericTeamId() const
 
 void AP12BaseCharacter::Client_ShowInterface_Implementation()
 {
-	/* Get HUD */
-	AController* CurrentController = GetController();
-	if (!CurrentController || CurrentController->GetLocalRole() < ROLE_AutonomousProxy)
-	{
-		return;
-	}
-	const APlayerController* PlayerController = Cast<APlayerController>(CurrentController);
-	if (!PlayerController)
-	{
-		return;
-	}
-	AP12HUD* HUD = PlayerController->GetHUD<AP12HUD>();
+	AP12HUD* HUD = GetHUD();
 	if (!HUD)
 	{
 		return;

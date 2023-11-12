@@ -48,7 +48,7 @@ void AP12ThrowableItem::OnThrowableTakenHandle(USkeletalMeshComponent* SkeletalM
 		return;
 	}
 	GetCachedEquipment()->TakeCurrentThrowableItem();
-	ToggleReticle(false);
+	Client_ToggleReticle(false);
 }
 
 void AP12ThrowableItem::OnThrowableLaunchedHandle(USkeletalMeshComponent* SkeletalMeshComponent)

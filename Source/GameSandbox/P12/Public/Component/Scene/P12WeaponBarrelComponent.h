@@ -88,6 +88,9 @@ private:
 	UFUNCTION()
 	void OnRep_LastShotsInfo();
 
+	UFUNCTION()
+	void ProcessProjectileHit(const FHitResult& HitResult, const FVector& Direction, AP12Projectile* Projectile);
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	float FiringRange = 5000.f;
@@ -102,6 +105,8 @@ protected:
 	EP12HitRegistrationType HitRegistrationType = EP12HitRegistrationType::HitScan;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel", meta = (EditCondition = "HitRegistrationType == EP12HitRegistrationType::Projectile"))
 	TSubclassOf<AP12Projectile> ProjectileClass;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel", meta = (ClampMin = 1, UIMin = 1))
+	int32 ProjectilePoolSize = 10;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* TraceNiagara = nullptr;
@@ -112,4 +117,10 @@ protected:
 private:
 	UPROPERTY(ReplicatedUsing = "OnRep_LastShotsInfo")
 	TArray<FP12ShotInfo> LastShotsInfo;
+
+	FVector ProjectilePoolLocation = FVector(0.f, 0.f, -100.f);
+	UPROPERTY(Replicated)
+	TArray<AP12Projectile*> ProjectilePool;
+	UPROPERTY(Replicated)
+	int32 CurrentProjectileIndex = 0;
 };

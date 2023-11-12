@@ -9,8 +9,9 @@
 class AP12ThrowableItem;
 class UProjectileMovementComponent;
 class USphereComponent;
+class AP12Projectile;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnProjectileHitSignature, const FHitResult&, const FVector& /*Direction*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FP12OnProjectileHitSignature, const FHitResult&, const FVector& /*Direction*/, AP12Projectile*)
 
 UCLASS()
 class GAMESANDBOX_API AP12Projectile : public AActor
@@ -22,12 +23,13 @@ public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return MovementComponent; }
 	virtual void LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom);
 
+	void ToggleActive(const bool bActive , const FVector& Location, const FVector& Direction = FVector::ForwardVector, AActor* LaunchedFrom = nullptr);
+	
 protected:
 	virtual void BeginPlay() override;
 	
 	UFUNCTION()
 	void OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	void OnProjectileHitHandle(const FHitResult& HitResult, const FVector& Vector);
 	
 public:
 	FP12OnProjectileHitSignature OnProjectileHit;

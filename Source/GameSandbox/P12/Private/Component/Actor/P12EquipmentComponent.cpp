@@ -192,11 +192,11 @@ void UP12EquipmentComponent::EquipCurrentItem()
 	if (CurrentEquippedItem)
 	{
 		CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetEquippedSocketName());
-		CurrentEquippedItem->ToggleReticle(!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot));
+		CurrentEquippedItem->Client_ToggleReticle(!IgnoredSlotsWhileSwitching.Contains(CurrentEquippedSlot));
 	}
 	if (CurrentMeleeWeapon)
 	{
-		CurrentMeleeWeapon->ToggleReticle(false);
+		CurrentMeleeWeapon->Client_ToggleReticle(false);
 	}
 }
 
