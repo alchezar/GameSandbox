@@ -90,6 +90,8 @@ private:
 
 	UFUNCTION()
 	void ProcessProjectileHit(const FHitResult& HitResult, const FVector& Direction, AP12Projectile* Projectile);
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_DrawBulletHoleDecal(const FHitResult& HitResult);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")

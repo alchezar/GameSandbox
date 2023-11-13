@@ -22,8 +22,8 @@ public:
 	AP12Projectile();
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return MovementComponent; }
 	virtual void LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom);
-
-	void ToggleActive(const bool bActive , const FVector& Location, const FVector& Direction = FVector::ForwardVector, AActor* LaunchedFrom = nullptr);
+	virtual void Tick(float DeltaSeconds) override;
+	void ToggleActive(const bool bActive , const FVector& Location, const FVector& Direction = FVector::ForwardVector, AActor* WeaponOwner = nullptr);
 	
 protected:
 	virtual void BeginPlay() override;
@@ -41,4 +41,8 @@ protected:
 	UStaticMeshComponent* MeshComponent;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UProjectileMovementComponent* MovementComponent;
+
+private:
+	FVector LastFrameLocation = FVector::ZeroVector;
+	FVector PoolLocation = FVector::ZeroVector;
 };

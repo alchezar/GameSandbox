@@ -109,10 +109,7 @@ void UP12WeaponBarrelComponent::ProjectileLaunch(const FVector& Start, const FVe
 	Projectile->OnProjectileHit.AddUObject(this, &ThisClass::ProcessProjectileHit);
 	Projectile->ToggleActive(true, Start, Direction, GetOwner());
 
-	if (++CurrentProjectileIndex == ProjectilePool.Num())
-	{
-		CurrentProjectileIndex = 0;
-	}
+	CurrentProjectileIndex = ++CurrentProjectileIndex % ProjectilePool.Num();
 }
 
 APawn* UP12WeaponBarrelComponent::GetOwningPawn() const
@@ -156,12 +153,7 @@ void UP12WeaponBarrelComponent::ProcessHit(const FHitResult& HitResult, const FV
 		HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
 	}
 
-	/* Draw decal. */
-	if (UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, HitResult.ImpactPoint, HitResult.ImpactNormal.ToOrientationRotator()))
-	{
-		BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
-		BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
-	}
+	Multicast_DrawBulletHoleDecal(HitResult);
 }
 
 void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsInfo)
@@ -208,8 +200,19 @@ void UP12WeaponBarrelComponent::OnRep_LastShotsInfo()
 void UP12WeaponBarrelComponent::ProcessProjectileHit(const FHitResult& HitResult, const FVector& Direction, AP12Projectile* Projectile)
 {
 	/* Deactivate projectile */
-	Projectile->OnProjectileHit.RemoveAll(this);
 	Projectile->ToggleActive(false, ProjectilePoolLocation);
+	Projectile->OnProjectileHit.RemoveAll(this);
 	
 	ProcessHit(HitResult, Direction);	
+}
+
+void UP12WeaponBarrelComponent::Multicast_DrawBulletHoleDecal_Implementation(const FHitResult& HitResult)
+{
+	UDecalComponent* BulletHoleDecal = UGameplayStatics::SpawnDecalAtLocation(GetWorld(), DecalInfo.Decal, DecalInfo.Size, HitResult.ImpactPoint, HitResult.ImpactNormal.ToOrientationRotator());
+	if (BulletHoleDecal)
+	{
+		return;
+	}
+	BulletHoleDecal->SetFadeOut(DecalInfo.Lifetime, DecalInfo.FadeOutTime);
+	BulletHoleDecal->SetFadeScreenSize(DecalInfo.FadeScreenSize);
 }
