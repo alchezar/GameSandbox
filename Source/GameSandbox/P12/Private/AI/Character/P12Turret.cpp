@@ -4,12 +4,14 @@
 
 #include "AIController.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Net/UnrealNetwork.h"
 #include "P12/Public/Component/Scene/P12WeaponBarrelComponent.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 
 AP12Turret::AP12Turret()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	SetReplicates(true);
 
 	USceneComponent* TurretRoot = CreateDefaultSubobject<USceneComponent>("TurretRootComponent");
 	SetRootComponent(TurretRoot);
@@ -39,6 +41,13 @@ void AP12Turret::Tick(const float DeltaTime)
 	}
 }
 
+void AP12Turret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, CurrentTarget);
+}
+
 FVector AP12Turret::GetPawnViewLocation() const
 {
 	// return Super::GetPawnViewLocation();
@@ -50,7 +59,7 @@ FRotator AP12Turret::GetViewRotation() const
 	// return Super::GetViewRotation();
 	return BarrelComponent->GetComponentRotation();	
 }
-
+	
 void AP12Turret::SetCurrentTarget(AActor* NewTarget)
 {
 	if (CurrentTarget != NewTarget)
@@ -60,19 +69,22 @@ void AP12Turret::SetCurrentTarget(AActor* NewTarget)
 	CurrentTarget = NewTarget;
 	BindOnTargetHealthChanged(CurrentTarget, true);
 	
+	OnCurrentTargetSet();
+}
+
+inline void AP12Turret::OnCurrentTargetSet()
+{
 	const EP12TurretState NewState = CurrentTarget ? EP12TurretState::Firing : EP12TurretState::Searching;
 	SetCurrentTurretState(NewState);
 }
 
 void AP12Turret::SetCurrentTurretState(const EP12TurretState NewState)
 {
-	const bool bStateChanged = TurretState != NewState;
-	TurretState = NewState;
-	
-	if (!bStateChanged)
+	if (TurretState == NewState)
 	{
 		return;
 	}
+	TurretState = NewState;
 	
 	if (TurretState == EP12TurretState::Searching)
 	{
@@ -157,4 +169,9 @@ void AP12Turret::PossessedBy(AController* NewController)
 		const FGenericTeamId TeamID = {static_cast<uint8>(Team)};
 		AIController->SetGenericTeamId(TeamID);
 	}
+}
+
+void AP12Turret::OnRep_CurrentTarget()
+{
+	OnCurrentTargetSet();
 }
