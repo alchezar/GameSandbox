@@ -21,6 +21,7 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 	FORCEINLINE bool GetIsIgnoreCameraPitch() const { return bIgnoreCameraPitch; }
 	void SetIsIgnoreCameraPitch(const bool bIgnore) { bIgnoreCameraPitch = bIgnore; }
+	void ToggleMenuInputMode(const bool bMenu);
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,6 +44,8 @@ protected:
 
 	void PrimaryMeleeInput();
 	void SecondaryMeleeInput();
+
+	void ShowMainMenu();
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -87,6 +90,8 @@ protected:
 	UInputAction* PrimaryMeleeAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* SecondaryMeleeAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* MainMenuAction = nullptr;
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;

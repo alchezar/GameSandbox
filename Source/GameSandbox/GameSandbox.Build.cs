@@ -31,8 +31,6 @@ public class GameSandbox : ModuleRules
 			"AnimGraphRuntime"
 		});
 
-		DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
-
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"EnhancedInput", 

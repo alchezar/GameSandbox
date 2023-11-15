@@ -3,6 +3,8 @@
 #include "P12/Public/Game/P12HUD.h"
 
 #include "P12/Public/Player/P12BaseCharacter.h"
+#include "P12/Public/Player/Controller/P12PlayerController.h"
+#include "P12/Public/UI/P12MainMenuWidget.h"
 #include "P12/Public/UI/P12PlayerHUDWidget.h"
 
 AP12HUD::AP12HUD()
@@ -12,16 +14,20 @@ AP12HUD::AP12HUD()
 void AP12HUD::BeginPlay()
 {
 	Super::BeginPlay();
-	// ShowGameScreen();
 }
 
-void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar)
+void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar, const bool bShow)
 {
-	if (!GameScreenClass)
+	/* Hide (destroy) if available. */
+	if (!bShow && GameScreenWidget)
 	{
-		return;
+		GameScreenWidget->RemoveFromParent();
+		GameScreenWidget = nullptr;
 	}
-	UP12PlayerHUDWidget* GameScreenWidget = CreateWidget<UP12PlayerHUDWidget>(GetWorld(), GameScreenClass);
+
+	/* Show (create new). */
+	check(GameScreenClass)
+	GameScreenWidget = CreateWidget<UP12PlayerHUDWidget>(GetWorld(), GameScreenClass);
 	if (!GameScreenWidget)
 	{
 		return;
@@ -30,7 +36,7 @@ void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar)
 	GameScreenWidget->AddToViewport(1);
 }
 
-void AP12HUD::ToggleReticle(const bool bShow, const EP12ReticleType ReticleType)
+void AP12HUD::ShowReticle(const bool bShow, const EP12ReticleType ReticleType)
 {
 	/* HireReticle */
 	if (!bShow && ReticleWidget)
@@ -54,4 +60,36 @@ void AP12HUD::ToggleReticle(const bool bShow, const EP12ReticleType ReticleType)
 	ReticleWidget = CreateWidget<UP12ReticleWidget>(GetWorld(), ReticlesMap[ReticleType]);
 	check(ReticleWidget)
 	ReticleWidget->AddToViewport(0);
+}
+
+void AP12HUD::ShowMainMenu(const bool bShow)
+{
+	GetCachedPlayerController()->ToggleMenuInputMode(bShow);
+
+	/* Toggle off. */
+	if (MainMenuWidget)
+	{
+		MainMenuWidget->RemoveFromParent();
+		MainMenuWidget = nullptr;
+		return;
+	}
+	
+
+	/* Toggle on. */
+	check(MainMenuWidgetClass)
+	MainMenuWidget = CreateWidget<UP12MainMenuWidget>(GetWorld(), MainMenuWidgetClass);
+	check(MainMenuWidget)
+	MainMenuWidget->CacheHUD(this);
+	MainMenuWidget->AddToViewport(0);
+	
+}
+
+AP12PlayerController* AP12HUD::GetCachedPlayerController()
+{
+	if (!CachedController)
+	{
+		CachedController = Cast<AP12PlayerController>(GetOwningPlayerController());
+		check(CachedController)
+	}
+	return CachedController;
 }

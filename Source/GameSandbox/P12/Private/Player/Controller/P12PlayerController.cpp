@@ -5,6 +5,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
+#include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -67,6 +68,8 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(EquipProjectileAction, ETriggerEvent::Started, this, &ThisClass::EquipThrowableInput);
 	InputComp->BindAction(PrimaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::PrimaryMeleeInput);
 	InputComp->BindAction(SecondaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::SecondaryMeleeInput);
+
+	InputComp->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::ShowMainMenu);
 }
 
 bool AP12PlayerController::GetCharacterCanProcessInput() const
@@ -211,6 +214,16 @@ void AP12PlayerController::SecondaryMeleeInput()
 	CachedBaseCharacter->SecondaryMeleeInput();
 }
 
+void AP12PlayerController::ShowMainMenu()
+{
+	AP12HUD* HUD = GetHUD<AP12HUD>();
+	if (!HUD)
+	{
+		return;
+	}
+	HUD->ShowMainMenu(true);
+}
+
 void AP12PlayerController::P12Debug_EnableAll()
 {
 	TArray<FString> ConsoleVariables = UP12Library::GetAllConsoleVariables();
@@ -226,5 +239,21 @@ void AP12PlayerController::P12Debug_DisableAll()
 	for(const FString& ConsoleVariable : ConsoleVariables)
 	{
 		ConsoleCommand( ConsoleVariable + " 0");
+	}
+}
+
+void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
+{
+	SetShowMouseCursor(bMenu);
+
+	FInputModeGameAndUI GameAndUIMode;
+	GameAndUIMode.SetHideCursorDuringCapture(false);
+	bMenu ? SetInputMode(GameAndUIMode) : SetInputMode(FInputModeGameOnly());
+	bMenu ? GetPawn()->DisableInput(this) : GetPawn()->EnableInput(this);
+	bMenu ? DisableInput(this) : EnableInput(this);
+
+	if (GetNetMode() == NM_Standalone)
+	{
+		SetPause(bMenu);
 	}
 }

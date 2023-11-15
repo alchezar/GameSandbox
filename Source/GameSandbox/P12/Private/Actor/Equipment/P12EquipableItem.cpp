@@ -105,6 +105,6 @@ void AP12EquipableItem::Client_ToggleReticle_Implementation(const bool bShow) co
 	{
 		return;
 	}
-	HUD->ToggleReticle(bShow, ReticleType);
+	HUD->ShowReticle(bShow, ReticleType);
 }
 
