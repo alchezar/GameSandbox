@@ -4,8 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
-// #include "Interfaces/OnlineSessionDelegates.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "P12/Public/UI/MainMenu/P12JoinSessionWidget.h"
 #include "P12GameInstance.generated.h"
 
 class FOnlineSessionSearch;
@@ -25,6 +25,10 @@ public:
 	virtual void Shutdown() override;
 	/* Allow to Exec console commands from GameInstance. */
 	virtual bool ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, UObject* Executor) override;
+
+	void LaunchLobby(int32 NewMaxPlayers, FName NewServerName, bool bLAN);
+	void FindMatch(const bool bLAN);
+	void JoinOnlineGame();
 
 private:
 	void DisplayNetworkErrorMessage(const FString& ErrorMessage);

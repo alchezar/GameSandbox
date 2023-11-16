@@ -4,8 +4,8 @@
 
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/Controller/P12PlayerController.h"
-#include "P12/Public/UI/P12MainMenuWidget.h"
 #include "P12/Public/UI/P12PlayerHUDWidget.h"
+#include "P12/Public/UI/MainMenu/P12MainMenuWidget.h"
 
 AP12HUD::AP12HUD()
 {	
@@ -34,6 +34,8 @@ void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar, const bool bShow)
 	}
 	GameScreenWidget->SetCachedCharacter(OwnerChar);
 	GameScreenWidget->AddToViewport(1);
+
+	GetCachedPlayerController()->ToggleMenuInputMode(false);
 }
 
 void AP12HUD::ShowReticle(const bool bShow, const EP12ReticleType ReticleType)

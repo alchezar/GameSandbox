@@ -58,6 +58,47 @@ bool UP12GameInstance::ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, U
 	return bResult;
 }
 
+void UP12GameInstance::LaunchLobby(int32 NewMaxPlayers, FName NewServerName, bool bLAN)
+{
+	MaxPlayers = NewMaxPlayers;
+	ServerName = NewServerName;
+	HostSession(GetPrimaryPlayerUniqueIdRepl().GetUniqueNetId(), ServerName, bLAN, true, MaxPlayers);
+}
+
+void UP12GameInstance::FindMatch(const bool bLAN)
+{
+	FindSession(GetPrimaryPlayerUniqueIdRepl().GetUniqueNetId(), bLAN, true);
+}
+
+void UP12GameInstance::JoinOnlineGame()
+{
+	const FUniqueNetIdPtr UniqueNetId = GetPrimaryPlayerUniqueIdRepl().GetUniqueNetId();
+	TArray<FOnlineSessionSearchResult> SessionSearchResults = SessionSearch->SearchResults;
+	if (SessionSearchResults.IsEmpty())
+	{
+		return;
+	}
+	for (int i = 0; i < SessionSearchResults.Num(); ++i)
+	{
+		/* To avoid something crazy, we filter sessions from ourself. */
+		if (SessionSearchResults[i].Session.OwningUserId == UniqueNetId)
+		{
+			continue;
+		}
+		/* Just a SearchResult where we can save the one we want to use, for the case we find more than one. */
+		const FOnlineSessionSearchResult SearchResult = SessionSearchResults[i];
+
+		/* Once we found source a Session that is not ours, just join it.
+		 * Instead of using a for loop, you could use a widget where you click on and have
+		 * a reference for the GameSession it represents which you can use */
+		if (!JoinFoundOnlineSession(UniqueNetId, NAME_GameSession, SearchResult))
+		{
+			DisplayNetworkErrorMessage("Failed to join a session! Please try again!");
+		}
+		break;
+	}
+}
+
 void UP12GameInstance::DisplayNetworkErrorMessage(const FString& ErrorMessage)
 {
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, *ErrorMessage);
