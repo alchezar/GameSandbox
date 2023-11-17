@@ -11,12 +11,14 @@
 #include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Actor/Interactive/Environment/P12Ladder.h"
+#include "P12/Public/Actor/Interactive/Interface/P12Interactable.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
+#include "P12/Public/Player/Controller/P12PlayerController.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -58,6 +60,7 @@ void AP12BaseCharacter::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	LegsIKFloorAlignment();
+	TraceLineOfSight();
 }
 
 void AP12BaseCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -619,3 +622,43 @@ void AP12BaseCharacter::Client_ShowInterface_Implementation()
 	}
 	HUD->ShowGameScreenFor(this);
 }
+
+void AP12BaseCharacter::TraceLineOfSight()
+{
+	if (!IsPlayerControlled())
+	{
+		return;
+	}
+	const AP12PlayerController* PlayerController = GetController<AP12PlayerController>();
+	if (!PlayerController)
+	{
+		return;
+	}
+	FVector ViewLocation;
+	FRotator ViewRotation;
+	PlayerController->GetPlayerViewPoint(ViewLocation, ViewRotation);
+	const FVector ViewDirection = ViewRotation.Vector();
+	const FVector TraceEnd = ViewLocation + ViewDirection * LineOfSightDistance;
+
+	FHitResult HitResult;
+	GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, TraceEnd, ECC_Visibility);
+	if (!HitResult.bBlockingHit || HitResult.GetActor() == LineOfSightObject.GetObject())
+	{
+		return;
+	}
+	LineOfSightObject = HitResult.GetActor();
+	FName ActionName = NAME_None;
+	if (LineOfSightObject.GetInterface())
+	{
+		ActionName = LineOfSightObject->GetActionEventName();
+	}
+}
+
+void AP12BaseCharacter::Interact()
+{
+	if (LineOfSightObject.GetInterface())
+	{
+		LineOfSightObject->Interact(this);
+	}
+}
+	

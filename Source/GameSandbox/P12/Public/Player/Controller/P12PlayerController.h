@@ -47,6 +47,8 @@ protected:
 
 	void ShowMainMenu();
 
+	void InteractInput();
+
 private:
 	void SubsystemDefaultMappingContext() const;
 	bool GetCharacterCanProcessInput() const;
@@ -92,6 +94,9 @@ protected:
 	UInputAction* SecondaryMeleeAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* MainMenuAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* InteractAction = nullptr;
+
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;

@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Interfaces/OnlineSessionInterface.h"
-#include "P12/Public/UI/MainMenu/P12JoinSessionWidget.h"
 #include "P12GameInstance.generated.h"
 
 class FOnlineSessionSearch;

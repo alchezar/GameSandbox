@@ -9,6 +9,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
+class IP12Interactable;
 class AP12HUD;
 class AP12RangeWeaponItem;
 class UP12WeaponBarrelComponent;
@@ -121,6 +122,7 @@ public:
 	void SecondaryMeleeInput();
 	virtual void PossessedBy(AController* NewController) override;
 	AP12HUD* GetHUD() const;
+	void Interact();
 
 	/* IGenericTeamInterface */
 	virtual FGenericTeamId GetGenericTeamId() const override;
@@ -132,6 +134,7 @@ protected:
 	virtual void OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime);
 	bool GetCanRun() const;
 	void OnDeath();
+	void TraceLineOfSight();
 	
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength, const float NewFOV = 90.f);
@@ -187,6 +190,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Team")
 	EP12Teams Team = EP12Teams::Player;
+	UPROPERTY(EditAnywhere, Category = "C++ | Line sight")
+	float LineOfSightDistance = 500.f;
 	
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
@@ -204,4 +209,7 @@ private:
 	float IKHitOffset = 0.f;
 	TInteractiveActorsArray AvailableInteractiveActors;
 	FVector CurrentFallApex = FVector::ZeroVector;
+	
+	UPROPERTY()
+	TScriptInterface<IP12Interactable> LineOfSightObject;
 };

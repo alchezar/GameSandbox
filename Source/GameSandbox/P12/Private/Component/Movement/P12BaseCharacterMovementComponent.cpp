@@ -72,7 +72,7 @@ void UP12BaseCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	bRunning = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
 
 	const bool bWasMantle = bMantle;
-	const bool bIsMantle = (Flags &= FSavedMove_Character::FLAG_Custom_1) != 0;
+	const bool bIsMantle = (Flags & FSavedMove_Character::FLAG_Custom_1) != 0;
 	if (GetBaseCharacterOwner()->HasAuthority() && !bWasMantle && bIsMantle)
 	{
 		GetBaseCharacterOwner()->MantleInput(true);

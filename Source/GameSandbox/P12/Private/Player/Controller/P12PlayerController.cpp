@@ -68,8 +68,8 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(EquipProjectileAction, ETriggerEvent::Started, this, &ThisClass::EquipThrowableInput);
 	InputComp->BindAction(PrimaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::PrimaryMeleeInput);
 	InputComp->BindAction(SecondaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::SecondaryMeleeInput);
-
 	InputComp->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::ShowMainMenu);
+	InputComp->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractInput);
 }
 
 bool AP12PlayerController::GetCharacterCanProcessInput() const
@@ -256,4 +256,13 @@ void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
 	{
 		SetPause(bMenu);
 	}
+}
+
+void AP12PlayerController::InteractInput()
+{
+	if (!GetCharacterCanProcessInput())
+	{
+		return;
+	}
+	CachedBaseCharacter->Interact();
 }
