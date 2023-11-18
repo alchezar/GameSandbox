@@ -16,22 +16,7 @@ AP12AICharacterController::AP12AICharacterController()
 void AP12AICharacterController::BeginPlay()
 {
 	Super::BeginPlay();
-
-	if (UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent())
-	{
-		if (!PatrollingComponent->GetCanPatrol())
-		{
-			return;
-		}
-		const FVector& ClosestWayPoint = PatrollingComponent->SelectClosestWayPoint();
-		// MoveToLocation(ClosestWayPoint);
-		if (Blackboard)
-		{
-			Blackboard->SetValueAsObject(BB_CurrentTarget, nullptr);
-			Blackboard->SetValueAsVector(BB_NextLocation, ClosestWayPoint);
-		}
-	}
-	bPatrolling = true;
+	// SetupPatrolling();
 }
 
 void AP12AICharacterController::SetPawn(APawn* InPawn)
@@ -46,6 +31,7 @@ void AP12AICharacterController::SetPawn(APawn* InPawn)
 
 	check(InPawn->IsA<AP12AICharacter>())
 	CachedAICharacter = StaticCast<AP12AICharacter*>(InPawn);
+	SetupPatrolling();
 	RunBehaviorTree(CachedAICharacter->GetBehaviorTree());
 }
 
@@ -120,4 +106,24 @@ bool AP12AICharacterController::GetIsTargetReached(const FVector& TargetLocation
 {
 	const float SquaredDistance = FVector::DistSquared(CachedAICharacter->GetActorLocation(), TargetLocation); 
 	return FMath::Square(TargetReachRadius) >= SquaredDistance;
+}
+
+void AP12AICharacterController::SetupPatrolling()
+{
+	if (UP12AIPatrollingComponent* PatrollingComponent = CachedAICharacter->GetAIPatrollingComponent())
+	{
+		if (!PatrollingComponent->GetCanPatrol())
+		{
+			return;
+		}
+		const FVector& ClosestWayPoint = PatrollingComponent->SelectClosestWayPoint();
+		// MoveToLocation(ClosestWayPoint);
+		if (Blackboard)
+		{
+			Blackboard->SetValueAsObject(BB_CurrentTarget, nullptr);
+			Blackboard->SetValueAsVector(BB_NextLocation, ClosestWayPoint);
+		}
+	}
+	bPatrolling = true;
+
 }

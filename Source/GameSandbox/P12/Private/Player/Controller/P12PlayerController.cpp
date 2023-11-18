@@ -4,6 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
@@ -20,12 +21,19 @@ void AP12PlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 	CachedBaseCharacter = Cast<AP12BaseCharacter>(InPawn);
+	if (CachedBaseCharacter.IsValid() && IsLocalController())
+	{
+		CachedBaseCharacter->OnInteractableObjectFound.AddUObject(this, &ThisClass::OnInteractableObjectFound);
+	}
 }
 
 void AP12PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	SubsystemDefaultMappingContext();
+	
+	CacheHUD();
+	FindInteractMappedKey();
 }
 
 void AP12PlayerController::SubsystemDefaultMappingContext() const
@@ -242,6 +250,12 @@ void AP12PlayerController::P12Debug_DisableAll()
 	}
 }
 
+void AP12PlayerController::CacheHUD()
+{
+	CachedHUD = GetHUD<AP12HUD>();
+	check(CachedHUD.Get())
+}
+
 void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
 {
 	SetShowMouseCursor(bMenu);
@@ -256,6 +270,24 @@ void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
 	{
 		SetPause(bMenu);
 	}
+}
+
+void AP12PlayerController::FindInteractMappedKey()
+{	
+	for (auto KeyMapping : DefaultContext->GetMappings())
+	{
+		if (KeyMapping.Action != InteractAction)
+		{
+			continue;
+		}
+		InteractKeyName = KeyMapping.Key.GetFName();
+		break;
+	}
+}
+
+void AP12PlayerController::OnInteractableObjectFound(bool bFound)
+{
+	CachedHUD->ShowInteractable(bFound, InteractKeyName);
 }
 
 void AP12PlayerController::InteractInput()

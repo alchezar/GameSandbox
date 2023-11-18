@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerController.h"
 #include "P12PlayerController.generated.h"
 
+class AP12HUD;
 class AP12BaseCharacter;
 struct FInputActionValue;
 class UInputAction;
@@ -22,6 +23,7 @@ public:
 	FORCEINLINE bool GetIsIgnoreCameraPitch() const { return bIgnoreCameraPitch; }
 	void SetIsIgnoreCameraPitch(const bool bIgnore) { bIgnoreCameraPitch = bIgnore; }
 	void ToggleMenuInputMode(const bool bMenu);
+	void OnInteractableObjectFound(bool bFound);
 
 protected:
 	virtual void BeginPlay() override;
@@ -56,6 +58,9 @@ private:
 	void P12Debug_EnableAll();
 	UFUNCTION(Exec)
 	void P12Debug_DisableAll();
+
+	void CacheHUD();
+	void FindInteractMappedKey();
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
@@ -100,4 +105,7 @@ protected:
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;
+
+	FName InteractKeyName = "NONE";
+	TWeakObjectPtr<AP12HUD> CachedHUD;
 };

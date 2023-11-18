@@ -55,6 +55,11 @@ void AP12BaseCharacter::BeginPlay()
 	OnReloadComplete.AddUObject(this, &ThisClass::OnReloadCompleteHandle);
 }
 
+void AP12BaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 void AP12BaseCharacter::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -642,15 +647,30 @@ void AP12BaseCharacter::TraceLineOfSight()
 
 	FHitResult HitResult;
 	GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, TraceEnd, ECC_Visibility);
-	if (!HitResult.bBlockingHit || HitResult.GetActor() == LineOfSightObject.GetObject())
+	if (!HitResult.bBlockingHit)
 	{
+		if (bInteractableFound)
+		{
+			bInteractableFound = false;
+			OnInteractableObjectFound.Broadcast(false);
+		}
+		if (LineOfSightObject.GetObject())
+		{
+			LineOfSightObject = nullptr;
+		}
 		return;
 	}
+	
 	LineOfSightObject = HitResult.GetActor();
-	FName ActionName = NAME_None;
+	// FName ActionName = NAME_None;
 	if (LineOfSightObject.GetInterface())
 	{
-		ActionName = LineOfSightObject->GetActionEventName();
+		// ActionName = LineOfSightObject->GetActionEventName();
+		if (!bInteractableFound)
+		{
+			bInteractableFound = true;
+			OnInteractableObjectFound.Broadcast(true);
+		}
 	}
 }
 

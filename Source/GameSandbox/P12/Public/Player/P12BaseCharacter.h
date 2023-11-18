@@ -71,6 +71,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnAimingStateChangedSignature, bool /*bS
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP12OnAmmoCountChangedSignature, int32 /*AmmoCount*/, int32 /*TotalAmmo*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnReloadCompleteSignature, bool /*bReloaded*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnLoadoutCreatedSignature, UP12EquipmentComponent* /*Equipment*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnInteractableObjectFoundSignature, bool/* bFound*/)
 
 UCLASS()
 class GAMESANDBOX_API AP12BaseCharacter : public ACharacter, public IGenericTeamAgentInterface
@@ -129,6 +130,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 	virtual bool CanJumpInternal_Implementation() const override;
 	virtual void OnJumped_Implementation() override;
 	virtual void OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime);
@@ -157,6 +159,7 @@ public:
 	FP12OnAmmoCountChangedSignature OnAmmoCountChanged;
 	FP12OnReloadCompleteSignature OnReloadComplete;
 	FP12OnLoadoutCreatedSignature OnLoadoutCreated;
+	FP12OnInteractableObjectFoundSignature OnInteractableObjectFound;
 
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
@@ -212,4 +215,5 @@ private:
 	
 	UPROPERTY()
 	TScriptInterface<IP12Interactable> LineOfSightObject;
+	bool bInteractableFound = false;
 };

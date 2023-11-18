@@ -26,6 +26,7 @@ protected:
 private:
 	void MoveToNextTarget();
 	bool GetIsTargetReached(const FVector& TargetLocation);
+	void SetupPatrolling();
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")

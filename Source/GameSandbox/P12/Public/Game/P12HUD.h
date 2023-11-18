@@ -7,6 +7,7 @@
 #include "P12/Public/UI/P12ReticleWidget.h"
 #include "P12HUD.generated.h"
 
+class UP12HighlightInteractableWidget;
 class AP12PlayerController;
 class UP12MainMenuWidget;
 enum class EP12ReticleType : uint8;
@@ -23,7 +24,9 @@ public:
 	void ShowReticle(const bool bShow, const EP12ReticleType ReticleType);
 	void ShowGameScreenFor(AP12BaseCharacter* OwnerChar, const bool bShow = true);
 	void ShowMainMenu(const bool bShow);
-
+	void ShowInteractable(const bool bShow, FName KeyName = NAME_None);
+	void SetInteractableText(const FName& KeyName);
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -36,6 +39,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP12MainMenuWidget> MainMenuWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP12HighlightInteractableWidget> HighlightWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
 	TMap<EP12ReticleType, TSubclassOf<UP12ReticleWidget>> ReticlesMap;
 	
 private:
@@ -47,4 +52,6 @@ private:
 	UP12MainMenuWidget* MainMenuWidget = nullptr;
 	UPROPERTY()
 	UP12PlayerHUDWidget* GameScreenWidget = nullptr;
+	UPROPERTY()
+	UP12HighlightInteractableWidget* HighlightWidget = nullptr;
 };

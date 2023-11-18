@@ -4,6 +4,7 @@
 
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/Player/Controller/P12PlayerController.h"
+#include "P12/Public/UI/P12HighlightInteractableWidget.h"
 #include "P12/Public/UI/P12PlayerHUDWidget.h"
 #include "P12/Public/UI/MainMenu/P12MainMenuWidget.h"
 
@@ -23,6 +24,7 @@ void AP12HUD::ShowGameScreenFor(AP12BaseCharacter* OwnerChar, const bool bShow)
 	{
 		GameScreenWidget->RemoveFromParent();
 		GameScreenWidget = nullptr;
+		return;
 	}
 
 	/* Show (create new). */
@@ -75,7 +77,6 @@ void AP12HUD::ShowMainMenu(const bool bShow)
 		MainMenuWidget = nullptr;
 		return;
 	}
-	
 
 	/* Toggle on. */
 	check(MainMenuWidgetClass)
@@ -84,6 +85,33 @@ void AP12HUD::ShowMainMenu(const bool bShow)
 	MainMenuWidget->CacheHUD(this);
 	MainMenuWidget->AddToViewport(0);
 	
+}
+
+void AP12HUD::ShowInteractable(const bool bShow, FName KeyName)
+{
+	if (HighlightWidget)
+	{
+		HighlightWidget->RemoveFromParent();
+		HighlightWidget = nullptr;
+	}
+	if (!bShow)
+	{
+		return;
+	}
+	
+	check(HighlightWidgetClass)
+	HighlightWidget = CreateWidget<UP12HighlightInteractableWidget>(GetWorld(), HighlightWidgetClass);
+	check(HighlightWidget)
+	HighlightWidget->SetActionText(KeyName);
+	HighlightWidget->AddToViewport(0);
+}
+
+void AP12HUD::SetInteractableText(const FName& KeyName)
+{
+	if (HighlightWidget)
+	{
+		HighlightWidget->SetActionText(KeyName);
+	}
 }
 
 AP12PlayerController* AP12HUD::GetCachedPlayerController()
