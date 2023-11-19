@@ -212,7 +212,7 @@ void AP12RangeWeaponItem::StartReloading()
 
 void AP12RangeWeaponItem::OnFullReloadedHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
-	if (GetCachedCharacter()->GetMesh() != SkeletalMeshComponent || !bReloading)
+	if (!GetCachedCharacter().IsValid() || GetCachedCharacter()->GetMesh() != SkeletalMeshComponent || !bReloading)
 	{
 		return;
 	}

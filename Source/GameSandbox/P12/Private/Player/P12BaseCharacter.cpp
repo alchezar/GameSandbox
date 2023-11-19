@@ -5,6 +5,7 @@
 #include "AIController.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Curves/CurveVector.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -19,6 +20,7 @@
 #include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
 #include "P12/Public/Player/Controller/P12PlayerController.h"
+#include "P12/Public/UI/P12AttributeProgressBarWidget.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
 
@@ -44,6 +46,9 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 	LedgeDetection = CreateDefaultSubobject<UP12LedgeDetectionComponent>("LedgeDetectorComponent");
 	CharacterAttribute = CreateDefaultSubobject<UP12AttributeComponent>("CharacterAttributeComponent");
 	Equipment = CreateDefaultSubobject<UP12EquipmentComponent>("EquipmentComponent");
+
+	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthProgressBarWidgetComponent");
+	HealthBar->SetupAttachment(RootComponent);
 }
 
 void AP12BaseCharacter::BeginPlay()
@@ -51,8 +56,9 @@ void AP12BaseCharacter::BeginPlay()
 	Super::BeginPlay();
 	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
 	CharacterAttribute->OnDeath.AddUObject(this, &ThisClass::OnDeath);
-	InitAnimNotify();
 	OnReloadComplete.AddUObject(this, &ThisClass::OnReloadCompleteHandle);
+	InitAnimNotify();
+	InitHealthProgress();
 }
 
 void AP12BaseCharacter::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -681,4 +687,19 @@ void AP12BaseCharacter::Interact()
 		LineOfSightObject->Interact(this);
 	}
 }
-	
+
+void AP12BaseCharacter::InitHealthProgress()
+{
+	UP12AttributeProgressBarWidget* Widget = Cast<UP12AttributeProgressBarWidget>(HealthBar->GetWidget());
+	if (!Widget || (IsPlayerControlled() && IsLocallyControlled()))
+	{
+		HealthBar->SetVisibility(false);
+		return;
+	}
+	OnHealthChange.AddUObject(Widget, &UP12AttributeProgressBarWidget::OnHealthChangedHandle);
+	CharacterAttribute->OnDeath.AddLambda([=]()
+	{
+		HealthBar->SetVisibility(false);
+	});
+	Widget->SetProgressPercentage(CharacterAttribute->GetHealthPercent());
+}

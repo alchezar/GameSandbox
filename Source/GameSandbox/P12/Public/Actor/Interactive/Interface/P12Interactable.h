@@ -19,6 +19,12 @@ class GAMESANDBOX_API IP12Interactable
 	GENERATED_BODY()
 
 public:
+	DECLARE_MULTICAST_DELEGATE(FP12OnInteraction)
+	
 	virtual void Interact(AP12BaseCharacter* Char) = 0; /*PURE_VIRTUAL(IP12Interactable::Interact, /* nothing to return #1#);*/
 	virtual FName GetActionEventName() const = 0; /*PURE_VIRTUAL(ThisClass::GetActionEventName, return FName(NAME_None); );*/
+
+	virtual bool HasOnInteractionCallback() const = 0; /*PURE_VIRTUAL(ThisClass::HasOnInteractionCallback, return false; );*/
+	virtual FDelegateHandle AddOnInteractionFunction(UObject* Object, const FName& Name) = 0; /*PURE_VIRTUAL(ThisClass::AddOnInteractionDelegate, return FDelegateHandle(); );*/
+	virtual void RemoveOnInteractionDelegate(FDelegateHandle Delegate) = 0; /*PURE_VIRTUAL(ThisClass::RemoveOnInteractionDelegate, );*/
 };

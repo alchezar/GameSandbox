@@ -9,15 +9,6 @@
 void UP12PlayerHUDWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
-	// CachedCharacter = GetOwningPlayerPawn<AP12BaseCharacter>();
-	// if (!CachedCharacter.IsValid())
-	// {
-	// 	return;
-	// }
-	// CachedCharacter->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChangeHandle);
-	// CachedCharacter->OnAmmoCountChanged.AddUObject(this, &ThisClass::OnAmmoCountChangedHandle);
-	// OnHealthChangeHandle(CachedCharacter->GetHeathPercent(), 1.f);
 }
 
 void UP12PlayerHUDWidget::SetCachedCharacter(AP12BaseCharacter* NewCharacter)

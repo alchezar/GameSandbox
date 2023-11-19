@@ -9,6 +9,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
+class UWidgetComponent;
 class IP12Interactable;
 class AP12HUD;
 class AP12RangeWeaponItem;
@@ -149,6 +150,7 @@ private:
 	void EnableRagdoll();
 	float GetDefaultCameraArmLength() const;
 	float GetDefaultCameraFOV() const;
+	void InitHealthProgress();
 	
 	UFUNCTION(Client, Reliable)
 	void Client_ShowInterface();
@@ -172,6 +174,8 @@ protected:
 	UP12AttributeComponent* CharacterAttribute;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UP12EquipmentComponent* Equipment;
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UWidgetComponent* HealthBar;
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	FP12CameraArmLength CameraArmLength;

@@ -34,8 +34,12 @@ class GAMESANDBOX_API AP12Door : public AActor, public IP12Interactable
 public:
 	AP12Door();
 	virtual void Tick(const float DeltaTime) override;
+	
 	virtual void Interact(AP12BaseCharacter* Char) override;
 	virtual FName GetActionEventName() const override;
+	virtual bool HasOnInteractionCallback() const override;
+	virtual FDelegateHandle AddOnInteractionFunction(UObject* Object, const FName& Name) override;
+	virtual void RemoveOnInteractionDelegate(FDelegateHandle Delegate) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -51,11 +55,11 @@ private:
 	void OpenDoorSmoothly(FRotator StartRotation, FRotator TargetRotation);
 	
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USceneComponent* DoorPivot;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UStaticMeshComponent* DoorMesh;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UStaticMeshComponent* FrameMesh;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Door opening")
@@ -73,4 +77,6 @@ private:
 
 	FTimerHandle DoorTimer;
 	float Alpha = 1.f;
+
+	IP12Interactable::FP12OnInteraction OnInteraction;
 };

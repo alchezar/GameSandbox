@@ -44,13 +44,8 @@ void AP12Door::Tick(const float DeltaTime)
 
 void AP12Door::Interact(AP12BaseCharacter* Char)
 {
-	if (!bCustomCurve || !DoorCurve)
-	{
-		OpenDoor();
-		return;
-	}
-	check(DoorCurve)
 	InteractWithDoor();
+	OnInteraction.Broadcast();
 }
 
 FName AP12Door::GetActionEventName() const
@@ -58,8 +53,33 @@ FName AP12Door::GetActionEventName() const
 	return FName("Interact_Open");
 }
 
+bool AP12Door::HasOnInteractionCallback() const 
+{
+	return true;
+}
+
+FDelegateHandle AP12Door::AddOnInteractionFunction(UObject* Object, const FName& Name) 
+{
+	return OnInteraction.AddUFunction(Object, Name);
+}
+
+void AP12Door::RemoveOnInteractionDelegate(FDelegateHandle Delegate) 
+{
+	OnInteraction.Remove(Delegate);
+}
+
+
 void AP12Door::InteractWithDoor() 
 {
+	/* By using trigonometry. */
+	if (!bCustomCurve || !DoorCurve)
+	{
+		OpenDoor();
+		return;
+	}
+
+	/* By using timeline. */
+	check(DoorCurve)
 	if (DoorOpenTimeline.IsPlaying())
 	{
 		return;
