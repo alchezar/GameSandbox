@@ -57,6 +57,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Reticle")
 	EP12ReticleType ReticleType = EP12ReticleType::Default;
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	FName DataTableID = NAME_None;
 	
 private:
 	TSoftObjectPtr<UP12EquipmentComponent> CachedEquipment;

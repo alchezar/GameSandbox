@@ -249,8 +249,14 @@ void AP12RangeWeaponItem::Reload(const bool bByOne, const int32 NumberOfAmmo)
 
 void AP12RangeWeaponItem::FinishReload(const bool bJumpToEnd)
 {
-	GetCachedCharacter()->StopAnimMontage(CharacterReloadMontage);
-	StopAnimMontage(WeaponReloadMontage);
+	if (CharacterReloadMontage)
+	{
+		GetCachedCharacter()->StopAnimMontage(CharacterReloadMontage);
+	}
+	if (WeaponReloadMontage)
+	{
+		StopAnimMontage(WeaponReloadMontage);
+	}
 
 	if (!bJumpToEnd)
 	{

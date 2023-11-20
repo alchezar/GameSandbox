@@ -9,6 +9,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
+class AP12EquipableItem;
 class UWidgetComponent;
 class IP12Interactable;
 class AP12HUD;
@@ -129,6 +130,8 @@ public:
 	/* IGenericTeamInterface */
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
+	void AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass);
+	
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;

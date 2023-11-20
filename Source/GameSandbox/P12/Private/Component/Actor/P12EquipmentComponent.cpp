@@ -249,3 +249,19 @@ void UP12EquipmentComponent::OnRep_ItemsArray()
 		Item->Unequip();
 	}
 }
+
+void UP12EquipmentComponent::AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass)
+{
+	const AP12RangeWeaponItem* RangeWeaponObject = Cast<AP12RangeWeaponItem>(EquipableItemClass->GetDefaultObject());
+	if (!RangeWeaponObject)
+	{
+		return;
+	}
+	const int32 AmmoIndex = static_cast<uint32>(RangeWeaponObject->GetAmmoType());
+	AmmunitionArray[AmmoIndex] += RangeWeaponObject->GetMaxAmmo();
+	
+	if (CurrentEquippedWeapon)
+	{
+		CachedCharacter->OnAmmoCountChanged.Broadcast(CurrentEquippedWeapon->GetAmmo(), AmmunitionArray[AmmoIndex]);
+	}
+}

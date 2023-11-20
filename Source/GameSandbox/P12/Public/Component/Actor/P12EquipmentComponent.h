@@ -40,6 +40,8 @@ public:
 	void TakeCurrentThrowableItem();
 	void LaunchCurrentThrowableItem();
 
+	void AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass);
+
 protected:
 	virtual void BeginPlay() override;
 

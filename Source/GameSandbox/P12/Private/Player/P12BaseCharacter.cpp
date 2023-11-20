@@ -703,3 +703,8 @@ void AP12BaseCharacter::InitHealthProgress()
 	});
 	Widget->SetProgressPercentage(CharacterAttribute->GetHealthPercent());
 }
+
+void AP12BaseCharacter::AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass)
+{
+	Equipment->AddEquipmentItem(EquipableItemClass);
+}

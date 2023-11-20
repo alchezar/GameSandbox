@@ -7,6 +7,7 @@
 #include "P12Interactable.generated.h"
 
 class AP12BaseCharacter;
+
 // This class does not need to be modified.
 UINTERFACE()
 class UP12Interactable : public UInterface
@@ -21,10 +22,10 @@ class GAMESANDBOX_API IP12Interactable
 public:
 	DECLARE_MULTICAST_DELEGATE(FP12OnInteraction)
 	
-	virtual void Interact(AP12BaseCharacter* Char) = 0; /*PURE_VIRTUAL(IP12Interactable::Interact, /* nothing to return #1#);*/
-	virtual FName GetActionEventName() const = 0; /*PURE_VIRTUAL(ThisClass::GetActionEventName, return FName(NAME_None); );*/
+	virtual void Interact(AP12BaseCharacter* Char)	 PURE_VIRTUAL(IP12Interactable::Interact, /* nothing to return */);
+	virtual FName GetActionEventName() const		 PURE_VIRTUAL(ThisClass::GetActionEventName, return FName(NAME_None); );
 
-	virtual bool HasOnInteractionCallback() const = 0; /*PURE_VIRTUAL(ThisClass::HasOnInteractionCallback, return false; );*/
-	virtual FDelegateHandle AddOnInteractionFunction(UObject* Object, const FName& Name) = 0; /*PURE_VIRTUAL(ThisClass::AddOnInteractionDelegate, return FDelegateHandle(); );*/
-	virtual void RemoveOnInteractionDelegate(FDelegateHandle Delegate) = 0; /*PURE_VIRTUAL(ThisClass::RemoveOnInteractionDelegate, );*/
+	virtual bool HasOnInteractionCallback() const										 PURE_VIRTUAL(ThisClass::HasOnInteractionCallback, return false; );
+	virtual FDelegateHandle AddOnInteractionFunction(UObject* Object, const FName& Name) PURE_VIRTUAL(ThisClass::AddOnInteractionDelegate, return FDelegateHandle(); );
+	virtual void RemoveOnInteractionDelegate(FDelegateHandle Delegate)					 PURE_VIRTUAL(ThisClass::RemoveOnInteractionDelegate, );
 };

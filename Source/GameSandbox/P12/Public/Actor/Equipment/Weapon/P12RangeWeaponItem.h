@@ -32,6 +32,8 @@ public:
 	void AimInput(const bool bStart);
 
 	FORCEINLINE int32 GetAmmo() const { return Ammo; }
+	FORCEINLINE int32 GetMaxAmmo() const { return MaxAmmo; }
+	FORCEINLINE EP12AmmunitionType GetAmmoType() const { return AmmoType; }
 	void SetAmmo(const int32 NewAmmo);
 	bool GetCanShoot();
 
