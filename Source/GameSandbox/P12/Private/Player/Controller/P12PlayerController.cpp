@@ -33,7 +33,7 @@ void AP12PlayerController::BeginPlay()
 	SubsystemDefaultMappingContext();
 	
 	CacheHUD();
-	FindInteractMappedKey();
+	FindInteractMappedKeyName();
 }
 
 void AP12PlayerController::SubsystemDefaultMappingContext() const
@@ -272,7 +272,7 @@ void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
 	}
 }
 
-void AP12PlayerController::FindInteractMappedKey()
+void AP12PlayerController::FindInteractMappedKeyName()
 {	
 	for (auto KeyMapping : DefaultContext->GetMappings())
 	{
@@ -283,6 +283,21 @@ void AP12PlayerController::FindInteractMappedKey()
 		InteractKeyName = KeyMapping.Key.GetFName();
 		break;
 	}
+}
+
+FKey AP12PlayerController::FindFireMappedKey()
+{
+	FKey FireKey;
+	for (auto KeyMapping : DefaultContext->GetMappings())
+	{
+		if (KeyMapping.Action != FireAction)
+		{
+			continue;
+		}
+		FireKey = KeyMapping.Key;
+		break;
+	}
+	return FireKey;
 }
 
 void AP12PlayerController::OnInteractableObjectFound(bool bFound)

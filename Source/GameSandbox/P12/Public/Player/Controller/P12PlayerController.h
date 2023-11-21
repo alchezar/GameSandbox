@@ -24,6 +24,7 @@ public:
 	void SetIsIgnoreCameraPitch(const bool bIgnore) { bIgnoreCameraPitch = bIgnore; }
 	void ToggleMenuInputMode(const bool bMenu);
 	void OnInteractableObjectFound(bool bFound);
+	FKey FindFireMappedKey();
 
 protected:
 	virtual void BeginPlay() override;
@@ -60,7 +61,7 @@ private:
 	void P12Debug_DisableAll();
 
 	void CacheHUD();
-	void FindInteractMappedKey();
+	void FindInteractMappedKeyName();
 	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
