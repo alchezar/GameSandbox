@@ -45,7 +45,7 @@ public:
 	FORCEINLINE int32 GetCapacity() const { return Capacity; }
 	FORCEINLINE bool HasFreeSlot() const { return ItemsInInventory < Capacity; }
 
-	bool TryAddItem(TWeakObjectPtr<UP12InventoryItem> ItemToAdd, int32 Count);
+	bool TryAddItem(const TWeakObjectPtr<UP12InventoryItem> ItemToAdd, int32 Count);
 	bool TryRemoveItem(const FName& ItemID);
 
 	FORCEINLINE TArray<FP12InventorySlot> GetAllItemsCopy() const { return InventorySlots; }

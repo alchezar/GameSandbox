@@ -23,7 +23,7 @@ void UP12AttributeComponent::BeginPlay()
 	Health = MaxHealth;
 	if (GetOwner()->HasAuthority())
 	{
-		CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+		OnHealthChanged();
 	}
 }
 
@@ -52,7 +52,7 @@ void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 	}
 	
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
-	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+	OnHealthChanged();
 
 	CheckIfDead();
 }
@@ -95,7 +95,23 @@ void UP12AttributeComponent::OnRep_Health(float LastHealth)
 		CachedCharacterOwner = Cast<AP12BaseCharacter>(GetOwner());
 		check(CachedCharacterOwner.Get());
 	}
-	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+	OnHealthChanged();
 
 	CheckIfDead();
+}
+
+void UP12AttributeComponent::OnHealthChanged()
+{
+	CachedCharacterOwner->OnHealthChange.Broadcast(Health, MaxHealth);
+}
+
+void UP12AttributeComponent::AddHealth(const float HealthToAdd)
+{
+	Health = FMath::Clamp(Health + HealthToAdd, 0, MaxHealth);
+	OnHealthChanged();
+}
+
+void UP12AttributeComponent::RestoreFullStamina()
+{
+	
 }

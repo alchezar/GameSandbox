@@ -6,9 +6,11 @@
 #include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "P12/Public/Inventory/P12InventoryItem.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
+class UP12InventoryComponent;
 class AP12EquipableItem;
 class UWidgetComponent;
 class IP12Interactable;
@@ -131,7 +133,9 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
 	void AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass);
-	
+	bool PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item);
+	void UseInventory(APlayerController* PlayerController);
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -179,6 +183,8 @@ protected:
 	UP12EquipmentComponent* Equipment;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UWidgetComponent* HealthBar;
+	UPROPERTY(EditAnywhere, Category = "C++ | Component")
+	UP12InventoryComponent* Inventory;
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	FP12CameraArmLength CameraArmLength;

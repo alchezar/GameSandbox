@@ -49,8 +49,8 @@ protected:
 	void SecondaryMeleeInput();
 
 	void ShowMainMenu();
-
 	void InteractInput();
+	void InventoryInput();
 
 private:
 	void SubsystemDefaultMappingContext() const;
@@ -102,7 +102,9 @@ protected:
 	UInputAction* MainMenuAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* InteractAction = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* InventoryAction = nullptr;
+	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;

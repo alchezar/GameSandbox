@@ -69,7 +69,7 @@ bool UP12InventoryComponent::GetIsViewVisible() const
 	return InventoryViewWidget && InventoryViewWidget->IsVisible();
 }
 
-bool UP12InventoryComponent::TryAddItem(TWeakObjectPtr<UP12InventoryItem> ItemToAdd, int32 Count)
+bool UP12InventoryComponent::TryAddItem(const TWeakObjectPtr<UP12InventoryItem> ItemToAdd, int32 Count)
 {
 	if (!ItemToAdd.IsValid() || Count < 0)
 	{
@@ -120,7 +120,7 @@ void UP12InventoryComponent::CreateViewWidget(APlayerController* InPlayerControl
 		return;
 	}
 	InventoryViewWidget = CreateWidget<UP12InventoryViewWidget>(InPlayerController, InventoryViewWidgetClass);
-	InventoryViewWidget->InitializeViewWidget(&InventorySlots);
+	InventoryViewWidget->InitializeViewWidget(InventorySlots);
 }
 
 FP12InventorySlot* UP12InventoryComponent::FindItemSlot(FName ItemID)

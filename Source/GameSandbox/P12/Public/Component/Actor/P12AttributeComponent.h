@@ -21,6 +21,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; }
 	float GetHealthPercent();
+	void AddHealth(const float HealthToAdd);
+	void RestoreFullStamina();
 
 protected:
 	virtual void BeginPlay() override;
@@ -31,6 +33,7 @@ private:
 	void CheckIfDead();
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
+	void OnHealthChanged();
 	
 #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
 	void DebugDrawAttributes();

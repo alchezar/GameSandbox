@@ -78,6 +78,7 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(SecondaryMeleeAction, ETriggerEvent::Started, this, &ThisClass::SecondaryMeleeInput);
 	InputComp->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::ShowMainMenu);
 	InputComp->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractInput);
+	InputComp->BindAction(InventoryAction, ETriggerEvent::Started, this, &ThisClass::InventoryInput);
 }
 
 bool AP12PlayerController::GetCharacterCanProcessInput() const
@@ -312,4 +313,13 @@ void AP12PlayerController::InteractInput()
 		return;
 	}
 	CachedBaseCharacter->Interact();
+}
+
+void AP12PlayerController::InventoryInput()
+{
+	if (!GetCharacterCanProcessInput())
+	{
+		return;
+	}
+	CachedBaseCharacter->UseInventory(this);
 }

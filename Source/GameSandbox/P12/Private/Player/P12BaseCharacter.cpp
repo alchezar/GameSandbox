@@ -15,6 +15,7 @@
 #include "P12/Public/Actor/Interactive/Interface/P12Interactable.h"
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Component/Actor/P12EquipmentComponent.h"
+#include "P12/Public/Component/Actor/P12InventoryComponent.h"
 #include "P12/Public/Component/Actor/P12LedgeDetectionComponent.h"
 #include "P12/Public/Component/MOvement/P12BaseCharacterMovementComponent.h"
 #include "P12/Public/Game/P12HUD.h"
@@ -49,6 +50,8 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthProgressBarWidgetComponent");
 	HealthBar->SetupAttachment(RootComponent);
+
+	Inventory = CreateDefaultSubobject<UP12InventoryComponent>("InventoryComponent");
 }
 
 void AP12BaseCharacter::BeginPlay()
@@ -707,4 +710,41 @@ void AP12BaseCharacter::InitHealthProgress()
 void AP12BaseCharacter::AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass)
 {
 	Equipment->AddEquipmentItem(EquipableItemClass);
+}
+
+bool AP12BaseCharacter::PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item)
+{
+	bool Result = false;
+	if (Inventory->HasFreeSlot())
+	{
+		Result = Inventory->TryAddItem(Item, 1);
+	}
+	
+	return Result;
+}
+
+void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
+{
+	if (!IsPlayerControlled())
+	{
+		return;
+	}
+	// APlayerController* PlayerController = GetController<APlayerController>();
+
+	if (!Inventory->GetIsViewVisible())
+	{
+		Inventory->OpenViewInventory(PlayerController);
+		
+		FInputModeGameAndUI GameAndUIMode;
+		GameAndUIMode.SetHideCursorDuringCapture(false);
+		PlayerController->SetInputMode(GameAndUIMode);
+		PlayerController->SetShowMouseCursor(true);
+	}
+	else
+	{
+		Inventory->CloseViewInventory();
+		
+		PlayerController->SetInputMode(FInputModeGameOnly());	
+		PlayerController->SetShowMouseCursor(false);
+	}
 }
