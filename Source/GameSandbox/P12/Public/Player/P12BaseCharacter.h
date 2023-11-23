@@ -132,7 +132,7 @@ public:
 	/* IGenericTeamInterface */
 	virtual FGenericTeamId GetGenericTeamId() const override;
 
-	void AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass);
+	// void AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex);
 	bool PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item);
 	void UseInventory(APlayerController* PlayerController);
 

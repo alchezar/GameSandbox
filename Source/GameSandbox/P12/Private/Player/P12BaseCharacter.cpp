@@ -707,10 +707,10 @@ void AP12BaseCharacter::InitHealthProgress()
 	Widget->SetProgressPercentage(CharacterAttribute->GetHealthPercent());
 }
 
-void AP12BaseCharacter::AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass)
-{
-	Equipment->AddEquipmentItem(EquipableItemClass);
-}
+// void AP12BaseCharacter::AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex)
+// {
+// 	Equipment->AddEquipmentItemToSlot(EquipableItemClass, SlotIndex);
+// }
 
 bool AP12BaseCharacter::PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item)
 {
@@ -729,11 +729,11 @@ void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
 	{
 		return;
 	}
-	// APlayerController* PlayerController = GetController<APlayerController>();
-
+	
 	if (!Inventory->GetIsViewVisible())
 	{
 		Inventory->OpenViewInventory(PlayerController);
+		Equipment->OpenViewEquipment(PlayerController);
 		
 		FInputModeGameAndUI GameAndUIMode;
 		GameAndUIMode.SetHideCursorDuringCapture(false);
@@ -743,6 +743,7 @@ void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
 	else
 	{
 		Inventory->CloseViewInventory();
+		Equipment->CloseViewEquipment();
 		
 		PlayerController->SetInputMode(FInputModeGameOnly());	
 		PlayerController->SetShowMouseCursor(false);

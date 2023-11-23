@@ -108,3 +108,7 @@ void AP12EquipableItem::Client_ToggleReticle_Implementation(const bool bShow) co
 	HUD->ShowReticle(bShow, ReticleType);
 }
 
+bool AP12EquipableItem::GetIsSlotCompatible(const EP12EquipmentSlot Slot) const
+{
+	return CompatibleEquipmentSlots.Contains(Slot);
+}

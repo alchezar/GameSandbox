@@ -27,6 +27,7 @@ public:
 	FORCEINLINE UAnimMontage* GetCharacterEquipAnimMontage() const { return CharacterEquipAnimMontage; }
 	FORCEINLINE TSoftObjectPtr<UP12EquipmentComponent> GetCachedEquipment() const { return CachedEquipment; }
 	FORCEINLINE TWeakObjectPtr<AP12BaseCharacter> GetCachedCharacter() const { return CachedCharacter; }
+	FORCEINLINE FName GetDataTableID() const { return DataTableID; }
 	void CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp);
 	virtual void AttachItem(const FName AttachSocketName);
 
@@ -34,6 +35,8 @@ public:
 	void Unequip();
 	UFUNCTION(Client, Reliable)
 	void Client_ToggleReticle(const bool bShow) const;
+
+	bool GetIsSlotCompatible(EP12EquipmentSlot Slot) const;
 
 protected:
 	virtual void InitAnimNotify();
@@ -51,6 +54,9 @@ protected:
 	FName UnEquippedSocketName = NAME_None;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName EquippedSocketName = NAME_None;
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	TArray<EP12EquipmentSlot> CompatibleEquipmentSlots; 
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
 	UAnimMontage* CharacterEquipAnimMontage = nullptr;

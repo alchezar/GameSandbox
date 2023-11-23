@@ -7,6 +7,7 @@
 #include "P12/Public/Actor/Equipment/Weapon/P12MeleeWeaponItem.h"
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
+#include "P12/Public/UI/Equipment/P12EquipmentViewWidget.h"
 
 UP12EquipmentComponent::UP12EquipmentComponent()
 {
@@ -54,18 +55,9 @@ void UP12EquipmentComponent::CreateLoadout()
 	}
 
 	ItemsArray.AddZeroed(static_cast<uint32>(EP12EquipmentSlot::MAX));
-	for (const TPair<EP12EquipmentSlot, TSubclassOf<AP12EquipableItem>>& ItemPair : ItemsLoadout)
+	for (auto [EquipmentSlot, EquipableItem] : ItemsLoadout)
 	{
-		if (!ItemPair.Value)
-		{
-			continue;
-		}
-		AP12EquipableItem* Item = GetWorld()->SpawnActorDeferred<AP12EquipableItem>(ItemPair.Value, FTransform::Identity, CachedCharacter.Get());
-		Item->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Item->GetUnEquippedSocketName());
-		Item->CacheEquipmentComponent(this);
-		Item->Unequip();
-		Item->FinishSpawning(FTransform::Identity);
-		ItemsArray[static_cast<uint32>(ItemPair.Key)] = Item;
+		AddEquipmentItemToSlot(EquipableItem, static_cast<int32>(EquipmentSlot));
 	}
 }
 
@@ -250,18 +242,87 @@ void UP12EquipmentComponent::OnRep_ItemsArray()
 	}
 }
 
-void UP12EquipmentComponent::AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass)
+bool UP12EquipmentComponent::AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex)
 {
-	const AP12RangeWeaponItem* RangeWeaponObject = Cast<AP12RangeWeaponItem>(EquipableItemClass->GetDefaultObject());
-	if (!RangeWeaponObject)
+	if (!EquipableItemClass)
 	{
-		return;
+		return false;
 	}
-	const int32 AmmoIndex = static_cast<uint32>(RangeWeaponObject->GetAmmoType());
-	AmmunitionArray[AmmoIndex] += RangeWeaponObject->GetMaxAmmo();
-	
-	if (CurrentEquippedWeapon)
+	const AP12EquipableItem* EquipableDefaultObject = EquipableItemClass->GetDefaultObject<AP12EquipableItem>();
+	if (!EquipableDefaultObject)
+	{
+		return false;
+	}
+	if (!EquipableDefaultObject->GetIsSlotCompatible(static_cast<EP12EquipmentSlot>(SlotIndex)))
+	{
+		return false;
+	}
+	if (!ItemsArray[SlotIndex])
+	{
+		AP12EquipableItem* Item = GetWorld()->SpawnActorDeferred<AP12EquipableItem>(EquipableItemClass, FTransform::Identity, CachedCharacter.Get());
+		Item->AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, Item->GetUnEquippedSocketName());
+		Item->CacheEquipmentComponent(this);
+		Item->Unequip();
+		Item->FinishSpawning(FTransform::Identity);
+		ItemsArray[SlotIndex] = Item;
+		return true;
+	}
+	/* If we are here, means that the item was already existed. Check if this is the weapon and just add ammo. */
+	const AP12RangeWeaponItem* RangeWeaponDefaultObject = Cast<AP12RangeWeaponItem>(EquipableDefaultObject);
+	if (!RangeWeaponDefaultObject)
+	{
+		return false;
+	}
+	const int32 AmmoIndex = static_cast<uint32>(RangeWeaponDefaultObject->GetAmmoType());
+	AmmunitionArray[AmmoIndex] += RangeWeaponDefaultObject->GetMaxAmmo();
+	if (CurrentEquippedWeapon && CurrentEquippedWeapon->GetClass() == EquipableItemClass)
 	{
 		CachedCharacter->OnAmmoCountChanged.Broadcast(CurrentEquippedWeapon->GetAmmo(), AmmunitionArray[AmmoIndex]);
 	}
+	return true;
+}
+
+void UP12EquipmentComponent::RemoveItemFromSlot(const int32 SlotIndex)
+{
+	if (static_cast<uint32>(CurrentEquippedSlot) == SlotIndex)
+	{
+		UnEquipCurrentItem();
+	}
+	ItemsArray[SlotIndex]->Destroy();
+	ItemsArray[SlotIndex] = nullptr;
+}
+
+void UP12EquipmentComponent::OpenViewEquipment(APlayerController* InPlayerController)
+{
+	if (!EquipmentViewWidget)
+	{
+		CreateViewWidget(InPlayerController);
+	}
+	if (!EquipmentViewWidget->IsVisible())
+	{
+		EquipmentViewWidget->AddToViewport();
+	}
+}
+
+void UP12EquipmentComponent::CloseViewEquipment()
+{
+	if (EquipmentViewWidget->IsVisible())
+	{
+		EquipmentViewWidget->RemoveFromParent();
+	}
+}
+
+bool UP12EquipmentComponent::GetIsViewVisible() const
+{
+	return EquipmentViewWidget && EquipmentViewWidget->IsVisible();
+}
+
+void UP12EquipmentComponent::CreateViewWidget(APlayerController* InPlayerController)
+{
+	if (!InPlayerController || !EquipmentViewWidgetClass || EquipmentViewWidget)
+	{
+		return;
+	}
+	EquipmentViewWidget = CreateWidget<UP12EquipmentViewWidget>(InPlayerController, EquipmentViewWidgetClass);
+	EquipmentViewWidget->InitializeViewWidget(this);
 }

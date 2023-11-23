@@ -7,6 +7,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipmentComponent.generated.h"
 
+class UP12EquipmentViewWidget;
 class AP12MeleeWeaponItem;
 class AP12ThrowableItem;
 class AP12EquipableItem;
@@ -40,10 +41,17 @@ public:
 	void TakeCurrentThrowableItem();
 	void LaunchCurrentThrowableItem();
 
-	void AddEquipmentItem(const TSubclassOf<AP12EquipableItem>& EquipableItemClass);
+	bool AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex);
+	void RemoveItemFromSlot(const int32 SlotIndex);
+	void OpenViewEquipment(APlayerController* InPlayerController);
+	void CloseViewEquipment();
+	bool GetIsViewVisible() const;
+	FORCEINLINE const TArray<AP12EquipableItem*>& GetItems() const { return ItemsArray; };
 
 protected:
 	virtual void BeginPlay() override;
+
+	void CreateViewWidget(APlayerController* InPlayerController);
 
 private:
 	void CreateLoadout();
@@ -65,6 +73,9 @@ protected:
 	TSet<EP12EquipmentSlot> IgnoredSlotsWhileSwitching;
 	UPROPERTY(EditAnywhere, Category = "C++ | Loadout")
 	EP12EquipmentSlot AutoEquipItemInSlot = EP12EquipmentSlot::None;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | View")
+	TSubclassOf<UP12EquipmentViewWidget> EquipmentViewWidgetClass;
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
@@ -85,4 +96,7 @@ private:
 	AP12ThrowableItem* CurrentThrowableItem = nullptr;
 	UPROPERTY()
 	AP12MeleeWeaponItem* CurrentMeleeWeapon = nullptr;
+
+	UPROPERTY()
+	UP12EquipmentViewWidget* EquipmentViewWidget = nullptr;
 };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "P12/Public/UI/Equipment/P12EquipmentSlotWidget.h"
 #include "P12InventorySlotWidget.generated.h"
 
 class UImage;
@@ -17,6 +18,7 @@ class GAMESANDBOX_API UP12InventorySlotWidget : public UUserWidget
 public:
 	void InitializeSlot(FP12InventorySlot& InventorySlot);
 	void UpdateView();
+	void SetItemIcon(UTexture2D* InIcon);
 
 protected:
 	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;

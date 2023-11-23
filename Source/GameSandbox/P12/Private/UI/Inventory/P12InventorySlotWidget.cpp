@@ -23,6 +23,11 @@ void UP12InventorySlotWidget::UpdateView()
 	ItemIcon->SetBrushFromTexture(bValid ? LinkedSlot->Item->GetDescription().Icon : nullptr);
 }
 
+void UP12InventorySlotWidget::SetItemIcon(UTexture2D* InIcon)
+{
+	ItemIcon->SetBrushFromTexture(InIcon);
+}
+
 FReply UP12InventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
 	// return Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
