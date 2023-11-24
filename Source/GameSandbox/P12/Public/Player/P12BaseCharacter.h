@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GenericTeamAgentInterface.h"
 #include "InputActionValue.h"
+#include "Controller/P12PlayerController.h"
 #include "GameFramework/Character.h"
 #include "P12/Public/Inventory/P12InventoryItem.h"
 #include "P12/Public/Util/P12CoreTypes.h"
@@ -135,6 +136,7 @@ public:
 	// void AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex);
 	bool PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item);
 	void UseInventory(APlayerController* PlayerController);
+	void ConfirmWeaponSelection(AP12PlayerController* AP12PlayerController);
 
 protected:
 	virtual void BeginPlay() override;

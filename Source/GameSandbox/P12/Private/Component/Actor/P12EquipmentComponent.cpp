@@ -8,6 +8,7 @@
 #include "P12/Public/Actor/Equipment/Weapon/P12RangeWeaponItem.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
 #include "P12/Public/UI/Equipment/P12EquipmentViewWidget.h"
+#include "P12/Public/UI/Equipment/P12WeaponWheelWidget.h"
 
 UP12EquipmentComponent::UP12EquipmentComponent()
 {
@@ -126,6 +127,18 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 
 void UP12EquipmentComponent::EquipNextItem() 
 {
+	if (CachedCharacter->IsPlayerControlled())
+	{
+		if (GetIsSelectingWeapon())
+		{
+			WeaponWheelWidget->NextSegment();
+			return;
+		}
+		APlayerController* PlayerController = CachedCharacter->GetController<APlayerController>();
+		OpenWeaponWheel(PlayerController);
+		return;
+	}
+	
 	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
 	for (int i = 1; i <= ItemsArray.Num(); ++i)
 	{
@@ -141,6 +154,18 @@ void UP12EquipmentComponent::EquipNextItem()
 
 void UP12EquipmentComponent::EquipPreviousItem() 
 {
+	if (CachedCharacter->IsPlayerControlled())
+	{
+		if (GetIsSelectingWeapon())
+		{
+			WeaponWheelWidget->PrevSegment();
+			return;
+		}
+		APlayerController* PlayerController = CachedCharacter->GetController<APlayerController>();
+		OpenWeaponWheel(PlayerController);
+		return;
+	}
+	
 	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
 	for (int i = 1; i < ItemsArray.Num(); ++i)
 	{
@@ -296,7 +321,7 @@ void UP12EquipmentComponent::OpenViewEquipment(APlayerController* InPlayerContro
 {
 	if (!EquipmentViewWidget)
 	{
-		CreateViewWidget(InPlayerController);
+		CreateEquipmentWidgets(InPlayerController);
 	}
 	if (!EquipmentViewWidget->IsVisible())
 	{
@@ -317,12 +342,43 @@ bool UP12EquipmentComponent::GetIsViewVisible() const
 	return EquipmentViewWidget && EquipmentViewWidget->IsVisible();
 }
 
-void UP12EquipmentComponent::CreateViewWidget(APlayerController* InPlayerController)
+void UP12EquipmentComponent::CreateEquipmentWidgets(APlayerController* InPlayerController)
 {
-	if (!InPlayerController || !EquipmentViewWidgetClass || EquipmentViewWidget)
+	if (!InPlayerController)
 	{
 		return;
 	}
-	EquipmentViewWidget = CreateWidget<UP12EquipmentViewWidget>(InPlayerController, EquipmentViewWidgetClass);
-	EquipmentViewWidget->InitializeViewWidget(this);
+	if (EquipmentViewWidgetClass && !EquipmentViewWidget)
+	{
+		EquipmentViewWidget = CreateWidget<UP12EquipmentViewWidget>(InPlayerController, EquipmentViewWidgetClass);
+		EquipmentViewWidget->InitializeViewWidget(this);
+	}
+	if (WeaponWheelWidgetClass && !WeaponWheelWidget)
+	{
+		WeaponWheelWidget = CreateWidget<UP12WeaponWheelWidget>(InPlayerController, WeaponWheelWidgetClass);
+		WeaponWheelWidget->InitializeWheelWidget(this);
+	}
+}
+
+void UP12EquipmentComponent::OpenWeaponWheel(APlayerController* InPlayerController)
+{
+	if (!WeaponWheelWidget)
+	{
+		CreateEquipmentWidgets(InPlayerController);
+	}
+	if (WeaponWheelWidget && !WeaponWheelWidget->IsVisible())
+	{
+		WeaponWheelWidget->AddToViewport();
+	}
+}
+
+bool UP12EquipmentComponent::GetIsSelectingWeapon() const
+{
+	return WeaponWheelWidget && WeaponWheelWidget->IsVisible();
+}
+
+void UP12EquipmentComponent::ConfirmWeaponSelection()
+{
+	check(WeaponWheelWidget)
+	WeaponWheelWidget->ConfirmSelection();
 }

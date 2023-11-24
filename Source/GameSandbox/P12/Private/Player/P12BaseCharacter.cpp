@@ -481,6 +481,12 @@ void AP12BaseCharacter::Landed(const FHitResult& Hit)
 
 void AP12BaseCharacter::FireInput(const bool bStart)
 {
+	if (Equipment->GetIsSelectingWeapon())
+	{
+		Equipment->ConfirmWeaponSelection();
+		return;
+	}
+	
 	bFiring = bStart;
 	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
 	if (!CurrentWeapon)
@@ -747,5 +753,13 @@ void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
 		
 		PlayerController->SetInputMode(FInputModeGameOnly());	
 		PlayerController->SetShowMouseCursor(false);
+	}
+}
+
+void AP12BaseCharacter::ConfirmWeaponSelection(AP12PlayerController* AP12PlayerController)
+{
+	if (Equipment->GetIsSelectingWeapon())
+	{
+		Equipment->ConfirmWeaponSelection();
 	}
 }

@@ -25,6 +25,7 @@ public:
 	void ToggleMenuInputMode(const bool bMenu);
 	void OnInteractableObjectFound(bool bFound);
 	FKey FindFireMappedKey();
+	void ConfirmWeaponWheelSelection();
 
 protected:
 	virtual void BeginPlay() override;
@@ -104,6 +105,8 @@ protected:
 	UInputAction* InteractAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* InventoryAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* WeaponWheelInput = nullptr;
 	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;

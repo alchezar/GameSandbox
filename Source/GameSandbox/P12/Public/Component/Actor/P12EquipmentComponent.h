@@ -7,6 +7,7 @@
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipmentComponent.generated.h"
 
+class UP12WeaponWheelWidget;
 class UP12EquipmentViewWidget;
 class AP12MeleeWeaponItem;
 class AP12ThrowableItem;
@@ -47,11 +48,14 @@ public:
 	void CloseViewEquipment();
 	bool GetIsViewVisible() const;
 	FORCEINLINE const TArray<AP12EquipableItem*>& GetItems() const { return ItemsArray; };
+	void OpenWeaponWheel(APlayerController* InPlayerController);
+	bool GetIsSelectingWeapon() const;
+	void ConfirmWeaponSelection();
 
 protected:
 	virtual void BeginPlay() override;
 
-	void CreateViewWidget(APlayerController* InPlayerController);
+	void CreateEquipmentWidgets(APlayerController* InPlayerController);
 
 private:
 	void CreateLoadout();
@@ -76,6 +80,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | View")
 	TSubclassOf<UP12EquipmentViewWidget> EquipmentViewWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++ | View")
+	TSubclassOf<UP12WeaponWheelWidget> WeaponWheelWidgetClass;
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
@@ -99,4 +105,6 @@ private:
 
 	UPROPERTY()
 	UP12EquipmentViewWidget* EquipmentViewWidget = nullptr;
+	UPROPERTY()
+	UP12WeaponWheelWidget* WeaponWheelWidget = nullptr;
 };

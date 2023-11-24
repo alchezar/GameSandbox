@@ -79,6 +79,7 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::ShowMainMenu);
 	InputComp->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractInput);
 	InputComp->BindAction(InventoryAction, ETriggerEvent::Started, this, &ThisClass::InventoryInput);
+	InputComp->BindAction(WeaponWheelInput, ETriggerEvent::Started, this, &ThisClass::ConfirmWeaponWheelSelection);
 }
 
 bool AP12PlayerController::GetCharacterCanProcessInput() const
@@ -322,4 +323,13 @@ void AP12PlayerController::InventoryInput()
 		return;
 	}
 	CachedBaseCharacter->UseInventory(this);
+}
+
+void AP12PlayerController::ConfirmWeaponWheelSelection()
+{
+	if (!GetCharacterCanProcessInput())
+	{
+		return;
+	}
+	CachedBaseCharacter->ConfirmWeaponSelection(this);
 }
