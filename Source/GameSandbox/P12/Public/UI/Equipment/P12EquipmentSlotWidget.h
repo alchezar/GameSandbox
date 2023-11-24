@@ -23,7 +23,7 @@ public:
 	FP12OnEquipmentDropInSlotSignature OnEquipmentDropInSlot;
 	FP12OnEquipmentRemoveFromSlotSignature OnEquipmentRemoveFromSlot;
 
-	void InitializeSlot(const TWeakObjectPtr<AP12EquipableItem>& InEquipableItem, const int32 InItemIndex);
+	void InitializeSlot(AP12EquipableItem* InEquipableItem, const int32 InItemIndex);
 	void UpdateView();
 	
 protected:

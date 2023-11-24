@@ -10,9 +10,9 @@
 #include "P12/Public/UI/Inventory/P12InventorySlotWidget.h"
 #include "P12/Public/Util/P12DataTableUtil.h"
 
-void UP12EquipmentSlotWidget::InitializeSlot(const TWeakObjectPtr<AP12EquipableItem>& InEquipableItem, const int32 InItemIndex)
+void UP12EquipmentSlotWidget::InitializeSlot(AP12EquipableItem* InEquipableItem, const int32 InItemIndex)
 {
-	if (!InEquipableItem.IsValid())
+	if (!InEquipableItem)
 	{
 		return;
 	}
@@ -32,7 +32,7 @@ void UP12EquipmentSlotWidget::UpdateView()
 {
 	const bool bValid = LinkedEquipableItem.IsValid();
 	ItemIconImage->SetBrushFromTexture(bValid ? InventoryItemAdapter->GetDescription().Icon : nullptr);
-	ItemNameText->SetText(bValid ? InventoryItemAdapter->GetDescription().Name : NAME_None);
+	ItemNameText->SetText(bValid ? InventoryItemAdapter->GetDescription().Name : FText::FromName(NAME_None));
 }
 
 FReply UP12EquipmentSlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
@@ -81,8 +81,8 @@ void UP12EquipmentSlotWidget::NativeOnDragCancelled(const FDragDropEvent& InDrag
 	InventoryItemAdapter = Cast<UP12WeaponInventoryItem>(InOperation->Payload);
 	check(InventoryItemAdapter.IsValid())
 	
-	LinkedEquipableItem = InventoryItemAdapter->GetEquipWeaponClass().Get();
-	UpdateView();
+	// LinkedEquipableItem = InventoryItemAdapter->GetEquipWeaponClass().Get();
+	// UpdateView();
 	
-	// OnEquipmentDropInSlot.Execute(InventoryItemAdapter->GetEquipWeaponClass(), SlotIndexInComponent);
+	OnEquipmentDropInSlot.Execute(InventoryItemAdapter->GetEquipWeaponClass(), SlotIndexInComponent);
 }
