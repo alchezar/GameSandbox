@@ -382,3 +382,8 @@ void UP12EquipmentComponent::ConfirmWeaponSelection()
 	check(WeaponWheelWidget)
 	WeaponWheelWidget->ConfirmSelection();
 }
+
+void UP12EquipmentComponent::OnLevelDeserialized_Implementation()
+{
+	EquipItemInSlot(CurrentEquippedSlot);
+}

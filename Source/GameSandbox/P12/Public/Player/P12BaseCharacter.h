@@ -8,6 +8,7 @@
 #include "Controller/P12PlayerController.h"
 #include "GameFramework/Character.h"
 #include "P12/Public/Inventory/P12InventoryItem.h"
+#include "P12/Public/Subsystem/SaveSubsystem/P12SaveSubsystemInterface.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12BaseCharacter.generated.h"
 
@@ -79,7 +80,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnLoadoutCreatedSignature, UP12Equipment
 DECLARE_MULTICAST_DELEGATE_OneParam(FP12OnInteractableObjectFoundSignature, bool/* bFound*/)
 
 UCLASS()
-class GAMESANDBOX_API AP12BaseCharacter : public ACharacter, public IGenericTeamAgentInterface
+class GAMESANDBOX_API AP12BaseCharacter : public ACharacter, public IGenericTeamAgentInterface, public IP12SaveSubsystemInterface
 {
 	GENERATED_BODY()
 
@@ -129,14 +130,15 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	AP12HUD* GetHUD() const;
 	void Interact();
-
-	/* IGenericTeamInterface */
-	virtual FGenericTeamId GetGenericTeamId() const override;
-
 	// void AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex);
 	bool PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item);
 	void UseInventory(APlayerController* PlayerController);
 	void ConfirmWeaponSelection(AP12PlayerController* AP12PlayerController);
+
+	/* IGenericTeamInterface */
+	virtual FGenericTeamId GetGenericTeamId() const override;
+	/* IP12SaveSubsystemInterface */
+	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;

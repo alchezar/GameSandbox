@@ -17,7 +17,7 @@ enum class EP12FireMode : uint8
 };
 
 UCLASS(Blueprintable)
-class GAMESANDBOX_API AP12RangeWeaponItem : public AP12EquipableItem
+class GAMESANDBOX_API AP12RangeWeaponItem : public AP12EquipableItem, public IP12SaveSubsystemInterface
 {
 	GENERATED_BODY()
 
@@ -44,6 +44,8 @@ public:
 	void FinishReload(const bool bJumpToEnd = true);
 
 	virtual void AttachItem(const FName AttachSocketName) override;
+
+	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -102,6 +104,7 @@ private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;
 	bool bAiming = false;
+	UPROPERTY(SaveGame)
 	int32 Ammo = 0;
 	bool bReloading = false;
 	float LastShotTime = 0.f;

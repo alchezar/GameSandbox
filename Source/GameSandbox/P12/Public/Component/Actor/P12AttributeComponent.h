@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "P12/Public/Subsystem/SaveSubsystem/P12SaveSubsystemInterface.h"
 #include "P12AttributeComponent.generated.h"
 
 class AP12BaseCharacter;
@@ -11,7 +12,7 @@ class AP12BaseCharacter;
 DECLARE_MULTICAST_DELEGATE(FP12OnDeathSignature)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class GAMESANDBOX_API UP12AttributeComponent : public UActorComponent
+class GAMESANDBOX_API UP12AttributeComponent : public UActorComponent, public IP12SaveSubsystemInterface
 {
 	GENERATED_BODY()
 
@@ -23,6 +24,8 @@ public:
 	float GetHealthPercent();
 	void AddHealth(const float HealthToAdd);
 	void RestoreFullStamina();
+
+	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -48,6 +51,6 @@ protected:
 
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacterOwner;
-	UPROPERTY(ReplicatedUsing = "OnRep_Health")
+	UPROPERTY(ReplicatedUsing = "OnRep_Health", SaveGame)
 	float Health = 0.f;
 };

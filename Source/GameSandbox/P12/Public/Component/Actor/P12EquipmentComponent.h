@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "P12/Public/Subsystem/SaveSubsystem/P12SaveSubsystemInterface.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12EquipmentComponent.generated.h"
 
@@ -19,7 +20,7 @@ typedef TArray<int32, TInlineAllocator<static_cast<uint32>(EP12AmmunitionType::M
 typedef TArray<AP12EquipableItem*, TInlineAllocator<static_cast<uint32>(EP12EquipmentSlot::MAX)>> TP12ItemsArray;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent
+class GAMESANDBOX_API UP12EquipmentComponent : public UActorComponent, public IP12SaveSubsystemInterface
 {
 	GENERATED_BODY()
 
@@ -51,6 +52,8 @@ public:
 	void OpenWeaponWheel(APlayerController* InPlayerController);
 	bool GetIsSelectingWeapon() const;
 	void ConfirmWeaponSelection();
+
+	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -85,13 +88,13 @@ protected:
 	
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
-	UPROPERTY(ReplicatedUsing = "OnRep_CurrentEquippedSlot")
+	UPROPERTY(ReplicatedUsing = "OnRep_CurrentEquippedSlot", SaveGame)
 	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
 	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
 	
-	UPROPERTY(Replicated)
+	UPROPERTY(Replicated, SaveGame)
 	TArray<int32> AmmunitionArray;
-	UPROPERTY(ReplicatedUsing = "OnRep_ItemsArray")
+	UPROPERTY(ReplicatedUsing = "OnRep_ItemsArray", SaveGame)
 	TArray<AP12EquipableItem*> ItemsArray;
 	
 	UPROPERTY()

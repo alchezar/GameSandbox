@@ -763,3 +763,8 @@ void AP12BaseCharacter::ConfirmWeaponSelection(AP12PlayerController* AP12PlayerC
 		Equipment->ConfirmWeaponSelection();
 	}
 }
+
+void AP12BaseCharacter::OnLevelDeserialized_Implementation()
+{
+	
+}

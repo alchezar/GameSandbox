@@ -29,7 +29,7 @@ void AP12CharacterAISpawner::BeginPlay()
 
 void AP12CharacterAISpawner::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	UnsubscribeFromTrigger();
+	// UnsubscribeFromTrigger();
 	
 	Super::EndPlay(EndPlayReason);
 }

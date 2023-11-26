@@ -53,6 +53,9 @@ protected:
 	void InteractInput();
 	void InventoryInput();
 
+	void QuickSaveGameInput();
+	void QuickLoadGameInput();
+
 private:
 	void SubsystemDefaultMappingContext() const;
 	bool GetCharacterCanProcessInput() const;
@@ -106,7 +109,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* InventoryAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
-	UInputAction* WeaponWheelInput = nullptr;
+	UInputAction* WeaponWheelAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* QuickSaveGameAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UInputAction* QuickLoadGameAction = nullptr;
 	
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;

@@ -72,6 +72,7 @@ bool FP12ActorSaveData::Serialize(FArchive& Archive)
 	FP12ObjectSaveData::Serialize(Archive);
 
 	Archive << Transform;
+	Archive << ObjectsSaveData;
 	return true;
 }
 
@@ -102,7 +103,7 @@ bool FP12LevelSaveData::Serialize(FArchive& Archive)
  */
 
 FP12GameSaveData::FP12GameSaveData()
-	:Level("Persistent"), StartTransform(FTransform::Identity)
+	:Level("Persistent"), StartTransform(FTransform::Identity), bSerialized(false)
 {
 	
 }
@@ -111,9 +112,13 @@ bool FP12GameSaveData::Serialize(FArchive& Archive)
 {
 	FP12LevelSaveData::Serialize(Archive);
 
+	bSerialized = true;
+
 	Archive << LevelName;
 	Archive << Level;
 	Archive << GameInstance;
 	Archive << StartTransform;
+	Archive << bSerialized;
+	
 	return true;
 }

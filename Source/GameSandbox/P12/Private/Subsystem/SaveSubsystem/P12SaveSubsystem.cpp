@@ -44,12 +44,14 @@ void UP12SaveSubsystem::SerializeLevel(const ULevel* Level, const ULevelStreamin
 
 	for (AActor* Actor : Level->Actors)
 	{
-		if (!Actor || (Actor && !Actor->Implements<UP12SaveSubsystemInterface>()))
+		if (!GetCanBeSaved(Actor))
 		{
 			continue;
 		}
 		FP12ActorSaveData& ActorSaveData = ActorsSaveData[ActorsSaveData.AddUnique(FP12ActorSaveData(Actor))];
 		ActorSaveData.Transform = Actor->GetTransform();
+		
+		SerializeActorComponents(Actor, ActorSaveData);
 
 		auto MemoryWriter = FMemoryWriter(ActorSaveData.RawData, true);
 		auto Archive = FP12SaveSubsystemArchive(MemoryWriter, false);
@@ -79,7 +81,7 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* L
 	for (auto ActorIterator = Level->Actors.CreateIterator(); ActorIterator; ++ActorIterator)
 	{
 		AActor* Actor = *ActorIterator;
-		if (!Actor || (Actor && !Actor->Implements<UP12SaveSubsystemInterface>()))
+		if (!GetCanBeSaved(Actor))
 		{
 			continue;
 		}
@@ -102,7 +104,7 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* L
 			return;
 		}
 
-		DeserializeActor(Actor, *ActorSaveData);
+		DeserializeActor(Actor, ActorSaveData);
 		ActorsToNotify.Add(Actor);
 	}
 	FActorSpawnParameters ActorSpawnParameters;
@@ -127,13 +129,13 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* L
 		/* Actor name can be changed so update it. */
 		ActorSaveData->Name = Actor->GetFName();
 
-		DeserializeActor(Actor, *ActorSaveData);
+		DeserializeActor(Actor, ActorSaveData);
 		ActorsToNotify.Add(Actor);
 	}
 
 	for (AActor* Actor : ActorsToNotify)
 	{
-		IP12SaveSubsystemInterface::Execute_OnLevelDeserialized(Actor);
+		NotifyActorAndComponents(Actor);
 	}
 }
 
@@ -154,7 +156,7 @@ void UP12SaveSubsystem::LoadLastGame()
 		UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::LoadLastGame(): %s Failed! No saves."), *GetNameSafe(this));
 		return;
 	}
-	LoadGame(SaveIds[SaveIds.Last()]);
+	LoadGame(SaveIds.Last());
 }
 
 void UP12SaveSubsystem::LoadGame(const int32 SaveId)
@@ -199,6 +201,11 @@ void UP12SaveSubsystem::SerializeGame()
 void UP12SaveSubsystem::DeserializeGame()
 {
 	UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeGame(): %s"), *GetNameSafe(this));
+
+	if (!GameSaveData.bSerialized)
+	{
+		return;
+	}
 
 	UGameInstance* GameInstance = GetGameInstance();
 	auto MemoryReader = FMemoryReader(GameSaveData.GameInstance.RawData, true);
@@ -273,13 +280,15 @@ void UP12SaveSubsystem::OnPostLoadMapWithWorld(UWorld* LoadedWorld)
 	DeserializeGame();
 }
 
-void UP12SaveSubsystem::DeserializeActor(AActor* Actor, const FP12ActorSaveData& ActorSaveData)
+void UP12SaveSubsystem::DeserializeActor(AActor* Actor, const FP12ActorSaveData* ActorSaveData)
 {
 	UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeActor(): %s, Actor: %s"), *GetNameSafe(this), *GetNameSafe(Actor));
 
-	Actor->SetActorTransform(ActorSaveData.Transform);
+	Actor->SetActorTransform(ActorSaveData->Transform);
 
-	auto MemoryReader = FMemoryReader(ActorSaveData.RawData, true);
+	DeserializeActorComponents(Actor, ActorSaveData);
+
+	auto MemoryReader = FMemoryReader(ActorSaveData->RawData, true);
 	auto Archive = FP12SaveSubsystemArchive(MemoryReader, false);
 	Actor->Serialize(Archive);
 }
@@ -295,7 +304,7 @@ int32 UP12SaveSubsystem::GetNextSaveId() const
 	{
 		return 1;
 	}
-	return SaveIds[SaveIds.Last()] + 1;
+	return SaveIds.Last() + 1;
 }
 
 void UP12SaveSubsystem::OnActorSpawned(AActor* SpawnedActor)
@@ -312,5 +321,60 @@ void UP12SaveSubsystem::OnActorSpawned(AActor* SpawnedActor)
 		return;
 	}
 	/* We should notify runtime spawned actors too. */
-	IP12SaveSubsystemInterface::Execute_OnLevelDeserialized(SpawnedActor);
+	NotifyActorAndComponents(SpawnedActor);
+}
+
+void UP12SaveSubsystem::SerializeActorComponents(AActor* Actor, FP12ActorSaveData& ActorSaveData)
+{
+	TArray<FP12ObjectSaveData>& ComponentsSaveData = ActorSaveData.ObjectsSaveData;
+	ComponentsSaveData.Empty();
+
+	for (UActorComponent* ActorComponent : Actor->GetComponents())
+	{
+		if (!GetCanBeSaved(ActorComponent))
+		{
+			continue;
+		}
+		FP12ObjectSaveData& ComponentSaveData = ComponentsSaveData[ComponentsSaveData.Emplace(ActorComponent)];
+
+		FMemoryWriter MemoryWriter = {ComponentSaveData.RawData, true};
+		FP12SaveSubsystemArchive Archive = {MemoryWriter, false};
+		ActorComponent->Serialize(Archive);
+	}
+}
+
+void UP12SaveSubsystem::DeserializeActorComponents(AActor* Actor, const FP12ActorSaveData* ActorSaveData)
+{
+	const TArray<FP12ObjectSaveData>& ComponentsSaveData = ActorSaveData->ObjectsSaveData;
+	for (UActorComponent* ActorComponent : Actor->GetComponents())
+	{
+		if (!GetCanBeSaved(ActorComponent))
+		{
+			continue;
+		}
+		const FP12ObjectSaveData* ComponentSaveData = ComponentsSaveData.FindByPredicate(
+			[=](const FP12ObjectSaveData& SaveData) { return SaveData.Name == ActorComponent->GetFName(); });
+
+		auto MemoryReader = FMemoryReader(ComponentSaveData->RawData, true);
+		auto Archive = FP12SaveSubsystemArchive(MemoryReader, false);
+		ActorComponent->Serialize(Archive);
+	}
+}
+
+bool UP12SaveSubsystem::GetCanBeSaved(const UObject* Object)
+{
+	return Object && Object->Implements<UP12SaveSubsystemInterface>();
+}
+
+void UP12SaveSubsystem::NotifyActorAndComponents(AActor* Actor)
+{
+	IP12SaveSubsystemInterface::Execute_OnLevelDeserialized(Actor);
+	for (UActorComponent* Component : Actor->GetComponents())
+	{
+		if (!GetCanBeSaved(Component))
+		{
+			continue;
+		}
+		IP12SaveSubsystemInterface::Execute_OnLevelDeserialized(Component);
+	}
 }

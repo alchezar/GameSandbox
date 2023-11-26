@@ -8,6 +8,7 @@
 #include "P12/Public/Component/Actor/P12AttributeComponent.h"
 #include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/P12BaseCharacter.h"
+#include "P12/Public/Subsystem/SaveSubsystem/P12SaveSubsystem.h"
 #include "P12/Public/Util/P12Library.h"
 
 class UEnhancedInputLocalPlayerSubsystem;
@@ -79,7 +80,10 @@ void AP12PlayerController::SetupInputComponent()
 	InputComp->BindAction(MainMenuAction, ETriggerEvent::Started, this, &ThisClass::ShowMainMenu);
 	InputComp->BindAction(InteractAction, ETriggerEvent::Started, this, &ThisClass::InteractInput);
 	InputComp->BindAction(InventoryAction, ETriggerEvent::Started, this, &ThisClass::InventoryInput);
-	InputComp->BindAction(WeaponWheelInput, ETriggerEvent::Started, this, &ThisClass::ConfirmWeaponWheelSelection);
+	InputComp->BindAction(WeaponWheelAction, ETriggerEvent::Started, this, &ThisClass::ConfirmWeaponWheelSelection);
+
+	InputComp->BindAction(QuickSaveGameAction, ETriggerEvent::Started, this, &ThisClass::QuickSaveGameInput);
+	InputComp->BindAction(QuickLoadGameAction, ETriggerEvent::Started, this, &ThisClass::QuickLoadGameInput);
 }
 
 bool AP12PlayerController::GetCharacterCanProcessInput() const
@@ -332,4 +336,24 @@ void AP12PlayerController::ConfirmWeaponWheelSelection()
 		return;
 	}
 	CachedBaseCharacter->ConfirmWeaponSelection(this);
+}
+
+void AP12PlayerController::QuickSaveGameInput()
+{
+	UP12SaveSubsystem* SaveSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UP12SaveSubsystem>();
+	if (!SaveSubsystem)
+	{
+		return;
+	}
+	SaveSubsystem->SaveGame();
+}
+
+void AP12PlayerController::QuickLoadGameInput()
+{
+	UP12SaveSubsystem* SaveSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UP12SaveSubsystem>();
+	if (!SaveSubsystem)
+	{
+		return;
+	}
+	SaveSubsystem->LoadLastGame();
 }

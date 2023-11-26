@@ -33,10 +33,16 @@ private:
 	void WriteSaveToFile();
 	void LoadSaveFromFile(int32 SaveId);
 	void OnPostLoadMapWithWorld(UWorld* LoadedWorld);
-	void DeserializeActor(AActor* Actor, const FP12ActorSaveData& ActorSaveData);
+	void DeserializeActor(AActor* Actor, const FP12ActorSaveData* ActorSaveData);
 	FString GetSaveFilePath(int32 SaveId) const;
 	int32 GetNextSaveId() const;
-	void OnActorSpawned(AActor* SpawnedActor);	
+	void OnActorSpawned(AActor* SpawnedActor);
+	
+	void SerializeActorComponents(AActor* Actor, FP12ActorSaveData& ActorSaveData);
+	void DeserializeActorComponents(AActor* Actor, const FP12ActorSaveData* ActorSaveData);
+	bool GetCanBeSaved(const UObject* Object);
+	void NotifyActorAndComponents(AActor* Actor);
+
 	
 private:
 	FP12GameSaveData GameSaveData;

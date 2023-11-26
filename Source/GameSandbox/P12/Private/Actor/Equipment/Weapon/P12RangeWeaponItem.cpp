@@ -295,3 +295,9 @@ UP12EquipmentComponent* AP12RangeWeaponItem::GetEquipment() const
 	}
 	return Equipment;
 }
+
+void AP12RangeWeaponItem::OnLevelDeserialized_Implementation()
+{
+	SetActorRelativeTransform(FTransform::Identity);
+	RefreshAmmoCount();
+}

@@ -6,6 +6,7 @@
 #include "Components/TimelineComponent.h"
 #include "GameFramework/Actor.h"
 #include "P12/Public/Actor/Interactive/Interface/P12Interactable.h"
+#include "P12/Public/Subsystem/SaveSubsystem/P12SaveSubsystemInterface.h"
 #include "P12Door.generated.h"
 
 struct FTimeline;
@@ -27,7 +28,7 @@ struct FP12DoorAngle
 };
 
 UCLASS()
-class GAMESANDBOX_API AP12Door : public AActor, public IP12Interactable
+class GAMESANDBOX_API AP12Door : public AActor, public IP12Interactable, public IP12SaveSubsystemInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,8 @@ public:
 	virtual bool HasOnInteractionCallback() const override;
 	virtual FDelegateHandle AddOnInteractionFunction(UObject* Object, const FName& Name) override;
 	virtual void RemoveOnInteractionDelegate(FDelegateHandle Delegate) override;
+
+	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -72,6 +75,7 @@ protected:
 	float OpeningTime = 1.f;
 
 private:
+	UPROPERTY(SaveGame)
 	bool bOpened = false;
 	FTimeline DoorOpenTimeline;
 

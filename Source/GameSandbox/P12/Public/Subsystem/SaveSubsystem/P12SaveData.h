@@ -63,6 +63,7 @@ public:
 	virtual bool Serialize(FArchive& Archive) override;
 
 public:
+	TArray<FP12ObjectSaveData> ObjectsSaveData;
 	FTransform Transform;
 };
 
@@ -100,4 +101,5 @@ public:
 	FP12LevelSaveData Level;
 	FP12ObjectSaveData GameInstance;
 	FTransform StartTransform;
+	bool bSerialized;
 };

@@ -115,3 +115,8 @@ void UP12AttributeComponent::RestoreFullStamina()
 {
 	
 }
+
+void UP12AttributeComponent::OnLevelDeserialized_Implementation()
+{
+	OnHealthChanged();
+}

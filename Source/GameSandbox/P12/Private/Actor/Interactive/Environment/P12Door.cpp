@@ -68,7 +68,6 @@ void AP12Door::RemoveOnInteractionDelegate(FDelegateHandle Delegate)
 	OnInteraction.Remove(Delegate);
 }
 
-
 void AP12Door::InteractWithDoor() 
 {
 	/* By using trigonometry. */
@@ -122,8 +121,6 @@ void AP12Door::OpenDoor()
 	GetWorld()->GetTimerManager().SetTimer(DoorTimer, DoorDelegate, GetWorld()->GetDeltaSeconds(), true);	
 }
 
-// ReSharper disable CppPassValueParameterByConstReference
-
 void AP12Door::OpenDoorSmoothly(FRotator StartRotation, FRotator TargetRotation)
 {
 	const float AlphaPerTick = GetWorld()->GetDeltaSeconds() / OpeningTime;
@@ -138,4 +135,10 @@ void AP12Door::OpenDoorSmoothly(FRotator StartRotation, FRotator TargetRotation)
 		GetWorld()->GetTimerManager().ClearTimer(DoorTimer);
 		SetActorTickEnabled(false);
 	}
+}
+
+void AP12Door::OnLevelDeserialized_Implementation()
+{
+	const float YawAngle = bOpened ? Angle.Opened : Angle.Closed;
+	DoorPivot->SetRelativeRotation(FRotator(0.f, YawAngle, 0.f));
 }
