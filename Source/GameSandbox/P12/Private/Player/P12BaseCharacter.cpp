@@ -21,6 +21,7 @@
 #include "P12/Public/Game/P12HUD.h"
 #include "P12/Public/Player/AnimNotify/P12AnimNotify_EnableRagdoll.h"
 #include "P12/Public/Player/Controller/P12PlayerController.h"
+#include "P12/Public/Subsystem/Streaming/P12StreamingSubsystemUtils.h"
 #include "P12/Public/UI/P12AttributeProgressBarWidget.h"
 #include "P12/Public/Util/P12CoreTypes.h"
 #include "P12/Public/Util/P12Library.h"
@@ -57,6 +58,8 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 void AP12BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+	UP12StreamingSubsystemUtils::CheckCharacterOverlapStreamingSubsystemVolume(this);
+	
 	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
 	CharacterAttribute->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 	OnReloadComplete.AddUObject(this, &ThisClass::OnReloadCompleteHandle);
