@@ -3,9 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "P12SaveData.h"
 #include "Serialization/ObjectAndNameAsStringProxyArchive.h"
+#include "P12SaveSubsystemTypes.generated.h"
+
+class UP12SaveSubsystem;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogP12SaveSubsystem, Log, All)
+
 const FName FileExtensionSave = "save";
 
 /**
@@ -42,4 +47,31 @@ public:
 private:
 	bool& bValue;
 	bool bInitialValue;
+};
+
+/**
+ * UP12StreamingLevelObserver
+ */
+
+UCLASS()
+class UP12StreamingLevelObserver : public UObject
+{
+	GENERATED_BODY()
+
+public:
+	UP12StreamingLevelObserver();
+	void Initialize(UP12SaveSubsystem* InSaveSubsystem, ULevelStreaming* InStreamingLevel);
+	void Deinitialize();
+	virtual void Serialize(FArchive& Archive) override;
+
+private:
+	UFUNCTION()
+	void OnLevelShown();
+	UFUNCTION()
+	void OnLevelHidden();
+
+private:
+	FP12LevelSaveData LevelSaveData;
+	TWeakObjectPtr<UP12SaveSubsystem> SaveSubsystem;
+	TWeakObjectPtr<ULevelStreaming> StreamingLevel;
 };

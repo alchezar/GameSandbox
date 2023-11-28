@@ -103,7 +103,7 @@ bool FP12LevelSaveData::Serialize(FArchive& Archive)
  */
 
 FP12GameSaveData::FP12GameSaveData()
-	:Level("Persistent"), StartTransform(FTransform::Identity), bSerialized(false)
+	:PersistentLevel("Persistent"), StartTransform(FTransform::Identity), bSerialized(false)
 {
 	
 }
@@ -115,7 +115,8 @@ bool FP12GameSaveData::Serialize(FArchive& Archive)
 	bSerialized = true;
 
 	Archive << LevelName;
-	Archive << Level;
+	Archive << PersistentLevel;
+	Archive << StreamingLevels;
 	Archive << GameInstance;
 	Archive << StartTransform;
 	Archive << bSerialized;

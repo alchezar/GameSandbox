@@ -7,6 +7,8 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "P12SaveSubsystem.generated.h"
 
+class UP12StreamingLevelObserver;
+
 UCLASS()
 class GAMESANDBOX_API UP12SaveSubsystem : public UGameInstanceSubsystem
 {
@@ -15,9 +17,9 @@ class GAMESANDBOX_API UP12SaveSubsystem : public UGameInstanceSubsystem
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
-
-	void SerializeLevel(const ULevel* Level, const ULevelStreaming* LevelStreaming = nullptr);
-	void DeserializeLevel(ULevel* Level, const ULevelStreaming* LevelStreaming = nullptr);
+	virtual UWorld* GetWorld() const override;
+	void SerializeLevel(const ULevel* Level, const ULevelStreaming* StreamingLevel = nullptr);
+	void DeserializeLevel(ULevel* Level, const ULevelStreaming* StreamingLevel = nullptr);
 	
 	FORCEINLINE const FP12GameSaveData& GetGameSaveData() const { return GameSaveData; }
 	UFUNCTION(BlueprintCallable, Category = "C++ | SaveSubsystem")
@@ -43,6 +45,8 @@ private:
 	bool GetCanBeSaved(const UObject* Object);
 	void NotifyActorAndComponents(AActor* Actor);
 
+	void CreateStreamingLevelObserver(UWorld* World);
+	void RemoveStreamingLevelObserver();
 	
 private:
 	FP12GameSaveData GameSaveData;
@@ -53,5 +57,8 @@ private:
 	bool bUseCompressedSaves = false;
 	/* To avoid double ::OnLevelDeserialized() invocations */
 	bool bIgnoreOnActorSpawnedCallback = false;
+
+	UPROPERTY(Transient)
+	TArray<UP12StreamingLevelObserver*> StreamingLevelObservers;
 	
 };

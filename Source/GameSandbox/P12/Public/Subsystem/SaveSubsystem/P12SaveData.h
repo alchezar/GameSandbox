@@ -98,7 +98,8 @@ public:
 
 public:
 	FName LevelName;
-	FP12LevelSaveData Level;
+	FP12LevelSaveData PersistentLevel;
+	TArray<FP12LevelSaveData> StreamingLevels;
 	FP12ObjectSaveData GameInstance;
 	FTransform StartTransform;
 	bool bSerialized;
