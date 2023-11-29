@@ -9,12 +9,12 @@ void UP12AttributeProgressBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	CachedCharacter = GetOwningPlayerPawn<AP12BaseCharacter>();
-	if (!CachedCharacter.IsValid())
-	{
-		return;
-	}
-	CachedCharacter->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+	// CachedCharacter = GetOwningPlayerPawn<AP12BaseCharacter>();
+	// if (!CachedCharacter.IsValid())
+	// {
+	// 	return;
+	// }
+	// CachedCharacter->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 }
 
 void UP12AttributeProgressBarWidget::SetProgressPercentage(float Percentage)
@@ -30,4 +30,14 @@ void UP12AttributeProgressBarWidget::OnHealthChangedHandle(float Health, float M
 		return;
 	}
 	ProgressBar->SetPercent(Health / MaxHealth);
+}
+
+void UP12AttributeProgressBarWidget::CacheOwner(AP12BaseCharacter* BaseChar)
+{
+	CachedCharacter = BaseChar;
+	if (!CachedCharacter.IsValid())
+	{
+		return;
+	}
+	CachedCharacter->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 }

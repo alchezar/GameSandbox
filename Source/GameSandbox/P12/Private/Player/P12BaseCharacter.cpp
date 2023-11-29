@@ -48,11 +48,10 @@ AP12BaseCharacter::AP12BaseCharacter(const FObjectInitializer& ObjectInitializer
 	LedgeDetection = CreateDefaultSubobject<UP12LedgeDetectionComponent>("LedgeDetectorComponent");
 	CharacterAttribute = CreateDefaultSubobject<UP12AttributeComponent>("CharacterAttributeComponent");
 	Equipment = CreateDefaultSubobject<UP12EquipmentComponent>("EquipmentComponent");
+	Inventory = CreateDefaultSubobject<UP12InventoryComponent>("InventoryComponent");
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthProgressBarWidgetComponent");
 	HealthBar->SetupAttachment(RootComponent);
-
-	Inventory = CreateDefaultSubobject<UP12InventoryComponent>("InventoryComponent");
 }
 
 void AP12BaseCharacter::BeginPlay()
@@ -713,6 +712,7 @@ void AP12BaseCharacter::InitHealthProgress()
 	{
 		HealthBar->SetVisibility(false);
 	});
+	Widget->CacheOwner(this);
 	Widget->SetProgressPercentage(CharacterAttribute->GetHealthPercent());
 }
 

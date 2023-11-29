@@ -17,9 +17,12 @@ class GAMESANDBOX_API AP12PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+	
+
 public:
 	AP12PlayerController();
 	virtual void SetPawn(APawn* InPawn) override;
+	virtual void Tick(float DeltaSeconds) override;
 	FORCEINLINE bool GetIsIgnoreCameraPitch() const { return bIgnoreCameraPitch; }
 	void SetIsIgnoreCameraPitch(const bool bIgnore) { bIgnoreCameraPitch = bIgnore; }
 	void ToggleMenuInputMode(const bool bMenu);

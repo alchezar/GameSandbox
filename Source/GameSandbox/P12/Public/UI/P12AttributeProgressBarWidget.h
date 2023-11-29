@@ -18,6 +18,7 @@ public:
 	virtual void NativeConstruct() override;
 	void SetProgressPercentage(float Percentage);
 	void OnHealthChangedHandle(float Health, float MaxHealth);
+	void CacheOwner(AP12BaseCharacter* BaseChar);
 	
 protected:
 	UPROPERTY(meta = (BindWidget))

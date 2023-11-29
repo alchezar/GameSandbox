@@ -31,8 +31,8 @@ void AP12AICharacterController::SetPawn(APawn* InPawn)
 
 	check(InPawn->IsA<AP12AICharacter>())
 	CachedAICharacter = StaticCast<AP12AICharacter*>(InPawn);
-	SetupPatrolling();
 	RunBehaviorTree(CachedAICharacter->GetBehaviorTree());
+	SetupPatrolling();
 }
 
 void AP12AICharacterController::Tick(float DeltaTime)

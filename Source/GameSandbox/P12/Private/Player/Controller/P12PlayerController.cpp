@@ -28,6 +28,11 @@ void AP12PlayerController::SetPawn(APawn* InPawn)
 	}
 }
 
+void AP12PlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+}
+
 void AP12PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
