@@ -16,6 +16,37 @@ enum class EP12FireMode : uint8
 	FullAuto
 };
 
+USTRUCT(BlueprintType)
+struct FP12RecoilParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = -2.f, UIMin = -2.f, ClampMax = 2.f, UIMax = 2.f))
+	float Yaw = -0.1f;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = -2.f, UIMin = -2.f, ClampMax = 2.f, UIMax = 2.f))
+	float Pitch = 0.2f;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 0.f, UIMin = 0.f))
+	float TimeInterval = 0.05f;
+	UPROPERTY(EditDefaultsOnly, meta = (ClampMin = 1.f, UIMin = 1.f))
+	float RollbackSpeed = 1200.f; /* In shots per minute. */
+};
+
+struct FP12AccumulatedRecoil
+{
+	void Reset()
+	{
+		Pitch = 0.f;
+		Yaw = 0.f;
+		Shots = 0;
+		RollbackTime = 0.f;
+	}
+
+	float Pitch = 0.f;
+	float Yaw = 0.f;
+	int32 Shots = 0;
+	float RollbackTime = 0.f;
+};
+
 UCLASS(Blueprintable)
 class GAMESANDBOX_API AP12RangeWeaponItem : public AP12EquipableItem, public IP12SaveSubsystemInterface
 {
@@ -23,7 +54,7 @@ class GAMESANDBOX_API AP12RangeWeaponItem : public AP12EquipableItem, public IP1
 
 public:
 	AP12RangeWeaponItem();
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(const float DeltaTime) override;
 	FORCEINLINE float GetAimSpeed() const { return AimSpeed; }
 	FORCEINLINE UP12WeaponBarrelComponent* GetBarrelComponent() const { return WeaponBarrel; }
 	FORCEINLINE float GetAimingFOV() const { return AimingFOV; };
@@ -44,7 +75,6 @@ public:
 	void FinishReload(const bool bJumpToEnd = true);
 
 	virtual void AttachItem(const FName AttachSocketName) override;
-
 	virtual void OnLevelDeserialized_Implementation() override;
 
 protected:
@@ -58,6 +88,10 @@ private:
 	void MakeShot();
 	void RefreshAmmoCount() const;
 	UP12EquipmentComponent* GetEquipment() const;
+	float GetRecoilTimeInterval();
+	void ProcessRecoil(const float DeltaTime);
+	void ProcessRecoilRollback(const float DeltaTime);
+	void StopRecoilRollback();
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -100,6 +134,11 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	float AimingFOV = 90.f;
 	
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Recoil")
+	FP12RecoilParams RecoilParams;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Recoil")
+	TSubclassOf<UCameraShakeBase> ShotCameraShakeClass;
+	
 private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;
@@ -108,4 +147,8 @@ private:
 	int32 Ammo = 0;
 	bool bReloading = false;
 	float LastShotTime = 0.f;
+	
+	FTimerHandle RecoilTimer;
+	FTimerHandle RecoilRollbackTimer;
+	FP12AccumulatedRecoil AccumulatedRecoil;
 };

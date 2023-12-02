@@ -9,7 +9,8 @@
 
 AP12EquipableItem::AP12EquipableItem()
 {
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 }
 
 void AP12EquipableItem::SetOwner(AActor* NewOwner)

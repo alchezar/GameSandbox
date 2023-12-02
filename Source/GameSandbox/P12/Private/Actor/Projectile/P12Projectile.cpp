@@ -8,7 +8,8 @@
 AP12Projectile::AP12Projectile()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 	SetReplicatingMovement(true);
 	
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");

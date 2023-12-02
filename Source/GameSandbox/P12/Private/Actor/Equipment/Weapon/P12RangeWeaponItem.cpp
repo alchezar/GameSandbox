@@ -36,19 +36,27 @@ void AP12RangeWeaponItem::BeginPlay()
 	SetAmmo(MaxAmmo);
 }
 
-void AP12RangeWeaponItem::Tick(float DeltaTime)
+void AP12RangeWeaponItem::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+	ProcessRecoil(DeltaTime);
+	ProcessRecoilRollback(DeltaTime);
 }
 
 void AP12RangeWeaponItem::FireInput(const bool bStart)
 {
 	if (!bStart)
 	{
+		AccumulatedRecoil.RollbackTime = AccumulatedRecoil.Shots * 60.f / RecoilParams.RollbackSpeed;
+		if (AccumulatedRecoil.Pitch != 0.f || AccumulatedRecoil.Yaw != 0.f)
+		{
+			GetWorld()->GetTimerManager().SetTimer(RecoilRollbackTimer, this, &ThisClass::StopRecoilRollback, AccumulatedRecoil.RollbackTime);
+		}
+		
 		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 		return;
 	}
-
+	StopRecoilRollback();
 	MakeShot();
 	if (FireMode < EP12FireMode::FullAuto)
 	{
@@ -164,6 +172,23 @@ void AP12RangeWeaponItem::MakeShot()
 
 	GetCachedCharacter()->PlayAnimMontage(CharacterFireMontage);
 	PlayAnimMontage(WeaponFireMontage);
+
+	/* Timer for recoil processing. */
+	GetWorld()->GetTimerManager().SetTimer(RecoilTimer, GetRecoilTimeInterval(), false);
+	/* ::Tick(...) -> ::ProcessRecoil(...) */
+
+	/* Camera shake on shot. */
+	if (ShotCameraShakeClass && GetCachedCharacter()->IsPlayerControlled())
+	{
+		APlayerController* Controller = GetCachedCharacter()->GetController<APlayerController>();
+		if (!Controller)
+		{
+			return;
+		}
+		// Controller->ClientStartCameraShake(ShotCameraShakeClass);
+		Controller->PlayerCameraManager->StartCameraShake(ShotCameraShakeClass);
+	}
+	++AccumulatedRecoil.Shots;
 }
 
 void AP12RangeWeaponItem::SetAmmo(const int32 NewAmmo)
@@ -300,4 +325,63 @@ void AP12RangeWeaponItem::OnLevelDeserialized_Implementation()
 {
 	SetActorRelativeTransform(FTransform::Identity);
 	RefreshAmmoCount();
+}
+
+float AP12RangeWeaponItem::GetRecoilTimeInterval()
+{
+	return FMath::Min(RecoilParams.TimeInterval, GetShotTimeInterval());
+}
+
+void AP12RangeWeaponItem::ProcessRecoil(const float DeltaTime)
+{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(RecoilTimer))
+	{
+		return;
+	}
+	AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
+	if (!CharacterOwner)
+	{
+		return;
+	}
+	if (!CharacterOwner->IsPlayerControlled() || !CharacterOwner->IsLocallyControlled())
+	{
+		return;
+	}
+
+	const float RecoilPitch = -RecoilParams.Pitch / GetRecoilTimeInterval() * DeltaTime;
+	CharacterOwner->AddControllerPitchInput(RecoilPitch);
+	AccumulatedRecoil.Pitch += RecoilPitch;
+	
+	float RecoilYaw = RecoilParams.Yaw / GetRecoilTimeInterval() * DeltaTime;
+	RecoilYaw = FMath::RandBool() ? RecoilYaw : -RecoilYaw;
+	CharacterOwner->AddControllerYawInput(RecoilYaw);
+	AccumulatedRecoil.Yaw += RecoilYaw;
+}
+
+void AP12RangeWeaponItem::ProcessRecoilRollback(const float DeltaTime)
+{
+	if (!GetWorld()->GetTimerManager().IsTimerActive(RecoilRollbackTimer))
+	{
+		return;
+	}
+	AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
+	if (!CharacterOwner)
+	{
+		return;
+	}
+	if (!CharacterOwner->IsPlayerControlled() || !CharacterOwner->IsLocallyControlled())
+	{
+		return;
+	}
+
+	const float RollbackPitch = -AccumulatedRecoil.Pitch / AccumulatedRecoil.RollbackTime * DeltaTime;
+	CharacterOwner->AddControllerPitchInput(RollbackPitch);
+	const float RollbackYaw = -AccumulatedRecoil.Yaw / AccumulatedRecoil.RollbackTime * DeltaTime;
+	CharacterOwner->AddControllerYawInput(RollbackYaw);
+}
+
+void AP12RangeWeaponItem::StopRecoilRollback()
+{
+	GetWorld()->GetTimerManager().ClearTimer(RecoilRollbackTimer);
+	AccumulatedRecoil.Reset();
 }
