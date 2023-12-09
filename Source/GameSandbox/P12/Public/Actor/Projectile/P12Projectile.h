@@ -23,17 +23,17 @@ public:
 	FORCEINLINE UProjectileMovementComponent* GetProjectileMovement() const { return MovementComponent; }
 	virtual void LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom);
 	virtual void Tick(float DeltaSeconds) override;
-	void ToggleActive(const bool bActive , const FVector& Location, const FVector& Direction = FVector::ForwardVector, AActor* WeaponOwner = nullptr);
-	
+	void ToggleActive(const bool bActive, const FVector& Location, const FVector& Direction = FVector::ForwardVector, AActor* WeaponOwner = nullptr);
+
 protected:
 	virtual void BeginPlay() override;
-	
+
 	UFUNCTION()
 	void OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
-	
+
 public:
 	FP12OnProjectileHitSignature OnProjectileHit;
-	
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USphereComponent* CollisionComponent;

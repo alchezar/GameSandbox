@@ -4,7 +4,7 @@
 
 #include "P12/Public/Actor/Navigation/P12PatrollingPath.h"
 
-FVector UP12AIPatrollingComponent::SelectClosestWayPoint() 
+FVector UP12AIPatrollingComponent::SelectClosestWayPoint()
 {
 	const FVector OwnerLocation = GetOwner()->GetActorLocation();
 	const TArray<FVector>& WayPoints = PatrollingPath->GetWayPoints();
@@ -27,17 +27,16 @@ FVector UP12AIPatrollingComponent::SelectClosestWayPoint()
 	return ClosestWayPoint;
 }
 
-FVector UP12AIPatrollingComponent::SelectNextWayPoint() 
+FVector UP12AIPatrollingComponent::SelectNextWayPoint()
 {
 	const TArray<FVector>& WayPoints = PatrollingPath->GetWayPoints();
 	const FTransform PathTransform = PatrollingPath->GetActorTransform();
-	
+
 	CurrentWayPointIndex = (CurrentWayPointIndex + 1) % WayPoints.Num();
 	return PathTransform.TransformPosition(WayPoints[CurrentWayPointIndex]);
 }
 
-bool UP12AIPatrollingComponent::GetCanPatrol() const 
+bool UP12AIPatrollingComponent::GetCanPatrol() const
 {
 	return PatrollingPath && !PatrollingPath->GetWayPoints().IsEmpty();
 }
-

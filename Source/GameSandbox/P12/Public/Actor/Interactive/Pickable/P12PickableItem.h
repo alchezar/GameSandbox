@@ -14,7 +14,7 @@ class GAMESANDBOX_API AP12PickableItem : public AActor, public IP12Interactable
 
 public:
 	FORCEINLINE const FName& GetDataTableID() const { return DataTableID; }
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName DataTableID = NAME_None;

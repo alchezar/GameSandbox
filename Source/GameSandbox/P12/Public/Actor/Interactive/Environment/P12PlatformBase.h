@@ -25,7 +25,7 @@ public:
 	AP12PlatformBase();
 	virtual void Tick(float DeltaTime) override;
 	void NewPlatformMove();
-	
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -50,12 +50,11 @@ protected:
 	float ReturnTime = 0.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	EP12PlatformBehavior PlatformBehavior;
-	
+
 private:
 	FTimeline PlatformTimeline;
 	FVector StartLocation = FVector::ZeroVector;
 	FVector EndLocation = FVector::ZeroVector;
 	bool bMovingForward = false;
 	FTimerHandle ReturnTimer;
-
 };

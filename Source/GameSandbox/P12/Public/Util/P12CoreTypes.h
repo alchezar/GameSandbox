@@ -17,9 +17,10 @@ struct FP12LedgeDescription
 
 	FP12LedgeDescription()
 		: Location(FVector::ZeroVector), Rotation(FRotator::ZeroRotator), Normal(FVector::ZeroVector) {}
+
 	FP12LedgeDescription(const FVector& NewLocation, const FRotator& NewRotation, const FVector& NewNormal)
 		: Location(NewLocation), Rotation(NewRotation), Normal(NewNormal) {}
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FVector Location;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,6 +36,7 @@ struct FP12Diapason
 
 	FP12Diapason()
 	{}
+
 	FP12Diapason(const float NewMin, const float NewMax)
 		: Min(NewMin), Max(NewMax) {}
 
@@ -42,7 +44,6 @@ struct FP12Diapason
 	float Min = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Max = 1.f;
-	
 };
 
 UENUM(BlueprintType)

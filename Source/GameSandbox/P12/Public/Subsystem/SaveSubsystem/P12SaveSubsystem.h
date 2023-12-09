@@ -20,7 +20,7 @@ public:
 	virtual UWorld* GetWorld() const override;
 	void SerializeLevel(const ULevel* Level, const ULevelStreaming* StreamingLevel = nullptr);
 	void DeserializeLevel(ULevel* Level, const ULevelStreaming* StreamingLevel = nullptr);
-	
+
 	FORCEINLINE const FP12GameSaveData& GetGameSaveData() const { return GameSaveData; }
 	UFUNCTION(BlueprintCallable, Category = "C++ | SaveSubsystem")
 	void SaveGame();
@@ -28,7 +28,7 @@ public:
 	void LoadLastGame();
 	UFUNCTION(BlueprintCallable, Category = "C++ | SaveSubsystem")
 	void LoadGame(const int32 SaveId);
-	
+
 private:
 	void SerializeGame();
 	void DeserializeGame();
@@ -39,7 +39,7 @@ private:
 	FString GetSaveFilePath(int32 SaveId) const;
 	int32 GetNextSaveId() const;
 	void OnActorSpawned(AActor* SpawnedActor);
-	
+
 	void SerializeActorComponents(AActor* Actor, FP12ActorSaveData& ActorSaveData);
 	void DeserializeActorComponents(AActor* Actor, const FP12ActorSaveData* ActorSaveData);
 	bool GetCanBeSaved(const UObject* Object);
@@ -47,18 +47,17 @@ private:
 
 	void CreateStreamingLevelObserver(UWorld* World);
 	void RemoveStreamingLevelObserver();
-	
+
 private:
 	FP12GameSaveData GameSaveData;
 	FString SaveDirectoryName;
 	TArray<int32> SaveIds;
 	FDelegateHandle OnActorSpawnedDelegateHandle;
-	
+
 	bool bUseCompressedSaves = false;
 	/* To avoid double ::OnLevelDeserialized() invocations */
 	bool bIgnoreOnActorSpawnedCallback = false;
 
 	UPROPERTY(Transient)
 	TArray<UP12StreamingLevelObserver*> StreamingLevelObservers;
-	
 };

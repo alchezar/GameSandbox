@@ -9,8 +9,7 @@
 #include "P12/Public/UI/MainMenu/P12MainMenuWidget.h"
 
 AP12HUD::AP12HUD()
-{	
-}
+{}
 
 void AP12HUD::BeginPlay()
 {
@@ -49,7 +48,7 @@ void AP12HUD::ShowReticle(const bool bShow, const EP12ReticleType ReticleType)
 		ReticleWidget = nullptr;
 		return;
 	}
-	
+
 	/* Remove previous reticle */
 	if (ReticleWidget)
 	{
@@ -84,7 +83,6 @@ void AP12HUD::ShowMainMenu(const bool bShow)
 	check(MainMenuWidget)
 	MainMenuWidget->CacheHUD(this);
 	MainMenuWidget->AddToViewport(0);
-	
 }
 
 void AP12HUD::ShowInteractable(const bool bShow, FName KeyName)
@@ -98,7 +96,7 @@ void AP12HUD::ShowInteractable(const bool bShow, FName KeyName)
 	{
 		return;
 	}
-	
+
 	check(HighlightWidgetClass)
 	HighlightWidget = CreateWidget<UP12HighlightInteractableWidget>(GetWorld(), HighlightWidgetClass);
 	check(HighlightWidget)

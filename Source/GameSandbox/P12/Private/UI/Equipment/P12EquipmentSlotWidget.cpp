@@ -25,7 +25,6 @@ void UP12EquipmentSlotWidget::InitializeSlot(AP12EquipableItem* InEquipableItem,
 		InventoryItemAdapter->Initialize(InEquipableItem->GetDataTableID(), WeaponTableRow->WeaponItemDescription);
 		InventoryItemAdapter->SetEquipWeaponClass(WeaponTableRow->EquipableActor);
 	}
-	
 }
 
 void UP12EquipmentSlotWidget::UpdateView()
@@ -54,7 +53,7 @@ void UP12EquipmentSlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	UP12InventorySlotWidget* DragWidget = CreateWidget<UP12InventorySlotWidget>(GetOwningPlayer(), DragAndDropWidgetClass);
 	check(DragWidget)
 	DragWidget->SetItemIcon(InventoryItemAdapter->GetDescription().Icon);
-	
+
 	UDragDropOperation* DragOperation = NewObject<UDragDropOperation>();
 	DragOperation->DefaultDragVisual = DragWidget;
 	DragOperation->Pivot = EDragPivot::MouseDown;
@@ -80,9 +79,9 @@ void UP12EquipmentSlotWidget::NativeOnDragCancelled(const FDragDropEvent& InDrag
 {
 	InventoryItemAdapter = Cast<UP12WeaponInventoryItem>(InOperation->Payload);
 	check(InventoryItemAdapter.IsValid())
-	
+
 	// LinkedEquipableItem = InventoryItemAdapter->GetEquipWeaponClass().Get();
 	// UpdateView();
-	
+
 	OnEquipmentDropInSlot.Execute(InventoryItemAdapter->GetEquipWeaponClass(), SlotIndexInComponent);
 }

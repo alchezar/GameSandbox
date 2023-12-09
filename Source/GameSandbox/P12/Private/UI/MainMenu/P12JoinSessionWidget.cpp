@@ -10,7 +10,7 @@
 void UP12JoinSessionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	CachedGameInstance = GetWorld()->GetGameInstance<UP12GameInstance>();
 	ToggleLeftButton->OnClicked.AddDynamic(this, &ThisClass::OnToggleSideButtonClicked);
 	ToggleRightButton->OnClicked.AddDynamic(this, &ThisClass::OnToggleSideButtonClicked);
@@ -26,19 +26,19 @@ void UP12JoinSessionWidget::CloseWidget()
 	Super::CloseWidget();
 }
 
-void UP12JoinSessionWidget::FindOnlineSession() 
+void UP12JoinSessionWidget::FindOnlineSession()
 {
 	CachedGameInstance->OnMatchFound.AddUObject(this, &ThisClass::OnMatchFound);
 	CachedGameInstance->FindMatch(bLAN);
 	SearchingSessionState = EP12SearchingSessionState::Searching;
 }
 
-void UP12JoinSessionWidget::JoinOnlineSession() 
+void UP12JoinSessionWidget::JoinOnlineSession()
 {
 	CachedGameInstance->JoinOnlineGame();
 }
 
-void UP12JoinSessionWidget::OnMatchFound(bool bSuccessful) 
+void UP12JoinSessionWidget::OnMatchFound(bool bSuccessful)
 {
 	SearchingSessionState = bSuccessful ? EP12SearchingSessionState::Found : EP12SearchingSessionState::None;
 	CachedGameInstance->OnMatchFound.RemoveAll(this);
@@ -74,4 +74,3 @@ void UP12JoinSessionWidget::OnAcceptButtonClicked()
 		JoinOnlineSession();
 	}
 }
-

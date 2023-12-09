@@ -13,7 +13,6 @@ AP12ExplosiveBarrel::AP12ExplosiveBarrel()
 
 	ExplosionComponent = CreateDefaultSubobject<UP12ExplosionComponent>("BarrelExplosionComponent");
 	ExplosionComponent->SetupAttachment(RootComponent);
-
 }
 
 void AP12ExplosiveBarrel::BeginPlay()

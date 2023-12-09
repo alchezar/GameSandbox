@@ -27,7 +27,7 @@ protected:
 
 private:
 	float GetMovementDirectionAngle() const;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	float Speed;
@@ -49,14 +49,14 @@ protected:
 	FRotator AimRotation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	FTransform GripSocketTransform;
-	
+
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector RightLegOffset = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector HipOffset = FVector::ZeroVector;
-	
+
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	TWeakObjectPtr<UP12BaseCharacterMovementComponent> CachedCharacterMovement;

@@ -31,7 +31,7 @@ public:
 	virtual void Tick(const float DeltaTime) override;
 	void StartAttack(EP12MeleeAttackType AttackType);
 	void ToggleHitRegistration(const bool bEnable);
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void InitAnimNotify() override;
@@ -45,7 +45,7 @@ private:
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UStaticMeshComponent* WeaponMesh;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Melee")
 	TMap<EP12MeleeAttackType, FP12MeleeAttackDescription> Attacks;
 

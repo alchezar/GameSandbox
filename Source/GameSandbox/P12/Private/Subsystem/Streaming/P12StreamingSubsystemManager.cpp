@@ -98,7 +98,7 @@ void UP12StreamingSubsystemManager::RemoveUnloadRequest(AP12StreamingSubsystemVo
 	}
 }
 
-void UP12StreamingSubsystemManager::LoadLevel() 
+void UP12StreamingSubsystemManager::LoadLevel()
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystemManager::LoadLevel(): LevelName: %s"), *LevelName);
 
@@ -112,7 +112,7 @@ void UP12StreamingSubsystemManager::LoadLevel()
 	StreamingLevel->bShouldBlockOnLoad = true;
 }
 
-void UP12StreamingSubsystemManager::UnloadLevel() 
+void UP12StreamingSubsystemManager::UnloadLevel()
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystemManager::UnloadLevel(): LevelName: %s"), *LevelName);
 
@@ -126,7 +126,7 @@ void UP12StreamingSubsystemManager::UnloadLevel()
 	StreamingLevel->bShouldBlockOnLoad = true;
 }
 
-void UP12StreamingSubsystemManager::OnLevelLoaded() 
+void UP12StreamingSubsystemManager::OnLevelLoaded()
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystemManager::OnLevelLoaded(): LevelName: %s"), *LevelName);
 
@@ -137,7 +137,7 @@ void UP12StreamingSubsystemManager::OnLevelLoaded()
 	StreamingLevelState = StreamingLevel->GetLevelStreamingState();
 }
 
-void UP12StreamingSubsystemManager::OnLevelUnloaded() 
+void UP12StreamingSubsystemManager::OnLevelUnloaded()
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystemManager::OnLevelUnloaded(): LevelName: %s"), *LevelName);
 
@@ -147,4 +147,3 @@ void UP12StreamingSubsystemManager::OnLevelUnloaded()
 	}
 	StreamingLevelState = StreamingLevel->GetLevelStreamingState();
 }
-

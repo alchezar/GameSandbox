@@ -31,7 +31,7 @@ private:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	float TargetReachRadius = 100.f;
-	
+
 private:
 	TWeakObjectPtr<AP12AICharacter> CachedAICharacter;
 	bool bPatrolling = false;

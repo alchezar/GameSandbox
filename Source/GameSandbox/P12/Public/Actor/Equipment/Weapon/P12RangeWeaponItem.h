@@ -133,12 +133,12 @@ protected:
 	int32 MaxAmmo = 30;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Fire")
 	float AimingFOV = 90.f;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Recoil")
 	FP12RecoilParams RecoilParams;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Recoil")
 	TSubclassOf<UCameraShakeBase> ShotCameraShakeClass;
-	
+
 private:
 	FTimerHandle ShotTimer;
 	float CurrentBulletSpread = 0.f;
@@ -147,7 +147,7 @@ private:
 	int32 Ammo = 0;
 	bool bReloading = false;
 	float LastShotTime = 0.f;
-	
+
 	FTimerHandle RecoilTimer;
 	FTimerHandle RecoilRollbackTimer;
 	FP12AccumulatedRecoil AccumulatedRecoil;

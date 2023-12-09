@@ -18,7 +18,7 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void ActorsPerceptionUpdated(const TArray<AActor*>& UpdatedActors) override;
-	
+
 protected:
 	virtual void BeginPlay() override;
 

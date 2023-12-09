@@ -38,7 +38,7 @@ void AP12PlatformBase::Tick(float DeltaTime)
 	PlatformTimeline.TickTimeline(DeltaTime);
 }
 
-void AP12PlatformBase::NewPlatformMove() 
+void AP12PlatformBase::NewPlatformMove()
 {
 	if (bMovingForward)
 	{
@@ -52,7 +52,7 @@ void AP12PlatformBase::NewPlatformMove()
 	}
 }
 
-void AP12PlatformBase::SetupTimeline() 
+void AP12PlatformBase::SetupTimeline()
 {
 	FOnTimelineFloat OnTimelineUpdate;
 	OnTimelineUpdate.BindDynamic(this, &ThisClass::PlatformUpdateHandle);
@@ -65,22 +65,16 @@ void AP12PlatformBase::SetupTimeline()
 
 void AP12PlatformBase::OnTriggerActiveHandle(bool bActive)
 {
-	// if (!bActive && PlatformTimeline.IsPlaying())
-	// {
-	// 	PlatformTimeline.Stop();
-	// 	return;
-	// }
 	NewPlatformMove();
 }
 
-
-void AP12PlatformBase::PlatformUpdateHandle(float Output) 
+void AP12PlatformBase::PlatformUpdateHandle(float Output)
 {
 	const FVector NewLocation = FMath::Lerp(StartLocation, EndLocation, Output);
 	SetActorLocation(NewLocation);
 }
 
-void AP12PlatformBase::PlatformFinishHandle() 
+void AP12PlatformBase::PlatformFinishHandle()
 {
 	if (PlatformBehavior == EP12PlatformBehavior::Loop)
 	{

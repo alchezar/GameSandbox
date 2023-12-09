@@ -12,8 +12,6 @@ void UP12ExplosionComponent::Explode(AController* Instigator)
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(this, ExplosionEffect, GetComponentLocation());
 	}
-	
-	OnExplosion.Broadcast();
 
-	
+	OnExplosion.Broadcast();
 }

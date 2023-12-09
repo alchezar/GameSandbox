@@ -162,7 +162,7 @@ void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsIn
 	{
 		LastShotsInfo = ShotsInfo;
 	}
-	
+
 	for (const FP12ShotInfo ShotInfo : ShotsInfo)
 	{
 		const FVector ShotStart = ShotInfo.GetLocation();
@@ -173,10 +173,10 @@ void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsIn
 		{
 			FHitResult ShotHitResult;
 			HitScan(ShotStart, ShotEnd, ShotDirection, ShotHitResult);
-			
-			const FVector EndPoint = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd; 
+
+			const FVector EndPoint = ShotHitResult.bBlockingHit ? ShotHitResult.ImpactPoint : ShotHitResult.TraceEnd;
 			DrawNiagaraTale(EndPoint);
-			
+
 			UP12Library::DrawDebugLineTrace(GetWorld(), ShotHitResult, UP12Library::GetCanDrawDebugFire(), false);
 		}
 		if (HitRegistrationType == EP12HitRegistrationType::Projectile)
@@ -185,7 +185,6 @@ void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsIn
 		}
 	}
 }
-
 
 void UP12WeaponBarrelComponent::Server_Shot_Implementation(const TArray<FP12ShotInfo>& ShotsInfo)
 {
@@ -202,8 +201,8 @@ void UP12WeaponBarrelComponent::ProcessProjectileHit(const FHitResult& HitResult
 	/* Deactivate projectile */
 	Projectile->ToggleActive(false, ProjectilePoolLocation);
 	Projectile->OnProjectileHit.RemoveAll(this);
-	
-	ProcessHit(HitResult, Direction);	
+
+	ProcessHit(HitResult, Direction);
 }
 
 void UP12WeaponBarrelComponent::Multicast_DrawBulletHoleDecal_Implementation(const FHitResult& HitResult)

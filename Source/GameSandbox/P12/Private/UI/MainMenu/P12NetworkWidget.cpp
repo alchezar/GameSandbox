@@ -15,5 +15,4 @@ void UP12NetworkWidget::ToggleNetworkType()
 void UP12NetworkWidget::CloseWidget()
 {
 	OnNetworkWidgetClose.Broadcast();
-	// SetVisibility(ESlateVisibility::Collapsed);
 }

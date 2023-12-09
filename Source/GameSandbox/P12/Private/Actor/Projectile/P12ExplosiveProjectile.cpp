@@ -8,7 +8,6 @@
 AP12ExplosiveProjectile::AP12ExplosiveProjectile()
 {
 	ExplosionComponent = CreateDefaultSubobject<UP12ExplosionComponent>("ExplosionComponent");
-	// ExplosionComponent->SetupAttachment(RootComponent);
 }
 
 void AP12ExplosiveProjectile::LaunchProjectile(const FVector& Direction, AActor* LaunchedFrom)
@@ -28,10 +27,9 @@ void AP12ExplosiveProjectile::Detonate()
 		Controller = Char->Controller;
 	}
 	ExplosionComponent->Explode(Controller);
-	
+
 	MeshComponent->SetVisibility(false);
 	CollisionComponent->SetSimulatePhysics(false);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetLifeSpan(5.f);
 }
-

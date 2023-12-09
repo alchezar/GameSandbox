@@ -13,7 +13,7 @@ class GAMESANDBOX_API AP12PowerupPickable : public AP12PickableItem
 
 public:
 	AP12PowerupPickable();
-	
+
 	virtual void Interact(AP12BaseCharacter* Char) override;
 	virtual FName GetActionEventName() const override;
 

@@ -37,7 +37,7 @@ private:
 	UFUNCTION()
 	void OnRep_Health(float LastHealth);
 	void OnHealthChanged();
-	
+
 #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
 	void DebugDrawAttributes();
 #endif

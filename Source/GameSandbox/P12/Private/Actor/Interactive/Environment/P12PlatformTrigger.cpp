@@ -13,10 +13,10 @@ AP12PlatformTrigger::AP12PlatformTrigger()
 	MinNetUpdateFrequency = 2.f;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
-	
+
 	TriggerBase = CreateDefaultSubobject<UStaticMeshComponent>("TriggerBaseStaticMeshComponent");
 	TriggerBase->SetupAttachment(RootComponent);
-	
+
 	PlatformTrigger = CreateDefaultSubobject<UBoxComponent>("PlatformTriggerBoxComponent");
 	PlatformTrigger->SetCollisionProfileName("PawnInteractionVolume");
 	PlatformTrigger->SetupAttachment(RootComponent);
@@ -41,15 +41,15 @@ void AP12PlatformTrigger::Tick(float DeltaTime)
 void AP12PlatformTrigger::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
+
 	DOREPLIFETIME(ThisClass, bActive);
-	
+
 	// FDoRepLifetimeParams RepParams;
 	// RepParams.RepNotifyCondition = REPNOTIFY_Always;
 	// DOREPLIFETIME_WITH_PARAMS(ThisClass, bActive, RepParams);
 }
 
-void AP12PlatformTrigger::OnTriggerBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
+void AP12PlatformTrigger::OnTriggerBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	APawn* OverlappedPawn = Cast<APawn>(OtherActor);
 	if (!OverlappedPawn)
@@ -67,7 +67,7 @@ void AP12PlatformTrigger::OnTriggerBeginOverlapHandle(UPrimitiveComponent* Overl
 	}
 }
 
-void AP12PlatformTrigger::OnTriggerEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex) 
+void AP12PlatformTrigger::OnTriggerEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
 {
 	APawn* OverlappedPawn = Cast<APawn>(OtherActor);
 	if (!OverlappedPawn)

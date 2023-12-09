@@ -18,7 +18,7 @@ public:
 	AP12CharacterAISpawner();
 	UFUNCTION()
 	void SpawnAI();
-	
+
 protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
@@ -26,7 +26,7 @@ protected:
 
 private:
 	void UnsubscribeFromTrigger();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TSubclassOf<AP12AICharacter> CharacterClass;
@@ -37,8 +37,8 @@ protected:
 
 	/* An actor implementing IP12Interactable interface */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
-	AActor* SpawnTriggerActor;	
-	
+	AActor* SpawnTriggerActor;
+
 private:
 	bool bCanSpawn = true;
 

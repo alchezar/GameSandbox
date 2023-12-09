@@ -24,10 +24,9 @@ protected:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UGridPanel* GridPanelItemsSlot;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP12InventorySlotWidget> InventorySlotWidgetClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
-	int32 ColumnCount = 4;	
-		
+	int32 ColumnCount = 4;
 };

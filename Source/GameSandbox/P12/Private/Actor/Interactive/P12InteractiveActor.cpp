@@ -25,12 +25,10 @@ bool AP12InteractiveActor::IsOverlappingCharacterCapsule(AActor* OtherActor, UPr
 	const AP12BaseCharacter* BaseCharacter = Cast<AP12BaseCharacter>(OtherActor);
 	if (!BaseCharacter)
 	{
-		BaseCharacter = nullptr;
 		return false;
 	}
-	if (Cast<UCapsuleComponent>(OtherComp) != BaseCharacter->GetCapsuleComponent())
+	if (OtherComp != BaseCharacter->GetCapsuleComponent())
 	{
-		BaseCharacter = nullptr;
 		return false;
 	}
 	return true;

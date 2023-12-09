@@ -59,7 +59,7 @@ float UP12BaseCharacterMovementComponent::GetMaxSpeed() const
 void UP12BaseCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 {
 	Super::UpdateFromCompressedFlags(Flags);
-	
+
 	/* FLAG_Reserved_1		= 0x04,	// Reserved for future use
 	 * FLAG_Reserved_2		= 0x08,	// Reserved for future use
 	 * // Remaining bit masks are available for custom flags.
@@ -68,7 +68,7 @@ void UP12BaseCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	 * FLAG_Custom_2		= 0x40,
 	 * FLAG_Custom_3		= 0x80,
 	 */
-	
+
 	bRunning = (Flags & FSavedMove_Character::FLAG_Custom_0) != 0;
 
 	const bool bWasMantle = bMantle;
@@ -216,7 +216,6 @@ void UP12BaseCharacterMovementComponent::OnMovementModeChanged(EMovementMode Pre
 	{
 		GetWorld()->GetTimerManager().SetTimer(MantlingTimer, this, &ThisClass::EndMantle, CurrentMantleParams.Duration);
 		bMantle = true;
-		
 	}
 	if (PreviousMovementMode == MOVE_Custom && PreviousCustomMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
 	{
@@ -241,7 +240,7 @@ void UP12BaseCharacterMovementComponent::PhysCustom(const float DeltaTime, const
 	{
 		return;
 	}
-	
+
 	if (CustomMovementMode == static_cast<uint8>(EP12CustomMovementMode::CMOVE_Mantling))
 	{
 		PhysMantling(DeltaTime, Iterations);
@@ -333,7 +332,7 @@ void UP12BaseCharacterMovementComponent::PhysicsRotation(const float DeltaTime)
 		UP12Library::FixedTurn(TargetRotation, CurrentRotation, DeltaRot);
 		FHitResult RotateHit;
 		SafeMoveUpdatedComponent(FVector::ZeroVector, TargetRotation, false, RotateHit);
-		
+
 		if (CurrentRotation.Equals(TargetRotation))
 		{
 			SwitchForceRotation(false);
@@ -404,7 +403,7 @@ uint8 FP12SavedMove_BaseCharacter::GetCompressedFlags() const
 		Result &= ~FLAG_Custom_0;
 		Result |= FLAG_Custom_1;
 	}
-	
+
 	return Result;
 }
 
@@ -439,14 +438,12 @@ void FP12SavedMove_BaseCharacter::PrepMoveFor(ACharacter* Character)
 
 FP12NetworkPredictionData_Client_BaseCharacter::FP12NetworkPredictionData_Client_BaseCharacter(const UCharacterMovementComponent& ClientMovement)
 	: Super(ClientMovement)
-{
-	
-}
+{}
 
 FSavedMovePtr FP12NetworkPredictionData_Client_BaseCharacter::AllocateNewMove()
 {
 	/* typedef TSharedPtr<class FSavedMove_Character> FSavedMovePtr; */
 	// return FSavedMovePtr(new FP12SavedMove_BaseCharacter());
-	
+
 	return MakeShared<FP12SavedMove_BaseCharacter>();
 }

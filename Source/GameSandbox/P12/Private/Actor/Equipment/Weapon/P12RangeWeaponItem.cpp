@@ -29,10 +29,6 @@ void AP12RangeWeaponItem::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// check(GetOwner()->IsA<AP12BaseCharacter>())
-	// CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
-	// InitAnimNotify();
-
 	SetAmmo(MaxAmmo);
 }
 
@@ -52,7 +48,7 @@ void AP12RangeWeaponItem::FireInput(const bool bStart)
 		{
 			GetWorld()->GetTimerManager().SetTimer(RecoilRollbackTimer, this, &ThisClass::StopRecoilRollback, AccumulatedRecoil.RollbackTime);
 		}
-		
+
 		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
 		return;
 	}
@@ -145,8 +141,7 @@ void AP12RangeWeaponItem::MakeShot()
 	}
 	check(GetCachedCharacter().IsValid())
 	GetCachedCharacter() = StaticCast<AP12BaseCharacter*>(GetOwner());
-	
-	
+
 	FVector ShotLocation;
 	FRotator ShotRotation;
 	if (GetCachedCharacter()->IsPlayerControlled())
@@ -262,7 +257,7 @@ void AP12RangeWeaponItem::OnOneReloadedHandle(USkeletalMeshComponent* SkeletalMe
 void AP12RangeWeaponItem::Reload(const bool bByOne, const int32 NumberOfAmmo)
 {
 	bReloading = false;
-	
+
 	const int32 AvailableAmmoCount = GetEquipment()->GetMaxAvailableAmmoAmount(AmmoType);
 	const int32 AmmoToReload = bByOne ? NumberOfAmmo : MaxAmmo - Ammo;
 	const int32 ReloadedAmmo = FMath::Min(AvailableAmmoCount, AmmoToReload);
@@ -351,7 +346,7 @@ void AP12RangeWeaponItem::ProcessRecoil(const float DeltaTime)
 	const float RecoilPitch = -RecoilParams.Pitch / GetRecoilTimeInterval() * DeltaTime;
 	CharacterOwner->AddControllerPitchInput(RecoilPitch);
 	AccumulatedRecoil.Pitch += RecoilPitch;
-	
+
 	float RecoilYaw = RecoilParams.Yaw / GetRecoilTimeInterval() * DeltaTime;
 	RecoilYaw = FMath::RandBool() ? RecoilYaw : -RecoilYaw;
 	CharacterOwner->AddControllerYawInput(RecoilYaw);

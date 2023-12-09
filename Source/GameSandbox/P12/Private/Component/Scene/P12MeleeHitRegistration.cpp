@@ -27,7 +27,7 @@ void UP12MeleeHitRegistration::TickComponent(float DeltaTime, ELevelTick TickTyp
 	PreviousLocation = GetComponentLocation();
 }
 
-void UP12MeleeHitRegistration::ProcessHitRegistration() 
+void UP12MeleeHitRegistration::ProcessHitRegistration()
 {
 	const FVector CurrentLocation = GetComponentLocation();
 	FHitResult HitResult;

@@ -33,15 +33,16 @@ struct FP12MaxSpeed
 struct FP12MantleMovementParams
 {
 	FP12MantleMovementParams() {};
+
 	FP12MantleMovementParams(const FVector& NewInitLocation, const FRotator& NewInitRotation, const FVector& NewTargetLocation, const FRotator& NewTargetRotation, const float NewDuration, const float NewStartTime, UCurveVector* NewCurve, const FVector& NewInitAnimLocation)
 		: InitLocation(NewInitLocation), InitRotation(NewInitRotation), TargetLocation(NewTargetLocation), TargetRotation(NewTargetRotation), Duration(NewDuration), StartTime(NewStartTime), Curve(NewCurve), InitAnimationLocation(NewInitAnimLocation) {}
-	
+
 	FVector InitLocation = FVector::ZeroVector;
 	FRotator InitRotation = FRotator::ZeroRotator;
 
 	FVector TargetLocation = FVector::ZeroVector;
 	FRotator TargetRotation = FRotator::ZeroRotator;
-	
+
 	float Duration = 1.f;
 	float StartTime = 0.f;
 
@@ -55,8 +56,8 @@ enum class EP12CustomMovementMode : uint8
 {
 	CMOVE_None = 0 UMETA(DisplayName = "None"),
 	CMOVE_Mantling UMETA(DisplayName = "Mantling"),
-	CMOVE_Ladder   UMETA(DisplayName = "Ladder"),
-	CMOVE_Max      UMETA(Hidden)
+	CMOVE_Ladder UMETA(DisplayName = "Ladder"),
+	CMOVE_Max UMETA(Hidden)
 };
 
 UENUM(BlueprintType)
@@ -150,10 +151,10 @@ public:
 	virtual uint8 GetCompressedFlags() const override;
 	virtual bool CanCombineWith(const FSavedMovePtr& NewMovePtr, ACharacter* InCharacter, float MaxDelta) const override;
 	virtual void SetMoveFor(ACharacter* InCharacter, float InDeltaTime, FVector const& NewAccel, FNetworkPredictionData_Client_Character& ClientData) override;
-	virtual void PrepMoveFor(ACharacter* Character) override;	
-	
+	virtual void PrepMoveFor(ACharacter* Character) override;
+
 private:
-	uint8 bSavedIsRunning : 1;
+	uint8 bSavedIsRunning  : 1;
 	uint8 bSavedIsMantling : 1;
 };
 
@@ -165,4 +166,3 @@ public:
 	explicit FP12NetworkPredictionData_Client_BaseCharacter(const UCharacterMovementComponent& ClientMovement);
 	virtual FSavedMovePtr AllocateNewMove() override;
 };
-

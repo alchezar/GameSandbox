@@ -69,7 +69,7 @@ void AP12MeleeWeaponItem::StartAttack(EP12MeleeAttackType AttackType)
 	CharacterOwner->PlayAnimMontage(CurrentAttack->Montage);
 }
 
-void AP12MeleeWeaponItem::OnMeleeAttackStartHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
+void AP12MeleeWeaponItem::OnMeleeAttackStartHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	const AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
 	if (CharacterOwner && CharacterOwner->GetMesh() != SkeletalMeshComponent)
@@ -80,7 +80,7 @@ void AP12MeleeWeaponItem::OnMeleeAttackStartHandle(USkeletalMeshComponent* Skele
 	ToggleHitRegistration(true);
 }
 
-void AP12MeleeWeaponItem::OnMeleeAttackEndHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
+void AP12MeleeWeaponItem::OnMeleeAttackEndHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	const AP12BaseCharacter* CharacterOwner = GetCachedCharacter().Get();
 	if (CharacterOwner && CharacterOwner->GetMesh() != SkeletalMeshComponent)
@@ -90,7 +90,7 @@ void AP12MeleeWeaponItem::OnMeleeAttackEndHandle(USkeletalMeshComponent* Skeleta
 
 	/* End attack window */
 	ToggleHitRegistration(false);
-	
+
 	CurrentAttack = nullptr;
 }
 

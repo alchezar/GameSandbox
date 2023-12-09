@@ -15,16 +15,15 @@ AP12Turret::AP12Turret()
 
 	USceneComponent* TurretRoot = CreateDefaultSubobject<USceneComponent>("TurretRootComponent");
 	SetRootComponent(TurretRoot);
-	
+
 	TurretBaseComponent = CreateDefaultSubobject<USceneComponent>("TurretBaseSceneComponent");
 	TurretBaseComponent->SetupAttachment(RootComponent);
-	
+
 	TurretBarrelComponent = CreateDefaultSubobject<USceneComponent>("TurretBarrelSceneComponent");
 	TurretBarrelComponent->SetupAttachment(TurretBaseComponent);
 
 	BarrelComponent = CreateDefaultSubobject<UP12WeaponBarrelComponent>("TurretWeaponBarrelComponent");
 	BarrelComponent->SetupAttachment(TurretBarrelComponent);
-
 }
 
 void AP12Turret::Tick(const float DeltaTime)
@@ -50,16 +49,14 @@ void AP12Turret::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 FVector AP12Turret::GetPawnViewLocation() const
 {
-	// return Super::GetPawnViewLocation();
 	return BarrelComponent->GetComponentLocation();
 }
 
 FRotator AP12Turret::GetViewRotation() const
 {
-	// return Super::GetViewRotation();
-	return BarrelComponent->GetComponentRotation();	
+	return BarrelComponent->GetComponentRotation();
 }
-	
+
 void AP12Turret::SetCurrentTarget(AActor* NewTarget)
 {
 	if (CurrentTarget != NewTarget)
@@ -68,7 +65,7 @@ void AP12Turret::SetCurrentTarget(AActor* NewTarget)
 	}
 	CurrentTarget = NewTarget;
 	BindOnTargetHealthChanged(CurrentTarget, true);
-	
+
 	OnCurrentTargetSet();
 }
 
@@ -85,7 +82,7 @@ void AP12Turret::SetCurrentTurretState(const EP12TurretState NewState)
 		return;
 	}
 	TurretState = NewState;
-	
+
 	if (TurretState == EP12TurretState::Searching)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(ShotTimer);
@@ -96,7 +93,7 @@ void AP12Turret::SetCurrentTurretState(const EP12TurretState NewState)
 	}
 }
 
-void AP12Turret::SearchingMovement(const float DeltaTime) 
+void AP12Turret::SearchingMovement(const float DeltaTime)
 {
 	FRotator TurretBaseRotation = TurretBaseComponent->GetRelativeRotation();
 	TurretBaseRotation.Yaw += DeltaTime * BaseSearchingRotationRate;
@@ -107,9 +104,9 @@ void AP12Turret::SearchingMovement(const float DeltaTime)
 	TurretBarrelComponent->SetRelativeRotation(TurretBarrelRotation);
 }
 
-void AP12Turret::FiringMovement(const float DeltaTime) 
+void AP12Turret::FiringMovement(const float DeltaTime)
 {
-	const FVector LookAtDirection = (CurrentTarget->GetActorLocation() -TurretBaseComponent->GetComponentLocation()).GetSafeNormal2D();
+	const FVector LookAtDirection = (CurrentTarget->GetActorLocation() - TurretBaseComponent->GetComponentLocation()).GetSafeNormal2D();
 	const FQuat LookAtQuat = LookAtDirection.ToOrientationQuat();
 	const FQuat TargetQuat = FMath::QInterpTo(TurretBaseComponent->GetComponentQuat(), LookAtQuat, DeltaTime, BaseFiringInterpSpeed);
 	TurretBaseComponent->SetWorldRotation(TargetQuat);

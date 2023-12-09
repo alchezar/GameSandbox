@@ -12,11 +12,10 @@ AP12StreamingSubsystemVolume::AP12StreamingSubsystemVolume()
 {
 	USceneComponent* SceneRoot = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	SetRootComponent(SceneRoot);
-	
+
 	Collision = CreateDefaultSubobject<UBoxComponent>("CollisionBoxComponent");
 	Collision->SetupAttachment(SceneRoot);
 }
-
 
 void AP12StreamingSubsystemVolume::BeginPlay()
 {
@@ -25,7 +24,7 @@ void AP12StreamingSubsystemVolume::BeginPlay()
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("AP12StreamingSubsystemVolume::BeginPlay(): %s"), *GetNameSafe(this));
 
 	StreamingSubsystem = GetWorld()->GetGameInstance()->GetSubsystem<UP12StreamingSubsystem>();
-	
+
 	Collision->OnComponentBeginOverlap.AddUniqueDynamic(this, &ThisClass::OnCollisionBeginOverlapHandle);
 	Collision->OnComponentEndOverlap.AddUniqueDynamic(this, &ThisClass::OnCollisionEndOverlapHandle);
 	Collision->SetCollisionResponseToAllChannels(ECR_Overlap);

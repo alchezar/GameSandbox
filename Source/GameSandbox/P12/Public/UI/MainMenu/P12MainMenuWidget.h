@@ -19,7 +19,7 @@ class GAMESANDBOX_API UP12MainMenuWidget : public UUserWidget
 
 public:
 	void CacheHUD(const AP12HUD* HUD);
-	
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -39,14 +39,14 @@ protected:
 	UButton* HostButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* JoinButton;
-	
+
 	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* MenuSwitcher;
 	UPROPERTY(meta = (BindWidget))
 	UP12HostSessionWidget* HostSessionWidget;
 	UPROPERTY(meta = (BindWidget))
 	UP12JoinSessionWidget* JoinSessionWidget;
-	
+
 private:
 	TSoftObjectPtr<AP12HUD> CachedHUD;
 	int32 MainMenuIndex = 0;

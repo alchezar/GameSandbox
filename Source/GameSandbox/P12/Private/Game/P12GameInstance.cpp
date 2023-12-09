@@ -39,7 +39,7 @@ void UP12GameInstance::Shutdown()
 {
 	GEngine->NetworkFailureEvent.Remove(OnNetworkFailureEventHandle);
 	GEngine->TravelFailureEvent.Remove(OnTravelFailureEventHandle);
-	
+
 	Super::Shutdown();
 }
 
@@ -54,7 +54,7 @@ bool UP12GameInstance::ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, U
 			bResult |= Subsystem->ProcessConsoleExec(Cmd, Ar, Executor);
 		}
 	}
-	
+
 	return bResult;
 }
 
@@ -118,7 +118,7 @@ IOnlineSessionPtr UP12GameInstance::GetSessionsFromOnlineSubsystem()
 /*------ CreatingNetworkSession ------*/
 
 bool UP12GameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName SessionName, bool bLAN, bool bPresence, int32 MaxNumPlayers)
-{	
+{
 	/* Get session interface, so we can call "CreateSession" method on it. */
 	const IOnlineSessionPtr Sessions = GetSessionsFromOnlineSubsystem();
 	if (!Sessions.IsValid() || !UserId.IsValid())
@@ -146,7 +146,7 @@ bool UP12GameInstance::HostSession(TSharedPtr<const FUniqueNetId> UserId, FName 
 	/* Set the delegate to the handle of the session interface. */
 	OnCreateSessionCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(OnCreateSessionCompleteDelegate);
 	/* ::OnCreateSessionComplete(...) */
-	
+
 	/* Our delegate should get called when this is complete (does not need to be successful). */
 	return Sessions->CreateSession(*UserId, SessionName, *SessionSettings);
 }
@@ -205,7 +205,7 @@ void UP12GameInstance::FindSession(TSharedPtr<const FUniqueNetId> UserId, bool b
 		OnFindSessionComplete(false);
 		return;
 	}
-	
+
 	/* Fill in all SearchSettings, like if we are searching for a LAN game and how many results we want to have. */
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
 	SessionSearch->bIsLanQuery = bLAN;
@@ -220,7 +220,7 @@ void UP12GameInstance::FindSession(TSharedPtr<const FUniqueNetId> UserId, bool b
 	/* Set the delegate to delegate handle of the find session function. */
 	OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);
 	/* ::OnFindSessionComplete(...) */
-	
+
 	/* Find session */
 	Sessions->FindSessions(*UserId, SessionSearch.ToSharedRef());
 }
@@ -236,7 +236,7 @@ void UP12GameInstance::OnFindSessionComplete(const bool bSuccessful)
 		OnMatchFound.Broadcast(bMatchFound);
 		return;
 	}
-	
+
 	/* Clear the delegate handle, since we finished this call. */
 	Sessions->ClearOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegateHandle);
 	/* Just debugging the Number of Search results. Can be displayed in UMG or something later on. */
@@ -248,7 +248,7 @@ void UP12GameInstance::OnFindSessionComplete(const bool bSuccessful)
 		OnMatchFound.Broadcast(bMatchFound);
 		return;
 	}
-	
+
 	/* "SessionSearch->SearchResults" is an Array that contains all the information.
 	 * You can access the Session in this and get a lot of information.
 	 * This can be customized later on with your own classes to add more information that can be set and displayed. */
@@ -269,7 +269,7 @@ bool UP12GameInstance::JoinFoundOnlineSession(TSharedPtr<const FUniqueNetId> Use
 {
 	/* Return bool */
 	bool bSuccessful = false;
-	
+
 	const IOnlineSessionPtr Sessions = GetSessionsFromOnlineSubsystem();
 	if (!Sessions.IsValid() || !UserId.IsValid())
 	{
@@ -278,12 +278,12 @@ bool UP12GameInstance::JoinFoundOnlineSession(TSharedPtr<const FUniqueNetId> Use
 	/* Set the Handle again. */
 	OnJoinSessionCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(OnJoinSessionCompleteDelegate);
 	/* ::OnJoinSessionComplete(...) */
-	
+
 	/* All the "JoinSession" Function with the passed "SearchResult".
 	 * The "SessionSearch->SearchResults" can be used to get such a "FOnlineSessionSearchResult" and pass it.
 	 * Pretty straight forward! */
 	bSuccessful = Sessions->JoinSession(*UserId, SessionName, SearchResult);
-	
+
 	return bSuccessful;
 }
 

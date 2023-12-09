@@ -17,10 +17,11 @@ struct FP12DoorAngle
 	GENERATED_BODY()
 
 	FP12DoorAngle()
-		{}
+	{}
+
 	FP12DoorAngle(const float NewClosed, const float NewOpened)
 		: Closed(NewClosed), Opened(NewOpened) {}
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Closed = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -35,7 +36,7 @@ class GAMESANDBOX_API AP12Door : public AActor, public IP12Interactable, public 
 public:
 	AP12Door();
 	virtual void Tick(const float DeltaTime) override;
-	
+
 	virtual void Interact(AP12BaseCharacter* Char) override;
 	virtual FName GetActionEventName() const override;
 	virtual bool HasOnInteractionCallback() const override;
@@ -56,7 +57,7 @@ private:
 
 	void OpenDoor();
 	void OpenDoorSmoothly(FRotator StartRotation, FRotator TargetRotation);
-	
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USceneComponent* DoorPivot;

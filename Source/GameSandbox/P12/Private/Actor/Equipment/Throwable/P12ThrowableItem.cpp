@@ -68,7 +68,7 @@ void AP12ThrowableItem::TakeThrowable()
 void AP12ThrowableItem::Throw()
 {
 	ProjectileBillet->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-	
+
 	const FRotator PlayerRotation = GetCachedCharacter()->GetViewRotation();
 	const FRotator FixedRotation = PlayerRotation + FRotator(GravityCompensationAngle, 0.f, 0.f);
 	const FVector PlayerDirection = PlayerRotation.RotateVector(FVector::ForwardVector);
@@ -83,6 +83,4 @@ void AP12ThrowableItem::Throw()
 }
 
 void AP12ThrowableItem::OnEquipmentStateChangedHandle(const bool bEquipped)
-{
-	
-}
+{}

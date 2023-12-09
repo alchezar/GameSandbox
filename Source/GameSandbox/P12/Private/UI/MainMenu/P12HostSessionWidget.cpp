@@ -10,7 +10,7 @@
 void UP12HostSessionWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	ToggleLeftButton->OnClicked.AddDynamic(this, &ThisClass::OnToggleLeftButtonClicked);
 	ToggleRightButton->OnClicked.AddDynamic(this, &ThisClass::OnToggleRightButtonClicked);
 	UserServerNameTextBox->OnTextCommitted.AddDynamic(this, &ThisClass::OnUserServerNameCommitted);

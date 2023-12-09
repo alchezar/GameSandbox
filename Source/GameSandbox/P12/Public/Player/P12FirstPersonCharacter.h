@@ -14,7 +14,7 @@ struct FP12LadderCameraLimits
 	GENERATED_BODY()
 
 	FP12LadderCameraLimits() {}
-	
+
 	FP12LadderCameraLimits(const float NewMinPitch, const float NewMaxPitch, const float NewMinYaw, const float NewMaxYaw)
 		: MinPitch(NewMinPitch), MaxPitch(NewMaxPitch), MinYaw(NewMinYaw), MaxYaw(NewMaxYaw) {}
 
@@ -63,7 +63,7 @@ private:
 	void SetCameraLimits(const FP12LadderCameraLimits Limits);
 	void ResetCameraLimits();
 	void TurnLadderLimits(const bool bOn);
-	
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USkeletalMeshComponent* FirstPersonMesh;
@@ -75,7 +75,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement | Ladder")
 	FP12LadderCameraLimits LadderCameraLimits;
-	
+
 private:
 	FTimerHandle MontageTimer;
 	TWeakObjectPtr<AP12PlayerController> CachedPlayerController;

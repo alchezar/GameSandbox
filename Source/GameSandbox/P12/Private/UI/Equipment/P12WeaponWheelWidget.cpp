@@ -12,13 +12,13 @@
 
 void UP12WeaponWheelWidget::InitializeWheelWidget(UP12EquipmentComponent* InEquipmentComp)
 {
-	EquipmentComponent = InEquipmentComp;	
+	EquipmentComponent = InEquipmentComp;
 }
 
 void UP12WeaponWheelWidget::NextSegment()
 {
 	CurrentSegmentIndex = ++CurrentSegmentIndex % EquipmentSlotsSegments.Num();
-	SelectSegment();	
+	SelectSegment();
 }
 
 void UP12WeaponWheelWidget::PrevSegment()

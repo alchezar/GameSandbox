@@ -27,5 +27,4 @@ protected:
 	UStaticMeshComponent* BarrelMesh;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++")
 	UP12ExplosionComponent* ExplosionComponent;
-	
 };

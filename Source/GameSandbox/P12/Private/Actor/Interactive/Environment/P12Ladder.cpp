@@ -11,7 +11,7 @@ AP12Ladder::AP12Ladder()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
-	
+
 	RightRailMesh = CreateDefaultSubobject<UStaticMeshComponent>("RightRailStaticMeshComponent");
 	RightRailMesh->SetupAttachment(RootComponent);
 
@@ -33,7 +33,7 @@ void AP12Ladder::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	RightRailMesh->SetRelativeLocation(FVector(-0.5f * Width, 0.f, Height / 2));
-	LeftRailMesh->SetRelativeLocation(FVector( 0.5f * Width, 0.f, Height / 2));
+	LeftRailMesh->SetRelativeLocation(FVector(0.5f * Width, 0.f, Height / 2));
 	StepRailMesh->SetRelativeLocation((BottomOffset / 2.f) * FVector::UpVector);
 
 	const UStaticMesh* RailMesh = RightRailMesh->GetStaticMesh();
@@ -48,7 +48,7 @@ void AP12Ladder::OnConstruction(const FTransform& Transform)
 	{
 		return;
 	}
-	
+
 	RightRailMesh->SetRelativeScale3D(FVector(1.f, 1.f, Height / MeshHeight));
 	LeftRailMesh->SetRelativeScale3D(FVector(1.f, 1.f, Height / MeshHeight));
 	StepRailMesh->SetRelativeScale3D(FVector(1.f, Width / MeshWidth, 1.f));

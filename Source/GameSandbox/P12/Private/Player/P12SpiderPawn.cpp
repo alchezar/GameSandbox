@@ -29,7 +29,7 @@ AP12SpiderPawn::AP12SpiderPawn()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	CameraComponent->SetupAttachment(SpringArmComponent);
-	
+
 	SkeletalMeshComponent = CreateDefaultSubobject<USkeletalMeshComponent>("SpiderSkeletalMeshComponent");
 	SkeletalMeshComponent->SetupAttachment(RootComponent);
 
@@ -52,9 +52,9 @@ void AP12SpiderPawn::Tick(float DeltaTime)
 
 	constexpr float IKOffsetInterp = 10.f;
 	IKRightFrontFootOffset = FMath::FInterpTo(IKRightFrontFootOffset, GetIKSocketOffset(RightFrontFootSocketName), DeltaTime, IKOffsetInterp);
-	IKRightRearFootOffset  = FMath::FInterpTo(IKRightRearFootOffset,  GetIKSocketOffset(RightRearFootSocketName),  DeltaTime, IKOffsetInterp);
-	IKLeftFrontFootOffset  = FMath::FInterpTo(IKLeftFrontFootOffset,  GetIKSocketOffset(LeftFrontFootSocketName),  DeltaTime, IKOffsetInterp);
-	IKLeftRearFootOffset   = FMath::FInterpTo(IKLeftRearFootOffset,   GetIKSocketOffset(LeftRearFootSocketName),   DeltaTime, IKOffsetInterp);
+	IKRightRearFootOffset = FMath::FInterpTo(IKRightRearFootOffset, GetIKSocketOffset(RightRearFootSocketName), DeltaTime, IKOffsetInterp);
+	IKLeftFrontFootOffset = FMath::FInterpTo(IKLeftFrontFootOffset, GetIKSocketOffset(LeftFrontFootSocketName), DeltaTime, IKOffsetInterp);
+	IKLeftRearFootOffset = FMath::FInterpTo(IKLeftRearFootOffset, GetIKSocketOffset(LeftRearFootSocketName), DeltaTime, IKOffsetInterp);
 }
 
 void AP12SpiderPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -70,7 +70,7 @@ void AP12SpiderPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	InputComp->BindAction(MoveAction, ETriggerEvent::Completed, this, &ThisClass::MoveInput);
 	InputComp->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 	InputComp->BindAction(LookAction, ETriggerEvent::Completed, this, &ThisClass::LookInput);
-	InputComp->BindAction(JumpAction, ETriggerEvent::Started,   this, &ThisClass::JumpInput);
+	InputComp->BindAction(JumpAction, ETriggerEvent::Started, this, &ThisClass::JumpInput);
 }
 
 void AP12SpiderPawn::SubsystemDefaultMappingContext() const
@@ -88,24 +88,24 @@ void AP12SpiderPawn::SubsystemDefaultMappingContext() const
 	Subsystem->AddMappingContext(DefaultContext, 0);
 }
 
-void AP12SpiderPawn::MoveInput(const FInputActionValue& Value) 
+void AP12SpiderPawn::MoveInput(const FInputActionValue& Value)
 {
 	if (!Controller)
 	{
 		return;
 	}
 	InputForward = Value.Get<FVector2D>().X;
-	InputRight   = Value.Get<FVector2D>().Y;
+	InputRight = Value.Get<FVector2D>().Y;
 
 	const FRotator YawRotation = FRotator(0.f, GetControlRotation().Yaw, 0.f);
 	const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-	const FVector RightDirection   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+	const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
 	AddMovementInput(ForwardDirection, InputForward);
 	AddMovementInput(RightDirection, InputRight);
 }
 
-void AP12SpiderPawn::LookInput(const FInputActionValue& Value) 
+void AP12SpiderPawn::LookInput(const FInputActionValue& Value)
 {
 	if (!Controller)
 	{
@@ -117,7 +117,7 @@ void AP12SpiderPawn::LookInput(const FInputActionValue& Value)
 	AddControllerPitchInput(LookVector.Y);
 }
 
-void AP12SpiderPawn::JumpInput() 
+void AP12SpiderPawn::JumpInput()
 {
 	check(MovementComponent->IsA<UP12SpiderMovementComponent>())
 	UP12SpiderMovementComponent* SpiderMovement = StaticCast<UP12SpiderMovementComponent*>(MovementComponent);
@@ -149,7 +149,7 @@ float AP12SpiderPawn::GetIKSocketOffset(const FName& SocketName)
 	UP12Library::DrawDebugLineTrace(GetWorld(), HitResult, UP12Library::GetCanDrawDebugLegAlignment());
 	if (HitResult.bBlockingHit)
 	{
-		return ((HitResult.TraceEnd - HitResult.Location) / GetActorScale3D()).Z + CollisionSphereRadius;  
+		return ((HitResult.TraceEnd - HitResult.Location) / GetActorScale3D()).Z + CollisionSphereRadius;
 	}
 	return 0.f;
 }

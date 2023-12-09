@@ -9,7 +9,7 @@ DEFINE_LOG_CATEGORY(LogP12SaveSubsystem)
  */
 
 FP12SaveSubsystemArchive::FP12SaveSubsystemArchive(FArchive& InInnerArchive, bool bInLoadIfFindFails)
-	:FObjectAndNameAsStringProxyArchive(InInnerArchive, bInLoadIfFindFails)
+	: FObjectAndNameAsStringProxyArchive(InInnerArchive, bInLoadIfFindFails)
 {
 	ArIsSaveGame = true;
 	ArNoDelta = true;
@@ -20,9 +20,9 @@ FP12SaveSubsystemArchive::FP12SaveSubsystemArchive(FArchive& InInnerArchive, boo
  */
 
 FP12SaveDirectoryVisitor::FP12SaveDirectoryVisitor(TArray<int32>& InSaveIds)
-	:SaveIds(InSaveIds)
+	: SaveIds(InSaveIds)
 {
-	
+	//
 }
 
 bool FP12SaveDirectoryVisitor::Visit(const TCHAR* FilenameOrDirectory, bool bIsDirectory)
@@ -70,7 +70,7 @@ FP12BoolScopeWrapper::~FP12BoolScopeWrapper()
 
 UP12StreamingLevelObserver::UP12StreamingLevelObserver()
 {
-	
+	//
 }
 
 void UP12StreamingLevelObserver::Initialize(UP12SaveSubsystem* InSaveSubsystem, ULevelStreaming* InStreamingLevel)
@@ -104,7 +104,7 @@ void UP12StreamingLevelObserver::Deinitialize()
 void UP12StreamingLevelObserver::Serialize(FArchive& Archive)
 {
 	// UObject::Serialize(Ar);
-	LevelSaveData.Serialize(Archive);		
+	LevelSaveData.Serialize(Archive);
 }
 
 void UP12StreamingLevelObserver::OnLevelShown()

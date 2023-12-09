@@ -22,5 +22,5 @@ protected:
 	UWidgetAnimation* ReticleAiming;
 
 private:
-	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;	
+	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 };

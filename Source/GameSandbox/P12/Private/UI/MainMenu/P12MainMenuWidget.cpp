@@ -21,7 +21,7 @@ void UP12MainMenuWidget::NativeConstruct()
 
 void UP12MainMenuWidget::CacheHUD(const AP12HUD* HUD)
 {
-	CachedHUD = HUD;	
+	CachedHUD = HUD;
 }
 
 void UP12MainMenuWidget::OnReturnButtonClickedHandle()

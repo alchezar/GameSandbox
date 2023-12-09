@@ -19,11 +19,11 @@ public:
 	void SetProgressPercentage(float Percentage);
 	void OnHealthChangedHandle(float Health, float MaxHealth);
 	void CacheOwner(AP12BaseCharacter* BaseChar);
-	
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UProgressBar* ProgressBar;
-	
+
 private:
-	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;	
+	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 };

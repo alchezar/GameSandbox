@@ -19,7 +19,7 @@ public:
 	virtual ~FP12BaseSaveData() {}
 	virtual bool Serialize(FArchive& Archive);
 
-	friend FArchive& operator << (FArchive& Archive, FP12BaseSaveData& SaveData)
+	friend FArchive& operator <<(FArchive& Archive, FP12BaseSaveData& SaveData)
 	{
 		SaveData.Serialize(Archive);
 		return Archive;
@@ -29,7 +29,7 @@ public:
 	FName Name;
 };
 
-FORCEINLINE bool operator == (const FP12BaseSaveData& First, const FP12BaseSaveData& Second) { return First.Name == Second.Name; }
+FORCEINLINE bool operator ==(const FP12BaseSaveData& First, const FP12BaseSaveData& Second) { return First.Name == Second.Name; }
 
 /**
  * Object data that will be saved/loaded.

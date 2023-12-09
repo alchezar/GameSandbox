@@ -32,7 +32,7 @@ void UP12SaveSubsystem::Deinitialize()
 
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 	RemoveStreamingLevelObserver();
-	
+
 	Super::Deinitialize();
 }
 
@@ -63,7 +63,7 @@ void UP12SaveSubsystem::SerializeLevel(const ULevel* Level, const ULevelStreamin
 	{
 		LevelSaveData = &GameSaveData.PersistentLevel;
 	}
-	
+
 	TArray<FP12ActorSaveData>& ActorsSaveData = LevelSaveData->ActorsSaveData;
 	ActorsSaveData.Empty();
 
@@ -75,7 +75,7 @@ void UP12SaveSubsystem::SerializeLevel(const ULevel* Level, const ULevelStreamin
 		}
 		FP12ActorSaveData& ActorSaveData = ActorsSaveData[ActorsSaveData.AddUnique(FP12ActorSaveData(Actor))];
 		ActorSaveData.Transform = Actor->GetTransform();
-		
+
 		SerializeActorComponents(Actor, ActorSaveData);
 
 		auto MemoryWriter = FMemoryWriter(ActorSaveData.RawData, true);
@@ -92,13 +92,13 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* S
 	if (StreamingLevel)
 	{
 		const FName& LevelName = StreamingLevel->GetWorldAssetPackageFName();
-		LevelSaveData = GameSaveData.StreamingLevels.FindByPredicate([=](const FP12LevelSaveData& Data){ return Data.Name == LevelName; });
+		LevelSaveData = GameSaveData.StreamingLevels.FindByPredicate([=](const FP12LevelSaveData& Data) { return Data.Name == LevelName; });
 	}
 	else
 	{
 		LevelSaveData = &GameSaveData.PersistentLevel;
 	}
-	
+
 	if (!LevelSaveData)
 	{
 		/* There is no save for this level yet. Call OnLevelDeserialized() in all cases! */
@@ -120,7 +120,7 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* S
 		{
 			continue;
 		}
-		
+
 		FP12ActorSaveData* ActorSaveData = nullptr;
 		for (auto ActorSaveDataIterator = ActorsSaveData.CreateIterator(); ActorSaveDataIterator; ++ActorSaveDataIterator)
 		{
@@ -149,7 +149,7 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* S
 
 	for (FP12ActorSaveData* ActorSaveData : ActorsSaveData)
 	{
-		UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeLevel(): %s, Spawn new actor with name: %s"), *GetNameSafe(this),  *ActorSaveData->Name.ToString());
+		UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeLevel(): %s, Spawn new actor with name: %s"), *GetNameSafe(this), *ActorSaveData->Name.ToString());
 		ActorSpawnParameters.Name = ActorSaveData->Name;
 
 		/* bIgnoreOnActorSpawnedCallbackFast is hook to avoid double OnLevelDeserialized invocations. */
@@ -158,7 +158,7 @@ void UP12SaveSubsystem::DeserializeLevel(ULevel* Level, const ULevelStreaming* S
 		AActor* Actor = GetWorld()->SpawnActor(ActorSaveData->Class.Get(), &ActorSaveData->Transform, ActorSpawnParameters);
 		if (!Actor || (Actor && !Actor->Implements<UP12SaveSubsystemInterface>()))
 		{
-			UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeLevel(): %s, Failed to spawn new actor with name: %s"), *GetNameSafe(this),  *ActorSaveData->Name.ToString());
+			UE_LOG(LogP12SaveSubsystem, Display, TEXT("UP12SaveSubsystem::DeserializeLevel(): %s, Failed to spawn new actor with name: %s"), *GetNameSafe(this), *ActorSaveData->Name.ToString());
 			continue;
 		}
 		/* Actor name can be changed so update it. */
@@ -204,7 +204,7 @@ void UP12SaveSubsystem::LoadGame(const int32 SaveId)
 		return;
 	}
 	RemoveStreamingLevelObserver();
-	
+
 	LoadSaveFromFile(SaveId);
 	UGameplayStatics::OpenLevel(this, GameSaveData.LevelName);
 	/* ::OnPostLoadMapWithWorld(...) */

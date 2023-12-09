@@ -16,7 +16,7 @@ class GAMESANDBOX_API AP12StreamingSubsystemVolume : public AActor
 
 public:
 	AP12StreamingSubsystemVolume();
-	FORCEINLINE const TSet<FString>& GetLevelsToLoad()   const { return LevelsToLoad; }
+	FORCEINLINE const TSet<FString>& GetLevelsToLoad() const { return LevelsToLoad; }
 	FORCEINLINE const TSet<FString>& GetLevelsToUnload() const { return LevelsToUnload; }
 	void HandleCharacterOverlapBegin(ACharacter* Character);
 
@@ -28,7 +28,6 @@ protected:
 	UFUNCTION()
 	void OnCollisionEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
-	
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	UBoxComponent* Collision;

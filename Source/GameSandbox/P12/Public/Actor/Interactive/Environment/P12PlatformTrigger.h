@@ -49,7 +49,7 @@ private:
 
 	UFUNCTION()
 	void OnRep_IsActivated(bool bWasActivated);
-	
+
 public:
 	FP12OnTriggerActivatedSignature OnTriggerActivated;
 

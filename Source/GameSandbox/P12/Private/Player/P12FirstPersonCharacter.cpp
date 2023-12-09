@@ -26,7 +26,7 @@ AP12FirstPersonCharacter::AP12FirstPersonCharacter(const FObjectInitializer& Obj
 	FirstPersonMesh->CastShadow = false;
 	FirstPersonMesh->bCastDynamicShadow = false;
 	FirstPersonMesh->SetOnlyOwnerSee(true);
-	
+
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>("FirstPersonCameraComponent");
 	FirstPersonCamera->SetupAttachment(FirstPersonMesh, SocketName);
 	// FirstPersonCamera->AttachToComponent(FirstPersonMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, SocketName);
@@ -139,7 +139,7 @@ void AP12FirstPersonCharacter::OnMantleHandle(const FP12MantleSettings& Settings
 	GetWorld()->GetTimerManager().SetTimer(MontageTimer, MontageDelegate, Duration, false);
 }
 
-bool AP12FirstPersonCharacter::IsAnyMontagePlayingOn(const USkeletalMeshComponent* MeshComponent) const 
+bool AP12FirstPersonCharacter::IsAnyMontagePlayingOn(const USkeletalMeshComponent* MeshComponent) const
 {
 	const UAnimInstance* AnimInstance = MeshComponent->GetAnimInstance();
 	return AnimInstance && AnimInstance->Montage_IsPlaying(nullptr);

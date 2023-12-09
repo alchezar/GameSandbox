@@ -29,8 +29,8 @@ void UP12SpiderAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	// bInAir = CachedPawn->GetMovementComponent()->IsFalling();
 	bInAir = CachedPawnMovement->GetIsJump();
 
-	RightFrontFootEffectorLocation = FVector( CachedPawn->GetIKRightFrontFootOffset(), 0.f, 0.f);
-	RightRearFootEffectorLocation = FVector( CachedPawn->GetIKRightRearFootOffset(), 0.f, 0.f);
-	LeftFrontFootEffectorLocation = FVector( CachedPawn->GetIKLeftFrontFootOffset(), 0.f, 0.f);
-	LeftRearFootEffectorLocation = FVector( CachedPawn->GetIKLeftRearFootOffset(), 0.f, 0.f);
+	RightFrontFootEffectorLocation = FVector(CachedPawn->GetIKRightFrontFootOffset(), 0.f, 0.f);
+	RightRearFootEffectorLocation = FVector(CachedPawn->GetIKRightRearFootOffset(), 0.f, 0.f);
+	LeftFrontFootEffectorLocation = FVector(CachedPawn->GetIKLeftFrontFootOffset(), 0.f, 0.f);
+	LeftRearFootEffectorLocation = FVector(CachedPawn->GetIKLeftRearFootOffset(), 0.f, 0.f);
 }

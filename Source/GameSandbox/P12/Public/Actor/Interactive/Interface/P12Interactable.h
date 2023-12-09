@@ -21,7 +21,7 @@ class GAMESANDBOX_API IP12Interactable
 
 public:
 	DECLARE_MULTICAST_DELEGATE(FP12OnInteraction)
-	
+
 	virtual void Interact(AP12BaseCharacter* Char)	 PURE_VIRTUAL(IP12Interactable::Interact, /* nothing to return */);
 	virtual FName GetActionEventName() const		 PURE_VIRTUAL(ThisClass::GetActionEventName, return FName(NAME_None); );
 

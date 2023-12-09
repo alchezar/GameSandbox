@@ -17,7 +17,7 @@ public:
 	UP12WeaponInventoryItem();
 	FORCEINLINE TSubclassOf<AP12EquipableItem> GetEquipWeaponClass() const { return EquipWeaponClass; }
 	void SetEquipWeaponClass(const TSubclassOf<AP12EquipableItem>& InEquipWeaponClass);
-	
+
 protected:
 	TSubclassOf<AP12EquipableItem> EquipWeaponClass;
 };

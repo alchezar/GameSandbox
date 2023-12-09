@@ -40,25 +40,24 @@ private:
 	void OnBackButtonClicked();
 	UFUNCTION()
 	void OnAcceptButtonClicked();
-	
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* NetworkTypeText;
 	UPROPERTY(meta = (BindWidget))
-	UButton* ToggleLeftButton;	
+	UButton* ToggleLeftButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* ToggleRightButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* BackButton;
 	UPROPERTY(meta = (BindWidget))
-	UButton* AcceptButton;	
+	UButton* AcceptButton;
 	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* ToggleWidgets;
-	
+
 	UPROPERTY(EditAnywhere, Transient, BlueprintReadOnly, Category = "C++")
 	EP12SearchingSessionState SearchingSessionState;
 
 private:
 	TWeakObjectPtr<UP12GameInstance> CachedGameInstance;
-	
 };

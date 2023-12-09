@@ -130,7 +130,6 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	AP12HUD* GetHUD() const;
 	void Interact();
-	// void AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex);
 	bool PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item);
 	void UseInventory(APlayerController* PlayerController);
 	void ConfirmWeaponSelection(AP12PlayerController* AP12PlayerController);
@@ -149,7 +148,7 @@ protected:
 	bool GetCanRun() const;
 	void OnDeath();
 	void TraceLineOfSight();
-	
+
 private:
 	void ChangeCameraArmLength(const bool bStart, const float NewArmLength, const float NewFOV = 90.f);
 	void SmoothlyChangeCameraArmLength(const bool bRunStart, const float TargetLength, const float TargetFOV);
@@ -162,7 +161,7 @@ private:
 	float GetDefaultCameraArmLength() const;
 	float GetDefaultCameraFOV() const;
 	void InitHealthProgress();
-	
+
 	UFUNCTION(Client, Reliable)
 	void Client_ShowInterface();
 
@@ -189,10 +188,10 @@ protected:
 	UWidgetComponent* HealthBar;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UP12InventoryComponent* Inventory;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	FP12CameraArmLength CameraArmLength;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Mantle")
 	FP12MantleSettings HighMantleSettings;
 	UPROPERTY(EditAnywhere, Category = "C++ | Mantle")
@@ -212,7 +211,7 @@ protected:
 	EP12Teams Team = EP12Teams::Player;
 	UPROPERTY(EditAnywhere, Category = "C++ | Line sight")
 	float LineOfSightDistance = 500.f;
-	
+
 private:
 	TSoftObjectPtr<UP12BaseCharacterMovementComponent> BaseCharacterMovement;
 	bool bCrouch = false;
@@ -229,7 +228,7 @@ private:
 	float IKHitOffset = 0.f;
 	TInteractiveActorsArray AvailableInteractiveActors;
 	FVector CurrentFallApex = FVector::ZeroVector;
-	
+
 	UPROPERTY()
 	TScriptInterface<IP12Interactable> LineOfSightObject;
 	bool bInteractableFound = false;

@@ -30,7 +30,7 @@ protected:
 	float ForwardCheckDistance = 100.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Detection", meta = (ClampMin = 0.f, UIMin = 0.f))
 	float DownwardCheckDistance = 100.f;
-	
+
 private:
 	TWeakObjectPtr<ACharacter> CachedOwnerCharacter;
 };

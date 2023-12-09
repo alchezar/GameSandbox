@@ -48,10 +48,10 @@ bool UP12EquipmentViewWidget::EquipEquipmentToSlot(const TSubclassOf<AP12Equipab
 		UpdateSlot(SenderIndex);
 		return true;
 	}
-	return false;	
+	return false;
 }
 
 void UP12EquipmentViewWidget::RemoveEquipmentFromSlot(int32 SlotIndex)
 {
-	LinkedEquipmentComponent->RemoveItemFromSlot(SlotIndex);	
+	LinkedEquipmentComponent->RemoveItemFromSlot(SlotIndex);
 }

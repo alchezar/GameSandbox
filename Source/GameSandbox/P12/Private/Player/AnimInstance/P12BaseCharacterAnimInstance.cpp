@@ -12,8 +12,6 @@ void UP12BaseCharacterAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 
-	// check(TryGetPawnOwner()->IsA<AP12BaseCharacter>())
-	// CachedCharacter = StaticCast<AP12BaseCharacter*>(TryGetPawnOwner());
 	CachedCharacter = Cast<AP12BaseCharacter>(TryGetPawnOwner());
 	check(CachedCharacter.IsValid())
 	CachedCharacterMovement = CachedCharacter->GetBaseCharacterMovement();
@@ -49,7 +47,7 @@ void UP12BaseCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	ItemType = CachedEquipmentComponent->GetCurrentEquippedItemType();
 	// AimRotation = (CachedCharacter->GetBaseAimRotation() - CachedCharacter->GetActorRotation()).GetNormalized();
 	AimRotation = CachedCharacter->GetLocalAimOffset();
-	
+
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
 	HipOffset = FVector(0.f, CachedCharacter->GetIKHipOffset(), 0.f);

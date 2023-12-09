@@ -26,7 +26,7 @@ public:
 	void ShowMainMenu(const bool bShow);
 	void ShowInteractable(const bool bShow, FName KeyName = NAME_None);
 	void SetInteractableText(const FName& KeyName);
-	
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -42,7 +42,7 @@ protected:
 	TSubclassOf<UP12HighlightInteractableWidget> HighlightWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TMap<EP12ReticleType, TSubclassOf<UP12ReticleWidget>> ReticlesMap;
-	
+
 private:
 	UPROPERTY()
 	AP12PlayerController* CachedController = nullptr;

@@ -35,7 +35,7 @@ private:
 
 public:
 	FP12OnMatchFound OnMatchFound;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	FName LobbyMapName;
@@ -69,9 +69,9 @@ protected:
 	 * Function fired when a session start request has completed.
 	 * @param SessionName the name of the session this callback is for.
 	 * @param bSuccessful true if the async action completed without error, false if there was an error.
-	 */		
+	 */
 	void OnStartOnlineGameComplete(FName SessionName, bool bSuccessful);
-	
+
 protected:
 	TSharedPtr<FOnlineSessionSettings> SessionSettings;
 	/* Delegate called when session is created. */
@@ -81,7 +81,7 @@ protected:
 	/* Handles to register delegates for creating/starting sessions. */
 	FDelegateHandle OnCreateSessionCompleteDelegateHandle;
 	FDelegateHandle OnStartSessionCompleteDelegateHandle;
-	
+
 	/*------ FindingNetworkSession ------*/
 protected:
 	/**
@@ -96,14 +96,14 @@ protected:
 	 * @param bSuccessful true if the async action completed without error, false if there was an error.
 	 */
 	void OnFindSessionComplete(const bool bSuccessful);
-	
+
 protected:
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	/* Delegate for searching for the sessions. */
 	FOnFindSessionsCompleteDelegate OnFindSessionsCompleteDelegate;
 	/* Handle for register delegates for searching a session. */
 	FDelegateHandle OnFindSessionsCompleteDelegateHandle;
-	
+
 	/*------ JoiningNetworkSession ------*/
 protected:
 	/**

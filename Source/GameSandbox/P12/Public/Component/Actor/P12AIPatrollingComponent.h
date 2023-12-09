@@ -17,7 +17,7 @@ public:
 	FVector SelectClosestWayPoint();
 	FVector SelectNextWayPoint();
 	bool GetCanPatrol() const;
-	
+
 protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadWrite, Category = "C++")
 	AP12PatrollingPath* PatrollingPath;

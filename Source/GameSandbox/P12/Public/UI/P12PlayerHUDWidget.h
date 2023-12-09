@@ -32,5 +32,5 @@ protected:
 	UTextBlock* TotalAmmoText;
 
 private:
-	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;	
+	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 };

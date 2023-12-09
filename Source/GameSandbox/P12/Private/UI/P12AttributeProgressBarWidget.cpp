@@ -8,13 +8,6 @@
 void UP12AttributeProgressBarWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-
-	// CachedCharacter = GetOwningPlayerPawn<AP12BaseCharacter>();
-	// if (!CachedCharacter.IsValid())
-	// {
-	// 	return;
-	// }
-	// CachedCharacter->OnHealthChange.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 }
 
 void UP12AttributeProgressBarWidget::SetProgressPercentage(float Percentage)

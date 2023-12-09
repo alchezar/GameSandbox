@@ -27,7 +27,7 @@ public:
 	TWeakObjectPtr<UP12InventoryItem> Item;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 0;
-	
+
 private:
 	mutable FP12OnInventorySlotUpdateSignature OnInventorySlotUpdate;
 };
@@ -41,7 +41,7 @@ public:
 	void OpenViewInventory(APlayerController* InPlayerController);
 	void CloseViewInventory();
 	bool GetIsViewVisible() const;
-	
+
 	FORCEINLINE int32 GetCapacity() const { return Capacity; }
 	FORCEINLINE bool HasFreeSlot() const { return ItemsInInventory < Capacity; }
 
@@ -50,7 +50,7 @@ public:
 
 	FORCEINLINE TArray<FP12InventorySlot> GetAllItemsCopy() const { return InventorySlots; }
 	TArray<FText> GetAllItemsNames() const;
-	
+
 protected:
 	virtual void BeginPlay() override;
 

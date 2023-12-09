@@ -16,7 +16,7 @@ class GAMESANDBOX_API UP12ExplosionComponent : public USceneComponent
 
 public:
 	void Explode(AController* Instigator);
-	
+
 public:
 	FP12OnExplosionSignature OnExplosion;
 
@@ -26,11 +26,10 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Damage")
 	FP12Diapason Radius = {300.f, 500.f};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Damage")
-	float DamageFallow = 1.f;	
+	float DamageFallow = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Damage")
 	TSubclassOf<UDamageType> DamageTypeClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
 	UParticleSystem* ExplosionEffect = nullptr;
-
 };

@@ -24,7 +24,7 @@ public:
 	void RemoveLoadRequest(AP12StreamingSubsystemVolume* Volume);
 	void AddUnloadRequest(AP12StreamingSubsystemVolume* Volume);
 	void RemoveUnloadRequest(AP12StreamingSubsystemVolume* Volume);
-	
+
 private:
 	void LoadLevel();
 	void UnloadLevel();
@@ -34,7 +34,6 @@ private:
 	UFUNCTION()
 	void OnLevelUnloaded();
 
-	
 private:
 	FString LevelName;
 	ELevelStreamingState StreamingLevelState = ELevelStreamingState::Unloaded;

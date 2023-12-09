@@ -17,7 +17,7 @@ void UP12FirstPersonCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeco
 	{
 		return;
 	}
-	
+
 	PlayerCameraPitchAngle = CalculateCameraPitchAngle();
 }
 

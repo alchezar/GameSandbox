@@ -20,9 +20,8 @@ protected:
 
 public:
 	FP12OnNetworkWidgetCloseSignature OnNetworkWidgetClose;
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	bool bLAN = false;
-	
 };

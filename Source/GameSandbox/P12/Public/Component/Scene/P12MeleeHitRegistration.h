@@ -18,7 +18,7 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 	FORCEINLINE void SetIsHitRegistration(const bool bNewHitRegistration) { bHitRegistration = bNewHitRegistration; };
 	void ProcessHitRegistration();
-	
+
 protected:
 	virtual void BeginPlay() override;
 

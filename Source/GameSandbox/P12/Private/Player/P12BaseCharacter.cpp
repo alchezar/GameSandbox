@@ -58,7 +58,7 @@ void AP12BaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	UP12StreamingSubsystemUtils::CheckCharacterOverlapStreamingSubsystemVolume(this);
-	
+
 	DefaultMeshLocation = GetMesh()->GetRelativeLocation();
 	CharacterAttribute->OnDeath.AddUObject(this, &ThisClass::OnDeath);
 	OnReloadComplete.AddUObject(this, &ThisClass::OnReloadCompleteHandle);
@@ -91,7 +91,7 @@ void AP12BaseCharacter::MoveInput(const FInputActionValue& Value)
 		BaseCharacterMovement->SetRotationMode(false);
 		return;
 	}
-	
+
 	const FVector2D MoveVector = Value.Get<FVector2D>();
 	if (!Controller || FMath::IsNearlyZero(MoveVector.Size()))
 	{
@@ -126,7 +126,7 @@ void AP12BaseCharacter::JumpInput()
 	{
 		return;
 	}
-	
+
 	Super::Jump();
 }
 
@@ -136,7 +136,7 @@ void AP12BaseCharacter::MantleInput(const bool bForce)
 	{
 		return;
 	}
-	
+
 	FP12LedgeDescription LedgeDescription;
 	if (!LedgeDetection->DetectLedge(OUT LedgeDescription) || BaseCharacterMovement->IsMantling())
 	{
@@ -164,7 +164,6 @@ void AP12BaseCharacter::MantleInput(const bool bForce)
 	if (IsLocallyControlled() || HasAuthority())
 	{
 		GetBaseCharacterMovement()->StartMantle(MantleParams);
-
 	}
 
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
@@ -283,9 +282,7 @@ void AP12BaseCharacter::OnJumped_Implementation()
 }
 
 void AP12BaseCharacter::OnMantleHandle(const FP12MantleSettings& Settings, const float StartTime)
-{
-	
-}
+{}
 
 bool AP12BaseCharacter::GetCanRun() const
 {
@@ -333,12 +330,12 @@ void AP12BaseCharacter::LegsIKFloorAlignment()
 {
 	if (!CharacterAttribute->GetIsAlive())
 	{
-		IKLeftLegOffset = 0.f; 
-		IKRightLegOffset = 0.f; 
+		IKLeftLegOffset = 0.f;
+		IKRightLegOffset = 0.f;
 		IKHitOffset = 0.f;
 		return;
 	}
-	
+
 	constexpr float MinDistanceThreshold = 12.f;
 	constexpr float IKOffsetInterp = 10.f;
 
@@ -437,7 +434,7 @@ void AP12BaseCharacter::OnDeath()
 		GetCharacterMovement()->DisableMovement();
 		GetCharacterMovement()->MovementState.bCanJump = false;
 	}
-	
+
 	if (DeathMontage)
 	{
 		PlayAnimMontage(DeathMontage);
@@ -488,7 +485,7 @@ void AP12BaseCharacter::FireInput(const bool bStart)
 		Equipment->ConfirmWeaponSelection();
 		return;
 	}
-	
+
 	bFiring = bStart;
 	AP12RangeWeaponItem* CurrentWeapon = Equipment->GetCurrentEquippedWeapon();
 	if (!CurrentWeapon)
@@ -542,7 +539,7 @@ float AP12BaseCharacter::GetDefaultCameraArmLength() const
 		{
 			return CameraArmLength.Crouch;
 		}
-		if(bRunning)
+		if (bRunning)
 		{
 			return CameraArmLength.Run;
 		}
@@ -555,7 +552,7 @@ float AP12BaseCharacter::GetDefaultCameraFOV() const
 	const UCameraComponent* DefaultCamera = Camera->GetClass()->GetDefaultObject<UCameraComponent>();
 	if (!DefaultCamera)
 	{
-		return 90.f ;
+		return 90.f;
 	}
 	return DefaultCamera->FieldOfView;
 }
@@ -677,7 +674,7 @@ void AP12BaseCharacter::TraceLineOfSight()
 		}
 		return;
 	}
-	
+
 	LineOfSightObject = HitResult.GetActor();
 	// FName ActionName = NAME_None;
 	if (LineOfSightObject.GetInterface())
@@ -716,11 +713,6 @@ void AP12BaseCharacter::InitHealthProgress()
 	Widget->SetProgressPercentage(CharacterAttribute->GetHealthPercent());
 }
 
-// void AP12BaseCharacter::AddEquipmentItemToSlot(const TSubclassOf<AP12EquipableItem>& EquipableItemClass, int32 SlotIndex)
-// {
-// 	Equipment->AddEquipmentItemToSlot(EquipableItemClass, SlotIndex);
-// }
-
 bool AP12BaseCharacter::PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item)
 {
 	bool Result = false;
@@ -728,7 +720,7 @@ bool AP12BaseCharacter::PickupItem(const TWeakObjectPtr<UP12InventoryItem> Item)
 	{
 		Result = Inventory->TryAddItem(Item, 1);
 	}
-	
+
 	return Result;
 }
 
@@ -738,12 +730,12 @@ void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
 	{
 		return;
 	}
-	
+
 	if (!Inventory->GetIsViewVisible())
 	{
 		Inventory->OpenViewInventory(PlayerController);
 		Equipment->OpenViewEquipment(PlayerController);
-		
+
 		FInputModeGameAndUI GameAndUIMode;
 		GameAndUIMode.SetHideCursorDuringCapture(false);
 		PlayerController->SetInputMode(GameAndUIMode);
@@ -753,8 +745,8 @@ void AP12BaseCharacter::UseInventory(APlayerController* PlayerController)
 	{
 		Inventory->CloseViewInventory();
 		Equipment->CloseViewEquipment();
-		
-		PlayerController->SetInputMode(FInputModeGameOnly());	
+
+		PlayerController->SetInputMode(FInputModeGameOnly());
 		PlayerController->SetShowMouseCursor(false);
 	}
 }
@@ -769,5 +761,5 @@ void AP12BaseCharacter::ConfirmWeaponSelection(AP12PlayerController* AP12PlayerC
 
 void AP12BaseCharacter::OnLevelDeserialized_Implementation()
 {
-	
+	//
 }

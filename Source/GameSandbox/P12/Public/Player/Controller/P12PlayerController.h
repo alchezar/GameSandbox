@@ -17,8 +17,6 @@ class GAMESANDBOX_API AP12PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	
-
 public:
 	AP12PlayerController();
 	virtual void SetPawn(APawn* InPawn) override;
@@ -69,7 +67,7 @@ private:
 
 	void CacheHUD();
 	void FindInteractMappedKeyName();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputMappingContext* DefaultContext = nullptr;
@@ -117,7 +115,7 @@ protected:
 	UInputAction* QuickSaveGameAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* QuickLoadGameAction = nullptr;
-	
+
 private:
 	TSoftObjectPtr<AP12BaseCharacter> CachedBaseCharacter;
 	bool bIgnoreCameraPitch = false;

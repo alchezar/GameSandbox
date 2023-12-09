@@ -48,7 +48,7 @@ void UP12EquipmentComponent::CreateLoadout()
 	{
 		return;
 	}
-	
+
 	AmmunitionArray.AddZeroed(static_cast<uint32>(EP12AmmunitionType::MAX));
 	for (const TPair<EP12AmmunitionType, int32>& AmmoPair : MaxAmmunitionAmount)
 	{
@@ -78,11 +78,11 @@ int32 UP12EquipmentComponent::GetMaxAvailableAmmoAmount(const EP12AmmunitionType
 
 void UP12EquipmentComponent::DecreaseMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType, const int32 AmmoToDecrease)
 {
-	AmmunitionArray[static_cast<uint32>(AmmoType)] -= AmmoToDecrease ;
+	AmmunitionArray[static_cast<uint32>(AmmoType)] -= AmmoToDecrease;
 }
 
 void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
-{	
+{
 	if (!CachedCharacter.IsValid() || CachedCharacter->GetIsEquipping())
 	{
 		return;
@@ -94,19 +94,19 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 	{
 		return;
 	}
-	
+
 	/* Equip new weapon */
 	CurrentEquippedItem = ItemsArray[static_cast<uint32>(Slot)];
 	CurrentEquippedWeapon = Cast<AP12RangeWeaponItem>(CurrentEquippedItem);
-	CurrentThrowableItem  = Cast<AP12ThrowableItem>(CurrentEquippedItem);
-	CurrentMeleeWeapon    = Cast<AP12MeleeWeaponItem>(CurrentEquippedItem);
-	
+	CurrentThrowableItem = Cast<AP12ThrowableItem>(CurrentEquippedItem);
+	CurrentMeleeWeapon = Cast<AP12MeleeWeaponItem>(CurrentEquippedItem);
+
 	if (!CurrentEquippedItem)
 	{
 		return;
 	}
 	CurrentEquippedSlot = Slot;
-	
+
 	if (UAnimMontage* EquipMontage = CurrentEquippedItem->GetCharacterEquipAnimMontage())
 	{
 		CachedCharacter->PlayEquippingItem(EquipMontage);
@@ -125,7 +125,7 @@ void UP12EquipmentComponent::EquipItemInSlot(EP12EquipmentSlot Slot)
 	}
 }
 
-void UP12EquipmentComponent::EquipNextItem() 
+void UP12EquipmentComponent::EquipNextItem()
 {
 	if (CachedCharacter->IsPlayerControlled())
 	{
@@ -138,7 +138,7 @@ void UP12EquipmentComponent::EquipNextItem()
 		OpenWeaponWheel(PlayerController);
 		return;
 	}
-	
+
 	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
 	for (int i = 1; i <= ItemsArray.Num(); ++i)
 	{
@@ -152,7 +152,7 @@ void UP12EquipmentComponent::EquipNextItem()
 	}
 }
 
-void UP12EquipmentComponent::EquipPreviousItem() 
+void UP12EquipmentComponent::EquipPreviousItem()
 {
 	if (CachedCharacter->IsPlayerControlled())
 	{
@@ -165,7 +165,7 @@ void UP12EquipmentComponent::EquipPreviousItem()
 		OpenWeaponWheel(PlayerController);
 		return;
 	}
-	
+
 	const uint32 CurrentSlotIndex = static_cast<uint32>(CurrentEquippedSlot);
 	for (int i = 1; i < ItemsArray.Num(); ++i)
 	{
@@ -191,10 +191,10 @@ void UP12EquipmentComponent::UnEquipCurrentItem()
 	{
 		PreviousEquippedSlot = CurrentEquippedSlot;
 	}
-	
+
 	CurrentEquippedItem->AttachItem(CurrentEquippedItem->GetUnEquippedSocketName());
 	CurrentEquippedItem->Unequip();
-	
+
 	CurrentEquippedSlot = EP12EquipmentSlot::None;
 	if (!CurrentEquippedWeapon)
 	{
@@ -220,7 +220,7 @@ void UP12EquipmentComponent::EquipCurrentItem()
 void UP12EquipmentComponent::TakeCurrentThrowableItem()
 {
 	check(CurrentThrowableItem)
-	
+
 	CachedCharacter->SetIsEquipping(true);
 
 	CurrentThrowableItem->TakeThrowable();
@@ -231,7 +231,7 @@ void UP12EquipmentComponent::LaunchCurrentThrowableItem()
 	check(CurrentThrowableItem)
 
 	CurrentThrowableItem->Throw();
-	
+
 	CachedCharacter->SetIsEquipping(false);
 	EquipItemInSlot(PreviousEquippedSlot);
 }

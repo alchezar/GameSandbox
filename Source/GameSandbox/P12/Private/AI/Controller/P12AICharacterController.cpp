@@ -16,7 +16,6 @@ AP12AICharacterController::AP12AICharacterController()
 void AP12AICharacterController::BeginPlay()
 {
 	Super::BeginPlay();
-	// SetupPatrolling();
 }
 
 void AP12AICharacterController::SetPawn(APawn* InPawn)
@@ -28,9 +27,9 @@ void AP12AICharacterController::SetPawn(APawn* InPawn)
 		CachedAICharacter = nullptr;
 		return;
 	}
-
 	check(InPawn->IsA<AP12AICharacter>())
 	CachedAICharacter = StaticCast<AP12AICharacter*>(InPawn);
+
 	RunBehaviorTree(CachedAICharacter->GetBehaviorTree());
 	SetupPatrolling();
 }

@@ -14,9 +14,7 @@
 class UEnhancedInputLocalPlayerSubsystem;
 
 AP12PlayerController::AP12PlayerController()
-{
-	
-}
+{}
 
 void AP12PlayerController::SetPawn(APawn* InPawn)
 {
@@ -37,7 +35,7 @@ void AP12PlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 	SubsystemDefaultMappingContext();
-	
+
 	CacheHUD();
 	FindInteractMappedKeyName();
 }
@@ -98,7 +96,7 @@ bool AP12PlayerController::GetCharacterCanProcessInput() const
 		&& CachedBaseCharacter->GetAttributeComponent()->GetIsAlive();
 }
 
-void AP12PlayerController::MoveInput(const FInputActionValue& Value) 
+void AP12PlayerController::MoveInput(const FInputActionValue& Value)
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -107,7 +105,7 @@ void AP12PlayerController::MoveInput(const FInputActionValue& Value)
 	CachedBaseCharacter->MoveInput(Value);
 }
 
-void AP12PlayerController::LookInput(const FInputActionValue& Value) 
+void AP12PlayerController::LookInput(const FInputActionValue& Value)
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -116,7 +114,7 @@ void AP12PlayerController::LookInput(const FInputActionValue& Value)
 	CachedBaseCharacter->LookInput(Value);
 }
 
-void AP12PlayerController::JumpInput() 
+void AP12PlayerController::JumpInput()
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -152,7 +150,7 @@ void AP12PlayerController::RunInput(const bool bRun)
 	CachedBaseCharacter->RunInput(bRun);
 }
 
-void AP12PlayerController::LadderJumpInput() 
+void AP12PlayerController::LadderJumpInput()
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -161,7 +159,7 @@ void AP12PlayerController::LadderJumpInput()
 	CachedBaseCharacter->LadderJumpInput();
 }
 
-void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value) 
+void AP12PlayerController::LadderClimbInput(const FInputActionValue& Value)
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -215,7 +213,7 @@ void AP12PlayerController::EquipThrowableInput()
 	CachedBaseCharacter->EquipThrowableInput();
 }
 
-void AP12PlayerController::PrimaryMeleeInput() 
+void AP12PlayerController::PrimaryMeleeInput()
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -224,7 +222,7 @@ void AP12PlayerController::PrimaryMeleeInput()
 	CachedBaseCharacter->PrimaryMeleeInput();
 }
 
-void AP12PlayerController::SecondaryMeleeInput() 
+void AP12PlayerController::SecondaryMeleeInput()
 {
 	if (!GetCharacterCanProcessInput())
 	{
@@ -246,18 +244,18 @@ void AP12PlayerController::ShowMainMenu()
 void AP12PlayerController::P12Debug_EnableAll()
 {
 	TArray<FString> ConsoleVariables = UP12Library::GetAllConsoleVariables();
-	for(const FString& ConsoleVariable : ConsoleVariables)
+	for (const FString& ConsoleVariable : ConsoleVariables)
 	{
-		ConsoleCommand( ConsoleVariable + " 1");
+		ConsoleCommand(ConsoleVariable + " 1");
 	}
 }
 
 void AP12PlayerController::P12Debug_DisableAll()
 {
 	TArray<FString> ConsoleVariables = UP12Library::GetAllConsoleVariables();
-	for(const FString& ConsoleVariable : ConsoleVariables)
+	for (const FString& ConsoleVariable : ConsoleVariables)
 	{
-		ConsoleCommand( ConsoleVariable + " 0");
+		ConsoleCommand(ConsoleVariable + " 0");
 	}
 }
 
@@ -284,7 +282,7 @@ void AP12PlayerController::ToggleMenuInputMode(const bool bMenu)
 }
 
 void AP12PlayerController::FindInteractMappedKeyName()
-{	
+{
 	for (auto KeyMapping : DefaultContext->GetMappings())
 	{
 		if (KeyMapping.Action != InteractAction)

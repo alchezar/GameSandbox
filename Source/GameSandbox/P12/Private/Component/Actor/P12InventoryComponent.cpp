@@ -84,7 +84,7 @@ bool UP12InventoryComponent::TryAddItem(const TWeakObjectPtr<UP12InventoryItem> 
 	FreeSlot->Count = Count;
 	++ItemsInInventory;
 	FreeSlot->UpdateSlotState();
-	
+
 	return true;
 }
 
@@ -95,7 +95,7 @@ bool UP12InventoryComponent::TryRemoveItem(const FName& ItemID)
 	{
 		return false;
 	}
-	InventorySlots.RemoveAll([=](const FP12InventorySlot& Slot){ return Slot.Item->GetDataTableID() == ItemID; });
+	InventorySlots.RemoveAll([=](const FP12InventorySlot& Slot) { return Slot.Item->GetDataTableID() == ItemID; });
 	return true;
 }
 
@@ -125,13 +125,12 @@ void UP12InventoryComponent::CreateViewWidget(APlayerController* InPlayerControl
 
 FP12InventorySlot* UP12InventoryComponent::FindItemSlot(FName ItemID)
 {
-	return InventorySlots.FindByPredicate([=](const FP12InventorySlot& Slot){ return Slot.Item->GetDataTableID() == ItemID; });
+	return InventorySlots.FindByPredicate([=](const FP12InventorySlot& Slot) { return Slot.Item->GetDataTableID() == ItemID; });
 }
 
 FP12InventorySlot* UP12InventoryComponent::FindFreeSlot()
 {
-	return InventorySlots.FindByPredicate([=](const FP12InventorySlot& Slot){ return !Slot.Item.IsValid(); });
-
+	return InventorySlots.FindByPredicate([=](const FP12InventorySlot& Slot) { return !Slot.Item.IsValid(); });
 }
 
 #pragma endregion UP12InventoryComponent

@@ -19,7 +19,7 @@ void AP12AITurretController::SetPawn(APawn* InPawn)
 		CachedTurret = nullptr;
 		return;
 	}
-	
+
 	check(InPawn->IsA<AP12Turret>())
 	CachedTurret = StaticCast<AP12Turret*>(InPawn);
 }
@@ -46,4 +46,3 @@ void AP12AITurretController::ActorsPerceptionUpdated(const TArray<AActor*>& Upda
 	AActor* ClosestActor = GetClosestSensedActor(UAISense_Sight::StaticClass());
 	CachedTurret->SetCurrentTarget(ClosestActor);
 }
-

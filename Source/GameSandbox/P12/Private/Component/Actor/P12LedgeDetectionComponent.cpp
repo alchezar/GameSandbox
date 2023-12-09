@@ -41,33 +41,33 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 	constexpr float BottomOffsetZ = 2.f;
 	const FVector CharacterBottomOffset = (CapsuleComponent->GetScaledCapsuleHalfHeight() - BottomOffsetZ) * FVector::UpVector;
 	const FVector CharacterBottomLocation = CachedOwnerCharacter->GetActorLocation() - CharacterBottomOffset;
-	
+
 	const float ForwardCheckCapsuleRadius = CapsuleComponent->GetScaledCapsuleRadius();
 	const float ForwardCheckCapsuleHalfHeight = (MaxLedgeHeight - MinLedgeHeight) / 2.f;
 
 	const FVector ForwardStartLocation = CharacterBottomLocation + (MinLedgeHeight + ForwardCheckCapsuleHalfHeight) * FVector::UpVector;
 	const FVector ForwardEndLocation = ForwardStartLocation + ForwardCheckDistance * CachedOwnerCharacter->GetActorForwardVector();
-	
+
 	FHitResult ForwardHitResult;
 	FCollisionShape ForwardCapsule = FCollisionShape::MakeCapsule(ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight);
-	GetWorld()->SweepSingleByChannel(ForwardHitResult, ForwardStartLocation, ForwardEndLocation,FQuat::Identity, ECC_CLIMBING, ForwardCapsule, QueryParams);
+	GetWorld()->SweepSingleByChannel(ForwardHitResult, ForwardStartLocation, ForwardEndLocation, FQuat::Identity, ECC_CLIMBING, ForwardCapsule, QueryParams);
 	UP12Library::DrawDebugCapsuleTrace(GetWorld(), ForwardHitResult, ForwardCheckCapsuleRadius, ForwardCheckCapsuleHalfHeight, FColor::Green, UP12Library::GetCanDrawDebugLedgeDetection());
 	if (!ForwardHitResult.bBlockingHit)
 	{
 		return false;
 	}
-	
+
 	/* Downward check. */
 	constexpr float DownwardCheckDepthOffset = 10.f;
 	const float DownwardCheckSphereRadius = ForwardCheckCapsuleRadius;
-	
+
 	FVector DownwardStart = ForwardHitResult.ImpactPoint - ForwardHitResult.ImpactNormal * DownwardCheckDepthOffset;
 	DownwardStart.Z = CharacterBottomLocation.Z + MaxLedgeHeight + DownwardCheckSphereRadius;
 	const FVector DownwardEnd = FVector(DownwardStart.X, DownwardStart.Y, CharacterBottomLocation.Z);
-	
+
 	FHitResult DownwardHitResult;
 	FCollisionShape DownwardSphere = FCollisionShape::MakeSphere(DownwardCheckSphereRadius);
-	GetWorld()->SweepSingleByChannel(DownwardHitResult, DownwardStart, DownwardEnd,	FQuat::Identity, ECC_CLIMBING, DownwardSphere, QueryParams);
+	GetWorld()->SweepSingleByChannel(DownwardHitResult, DownwardStart, DownwardEnd, FQuat::Identity, ECC_CLIMBING, DownwardSphere, QueryParams);
 	UP12Library::DrawDebugCapsuleTrace(GetWorld(), DownwardHitResult, DownwardCheckSphereRadius, 0.f, FColor::Blue, UP12Library::GetCanDrawDebugLedgeDetection());
 	if (!DownwardHitResult.bBlockingHit)
 	{
@@ -79,13 +79,13 @@ bool UP12LedgeDetectionComponent::DetectLedge(FP12LedgeDescription& LedgeDescrip
 	const float OverlapCapsuleHalfHeight = CapsuleComponent->GetScaledCapsuleHalfHeight();
 	const FVector OverlapLocation = DownwardHitResult.Location + FVector(0.f, 0.f, OverlapCapsuleHalfHeight - OverlapCapsuleRadius + BottomOffsetZ);
 	const FName CollisionProfileName = CapsuleComponent->GetCollisionProfileName();
-	
+
 	FCollisionShape OverlapCapsule = FCollisionShape::MakeCapsule(OverlapCapsuleRadius, OverlapCapsuleHalfHeight);
 	if (GetWorld()->OverlapBlockingTestByProfile(OverlapLocation, FQuat::Identity, CollisionProfileName, OverlapCapsule, QueryParams))
 	{
 		return false;
 	}
-	
+
 	LedgeDescription.Location = OverlapLocation;
 	LedgeDescription.Rotation = (ForwardHitResult.ImpactNormal * FVector(-1.f, -1.f, 0.f)).ToOrientationRotator();
 	LedgeDescription.Normal = ForwardHitResult.ImpactNormal;

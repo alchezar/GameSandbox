@@ -27,14 +27,14 @@ AActor* AP12AIController::GetClosestSensedActor(const TSubclassOf<UAISense> Sens
 	{
 		return nullptr;
 	}
-	
+
 	TArray<AActor*> SensedActors;
 	PerceptionComponent->GetCurrentlyPerceivedActors(SenseClass, SensedActors);
 
 	const FVector PawnLocation = ControlledPawn->GetActorLocation();
 	float MinSquaredDistance = FLT_MAX;
 	AActor* ClosestActor = nullptr;
-	
+
 	for (AActor* SensedActor : SensedActors)
 	{
 		if (SensedActor->GetLifeSpan() != 0.f)

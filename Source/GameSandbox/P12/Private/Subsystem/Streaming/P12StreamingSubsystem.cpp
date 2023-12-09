@@ -24,7 +24,7 @@ void UP12StreamingSubsystem::Deinitialize()
 	FCoreUObjectDelegates::PostLoadMapWithWorld.RemoveAll(this);
 
 	RemoveStreamingLevelManagers();
-	
+
 	Super::Deinitialize();
 }
 
@@ -44,7 +44,7 @@ UWorld* UP12StreamingSubsystem::GetWorld() const
 void UP12StreamingSubsystem::OnVolumeBeginOverlap(AP12StreamingSubsystemVolume* SubsystemVolume)
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystem::OnVolumeBeginOverlap(): %s, SubsystemVolume: %s"), *GetNameSafe(this), *GetNameSafe(SubsystemVolume));
-	
+
 	for (const FString& LevelToLoad : SubsystemVolume->GetLevelsToLoad())
 	{
 		UP12StreamingSubsystemManager* Manager = nullptr;
@@ -54,7 +54,7 @@ void UP12StreamingSubsystem::OnVolumeBeginOverlap(AP12StreamingSubsystemVolume* 
 		}
 		Manager->AddLoadRequest(SubsystemVolume);
 	}
-	
+
 	for (const FString& LevelToUnload : SubsystemVolume->GetLevelsToUnload())
 	{
 		UP12StreamingSubsystemManager* Manager = nullptr;
@@ -69,7 +69,7 @@ void UP12StreamingSubsystem::OnVolumeBeginOverlap(AP12StreamingSubsystemVolume* 
 void UP12StreamingSubsystem::OnVolumeOverlapEnd(AP12StreamingSubsystemVolume* SubsystemVolume)
 {
 	UE_LOG(LogP12StreamingSubsystem, Display, TEXT("UP12StreamingSubsystem::OnVolumeOverlapEnd(): %s, SubsystemVolume: %s"), *GetNameSafe(this), *GetNameSafe(SubsystemVolume));
-	
+
 	for (const FString& LevelToLoad : SubsystemVolume->GetLevelsToLoad())
 	{
 		UP12StreamingSubsystemManager* Manager = nullptr;
@@ -79,7 +79,7 @@ void UP12StreamingSubsystem::OnVolumeOverlapEnd(AP12StreamingSubsystemVolume* Su
 		}
 		Manager->RemoveLoadRequest(SubsystemVolume);
 	}
-	
+
 	for (const FString& LevelToUnload : SubsystemVolume->GetLevelsToUnload())
 	{
 		UP12StreamingSubsystemManager* Manager = nullptr;

@@ -6,8 +6,6 @@
 #include "BehaviorTree/BTTaskNode.h"
 #include "P12Task_SelectRandomPointAroundTarget.generated.h"
 
-
-
 UCLASS()
 class GAMESANDBOX_API UP12Task_SelectRandomPointAroundTarget : public UBTTaskNode
 {

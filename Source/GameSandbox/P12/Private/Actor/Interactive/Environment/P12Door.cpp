@@ -6,7 +6,7 @@ AP12Door::AP12Door()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.bStartWithTickEnabled = false;
-	
+
 	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRootComponent"));
 
 	DoorPivot = CreateDefaultSubobject<USceneComponent>("DoorPivotSceneComponent");
@@ -17,7 +17,6 @@ AP12Door::AP12Door()
 
 	FrameMesh = CreateDefaultSubobject<UStaticMeshComponent>("FrameStaticMeshComponent");
 	FrameMesh->SetupAttachment(RootComponent);
-	
 }
 
 void AP12Door::BeginPlay()
@@ -53,22 +52,22 @@ FName AP12Door::GetActionEventName() const
 	return FName("Interact_Open");
 }
 
-bool AP12Door::HasOnInteractionCallback() const 
+bool AP12Door::HasOnInteractionCallback() const
 {
 	return true;
 }
 
-FDelegateHandle AP12Door::AddOnInteractionFunction(UObject* Object, const FName& Name) 
+FDelegateHandle AP12Door::AddOnInteractionFunction(UObject* Object, const FName& Name)
 {
 	return OnInteraction.AddUFunction(Object, Name);
 }
 
-void AP12Door::RemoveOnInteractionDelegate(FDelegateHandle Delegate) 
+void AP12Door::RemoveOnInteractionDelegate(FDelegateHandle Delegate)
 {
 	OnInteraction.Remove(Delegate);
 }
 
-void AP12Door::InteractWithDoor() 
+void AP12Door::InteractWithDoor()
 {
 	/* By using trigonometry. */
 	if (!bCustomCurve || !DoorCurve)
@@ -87,7 +86,7 @@ void AP12Door::InteractWithDoor()
 	DoorOpenTimeline.PlayFromStart();
 }
 
-void AP12Door::OnUpdateDoorTimelineHandle(float TimelineAlpha) 
+void AP12Door::OnUpdateDoorTimelineHandle(float TimelineAlpha)
 {
 	const float StartAngle = bOpened ? Angle.Opened : Angle.Closed;
 	const float EndAngle = bOpened ? Angle.Closed : Angle.Opened;
@@ -95,7 +94,7 @@ void AP12Door::OnUpdateDoorTimelineHandle(float TimelineAlpha)
 	DoorPivot->SetRelativeRotation(FRotator(0.f, Yaw, 0.f));
 }
 
-void AP12Door::OnFinishedDoorTimelineHandle() 
+void AP12Door::OnFinishedDoorTimelineHandle()
 {
 	bOpened = !bOpened;
 	SetActorTickEnabled(false);
@@ -112,24 +111,24 @@ void AP12Door::OpenDoor()
 
 	const FRotator ClosedRotation = FRotator(0.f, Angle.Closed, 0.f);
 	const FRotator OpenedRotation = FRotator(0.f, Angle.Opened, 0.f);
-	
+
 	const FRotator StartRotation = bOpened ? ClosedRotation : OpenedRotation;
 	const FRotator TargetRotation = bOpened ? OpenedRotation : ClosedRotation;
-	
+
 	FTimerDelegate DoorDelegate;
 	DoorDelegate.BindUObject(this, &ThisClass::OpenDoorSmoothly, StartRotation, TargetRotation);
-	GetWorld()->GetTimerManager().SetTimer(DoorTimer, DoorDelegate, GetWorld()->GetDeltaSeconds(), true);	
+	GetWorld()->GetTimerManager().SetTimer(DoorTimer, DoorDelegate, GetWorld()->GetDeltaSeconds(), true);
 }
 
 void AP12Door::OpenDoorSmoothly(FRotator StartRotation, FRotator TargetRotation)
 {
 	const float AlphaPerTick = GetWorld()->GetDeltaSeconds() / OpeningTime;
 	Alpha = FMath::Clamp(Alpha + AlphaPerTick, 0.f, 1.f);
-	
+
 	const float SmoothAlpha = 0.5f - cos(Alpha * UE_PI) / 2.f;
 	const FRotator CurrentRotation = FMath::Lerp(StartRotation, TargetRotation, SmoothAlpha);
 	DoorPivot->SetRelativeRotation(CurrentRotation);
-	
+
 	if (Alpha == 1.f)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(DoorTimer);

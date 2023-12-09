@@ -5,7 +5,6 @@
 UP12SpiderMovementComponent::UP12SpiderMovementComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	
 }
 
 void UP12SpiderMovementComponent::BeginPlay()
@@ -46,7 +45,7 @@ void UP12SpiderMovementComponent::MovePawn(const float DeltaTime)
 	// float LineTraceLength = SphereRadius + TraceDepth;
 	FVector StartPoint = UpdatedComponent->GetComponentLocation();
 	FVector EndPoint = StartPoint - TraceDepth * FVector::UpVector;
-	
+
 	FHitResult HitResult;
 	FCollisionQueryParams CollisionParams;
 	CollisionParams.AddIgnoredActor(GetOwner());

@@ -32,21 +32,21 @@ private:
 	void OnBackButtonClicked();
 	UFUNCTION()
 	void OnCreateButtonClicked();
-	
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* NetworkTypeText;
 	UPROPERTY(meta = (BindWidget))
-	UButton* ToggleLeftButton;	
+	UButton* ToggleLeftButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* ToggleRightButton;
 	UPROPERTY(meta = (BindWidget))
-	UEditableTextBox* UserServerNameTextBox;	
+	UEditableTextBox* UserServerNameTextBox;
 	UPROPERTY(meta = (BindWidget))
 	UButton* BackButton;
 	UPROPERTY(meta = (BindWidget))
-	UButton* CreateButton;	
-	
+	UButton* CreateButton;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FName ServerName;
 };

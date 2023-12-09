@@ -119,7 +119,6 @@ void UP12Library::DrawPrintString(const UWorld* World, const FString& Text, cons
 		return;
 	}
 	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, bOnTick ? 0.f : 5.f, FColor::Cyan, Text);
-
 }
 
 void UP12Library::DrawDebugSphereTrace(const UWorld* World, const FHitResult& HitResult, const float Radius, const FVector& Start, const FVector& End, const bool bDraw, const bool bOnTick)

@@ -11,7 +11,7 @@ AP12Projectile::AP12Projectile()
 	// SetReplicates(true);
 	bReplicates = true;
 	SetReplicatingMovement(true);
-	
+
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	CollisionComponent->InitSphereRadius(5.f);
 	CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -55,7 +55,6 @@ void AP12Projectile::LaunchProjectile(const FVector& Direction, AActor* Launched
 	CollisionComponent->IgnoreActorWhenMoving(LaunchedFrom->GetOwner(), true);
 
 	MovementComponent->Velocity = Direction * MovementComponent->InitialSpeed;
-
 }
 
 void AP12Projectile::OnCollisionHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -70,15 +69,15 @@ void AP12Projectile::ToggleActive(const bool bActive, const FVector& Location, c
 	{
 		PoolLocation = Location;
 	}
-	
+
 	SetActorLocation(Location);
 	SetActorRotation(Direction.ToOrientationRotator());
-	
+
 	if (bActive && WeaponOwner)
 	{
 		LaunchProjectile(Direction.GetSafeNormal(), WeaponOwner);
 	}
-	
+
 	/* Set projectile active */
 	SetHidden(!bActive);
 	MeshComponent->SetVisibility(bActive);

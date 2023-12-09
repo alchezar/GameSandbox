@@ -19,7 +19,7 @@ void UP12AttributeComponent::BeginPlay()
 	check(GetOwner()->IsA<AP12BaseCharacter>())
 	CachedCharacterOwner = StaticCast<AP12BaseCharacter*>(GetOwner());
 	CachedCharacterOwner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnTakeAnyDamage);
-	
+
 	Health = MaxHealth;
 	if (GetOwner()->HasAuthority())
 	{
@@ -30,11 +30,10 @@ void UP12AttributeComponent::BeginPlay()
 void UP12AttributeComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-	
+
 #if UE_BUILD_DEBUG || UE_BUILD_DEVELOPMENT
 	DebugDrawAttributes();
 #endif
-
 }
 
 void UP12AttributeComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -50,7 +49,7 @@ void UP12AttributeComponent::OnTakeAnyDamage(AActor* DamagedActor, float Damage,
 	{
 		return;
 	}
-	
+
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	OnHealthChanged();
 
@@ -113,7 +112,7 @@ void UP12AttributeComponent::AddHealth(const float HealthToAdd)
 
 void UP12AttributeComponent::RestoreFullStamina()
 {
-	
+	//
 }
 
 void UP12AttributeComponent::OnLevelDeserialized_Implementation()

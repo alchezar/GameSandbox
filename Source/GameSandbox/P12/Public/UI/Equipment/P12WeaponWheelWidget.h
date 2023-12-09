@@ -36,7 +36,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* WeaponNameText;
 
-	/* Array to match between equipment slots and radial menu segments (array indexes). */	 
+	/* Array to match between equipment slots and radial menu segments (array indexes). */
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TArray<EP12EquipmentSlot> EquipmentSlotsSegments;
 

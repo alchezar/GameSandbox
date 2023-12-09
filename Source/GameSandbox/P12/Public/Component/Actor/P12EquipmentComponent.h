@@ -33,7 +33,7 @@ public:
 	EP12EquipableItemType GetCurrentEquippedItemType() const;
 	int32 GetMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType);
 	void DecreaseMaxAvailableAmmoAmount(const EP12AmmunitionType AmmoType, const int32 AmmoToDecrease);
-	
+
 	void EquipItemInSlot(EP12EquipmentSlot Slot);
 	void EquipNextItem();
 	void EquipPreviousItem();
@@ -70,7 +70,7 @@ private:
 	void OnRep_CurrentEquippedSlot(EP12EquipmentSlot OldCurrentSlot);
 	UFUNCTION()
 	void OnRep_ItemsArray();
-	
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loadout")
 	TMap<EP12AmmunitionType, int32> MaxAmmunitionAmount;
@@ -85,18 +85,18 @@ protected:
 	TSubclassOf<UP12EquipmentViewWidget> EquipmentViewWidgetClass;
 	UPROPERTY(EditAnywhere, Category = "C++ | View")
 	TSubclassOf<UP12WeaponWheelWidget> WeaponWheelWidgetClass;
-	
+
 private:
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
 	UPROPERTY(ReplicatedUsing = "OnRep_CurrentEquippedSlot", SaveGame)
 	EP12EquipmentSlot CurrentEquippedSlot = EP12EquipmentSlot::None;
 	EP12EquipmentSlot PreviousEquippedSlot = EP12EquipmentSlot::None;
-	
+
 	UPROPERTY(Replicated, SaveGame)
 	TArray<int32> AmmunitionArray;
 	UPROPERTY(ReplicatedUsing = "OnRep_ItemsArray", SaveGame)
 	TArray<AP12EquipableItem*> ItemsArray;
-	
+
 	UPROPERTY()
 	AP12EquipableItem* CurrentEquippedItem = nullptr;
 	UPROPERTY()

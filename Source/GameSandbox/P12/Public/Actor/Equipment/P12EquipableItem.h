@@ -45,7 +45,7 @@ protected:
 	virtual void OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent);
 
 public:
-	FP12OnEquipmentStateChangedSignature OnEquipmentStateChanged; 
+	FP12OnEquipmentStateChangedSignature OnEquipmentStateChanged;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
@@ -56,7 +56,7 @@ protected:
 	FName EquippedSocketName = NAME_None;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
-	TArray<EP12EquipmentSlot> CompatibleEquipmentSlots; 
+	TArray<EP12EquipmentSlot> CompatibleEquipmentSlots;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Animation | Character")
 	UAnimMontage* CharacterEquipAnimMontage = nullptr;
@@ -66,9 +66,8 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName DataTableID = NAME_None;
-	
+
 private:
 	TSoftObjectPtr<UP12EquipmentComponent> CachedEquipment;
 	TWeakObjectPtr<AP12BaseCharacter> CachedCharacter;
-
 };

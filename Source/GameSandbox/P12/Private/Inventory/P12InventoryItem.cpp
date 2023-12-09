@@ -12,10 +12,10 @@ void UP12InventoryItem::Initialize(const FName& InDataTableID, const FP12Invento
 
 bool UP12InventoryItem::GetIsEquipable() const
 {
-	return ItemType == EP12ItemType::Equipable;	
+	return ItemType == EP12ItemType::Equipable;
 }
 
 bool UP12InventoryItem::GetIsConsumable() const
 {
-	return ItemType == EP12ItemType::Consumable;	
+	return ItemType == EP12ItemType::Consumable;
 }

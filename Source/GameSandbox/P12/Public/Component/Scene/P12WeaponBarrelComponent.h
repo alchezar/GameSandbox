@@ -23,7 +23,7 @@ struct FP12DecalInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float FadeOutTime = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float FadeScreenSize = 0.002f;	
+	float FadeScreenSize = 0.002f;
 };
 
 UENUM(BlueprintType)
@@ -40,7 +40,7 @@ struct FP12ShotInfo
 
 	FP12ShotInfo()
 		: Location10(FVector_NetQuantize100::ZeroVector), Direction(FVector_NetQuantizeNormal::ZeroVector) {}
-	
+
 	FP12ShotInfo(const FVector& Location, const FVector& Direction)
 		: Location10(Location * 10.f), Direction(Direction) {}
 
@@ -53,7 +53,7 @@ struct FP12ShotInfo
 	{
 		return Direction;
 	}
-	
+
 	UPROPERTY()
 	FVector_NetQuantize100 Location10;
 	UPROPERTY()
@@ -102,14 +102,14 @@ protected:
 	int32 BulletsPerShot = 1;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	TSubclassOf<UDamageType> DamageTypeClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel")
 	EP12HitRegistrationType HitRegistrationType = EP12HitRegistrationType::HitScan;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel", meta = (EditCondition = "HitRegistrationType == EP12HitRegistrationType::Projectile"))
 	TSubclassOf<AP12Projectile> ProjectileClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Barrel", meta = (ClampMin = 1, UIMin = 1))
 	int32 ProjectilePoolSize = 10;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	UNiagaraSystem* TraceNiagara = nullptr;
 

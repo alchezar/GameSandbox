@@ -22,7 +22,7 @@ void AP12EquipableItem::SetOwner(AActor* NewOwner)
 		check(NewOwner->IsA<AP12BaseCharacter>())
 		CachedCharacter = StaticCast<AP12BaseCharacter*>(NewOwner);
 
-		if(GetLocalRole() == ROLE_Authority)
+		if (GetLocalRole() == ROLE_Authority)
 		{
 			SetAutonomousProxy(true);
 		}
@@ -37,10 +37,8 @@ void AP12EquipableItem::CacheEquipmentComponent(const UP12EquipmentComponent* Eq
 void AP12EquipableItem::BeginPlay()
 {
 	Super::BeginPlay();
+
 	InitAnimNotify();
-	
-	// check(GetOwner()->IsA<AP12BaseCharacter>())
-	// CachedCharacter = StaticCast<AP12BaseCharacter*>(GetOwner());
 }
 
 void AP12EquipableItem::InitAnimNotify()
@@ -60,7 +58,7 @@ void AP12EquipableItem::InitAnimNotify()
 	}
 }
 
-void AP12EquipableItem::OnEquippingStartedHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
+void AP12EquipableItem::OnEquippingStartedHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	if (!CachedEquipment.IsValid())
 	{
@@ -69,7 +67,7 @@ void AP12EquipableItem::OnEquippingStartedHandle(USkeletalMeshComponent* Skeleta
 	CachedEquipment->EquipCurrentItem();
 }
 
-void AP12EquipableItem::OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent) 
+void AP12EquipableItem::OnEquippingFinishedHandle(USkeletalMeshComponent* SkeletalMeshComponent)
 {
 	if (!CachedCharacter.IsValid())
 	{
@@ -83,15 +81,14 @@ void AP12EquipableItem::AttachItem(const FName AttachSocketName)
 	AttachToComponent(CachedCharacter->GetMesh(), FAttachmentTransformRules::KeepRelativeTransform, AttachSocketName);
 }
 
-void AP12EquipableItem::Equip() 
+void AP12EquipableItem::Equip()
 {
 	OnEquipmentStateChanged.Broadcast(true);
 }
 
-void AP12EquipableItem::Unequip() 
+void AP12EquipableItem::Unequip()
 {
 	OnEquipmentStateChanged.Broadcast(false);
-
 }
 
 void AP12EquipableItem::Client_ToggleReticle_Implementation(const bool bShow) const

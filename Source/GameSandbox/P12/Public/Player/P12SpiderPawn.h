@@ -40,12 +40,12 @@ private:
 	void SubsystemDefaultMappingContext() const;
 	void RotatePawnToMovement(const float DeltaTime);
 	float GetIKSocketOffset(const FName& SocketName);
-	
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++")
 	USphereComponent* SphereRootComponent;
 	UPROPERTY(VisibleAnywhere, Category = "C++")
-	UPawnMovementComponent* MovementComponent;	
+	UPawnMovementComponent* MovementComponent;
 	UPROPERTY(VisibleAnywhere, Category = "C++")
 	USpringArmComponent* SpringArmComponent;
 	UPROPERTY(VisibleAnywhere, Category = "C++")
@@ -59,16 +59,16 @@ protected:
 	float CollisionSphereRadius = 50.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float RotationInterpolationSpeed = 10.f;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++")
-	UInputMappingContext* DefaultContext;	
+	UInputMappingContext* DefaultContext;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* MoveAction;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* LookAction;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UInputAction* JumpAction;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	FName RightFrontFootSocketName = "IK_FrontRightSocket";
 	UPROPERTY(EditDefaultsOnly, Category = "C++")

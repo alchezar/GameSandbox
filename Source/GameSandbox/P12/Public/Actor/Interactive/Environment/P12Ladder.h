@@ -36,7 +36,7 @@ protected:
 	UInstancedStaticMeshComponent* StepRailMesh;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
 	UBoxComponent* TopInteractionVolume;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Params")
 	float Height = 100.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Params")
@@ -48,7 +48,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Params")
 	FVector AttachFromTopInitOffset = FVector(0.f, -20.f, 20.f);
-	
+
 private:
 	bool bOnTop = false;
 };

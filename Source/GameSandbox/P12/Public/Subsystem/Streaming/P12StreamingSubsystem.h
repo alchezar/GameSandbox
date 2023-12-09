@@ -8,6 +8,7 @@
 #include "P12StreamingSubsystem.generated.h"
 
 class UP12StreamingSubsystemManager;
+
 UCLASS()
 class GAMESANDBOX_API UP12StreamingSubsystem : public UGameInstanceSubsystem
 {

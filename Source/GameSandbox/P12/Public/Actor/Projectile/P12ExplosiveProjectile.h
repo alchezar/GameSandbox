@@ -28,5 +28,4 @@ protected:
 
 private:
 	FTimerHandle DetonationHandle;
-	
 };

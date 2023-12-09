@@ -48,9 +48,9 @@ FReply UP12InventorySlotWidget::NativeOnMouseButtonDown(const FGeometry& InGeome
 		{
 			LinkedSlot->ClearSlot();
 		}
-		return FReply::Handled();	
+		return FReply::Handled();
 	}
-	
+
 	FEventReply Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
 	return Reply.NativeReply;
 }
@@ -60,7 +60,7 @@ void UP12InventorySlotWidget::NativeOnDragDetected(const FGeometry& InGeometry, 
 	// UDragDropOperation* DragOperation = Cast<UDragDropOperation>(UWidgetBlueprintLibrary::CreateDragDropOperation(UDragDropOperation::StaticClass()));
 	UDragDropOperation* DragOperation = NewObject<UDragDropOperation>();
 
-	 /* Some simplification to not define a new widget for the drag and drop operation. */
+	/* Some simplification to not define a new widget for the drag and drop operation. */
 	UP12InventorySlotWidget* DragWidget = CreateWidget<UP12InventorySlotWidget>(GetOwningPlayer(), GetClass());
 	DragWidget->ItemIcon->SetBrushFromTexture(LinkedSlot->Item->GetDescription().Icon);
 
