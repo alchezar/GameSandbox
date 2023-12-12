@@ -39,7 +39,8 @@ public class GameSandbox : ModuleRules
 			"AnimGraphRuntime",
 			"OnlineSubsystem",
 			"Json",
-			"JsonUtilities"
+			"JsonUtilities",
+			"UnrealEd"
 		});
 
 		PublicIncludePaths.AddRange(new[]

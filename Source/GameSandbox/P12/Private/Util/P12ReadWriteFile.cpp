@@ -2,7 +2,10 @@
 
 #include "P12/Public/Util/P12ReadWriteFile.h"
 
+#include "AssetImportTask.h"
+#include "AssetToolsModule.h"
 #include "JsonObjectConverter.h"
+#include "Factories/ReimportDataTableFactory.h"
 
 /* ----------------------------- Text file ----------------------------- */
 
@@ -121,4 +124,216 @@ void UP12ReadWriteFile::WriteTestStructToJsonFile(const FString& JsonFilepath, c
 	}
 	/* Try to write json to file. */
 	WriteJson(JsonFilepath, JsonObject, bOutSuccess, OutInfoMessage);
+}
+
+/* --------------------------- Import asset ---------------------------- */
+
+UAssetImportTask* UP12ReadWriteFile::CreateImportTask(FString SourcePath, const FString& DestinationPath, UFactory* ExtraFactory, UObject* ExtraOptions, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Create task object. */
+	UAssetImportTask* ImportTask = NewObject<UAssetImportTask>();
+
+	/* Make sure the object was created properly. */
+	if (!ImportTask)
+	{
+		bOutSuccess = false;
+		OutInfoMessage = "Create import task failed - Was not able to create the import task object. That shouldn't really happen. - " + SourcePath;
+		return nullptr;
+	}
+	/* Set path information. */
+	ImportTask->Filename = SourcePath;
+	ImportTask->DestinationPath = FPaths::GetPath(DestinationPath);
+	ImportTask->DestinationName = FPaths::GetCleanFilename(DestinationPath);
+
+	/* Set basic options. */
+	ImportTask->bSave = false;
+	ImportTask->bAutomated = true;
+	ImportTask->bAsync = false;
+	ImportTask->bReplaceExisting = true;
+	ImportTask->bReplaceExistingSettings = false;
+
+	/* Optional extra factory and options. */
+	ImportTask->Factory = ExtraFactory;
+	ImportTask->Options = ExtraOptions;
+
+	/* Return the task. */
+	bOutSuccess = true;
+	OutInfoMessage = "Create import task succeeded - " + SourcePath;
+	return ImportTask;
+}
+
+UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Make sure the import task is valid. */
+	if (!ImportTask)
+	{
+		bOutSuccess = false;
+		OutInfoMessage = "Process import task failed - The task was invalid. Cannot process";
+		return nullptr;
+	}
+
+	/* Get asset tool module. */
+	const FAssetToolsModule* AssetTools = FModuleManager::LoadModulePtr<FAssetToolsModule>("AssetTools");
+	if (!AssetTools)
+	{
+		bOutSuccess = false;
+		OutInfoMessage = "Process import task failed - The asset tool module is invalid. " + ImportTask->Filename;
+		return nullptr;
+	}
+
+	/* Import the asset. */
+	AssetTools->Get().ImportAssetTasks({ImportTask});
+
+	/* Check if anything was imported during the process. */
+	if (ImportTask->GetObjects().IsEmpty())
+	{
+		bOutSuccess = false;
+		OutInfoMessage = "Process import task failed - Nothing was imported. Is your file valid? Is the asset type supported? " + ImportTask->Filename;
+		return nullptr;
+	}
+
+	/* Because some import tasks actually creates multiple assets (e.g. SkeletalMesh), we manually get the right asset. */
+	UObject* ImportedAsset = StaticLoadObject(UObject::StaticClass(), nullptr, *FPaths::Combine(ImportTask->DestinationPath, ImportTask->DestinationName));
+
+	/* Return the asset. */
+	bOutSuccess = true;
+	OutInfoMessage = "Process import task succeeded. - " + ImportTask->Filename;
+	return ImportedAsset;
+}
+
+UObject* UP12ReadWriteFile::ImportAsset(FString SourcePath, FString DestinationPath, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Create import task. */
+	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, nullptr, nullptr, bOutSuccess, OutInfoMessage);
+	if (!bOutSuccess)
+	{
+		return nullptr;
+	}
+
+	/* Import the asset. */
+	UObject* ReturnAsset = ProcessImportTask(ImportTask, bOutSuccess, OutInfoMessage);
+	if (!bOutSuccess)
+	{
+		return nullptr;
+	}
+
+	/* Return the imported asset. */
+	bOutSuccess = true;
+	OutInfoMessage = "Import asset succeeded - " + DestinationPath;
+	return ReturnAsset;
+}
+
+/* ---------------------------- Data table ----------------------------- */
+
+UDataTable* UP12ReadWriteFile::ImportDataTableFromJsonOrCsv(FString SourcePath, FString DestinationPath, UScriptStruct* StructClass, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Create factory to import a data table. */
+	UReimportDataTableFactory* DataTableFactory = NewObject<UReimportDataTableFactory>();
+	DataTableFactory->AutomatedImportSettings.ImportType = ECSVImportType::ECSV_DataTable;
+	DataTableFactory->AutomatedImportSettings.ImportRowStruct = StructClass;
+
+	/* Create import task. */
+	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, DataTableFactory, nullptr, bOutSuccess, OutInfoMessage);
+	if (!bOutSuccess)
+	{
+		return nullptr;
+	}
+
+	/* Import asset. */
+	UObject* ImportedAsset = ProcessImportTask(ImportTask, bOutSuccess, OutInfoMessage);
+	if (!bOutSuccess)
+	{
+		return nullptr;
+	}
+
+	/* Return imported asset. */
+	bOutSuccess = true;
+	OutInfoMessage = "Import data table succeeded - " + DestinationPath;
+	return Cast<UDataTable>(ImportedAsset);
+}
+
+void UP12ReadWriteFile::ExportDataTableToJsonOrCsv(FString FilePath, UDataTable* DataTable, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Check if data table is valid. */
+	if (!DataTable)
+	{
+		bOutSuccess = false;
+		OutInfoMessage = "Export data table to json or csv failed - Data table is nullptr. Filepath - " + FilePath;
+		return;
+	}
+
+	/* Convert table to string. */
+	FString TableString;
+
+	if (FilePath.Contains(".csv"))
+	{
+		TableString = DataTable->GetTableAsCSV();
+	}
+	else
+	{
+		TableString = DataTable->GetTableAsJSON();
+	}
+
+	/* Write string to file. */
+	WriteStringToFile(FilePath, TableString, bOutSuccess, OutInfoMessage);
+}
+
+/* ------------------------- Data table Json --------------------------- */
+
+TMap<FString, FP12JsonTestStruct> UP12ReadWriteFile::ReadStructFromJsonFile_DataTableFormat(FString FilePath, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Read file. */
+	const FString JsonString = ReadStringFromFile(FilePath, bOutSuccess, OutInfoMessage);
+	if (!bOutSuccess)
+	{
+		return TMap<FString, FP12JsonTestStruct>();
+	}
+
+	/* Create data table and tell it which struct it's using. */
+	UDataTable* Table = NewObject<UDataTable>();
+	Table->RowStruct = FP12JsonTestStruct::StaticStruct();
+
+	/* Populate data table. */
+	Table->CreateTableFromJSONString(JsonString);
+
+	/* Retrieve the rows. */
+	TArray<FName> RowNames = Table->GetRowNames();
+
+	/* Populate the return map. */
+	TMap<FString, FP12JsonTestStruct> RowsToStruct;
+
+	for (FName RowName : RowNames)
+	{
+		const FP12JsonTestStruct* Row = Table->FindRow<FP12JsonTestStruct>(RowName, nullptr);
+		if (!Row)
+		{
+			continue;
+		}
+		RowsToStruct.Add(RowName.ToString(), *Row);
+	}
+
+	/* Return the rows. */
+	bOutSuccess = true;
+	OutInfoMessage = "Read data table json succeeded - " + FilePath;
+	return RowsToStruct;
+}
+
+void UP12ReadWriteFile::WriteStructToJsonFile_DataTableFormat(FString FilePath, TMap<FString, FP12JsonTestStruct> RowsToStruct, bool& bOutSuccess, FString& OutInfoMessage)
+{
+	/* Convert all rows to string. */
+	TArray<FString> RowNames;
+	RowsToStruct.GetKeys(RowNames);
+
+	/* Create data table and tell it which struct it's using. */
+	UDataTable* Table = NewObject<UDataTable>();
+	Table->RowStruct = FP12JsonTestStruct::StaticStruct();
+
+	/* Add all rows to data table. */
+	for (FString RowName : RowNames)
+	{
+		Table->AddRow(*RowName, RowsToStruct[RowName]);
+	}
+
+	/* Export to file. */
+	ExportDataTableToJsonOrCsv(FilePath, Table, bOutSuccess, OutInfoMessage);
 }

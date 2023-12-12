@@ -8,7 +8,7 @@
 #include "P12ReadWriteFile.generated.h"
 
 USTRUCT(BlueprintType, Category = "C++ | Kinder")
-struct FP12JsonTestStruct
+struct FP12JsonTestStruct : public FTableRowBase
 {
 	GENERATED_BODY()
 
@@ -176,4 +176,109 @@ public:
 		/* Try to write json to file. */
 		WriteJson(JsonFilepath, JsonObject, bOutSuccess, OutInfoMessage);
 	}
+
+	/* --------------------------- Import asset ---------------------------- */
+
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Create an import task that you can then process to import any kind of assets
+	 *
+	 * @param SourcePath		The path of the source file: "C:/Temp//Texture.peg"
+	 * @param DestinationPath	The path of the Imported asset: /Game/Folder/MyTexture"
+	 * @param ExtraFactory		Optional. Some asset types require a special factory to import them
+	 * @param ExtraOptions		Optional. Some asset types have some extra settings you can set
+	 * @param bOutSuccess		If the action was a success or not
+	 * @param OutInfoMessage	More information about the action's result
+	 * @return					The import task
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static UAssetImportTask* CreateImportTask(FString SourcePath, const FString& DestinationPath, UFactory* ExtraFactory, UObject* ExtraOptions, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/**
+	 * Editor Daly - Will not work in packaged build.
+	 *
+	 * Process the import task to import the assets
+	 *
+	 * @param ImportTask		The task you want to process
+	 * @param bOutSuccess		If the action was a success or not
+	 * @param OutInfoMessage	More information about the action's result
+	 * @return					The Imported asset
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static UObject* ProcessImportTask(UAssetImportTask* ImportTask, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Create and process a basic import task.
+	 * Will work for the basic asset types like textures and sounds:
+	 * Can also be used for meshes, but you might not have all the control you want.
+	 *
+	 * @param SourcePath		The path of the source file: "C:/Temp//Texture.peg"
+	 * @param DestinationPath	The path of the Imported asset: /Game/Folder/MyTexture"
+	 * @param bOutSuccess		If the action was a success or not
+	 * @param OutInfoMessage	More information about the action's result
+	 * @return					The Imported asset
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static UObject* ImportAsset(FString SourcePath, FString DestinationPath, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/* ---------------------------- Data table ----------------------------- */
+
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Import a data table from a json or csv file.
+	 *
+	 * @param SourcePath		The path of the source file: "C:/Temp/My3son.json".
+	 * @param DestinationPath	The path of the imported asset: "/Game/Folder/MyDataTable".
+	 * @param StructClass		The structure to use for this data table.
+	 * @param bOutSuccess		If the action was a success or not.
+	 * @param OutInfoMessage	More information about the action's result.
+	 * @return					The Imported data table.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static UDataTable* ImportDataTableFromJsonOrCsv(FString SourcePath, FString DestinationPath, UScriptStruct* StructClass, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Export a data table to a json or csv file.
+	 * 
+	 * @param FilePath			The path of the output file: "C:/Temp/y3son.json".
+	 * @param DataTable			The data table to sport.
+	 * @param bOutSuccess		If the action was a success or not.
+	 * @param OutInfoMessage	More information about the action's result.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static void ExportDataTableToJsonOrCsv(FString FilePath, UDataTable* DataTable, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/* ------------------------- Data table Json --------------------------- */
+	
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Read a series of struct based on a json file formatted like a data table.
+	 *
+	 * @param FilePath			The path of the source file: "C:/Temp/MyJson.json"
+	 * @param bOutSuccess		If the action was a success or not
+	 * @param OutInfoMessage	More information about the action's result
+	 * @return					The structs
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static TMap<FString, FP12JsonTestStruct> ReadStructFromJsonFile_DataTableFormat(FString FilePath, bool& bOutSuccess, FString& OutInfoMessage);
+
+	/**
+	 * Editor Only - Will not work in packaged build.
+	 *
+	 * Write a series of struct to a json file. Will be formatted like a data table.
+	 *
+	 * @param FilePath			The path of the output file: "C:/Temp/My3son.json".
+	 * @param RowsToStruct		The structs to write in the json.
+	 * @param bOutSuccess		If the action was a success or not.
+	 * @param OutInfoMessage	More information about the action's result.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "C++ | Kinder")
+	static void WriteStructToJsonFile_DataTableFormat(FString FilePath, TMap<FString, FP12JsonTestStruct> RowsToStruct, bool& bOutSuccess, FString& OutInfoMessage);
 };
