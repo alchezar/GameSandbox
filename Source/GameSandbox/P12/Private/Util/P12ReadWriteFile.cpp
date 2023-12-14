@@ -9,126 +9,114 @@
 
 /* ----------------------------- Text file ----------------------------- */
 
-FString UP12ReadWriteFile::ReadStringFromFile(const FString& Filepath, bool& bOutSuccess, FString& OutInfoMessage)
+FString UP12ReadWriteFile::ReadStringFromFile(const FString& Filepath, FP12ReturnInfo& ReturnInfo)
 {
 	FString Result = "";
 
 	/* Check if the file exists. */
 	if (!FPlatformFileManager::Get().GetPlatformFile().FileExists(*Filepath))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Read string from file failed - File does`n exist - " + Filepath;
+		ReturnInfo = {false, "Read string from file failed - File does`n exist - " + Filepath};
 		return Result;
 	}
 	/* Try to read the file. Output goes in Result string. */
 	if (!FFileHelper::LoadFileToString(Result, *Filepath))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Read string from file failed - Was not able to read the file. Is this a text file? - " + Filepath;
+		ReturnInfo = {false, "Read string from file failed - Was not able to read the file. Is this a text file? - " + Filepath};
 		return Result;
 	}
-	bOutSuccess = true;
-	OutInfoMessage = "Read string from file succeeded - " + Filepath;
+	ReturnInfo = {true, "Read string from file succeeded - " + Filepath};
 	return Result;
 }
 
-void UP12ReadWriteFile::WriteStringToFile(const FString& Filepath, const FString String, bool& bOutSuccess, FString& OutInfoMessage)
+void UP12ReadWriteFile::WriteStringToFile(const FString& Filepath, const FString String, FP12ReturnInfo& ReturnInfo)
 {
 	/* Try to write the string into the file. */
 	if (!FFileHelper::SaveStringToFile(String, *Filepath))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Write string to file failed - Wasn't able to write into file. Is your file read only? Is the path valid? - " + Filepath;
+		ReturnInfo = {false, "Write string to file failed - Wasn't able to write into file. Is your file read only? Is the path valid? - " + Filepath};
 	}
-	bOutSuccess = true;
-	OutInfoMessage = "Write string to file succeeded - " + Filepath;
+	ReturnInfo = {true, "Write string to file succeeded - " + Filepath};
 }
 
 /* ----------------------------- Json file ----------------------------- */
 
-TSharedPtr<FJsonObject> UP12ReadWriteFile::ReadJson(const FString& JsonFilepath, bool& bOutSuccess, FString& OutInfoMessage)
+TSharedPtr<FJsonObject> UP12ReadWriteFile::ReadJson(const FString& JsonFilepath, FP12ReturnInfo& ReturnInfo)
 {
 	TSharedPtr<FJsonObject> Result;
 
 	/* Try to read the file. Output goes in Result shared pointer. */
-	const FString JsonString = ReadStringFromFile(JsonFilepath, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	const FString JsonString = ReadStringFromFile(JsonFilepath, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return Result;
 	}
 	/* Try to convert the string into the json object. Output goes in Result shared pointer. */
 	if (!FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(JsonString), Result))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Read Json failed - Was not able to deserialize the json string. Is it the right format? - " + JsonFilepath;
+		ReturnInfo = {false, "Read Json failed - Was not able to deserialize the json string. Is it the right format? - " + JsonFilepath};
 		return Result;
 	}
-	bOutSuccess = true;
-	OutInfoMessage = "Read Json succeeded - " + JsonFilepath;
+	ReturnInfo = {true, "Read Json succeeded - " + JsonFilepath};
 	return Result;
 }
 
-void UP12ReadWriteFile::WriteJson(const FString& JsonFilepath, const TSharedPtr<FJsonObject>& JsonObject, bool& bOutSuccess, FString& OutInfoMessage)
+void UP12ReadWriteFile::WriteJson(const FString& JsonFilepath, const TSharedPtr<FJsonObject>& JsonObject, FP12ReturnInfo& ReturnInfo)
 {
 	FString JsonString;
 	/* Try to convert json object into the string. Output goes in JsonString. */
 	if (!FJsonSerializer::Serialize(JsonObject.ToSharedRef(), TJsonWriterFactory<>::Create(&JsonString)))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Write json failed - Was not able to serialize the json to the string. Is the JsonObject valid? - " + JsonFilepath;
+		ReturnInfo = {false, "Write json failed - Was not able to serialize the json to the string. Is the JsonObject valid? - " + JsonFilepath};
 		return;
 	}
 	/* Try to write json string to file. */
-	WriteStringToFile(JsonFilepath, JsonString, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	WriteStringToFile(JsonFilepath, JsonString, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return;
 	}
-	bOutSuccess = true;
-	OutInfoMessage = "Write Json succeeded - " + JsonFilepath;
+	ReturnInfo = {true, "Write Json succeeded - " + JsonFilepath};
 }
 
 /* ---------------------------- Struct file ---------------------------- */
 
-FP12JsonTestStruct UP12ReadWriteFile::ReadTestStructFromJsonFile(const FString& JsonFilepath, bool& bOutSuccess, FString& OutInfoMessage)
+FP12JsonTestStruct UP12ReadWriteFile::ReadTestStructFromJsonFile(const FString& JsonFilepath, FP12ReturnInfo& ReturnInfo)
 {
 	FP12JsonTestStruct Result;
 
 	/* Try to read generic json object from file. */
-	const TSharedPtr<FJsonObject> JsonObject = ReadJson(JsonFilepath, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	const TSharedPtr<FJsonObject> JsonObject = ReadJson(JsonFilepath, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return FP12JsonTestStruct();
 	}
 	/* Try to convert generic json object into the desired structure. Output goes in Result structure. */
 	if (!FJsonObjectConverter::JsonObjectToUStruct<FP12JsonTestStruct>(JsonObject.ToSharedRef(), &Result))
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Read struct json failed – Was not able to convert the json object to your desired structure. Is it the right format / struct? - " + JsonFilepath;
+		ReturnInfo = {false, "Read struct json failed – Was not able to convert the json object to your desired structure. Is it the right format / struct? - " + JsonFilepath};
 		return FP12JsonTestStruct();
 	}
-	bOutSuccess = true;
-	OutInfoMessage = "Read struct json succeeded - " + JsonFilepath;
+	ReturnInfo = {true, "Read struct json succeeded - " + JsonFilepath};
 	return Result;
 }
 
-void UP12ReadWriteFile::WriteTestStructToJsonFile(const FString& JsonFilepath, const FP12JsonTestStruct& Struct, bool& bOutSuccess, FString& OutInfoMessage)
+void UP12ReadWriteFile::WriteTestStructToJsonFile(const FString& JsonFilepath, const FP12JsonTestStruct& Struct, FP12ReturnInfo& ReturnInfo)
 {
 	/* Try to convert the struct to generic json object. */
 	const TSharedPtr<FJsonObject> JsonObject = FJsonObjectConverter::UStructToJsonObject(Struct);
 	if (!JsonObject.IsValid())
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Write struct json failed - Was not able to convert the struct to a json object. This shouldn't really happen.";
+		ReturnInfo = {false, "Write struct json failed - Was not able to convert the struct to a json object. This shouldn't really happen - " + JsonFilepath};
 		return;
 	}
 	/* Try to write json to file. */
-	WriteJson(JsonFilepath, JsonObject, bOutSuccess, OutInfoMessage);
+	WriteJson(JsonFilepath, JsonObject, ReturnInfo);
 }
 
 /* --------------------------- Import asset ---------------------------- */
 
-UAssetImportTask* UP12ReadWriteFile::CreateImportTask(FString SourcePath, const FString& DestinationPath, UFactory* ExtraFactory, UObject* ExtraOptions, bool& bOutSuccess, FString& OutInfoMessage)
+UAssetImportTask* UP12ReadWriteFile::CreateImportTask(FString SourcePath, const FString& DestinationPath, UFactory* ExtraFactory, UObject* ExtraOptions, FP12ReturnInfo& ReturnInfo)
 {
 	/* Create task object. */
 	UAssetImportTask* ImportTask = NewObject<UAssetImportTask>();
@@ -136,8 +124,7 @@ UAssetImportTask* UP12ReadWriteFile::CreateImportTask(FString SourcePath, const 
 	/* Make sure the object was created properly. */
 	if (!ImportTask)
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Create import task failed - Was not able to create the import task object. That shouldn't really happen. - " + SourcePath;
+		ReturnInfo = {false, "Create import task failed - Was not able to create the import task object. That shouldn't really happen - " + SourcePath};
 		return nullptr;
 	}
 	/* Set path information. */
@@ -157,18 +144,16 @@ UAssetImportTask* UP12ReadWriteFile::CreateImportTask(FString SourcePath, const 
 	ImportTask->Options = ExtraOptions;
 
 	/* Return the task. */
-	bOutSuccess = true;
-	OutInfoMessage = "Create import task succeeded - " + SourcePath;
+	ReturnInfo = {true, "Create import task succeeded - " + SourcePath};
 	return ImportTask;
 }
 
-UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, bool& bOutSuccess, FString& OutInfoMessage)
+UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, FP12ReturnInfo& ReturnInfo)
 {
 	/* Make sure the import task is valid. */
 	if (!ImportTask)
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Process import task failed - The task was invalid. Cannot process";
+		ReturnInfo = {false, "Process import task failed - The task was invalid. Cannot process - " + ImportTask->Filename};
 		return nullptr;
 	}
 
@@ -176,8 +161,7 @@ UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, bool
 	const FAssetToolsModule* AssetTools = FModuleManager::LoadModulePtr<FAssetToolsModule>("AssetTools");
 	if (!AssetTools)
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Process import task failed - The asset tool module is invalid. " + ImportTask->Filename;
+		ReturnInfo = {false, "Process import task failed - The asset tool module is invalid - " + ImportTask->Filename};
 		return nullptr;
 	}
 
@@ -187,8 +171,7 @@ UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, bool
 	/* Check if anything was imported during the process. */
 	if (ImportTask->GetObjects().IsEmpty())
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Process import task failed - Nothing was imported. Is your file valid? Is the asset type supported? " + ImportTask->Filename;
+		ReturnInfo = {false, "Process import task failed - Nothing was imported. Is your file valid? Is the asset type supported? - " + ImportTask->Filename};
 		return nullptr;
 	}
 
@@ -196,36 +179,34 @@ UObject* UP12ReadWriteFile::ProcessImportTask(UAssetImportTask* ImportTask, bool
 	UObject* ImportedAsset = StaticLoadObject(UObject::StaticClass(), nullptr, *FPaths::Combine(ImportTask->DestinationPath, ImportTask->DestinationName));
 
 	/* Return the asset. */
-	bOutSuccess = true;
-	OutInfoMessage = "Process import task succeeded. - " + ImportTask->Filename;
+	ReturnInfo = {true, "Process import task succeeded - " + ImportTask->Filename};
 	return ImportedAsset;
 }
 
-UObject* UP12ReadWriteFile::ImportAsset(FString SourcePath, FString DestinationPath, bool& bOutSuccess, FString& OutInfoMessage)
+UObject* UP12ReadWriteFile::ImportAsset(FString SourcePath, FString DestinationPath, FP12ReturnInfo& ReturnInfo)
 {
 	/* Create import task. */
-	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, nullptr, nullptr, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, nullptr, nullptr, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return nullptr;
 	}
 
 	/* Import the asset. */
-	UObject* ReturnAsset = ProcessImportTask(ImportTask, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	UObject* ReturnAsset = ProcessImportTask(ImportTask, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return nullptr;
 	}
 
 	/* Return the imported asset. */
-	bOutSuccess = true;
-	OutInfoMessage = "Import asset succeeded - " + DestinationPath;
+	ReturnInfo = {true, "Import asset succeeded - " + DestinationPath};
 	return ReturnAsset;
 }
 
 /* ---------------------------- Data table ----------------------------- */
 
-UDataTable* UP12ReadWriteFile::ImportDataTableFromJsonOrCsv(FString SourcePath, FString DestinationPath, UScriptStruct* StructClass, bool& bOutSuccess, FString& OutInfoMessage)
+UDataTable* UP12ReadWriteFile::ImportDataTableFromJsonOrCsv(FString SourcePath, FString DestinationPath, UScriptStruct* StructClass, FP12ReturnInfo& ReturnInfo)
 {
 	/* Create factory to import a data table. */
 	UReimportDataTableFactory* DataTableFactory = NewObject<UReimportDataTableFactory>();
@@ -233,32 +214,31 @@ UDataTable* UP12ReadWriteFile::ImportDataTableFromJsonOrCsv(FString SourcePath, 
 	DataTableFactory->AutomatedImportSettings.ImportRowStruct = StructClass;
 
 	/* Create import task. */
-	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, DataTableFactory, nullptr, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	UAssetImportTask* ImportTask = CreateImportTask(SourcePath, DestinationPath, DataTableFactory, nullptr, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return nullptr;
 	}
 
 	/* Import asset. */
-	UObject* ImportedAsset = ProcessImportTask(ImportTask, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	UObject* ImportedAsset = ProcessImportTask(ImportTask, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return nullptr;
 	}
 
 	/* Return imported asset. */
-	bOutSuccess = true;
-	OutInfoMessage = "Import data table succeeded - " + DestinationPath;
+	ReturnInfo = {true, "Import data table succeeded - " + DestinationPath};
 	return Cast<UDataTable>(ImportedAsset);
 }
 
-void UP12ReadWriteFile::ExportDataTableToJsonOrCsv(FString FilePath, UDataTable* DataTable, bool& bOutSuccess, FString& OutInfoMessage)
+void UP12ReadWriteFile::ExportDataTableToJsonOrCsv(FString FilePath, UDataTable* DataTable, FP12ReturnInfo& ReturnInfo)
 {
 	/* Check if data table is valid. */
 	if (!DataTable)
 	{
-		bOutSuccess = false;
-		OutInfoMessage = "Export data table to json or csv failed - Data table is nullptr. Filepath - " + FilePath;
+		ReturnInfo = {false, "Export data table to json or csv failed - Data table is nullptr. Filepath - " + FilePath};
+
 		return;
 	}
 
@@ -275,16 +255,16 @@ void UP12ReadWriteFile::ExportDataTableToJsonOrCsv(FString FilePath, UDataTable*
 	}
 
 	/* Write string to file. */
-	WriteStringToFile(FilePath, TableString, bOutSuccess, OutInfoMessage);
+	WriteStringToFile(FilePath, TableString, ReturnInfo);
 }
 
 /* ------------------------- Data table Json --------------------------- */
 
-TMap<FString, FP12JsonTestStruct> UP12ReadWriteFile::ReadStructFromJsonFile_DataTableFormat(FString FilePath, bool& bOutSuccess, FString& OutInfoMessage)
+TMap<FString, FP12JsonTestStruct> UP12ReadWriteFile::ReadStructFromJsonFile_DataTableFormat(FString FilePath, FP12ReturnInfo& ReturnInfo)
 {
 	/* Read file. */
-	const FString JsonString = ReadStringFromFile(FilePath, bOutSuccess, OutInfoMessage);
-	if (!bOutSuccess)
+	const FString JsonString = ReadStringFromFile(FilePath, ReturnInfo);
+	if (!ReturnInfo.bOutSuccess)
 	{
 		return TMap<FString, FP12JsonTestStruct>();
 	}
@@ -313,12 +293,11 @@ TMap<FString, FP12JsonTestStruct> UP12ReadWriteFile::ReadStructFromJsonFile_Data
 	}
 
 	/* Return the rows. */
-	bOutSuccess = true;
-	OutInfoMessage = "Read data table json succeeded - " + FilePath;
+	ReturnInfo = {true, "Read data table json succeeded - " + FilePath};
 	return RowsToStruct;
 }
 
-void UP12ReadWriteFile::WriteStructToJsonFile_DataTableFormat(FString FilePath, TMap<FString, FP12JsonTestStruct> RowsToStruct, bool& bOutSuccess, FString& OutInfoMessage)
+void UP12ReadWriteFile::WriteStructToJsonFile_DataTableFormat(FString FilePath, TMap<FString, FP12JsonTestStruct> RowsToStruct, FP12ReturnInfo& ReturnInfo)
 {
 	/* Convert all rows to string. */
 	TArray<FString> RowNames;
@@ -335,5 +314,5 @@ void UP12ReadWriteFile::WriteStructToJsonFile_DataTableFormat(FString FilePath, 
 	}
 
 	/* Export to file. */
-	ExportDataTableToJsonOrCsv(FilePath, Table, bOutSuccess, OutInfoMessage);
+	ExportDataTableToJsonOrCsv(FilePath, Table, ReturnInfo);
 }
