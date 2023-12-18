@@ -14,7 +14,8 @@
 AP10Projectile::AP10Projectile()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 	SetReplicatingMovement(true);
 
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");

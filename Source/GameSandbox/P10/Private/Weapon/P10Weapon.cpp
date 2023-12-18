@@ -15,7 +15,8 @@
 AP10Weapon::AP10Weapon()
 {
 	PrimaryActorTick.bCanEverTick = false;
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 	NetUpdateFrequency = 60.f;
 	MinNetUpdateFrequency = 30.f;
 

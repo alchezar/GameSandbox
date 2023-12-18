@@ -5,7 +5,8 @@
 AP10Powerup::AP10Powerup()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetReplicates(true);
+	// SetReplicates(true);
+	bReplicates = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");

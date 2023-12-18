@@ -281,17 +281,17 @@ void AP10TrackerBot::FindDefaultReferences()
 {
 	if (!Sound.Explode)
 	{
-		static ConstructorHelpers::FObjectFinder<USoundBase> ExplodeSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Sound/MFX_Explode.MFX_Explode'"));
+		static ConstructorHelpers::FObjectFinder<USoundBase> ExplodeSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Audio/MFX_Explode.MFX_Explode'"));
 		if (ExplodeSoundFinder.Succeeded()) Sound.Explode = ExplodeSoundFinder.Object;
 	}
 	if (!Sound.Rolling)
 	{
-		static ConstructorHelpers::FObjectFinder<USoundBase> RollingSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Sound/MFX_Rolling.MFX_Rolling'"));
+		static ConstructorHelpers::FObjectFinder<USoundBase> RollingSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Audio/MFX_Rolling.MFX_Rolling'"));
 		if (RollingSoundFinder.Succeeded()) Sound.Rolling = RollingSoundFinder.Object;
 	}
 	if (!Sound.TargetReached)
 	{
-		static ConstructorHelpers::FObjectFinder<USoundBase> TargetReachedSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Sound/MFX_Reached.MFX_Reached'"));
+		static ConstructorHelpers::FObjectFinder<USoundBase> TargetReachedSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Audio/MFX_Reached.MFX_Reached'"));
 		if (TargetReachedSoundFinder.Succeeded()) Sound.TargetReached = TargetReachedSoundFinder.Object;
 	}
 	if (!Explosion)
@@ -301,7 +301,7 @@ void AP10TrackerBot::FindDefaultReferences()
 	}
 	if (!Sound.SelfDestruct)
 	{
-		static ConstructorHelpers::FObjectFinder<USoundBase> SelfDestructSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Sound/MFX_SelfDestruct.MFX_SelfDestruct'"));
+		static ConstructorHelpers::FObjectFinder<USoundBase> SelfDestructSoundFinder(TEXT("/Script/MetasoundEngine.MetaSoundSource'/Game/Project/PP10/Audio/MFX_SelfDestruct.MFX_SelfDestruct'"));
 		if (SelfDestructSoundFinder.Succeeded()) Sound.SelfDestruct = SelfDestructSoundFinder.Object;
 	}
 }

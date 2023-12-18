@@ -11,8 +11,9 @@
 AP10Objective::AP10Objective()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	SetReplicates(true);
-
+	// SetReplicates(true);
+	bReplicates = true;
+	
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("StaticMeshComponent");
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	SetRootComponent(MeshComponent);

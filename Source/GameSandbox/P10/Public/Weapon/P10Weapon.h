@@ -23,9 +23,9 @@ struct FP10HitScanTrace
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TEnumAsByte<EPhysicalSurface> SurfaceType;
+	TEnumAsByte<EPhysicalSurface> SurfaceType = EPhysicalSurface::SurfaceType_Default;
 	UPROPERTY()
-	FVector_NetQuantize TraceTo;
+	FVector_NetQuantize TraceTo = FVector_NetQuantize::ZeroVector;
 };
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP10OnReloadSignature, APawn*, bool)

@@ -10,8 +10,9 @@
 AP10PickupActor::AP10PickupActor()
 {
 	RootComponent = CreateDefaultSubobject<USceneComponent>("RootSceneComponent");
-	SetReplicates(true);
-
+	// SetReplicates(true);
+	bReplicates = true;
+	
 	SphereComponent = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SphereComponent->SetupAttachment(RootComponent);
 	SphereComponent->SetSphereRadius(100.f);
