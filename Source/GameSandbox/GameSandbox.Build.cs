@@ -37,7 +37,10 @@ public class GameSandbox : ModuleRules
 			"Slate", 
 			"SlateCore", 
 			"AnimGraphRuntime",
-			"OnlineSubsystem"
+			"OnlineSubsystem",
+			"Json",
+			"JsonUtilities",
+			"UnrealEd"
 		});
 
 		PublicIncludePaths.AddRange(new[]
