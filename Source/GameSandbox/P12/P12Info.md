@@ -1,6 +1,6 @@
 **Code name:** PetProject №12  
-**Project name:** GameCode  
-**Instructor:** XYZ School 
+**Project name:** GameCode XYZ School  
+**Instructor:** Alexandr Balashyn
 **Price:** ~~$1400~~ $ 0.00  
 **Links:**
 [Source](https://www.school-xyz.com/gamecode),
