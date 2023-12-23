@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "P13SnakeBase.generated.h"
 
+class AP13SnakeElementBase;
+
 UENUM()
 enum class EP13MoveDirection : uint8
 {
@@ -15,27 +17,34 @@ enum class EP13MoveDirection : uint8
 	Right
 };
 
-class AP13SnakeElementBase;
-
+/* =================================== Class =============================== */
 UCLASS()
 class GAMESANDBOX_API AP13SnakeBase : public AActor
 {
 	GENERATED_BODY()
 
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13SnakeBase();
 	virtual void Tick(const float DeltaTime) override;
-	FORCEINLINE EP13MoveDirection GetMoveDirection() const { return LastMoveDirection; }
-	void SetMoveDirection(const EP13MoveDirection NewDirection);
 
 protected:
 	virtual void BeginPlay() override;
-	void AddSnakeElement(const int32 ElementsNum = 1);
+
+	/* ------------------------------- This -------------------------------- */
+public:
+	FORCEINLINE EP13MoveDirection GetMoveDirection() const { return LastMoveDirection; }
+	void SetMoveDirection(const EP13MoveDirection NewDirection);
+	void AddSnakeElement(const int32 ElementsNum = 1, const bool bVisible = false);
+
+protected:
 	void SnakeMove();
+	void OnSnakeElementOverlap(AP13SnakeElementBase* OverlappedElement, AActor* OverlappedWith);
 
 private:
 	void SetHeadAppearance();
 
+	/* ------------------------------ Members ------------------------------ */
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<AP13SnakeElementBase> SnakeElementClass;

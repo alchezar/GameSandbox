@@ -17,6 +17,7 @@ class GAMESANDBOX_API AP13PawnSnake : public APawn
 {
 	GENERATED_BODY()
 
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13PawnSnake();
 	virtual void Tick(float DeltaTime) override;
@@ -24,12 +25,16 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	/* ------------------------------- This -------------------------------- */
+protected:
 	void MoveInput(const FInputActionValue& Value);
 
 private:
 	void AddDefaultMappingContext();
 	void CreateSnakeActor();
 
+	/* ------------------------------ Members ------------------------------ */
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++")
 	UCameraComponent* PawnCamera;
