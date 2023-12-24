@@ -13,4 +13,5 @@
 #define ECC_CLIMBING         ECC_GameTraceChannel6
 #define ECC_BULLET           ECC_GameTraceChannel7
 #define ECC_MELEE            ECC_GameTraceChannel8
+#define ECC_CURSOR           ECC_GameTraceChannel9
 	
