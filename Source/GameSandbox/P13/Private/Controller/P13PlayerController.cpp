@@ -10,6 +10,8 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
+#include "P13/Public/Intearface/P13InputInterface.h"
 
 AP13PlayerController::AP13PlayerController()
 {
@@ -39,6 +41,14 @@ void AP13PlayerController::SetupInputComponent()
 	InputComp->BindAction(SetDestinationAction, ETriggerEvent::Triggered, this, &ThisClass::OnSetDestinationTriggered);
 	InputComp->BindAction(SetDestinationAction, ETriggerEvent::Completed, this, &ThisClass::OnSetDestinationReleased);
 	InputComp->BindAction(SetDestinationAction, ETriggerEvent::Canceled, this, &ThisClass::OnSetDestinationReleased);
+
+	InputComp->BindAction(SprintAction, ETriggerEvent::Started, this, &ThisClass::SprintInput, true);
+	InputComp->BindAction(SprintAction, ETriggerEvent::Completed, this, &ThisClass::SprintInput, false);
+
+	InputComp->BindAction(AimAction, ETriggerEvent::Started, this, &ThisClass::AimInput, true);
+	InputComp->BindAction(AimAction, ETriggerEvent::Completed, this, &ThisClass::AimInput, false);
+
+	InputComp->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ThisClass::ZoomInput);
 }
 
 void AP13PlayerController::OnInputStarted() 
@@ -70,8 +80,16 @@ void AP13PlayerController::OnSetDestinationTriggered()
 	const FVector WorldDirection = (CachedDestination - OurChar->GetActorLocation()).GetSafeNormal();
 	OurChar->AddMovementInput(WorldDirection, 1.0, false);
 
-	const FRotator MeshRotation = OurChar->GetCharacterMovement()->Velocity.GetSafeNormal().Rotation() - FRotator(0.f, 90.f, 0.f);
-	OurChar->GetMesh()->SetWorldRotation(MeshRotation);
+	// const FRotator MeshOldRotation = OurChar->GetMesh()->GetComponentRotation();
+	// const FRotator MeshNewRotation = OurChar->GetCharacterMovement()->Velocity.GetSafeNormal().Rotation() - FRotator(0.f, 90.f, 0.f);
+	// const FRotator InterpRotation = FMath::RInterpTo(MeshOldRotation, MeshNewRotation, GetWorld()->GetDeltaSeconds(), 2.f);
+	// OurChar->GetMesh()->SetWorldRotation(InterpRotation);
+
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		const FVector ToCursorDirection = OurChar->GetCharacterMovement()->Velocity.GetSafeNormal();
+		InputInterface->RotateTowardMovement(ToCursorDirection);
+	}
 
 #if WITH_EDITOR
 	DrawDebugDirectionalArrow(GetWorld(), OurChar->GetActorLocation(), OurChar->GetActorLocation() + OurChar->GetCharacterMovement()->Velocity / 3.f, 50.f, FColor::Red);
@@ -90,6 +108,19 @@ void AP13PlayerController::OnSetDestinationReleased()
 		/* We move there and spawn some particles. */
 		UAIBlueprintHelperLibrary::SimpleMoveToLocation(this, CachedDestination);
 		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, FXCursor, CachedDestination, FRotator::ZeroRotator, FVector(1.f, 1.f, 1.f), true, true, ENCPoolMethod::None, true);
+
+		if (const APawn* OurPawn = GetPawn())
+		{
+			const FVector DirectionToCursor = (CachedDestination - OurPawn->GetActorLocation()).GetSafeNormal2D();
+			
+			FTimerDelegate RotationTickDelegate;
+			RotationTickDelegate.BindUObject(this, &ThisClass::RotateTowardCursorSmoothly, DirectionToCursor);
+			GetWorld()->GetTimerManager().SetTimer(RotationTickTimer, RotationTickDelegate, GetWorld()->GetDeltaSeconds(), true);
+
+			FTimerDelegate RotationDelegate;
+			RotationDelegate.BindLambda([&]() { GetWorld()->GetTimerManager().ClearTimer(RotationTickTimer); });
+			GetWorld()->GetTimerManager().SetTimer(RotationTimer, RotationDelegate, 2.f, false);
+		}
 	}
 
 	FollowTime = 0.f;
@@ -98,27 +129,9 @@ void AP13PlayerController::OnSetDestinationReleased()
 
 void AP13PlayerController::MoveInput(const FInputActionValue& Value) 
 {
-	const FVector2D MoveVector = Value.Get<FVector2D>();
-	APawn* OurPawn = GetPawn();
-	if (!OurPawn)
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
 	{
-		return;
-	}
-	const FVector ForwardDirection = OurPawn->GetActorForwardVector();
-	const FVector RightDirection = OurPawn->GetActorRightVector();
-	
-	OurPawn->AddMovementInput(ForwardDirection, MoveVector.Y);
-	OurPawn->AddMovementInput(RightDirection, MoveVector.X);
-
-	FHitResult Hit;
-	GetHitResultUnderCursor(ECC_CURSOR, true, Hit);
-	if (Hit.bBlockingHit)
-	{
-		FVector LookAtDirection = (Hit.Location - OurPawn->GetActorLocation()).GetSafeNormal2D();
-		FRotator LookAtRotation = LookAtDirection.Rotation() - FRotator(0.f, 90.f, 0.f);
-
-		ACharacter* OurChar = Cast<ACharacter>(OurPawn);
-		OurChar->GetMesh()->SetWorldRotation(LookAtRotation);
+		InputInterface->MoveInput(Value.Get<FVector2D>());
 	}
 }
 
@@ -127,6 +140,29 @@ void AP13PlayerController::LookInput(const FInputActionValue& Value)
 
 }
 
+void AP13PlayerController::SprintInput(const bool bStart)
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->SprintInput(bStart);
+	}
+}
+
+void AP13PlayerController::AimInput(const bool bStart)
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->AimInput(bStart);
+	}
+}
+
+void AP13PlayerController::ZoomInput(const FInputActionValue& Value)
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+    {
+    	InputInterface->ZoomInput(Value.Get<float>());
+    }
+}
 
 void AP13PlayerController::AddDefaultMappingContext()
 {
@@ -136,4 +172,12 @@ void AP13PlayerController::AddDefaultMappingContext()
 		return;
 	}
 	Subsystem->AddMappingContext(DefaultContext, 0);
+}
+
+void AP13PlayerController::RotateTowardCursorSmoothly(const FVector Direction)
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->RotateTowardMovement(Direction);
+	}
 }
