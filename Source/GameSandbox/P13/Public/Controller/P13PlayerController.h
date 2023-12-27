@@ -24,6 +24,9 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+public:
+	virtual void Tick(const float DeltaSeconds) override;
+
 	/* ------------------------------- This -------------------------------- */
 protected:
 	void OnInputStarted();
@@ -36,10 +39,14 @@ protected:
 	void SprintInput(const bool bStart);
 	void AimInput(const bool bStart);
 	void ZoomInput(const FInputActionValue& Value);
+	void FireInput(bool const bStart);
 
 private:
 	void AddDefaultMappingContext();
 	void RotateTowardCursorSmoothly(const FVector Direction);
+	void FindPointUnderCursor();
+	void SpawnCursorDecal();
+	void UpdateCursorDecalPosition() const;
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -57,16 +64,27 @@ protected:
 	UInputAction* AimAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* ZoomAction = nullptr;
-
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
+	UInputAction* FireAction = nullptr;
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;
-	UPROPERTY(EditAnywhere, Category = "C++ | Input")
-	UNiagaraSystem* FXCursor = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
+	UNiagaraSystem* CursorClickFX = nullptr;
+	// UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
+	// UDecalComponent* CursorDecal = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
+	UMaterialInterface* CursorMaterial = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
+	FVector CursorSize = FVector(20.f, 40.f, 40.f);	
+	
 private:
 	FVector CachedDestination;
 	/* For how long it has been pressed. */
 	float FollowTime = 0.f;
 	FTimerHandle RotationTickTimer;
 	FTimerHandle RotationTimer;
+	FHitResult HitUnderCursor;
+
+	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;
 };

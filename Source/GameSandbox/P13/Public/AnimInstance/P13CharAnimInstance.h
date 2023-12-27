@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
+#include "P13/Public/Library/P13Types.h"
 #include "P13CharAnimInstance.generated.h"
 
 class AP13TopDownCharacter;
@@ -37,7 +38,9 @@ protected:
 	bool bCrouch;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	bool bAim;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	EP13MovementState MovementState;
+	
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")

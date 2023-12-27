@@ -8,6 +8,7 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13TopDownCharacter.generated.h"
 
+class AP13Weapon;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -22,12 +23,14 @@ struct FP13CameraHeightClamp
 	float Max = 1500.f;	
 };
 
-UCLASS()
+UCLASS(meta = (PrioritizeCategories = "C++"))
 class GAMESANDBOX_API AP13TopDownCharacter : public ACharacter, public IP13InputInterface
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                                Super                                  *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	AP13TopDownCharacter();
 
@@ -39,21 +42,25 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	/* ----------------------------- Interface ----------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                               Interface                               *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	virtual void MoveInput(const FVector2D MoveVector) override;
 	virtual void SprintInput(const bool bStart) override;
 	virtual void AimInput(const bool bStart) override;
 	virtual void ZoomInput(const float Axis) override;
-	
-	virtual void RotateTowardMovement(const FVector& LookAtDirection) override;
+	virtual void RotateTowardMovement(const FVector& Direction) override;
+	virtual void FireInput(const bool bStart) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                                 This                                  *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
-
+	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
 	void UpdateCharacterSpeed();
 	void ChangeMovementState(const EP13MovementState NewMovementState);
 
@@ -61,14 +68,15 @@ private:
 	void CreateComponents();
 	void SetupCameraBoom() const;
 	void ShakeCamera() const;
-
 	/* Leg alignment. */
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
-
 	void ZoomSmoothly(const float DeltaTime, const float FinalLength);
+	void InitWeapon();
 
-	/* ----------------------------- Variables ----------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                               Variables                               *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* TopDownCamera;
@@ -95,7 +103,12 @@ protected:
 	EP13MovementState MovementState = EP13MovementState::Run;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	FP13MovementSpeed MovementSpeed;
+	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
+	float RotationRate = 10.f;
 
+	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
+	TSubclassOf<AP13Weapon> WeaponClass;
+	
 private:
 	float IKLeftLegOffset = 0.f;
 	float IKRightLegOffset = 0.f;
@@ -104,4 +117,5 @@ private:
 	FTimerHandle ScrollTimer;
 	FTimerHandle ZoomTimer;
 	EP13MovementState PreviousMovementState = MovementState;
+	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 };

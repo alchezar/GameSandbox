@@ -23,6 +23,6 @@ public:
 	virtual void SprintInput(const bool bStart) = 0;
 	virtual void AimInput(const bool bStart) = 0;
 	virtual void ZoomInput(const float Axis) = 0;
-
-	virtual void RotateTowardMovement(const FVector& LookAtDirection) = 0;
+	virtual void RotateTowardMovement(const FVector& Direction) = 0;
+	virtual void FireInput(const bool bStart) = 0;
 };

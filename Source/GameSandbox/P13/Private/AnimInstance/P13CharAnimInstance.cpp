@@ -11,7 +11,6 @@ void UP13CharAnimInstance::NativeBeginPlay()
 
 	CachedCharacter = Cast<AP13TopDownCharacter>(TryGetPawnOwner());
 	check(CachedCharacter.IsValid())
-
 }
 
 void UP13CharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
@@ -28,7 +27,8 @@ void UP13CharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	Direction = GetMovementDirectionAngle();
 	bInAir = CachedCharacter->GetCharacterMovement()->IsFalling();
 	bCrouch = CachedCharacter->GetCharacterMovement()->IsCrouching();
-	bAim = false;
+	bAim = CachedCharacter->GetMovementState() == EP13MovementState::Aim;
+	MovementState = CachedCharacter->GetMovementState();
 
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
@@ -47,7 +47,6 @@ float UP13CharAnimInstance::GetMovementDirectionAngle() const
 	const FVector VelocityVector = CachedCharacter->GetVelocity().GetSafeNormal2D();
 	const float Angle = FMath::RadiansToDegrees(FMath::Acos(ForwardVector | VelocityVector));
 	const float Sign = FMath::Sign((ForwardVector ^ VelocityVector).Z);
-	
-	return Sign * Angle;
 
+	return Sign * Angle;
 }

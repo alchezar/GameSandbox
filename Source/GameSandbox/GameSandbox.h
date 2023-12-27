@@ -8,8 +8,8 @@
 #define SURFACE_BODY         SurfaceType2
 #define SURFACE_HEAD         SurfaceType3
 
-#define ECC_PROJECTILE		 ECC_GameTraceChannel3
-#define ECC_WEAPON			 ECC_GameTraceChannel5
+#define ECC_PROJECTILE       ECC_GameTraceChannel3
+#define ECC_WEAPON           ECC_GameTraceChannel5
 #define ECC_CLIMBING         ECC_GameTraceChannel6
 #define ECC_BULLET           ECC_GameTraceChannel7
 #define ECC_MELEE            ECC_GameTraceChannel8
