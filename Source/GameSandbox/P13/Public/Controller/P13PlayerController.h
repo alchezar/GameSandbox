@@ -11,12 +11,16 @@ class UNiagaraSystem;
 class UInputAction;
 class UInputMappingContext;
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnHitUnderCursorChangedSignature, APlayerController*, const FHitResult&)
+
 UCLASS()
 class GAMESANDBOX_API AP13PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                                Super                                  *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	AP13PlayerController();
 
@@ -27,7 +31,9 @@ protected:
 public:
 	virtual void Tick(const float DeltaSeconds) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                                 This                                  *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	void OnInputStarted();
 	/* Triggered every frame when the input is held down. */
@@ -37,7 +43,7 @@ protected:
 	void MoveInput(const FInputActionValue& Value);
 	void LookInput(const FInputActionValue& Value);
 	void SprintInput(const bool bStart);
-	void AimInput(const bool bStart);
+	void AimInput();
 	void ZoomInput(const FInputActionValue& Value);
 	void FireInput(bool const bStart);
 
@@ -48,7 +54,12 @@ private:
 	void SpawnCursorDecal();
 	void UpdateCursorDecalPosition() const;
 
-	/* ----------------------------- Variables ----------------------------- */
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                               Variables                               *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+public:
+	FP13OnHitUnderCursorChangedSignature OnHitUnderCursorChanged; 
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputMappingContext* DefaultContext = nullptr;
@@ -82,8 +93,8 @@ private:
 	FVector CachedDestination;
 	/* For how long it has been pressed. */
 	float FollowTime = 0.f;
-	FTimerHandle RotationTickTimer;
-	FTimerHandle RotationTimer;
+	// FTimerHandle RotationTickTimer;
+	// FTimerHandle RotationTimer;
 	FHitResult HitUnderCursor;
 
 	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;

@@ -21,7 +21,7 @@ class GAMESANDBOX_API IP13InputInterface
 public:
 	virtual void MoveInput(const FVector2D MoveVector) = 0;
 	virtual void SprintInput(const bool bStart) = 0;
-	virtual void AimInput(const bool bStart) = 0;
+	virtual void AimInput() = 0;
 	virtual void ZoomInput(const float Axis) = 0;
 	virtual void RotateTowardMovement(const FVector& Direction) = 0;
 	virtual void FireInput(const bool bStart) = 0;

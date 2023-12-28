@@ -30,12 +30,15 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	void SetFireState(bool bFiring);
-	void Fire();
+	void WeaponInit(FP13WeaponInfo* WeaponInfo);
+	void UpdateWeaponState(EP13MovementState NewState);
+	void SetFireState(const bool bFiring);
 
 private:
+	void Fire();
 	bool CheckWeaponCanFire();
-	void SpawnProjectile(TSubclassOf<AP13ProjectileDefault> ProjectileClass);
+	void SpawnProjectile() const;
+	void ChangeDispersion();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -49,8 +52,10 @@ protected:
 	UArrowComponent* ShootLocation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Fire")
-	FP13WeaponInfo WeaponSettings;
-
+	FP13WeaponDynamicInfo WeaponDynamicSettings;
+	
 private:
 	FTimerHandle FireTimer;
+	FP13WeaponInfo* WeaponSettings;
+	double LastShotTime = 0.f;
 };

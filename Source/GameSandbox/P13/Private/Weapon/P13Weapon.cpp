@@ -32,7 +32,17 @@ void AP13Weapon::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP13Weapon::SetFireState(bool bFiring)
+void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo)
+{
+	WeaponSettings = WeaponInfo;
+}
+
+void AP13Weapon::UpdateWeaponState(EP13MovementState NewState)
+{
+	ChangeDispersion();
+}
+
+void AP13Weapon::SetFireState(const bool bFiring)
 {
 	FTimerManager* TimerManager = &GetWorld()->GetTimerManager();
 	if (!bFiring && TimerManager->IsTimerActive(FireTimer))
@@ -45,16 +55,16 @@ void AP13Weapon::SetFireState(bool bFiring)
 	{
 		return;
 	}
-	const float SecondsPerShot = 60.f / WeaponSettings.RateOfFire;
+	const float SecondsPerShot = 60.f / WeaponSettings->RateOfFire;
 	TimerManager->SetTimer(FireTimer, this, &ThisClass::Fire, SecondsPerShot, true, 0.f);
-	
+	LastShotTime = GetWorld()->GetTimeSeconds();
 }
 
 void AP13Weapon::Fire()
 {
-	if (const TSubclassOf<AP13ProjectileDefault> ProjectileClass = WeaponSettings.ProjectileSettings.Class)
+	if (WeaponSettings->ProjectileSettings.Class)
 	{
-		SpawnProjectile(ProjectileClass);
+		SpawnProjectile();
 		return;
 	}
 	// TODO: line trace shot
@@ -62,13 +72,21 @@ void AP13Weapon::Fire()
 
 bool AP13Weapon::CheckWeaponCanFire()
 {
-	return true;
+	bool bResult = true;
+
+	const double CurrentShotTime = GetWorld()->GetTimeSeconds();
+	const double TimeFromLastShot = CurrentShotTime - LastShotTime;
+	const double MinTimeBetweenShots = 60.f / WeaponSettings->RateOfFire;
+	bResult = bResult && MinTimeBetweenShots < TimeFromLastShot;
+	bResult = bResult && !GetWorld()->GetTimerManager().IsTimerActive(FireTimer);
+
+	return bResult;
 }
 
-void AP13Weapon::SpawnProjectile(TSubclassOf<AP13ProjectileDefault> ProjectileClass)
+void AP13Weapon::SpawnProjectile() const
 {
-	const FP13ProjectileInfo Projectile = WeaponSettings.ProjectileSettings;
-	if (!Projectile.Class)
+	const TSubclassOf<AP13ProjectileDefault> ProjectileClass = WeaponSettings->ProjectileSettings.Class;
+	if (!ProjectileClass)
 	{
 		return;
 	}
@@ -79,11 +97,15 @@ void AP13Weapon::SpawnProjectile(TSubclassOf<AP13ProjectileDefault> ProjectileCl
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.Instigator = GetInstigator();
 
-	auto* Bullet = GetWorld()->SpawnActor<AP13ProjectileDefault>(Projectile.Class, ShootLocation->GetComponentTransform(), SpawnParams);
+	auto* Bullet = GetWorld()->SpawnActor<AP13ProjectileDefault>(ProjectileClass, ShootLocation->GetComponentTransform(), SpawnParams);
 	if (!Bullet)
 	{
 		return;
 	}
 	Bullet->InitialLifeSpan = 20.f;
-	// Bullet->GetBulletMovement()->InitialSpeed = 2000.f;
+}
+
+void AP13Weapon::ChangeDispersion()
+{
+	
 }

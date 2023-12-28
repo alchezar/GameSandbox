@@ -6,6 +6,8 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P13Types.generated.h"
 
+class UNiagaraSystem;
+class AP13Weapon;
 class AP13ProjectileDefault;
 
 
@@ -56,19 +58,80 @@ struct FP13ProjectileInfo
     TSubclassOf<AP13ProjectileDefault> Class = nullptr;
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     float Damage = 20.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Lifetime = 20.f;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float InitSpeed = 2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bRadialDamage = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DamageRadius = 200.f;
 };
 
 USTRUCT(BlueprintType)
-struct FP13WeaponInfo
+struct FP13WeaponDispersion
+{
+	GENERATED_BODY()
+	
+};
+
+USTRUCT(BlueprintType)
+struct FP13WeaponDynamicInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Round = 10;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                               Data table                              *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+USTRUCT(BlueprintType)
+struct FP13WeaponInfo : public FTableRowBase
 {
     GENERATED_BODY()
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Class")
+	TSubclassOf<AP13Weapon> Class;
+	
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
     float Damage = 20.f;    
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = 1.f, ClampMin = 1.f))
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = 1.f, ClampMin = 1.f), Category = "State")
     float RateOfFire = 30.f;
-    UPROPERTY(EditAnywhere, BlueprintReadWrite)
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	float ReloadTime = 2.f;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	int32 MaxRound = 10;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dispersion")
+	FP13WeaponDispersion WeaponDispersion;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile")
     FP13ProjectileInfo ProjectileSettings;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Trace")
+	float DistanceTrace = 2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* FireSound = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* ReloadSound = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	UDecalComponent* DecalOnHit = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	UNiagaraSystem* EffectFireWeapon = nullptr;	
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* CharFire = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* CharReload = nullptr;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* CharEquip = nullptr;	
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

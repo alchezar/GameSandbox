@@ -2,10 +2,11 @@
 
 #include "P13/Public/Character/P13TopDownCharacter.h"
 
-#include "GameSandbox.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P13/Public/Controller/P13PlayerController.h"
+#include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
 AP13TopDownCharacter::AP13TopDownCharacter()
@@ -20,16 +21,28 @@ AP13TopDownCharacter::AP13TopDownCharacter()
 	CreateComponents();
 }
 
+void AP13TopDownCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	SetupCameraBoom();
+}
+
+void AP13TopDownCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	if (AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController))
+	{
+		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
+	}
+}
+
 void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitWeapon();
-}
-
-void AP13TopDownCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
+	InitWeapon(CurrentWeaponID);
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -37,11 +50,10 @@ void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
-void AP13TopDownCharacter::OnConstruction(const FTransform& Transform)
+void AP13TopDownCharacter::Tick(const float DeltaTime)
 {
-	Super::OnConstruction(Transform);
-
-	SetupCameraBoom();
+	Super::Tick(DeltaTime);
+	UpdateMeshRotation();
 }
 
 void AP13TopDownCharacter::MoveInput(const FVector2D MoveVector)
@@ -51,24 +63,6 @@ void AP13TopDownCharacter::MoveInput(const FVector2D MoveVector)
 
 	AddMovementInput(ForwardDirection, MoveVector.Y);
 	AddMovementInput(RightDirection, MoveVector.X);
-
-	APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!PlayerController)
-	{
-		return;
-	}
-
-	FHitResult Hit;
-	PlayerController->GetHitResultUnderCursor(ECC_CURSOR, true, Hit);
-	if (!Hit.bBlockingHit)
-	{
-		return;
-	}
-
-	FVector LookAtDirection = (Hit.Location - GetActorLocation()).GetSafeNormal2D();
-	RotateTowardMovement(LookAtDirection);
-	// FRotator LookAtRotation = LookAtDirection.Rotation() - FRotator(0.f, 90.f, 0.f);
-	// GetMesh()->SetWorldRotation(LookAtRotation);
 }
 
 void AP13TopDownCharacter::SprintInput(const bool bStart)
@@ -88,7 +82,7 @@ void AP13TopDownCharacter::SprintInput(const bool bStart)
 	ChangeMovementState(bStart ? EP13MovementState::Sprint : PreviousMovementState);
 }
 
-void AP13TopDownCharacter::AimInput(const bool bStart)
+void AP13TopDownCharacter::AimInput()
 {
 	/* Check if it can start aiming. */
 	if (MovementState > EP13MovementState::Run)
@@ -96,13 +90,17 @@ void AP13TopDownCharacter::AimInput(const bool bStart)
 		return;
 	}
 
-	/* Cache the previous movement, to apply the correct one after aiming. */
-	if (bStart)
+	 /* Cache the previous movement, to apply the correct one after aiming.
+	  * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
+	if (MovementState == EP13MovementState::Aim)
 	{
-		PreviousMovementState = MovementState;
+		ChangeMovementState(PreviousMovementState);
+		ZoomToCursor(false);
+		return;
 	}
-
-	ChangeMovementState(bStart ? EP13MovementState::Aim : PreviousMovementState);
+	PreviousMovementState = MovementState;
+	ChangeMovementState(EP13MovementState::Aim);
+	ZoomToCursor(true);
 }
 
 void AP13TopDownCharacter::ZoomInput(const float Axis)
@@ -137,7 +135,7 @@ void AP13TopDownCharacter::FireInput(const bool bStart)
 	CachedWeapon->SetFireState(bStart);
 }
 
-void AP13TopDownCharacter::UpdateCharacterSpeed()
+void AP13TopDownCharacter::UpdateCharacter()
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;
 
@@ -159,18 +157,33 @@ void AP13TopDownCharacter::UpdateCharacterSpeed()
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = ResSpeed;
+
+	if (CachedWeapon.IsValid())
+	{
+		CachedWeapon->UpdateWeaponState(MovementState);
+	}
 }
 
 void AP13TopDownCharacter::ChangeMovementState(const EP13MovementState NewMovementState)
 {
 	MovementState = NewMovementState;
-	UpdateCharacterSpeed();
+	UpdateCharacter();
+}
+
+void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
+{
+	if (PlayerController != Controller)
+	{
+		return;
+	}
+	HitUnderCursor = HitResult;
 }
 
 void AP13TopDownCharacter::CreateComponents()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
 	CameraBoom->SetupAttachment(RootComponent);
+	
 
 	TopDownCamera = CreateDefaultSubobject<UCameraComponent>("TopDownCameraComponent");
 	TopDownCamera->SetupAttachment(CameraBoom);
@@ -194,6 +207,16 @@ void AP13TopDownCharacter::ShakeCamera() const
 	PlayerController->ClientStartCameraShake(ShakeClass);
 }
 
+void AP13TopDownCharacter::UpdateMeshRotation()
+{
+	if (!HitUnderCursor.bBlockingHit)
+	{
+		return;
+	}
+	const FVector CursorDirection = (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal2D();
+	RotateTowardMovement(CursorDirection);
+}
+
 float AP13TopDownCharacter::GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance, const float FromBoneToBottom)
 {
 	const FVector SocketLocation = GetMesh()->GetBoneLocation(VirtualBoneName);
@@ -214,13 +237,13 @@ float AP13TopDownCharacter::GetIKSocketOffset(const FName& VirtualBoneName, cons
 
 void AP13TopDownCharacter::LegsIKFloorAlignment()
 {
-	// if (!CharacterAttribute->GetIsAlive())
-	// {
-	// 	IKLeftLegOffset = 0.f;
-	// 	IKRightLegOffset = 0.f;
-	// 	IKHitOffset = 0.f;
-	// 	return;
-	// }
+	/*if (!CharacterAttribute->GetIsAlive())
+	{
+		IKLeftLegOffset = 0.f;
+		IKRightLegOffset = 0.f;
+		IKHitOffset = 0.f;
+		return;
+	}*/
 
 	constexpr float MinDistanceThreshold = 12.f;
 	constexpr float IKOffsetInterp = 10.f;
@@ -260,9 +283,16 @@ void AP13TopDownCharacter::ZoomSmoothly(const float DeltaTime, const float Final
 	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, FinalLength, DeltaTime, 1.f);
 }
 
-void AP13TopDownCharacter::InitWeapon()
+void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
 {
-	if (!WeaponClass)
+	const UP13GameInstance* GameInstance = GetGameInstance<UP13GameInstance>();
+	if (!GameInstance)
+	{
+		return;
+	}
+	FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
+	
+	if (!WeaponInfo->Class)
 	{
 		return;
 	}
@@ -272,10 +302,52 @@ void AP13TopDownCharacter::InitWeapon()
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.Instigator = GetInstigator();
 	
-	CachedWeapon = GetWorld()->SpawnActor<AP13Weapon>(WeaponClass, SpawnParams);
+	CachedWeapon = GetWorld()->SpawnActor<AP13Weapon>(WeaponInfo->Class, SpawnParams);
 	if (!CachedWeapon.IsValid())
 	{
 		return;
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
+	CachedWeapon->WeaponInit(WeaponInfo);
+	CachedWeapon->UpdateWeaponState(MovementState);
+}
+
+void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
+{
+	if (!bOn)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(AimTimer);
+		CameraBoom->SetRelativeLocation(FVector::ZeroVector);
+		return;
+	}
+
+	FTimerDelegate AimDelegate;
+	AimDelegate.BindUObject(this, &ThisClass::ZoomToCursorSmoothly);
+	GetWorld()->GetTimerManager().SetTimer(AimTimer, AimDelegate, GetWorld()->GetDeltaSeconds(), true);
+}
+
+void AP13TopDownCharacter::ZoomToCursorSmoothly() const
+{
+	const FVector UnsafeCursorDirection = HitUnderCursor.Location - GetActorLocation();
+	const FVector DirectionToCursor = UnsafeCursorDirection.GetSafeNormal2D();
+	const float   DistanceToCursor = UnsafeCursorDirection.Size2D(); 
+
+	constexpr float AimMin = 100.f;
+	const float AimMax = CameraBoom->TargetArmLength / 2.f;
+	constexpr float InterpSpeed = 2.f;
+	
+	FVector NewOffset = DirectionToCursor * (DistanceToCursor - AimMin);
+	/* Set a safe zone around the character, to avoid offset flickering, when the cursor direction changes very quickly. */
+	if (DistanceToCursor < AimMin)
+	{
+		NewOffset = FVector::ZeroVector;
+	}
+	/* Try not to lose sight of the character mesh. */
+	else if (DistanceToCursor > AimMax)
+	{
+		NewOffset = DirectionToCursor * AimMax;
+	}
+	
+	const FVector InterpOffset = FMath::VInterpTo(CameraBoom->GetRelativeLocation(), NewOffset, GetWorld()->GetDeltaSeconds(), InterpSpeed);
+	CameraBoom->SetRelativeLocation(InterpOffset);
 }
