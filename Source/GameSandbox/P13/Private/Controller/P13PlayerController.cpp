@@ -53,15 +53,16 @@ void AP13PlayerController::SetupInputComponent()
 
 	InputComp->BindAction(FireAction, ETriggerEvent::Started, this, &ThisClass::FireInput, true);
 	InputComp->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
+
+	InputComp->BindAction(ReloadAction, ETriggerEvent::Started, this, &ThisClass::ReloadInput);
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-	
+
 	FindPointUnderCursor();
 	UpdateCursorDecalPosition();
-	// UpdateControlledPawnRotation();
 }
 
 void AP13PlayerController::OnInputStarted()
@@ -105,7 +106,7 @@ void AP13PlayerController::OnSetDestinationReleased()
 void AP13PlayerController::MoveInput(const FInputActionValue& Value)
 {
 	StopMovement();
-	
+
 	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
 	{
 		InputInterface->MoveInput(Value.Get<FVector2D>());
@@ -146,6 +147,14 @@ void AP13PlayerController::FireInput(const bool bStart)
 	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
 	{
 		InputInterface->FireInput(bStart);
+	}
+}
+
+void AP13PlayerController::ReloadInput()
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->ReloadInput();
 	}
 }
 
@@ -192,7 +201,7 @@ void AP13PlayerController::UpdateCursorDecalPosition() const
 		return;
 	}
 
-	const FVector CursorLocation  = HitUnderCursor.bBlockingHit ? HitUnderCursor.Location : FVector::ZeroVector;
+	const FVector CursorLocation = HitUnderCursor.bBlockingHit ? HitUnderCursor.Location : FVector::ZeroVector;
 	const FRotator CursorRotation = HitUnderCursor.bBlockingHit ? HitUnderCursor.ImpactNormal.Rotation() : FRotator::ZeroRotator;
 
 	CachedCursorDecal->SetWorldLocation(CursorLocation);

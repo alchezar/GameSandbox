@@ -20,7 +20,7 @@ struct FP13CameraHeightClamp
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float Min = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float Max = 1500.f;	
+	float Max = 1500.f;
 };
 
 UCLASS(meta = (PrioritizeCategories = "C++"))
@@ -53,6 +53,7 @@ public:
 	virtual void ZoomInput(const float Axis) override;
 	virtual void RotateTowardMovement(const FVector& Direction) override;
 	virtual void FireInput(const bool bStart) override;
+	virtual void ReloadInput() override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
@@ -62,12 +63,14 @@ public:
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
+	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
 	void UpdateCharacter();
 	void ChangeMovementState(const EP13MovementState NewMovementState);
+	FVector GetLookAtCursorDirection() const;
 
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
-	
+
 private:
 	void CreateComponents();
 	void SetupCameraBoom() const;
@@ -80,6 +83,7 @@ private:
 	void InitWeapon(const FName WeaponID);
 	void ZoomToCursor(const bool bOn);
 	void ZoomToCursorSmoothly() const;
+	bool CheckCharacterCanFire();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -113,11 +117,9 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
 
-	// UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	// TSubclassOf<AP13Weapon> WeaponClass;
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
 	FName CurrentWeaponID = "Pistol";
-	
+
 private:
 	float IKLeftLegOffset = 0.f;
 	float IKRightLegOffset = 0.f;

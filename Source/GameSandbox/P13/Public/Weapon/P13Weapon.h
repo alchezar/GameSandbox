@@ -24,21 +24,29 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	virtual void Tick(float DeltaTime) override;
+	virtual void Tick(const float DeltaTime) override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	void WeaponInit(FP13WeaponInfo* WeaponInfo);
-	void UpdateWeaponState(EP13MovementState NewState);
+	FVector GetShootLocation() const;
+	int32 GetWeaponRound();
+	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const USkeletalMeshComponent* Mesh);
+	void UpdateWeaponState(const EP13MovementState NewState);
+	void SetTargetLocation(const FVector& TargetLocation);
 	void SetFireState(const bool bFiring);
+	void TryReloadForce();
 
 private:
-	void Fire();
 	bool CheckWeaponCanFire();
+	void Fire();
 	void SpawnProjectile() const;
-	void ChangeDispersion();
+	FVector GetFinalDirection() const;
+	void UpdateDispersion(const bool bRest = false);
+	void DisperseReducing();
+	void InitReload();
+	void FinishReload();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -52,10 +60,16 @@ protected:
 	UArrowComponent* ShootLocation = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Fire")
-	FP13WeaponDynamicInfo WeaponDynamicSettings;
+	FP13WeaponDynamicInfo WeaponCurrentSettings;
 	
 private:
 	FTimerHandle FireTimer;
+	FTimerHandle DisperseTimer;
 	FP13WeaponInfo* WeaponSettings;
-	double LastShotTime = 0.f;
+	double LastShotTime = 0.0;
+	bool bReloading = false;
+	TSoftObjectPtr<USkeletalMeshComponent> OwnerMesh;
+	FVector ShotTargetLocation = FVector::ZeroVector;
+	float DispersionAngle = 0.f;
+	FP13DispersionType CurrentDispersion;
 };

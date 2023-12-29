@@ -46,6 +46,7 @@ protected:
 	void AimInput();
 	void ZoomInput(const FInputActionValue& Value);
 	void FireInput(bool const bStart);
+	void ReloadInput();
 
 private:
 	void AddDefaultMappingContext();
@@ -58,7 +59,7 @@ private:
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	FP13OnHitUnderCursorChangedSignature OnHitUnderCursorChanged; 
+	FP13OnHitUnderCursorChangedSignature OnHitUnderCursorChanged;
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
@@ -77,7 +78,9 @@ protected:
 	UInputAction* ZoomAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* FireAction = nullptr;
-	
+	UPROPERTY(EditAnywhere, Category = "C++ | Input")
+	UInputAction* ReloadAction = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
@@ -87,14 +90,11 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	UMaterialInterface* CursorMaterial = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
-	FVector CursorSize = FVector(20.f, 40.f, 40.f);	
-	
+	FVector CursorSize = FVector(20.f, 40.f, 40.f);
+
 private:
 	FVector CachedDestination;
-	/* For how long it has been pressed. */
-	float FollowTime = 0.f;
-	// FTimerHandle RotationTickTimer;
-	// FTimerHandle RotationTimer;
+	float FollowTime = 0.f; /* For how long it has been pressed. */
 	FHitResult HitUnderCursor;
 
 	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;

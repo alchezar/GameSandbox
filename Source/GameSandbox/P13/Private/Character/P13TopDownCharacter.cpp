@@ -90,8 +90,8 @@ void AP13TopDownCharacter::AimInput()
 		return;
 	}
 
-	 /* Cache the previous movement, to apply the correct one after aiming.
-	  * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
+	/* Cache the previous movement, to apply the correct one after aiming.
+	 * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
 	if (MovementState == EP13MovementState::Aim)
 	{
 		ChangeMovementState(PreviousMovementState);
@@ -128,11 +128,21 @@ void AP13TopDownCharacter::RotateTowardMovement(const FVector& Direction)
 
 void AP13TopDownCharacter::FireInput(const bool bStart)
 {
-	if (!CachedWeapon.IsValid())
+	/* Check  if there are any reasons why the character can't pull the trigger. */
+	if (!CachedWeapon.IsValid() || !CheckCharacterCanFire())
 	{
 		return;
 	}
 	CachedWeapon->SetFireState(bStart);
+}
+
+void AP13TopDownCharacter::ReloadInput()
+{
+	if (!CachedWeapon.IsValid())
+	{
+		return;
+	}
+	CachedWeapon->TryReloadForce();
 }
 
 void AP13TopDownCharacter::UpdateCharacter()
@@ -170,6 +180,11 @@ void AP13TopDownCharacter::ChangeMovementState(const EP13MovementState NewMoveme
 	UpdateCharacter();
 }
 
+FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
+{
+	return (HitUnderCursor.Location - CachedWeapon->GetShootLocation()).GetSafeNormal();
+}
+
 void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
 {
 	if (PlayerController != Controller)
@@ -177,13 +192,17 @@ void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* Play
 		return;
 	}
 	HitUnderCursor = HitResult;
+
+	if (CachedWeapon.IsValid())
+	{
+		CachedWeapon->SetTargetLocation(HitResult.Location);
+	}
 }
 
 void AP13TopDownCharacter::CreateComponents()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
 	CameraBoom->SetupAttachment(RootComponent);
-	
 
 	TopDownCamera = CreateDefaultSubobject<UCameraComponent>("TopDownCameraComponent");
 	TopDownCamera->SetupAttachment(CameraBoom);
@@ -291,7 +310,7 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
 		return;
 	}
 	FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
-	
+
 	if (!WeaponInfo->Class)
 	{
 		return;
@@ -301,15 +320,14 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.Instigator = GetInstigator();
-	
+
 	CachedWeapon = GetWorld()->SpawnActor<AP13Weapon>(WeaponInfo->Class, SpawnParams);
 	if (!CachedWeapon.IsValid())
 	{
 		return;
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-	CachedWeapon->WeaponInit(WeaponInfo);
-	CachedWeapon->UpdateWeaponState(MovementState);
+	CachedWeapon->WeaponInit(WeaponInfo, MovementState, GetMesh());
 }
 
 void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
@@ -330,12 +348,12 @@ void AP13TopDownCharacter::ZoomToCursorSmoothly() const
 {
 	const FVector UnsafeCursorDirection = HitUnderCursor.Location - GetActorLocation();
 	const FVector DirectionToCursor = UnsafeCursorDirection.GetSafeNormal2D();
-	const float   DistanceToCursor = UnsafeCursorDirection.Size2D(); 
+	const float DistanceToCursor = UnsafeCursorDirection.Size2D();
 
 	constexpr float AimMin = 100.f;
 	const float AimMax = CameraBoom->TargetArmLength / 2.f;
 	constexpr float InterpSpeed = 2.f;
-	
+
 	FVector NewOffset = DirectionToCursor * (DistanceToCursor - AimMin);
 	/* Set a safe zone around the character, to avoid offset flickering, when the cursor direction changes very quickly. */
 	if (DistanceToCursor < AimMin)
@@ -347,7 +365,15 @@ void AP13TopDownCharacter::ZoomToCursorSmoothly() const
 	{
 		NewOffset = DirectionToCursor * AimMax;
 	}
-	
+
 	const FVector InterpOffset = FMath::VInterpTo(CameraBoom->GetRelativeLocation(), NewOffset, GetWorld()->GetDeltaSeconds(), InterpSpeed);
 	CameraBoom->SetRelativeLocation(InterpOffset);
+}
+
+bool AP13TopDownCharacter::CheckCharacterCanFire()
+{
+	bool bResult = true;
+	bResult = bResult && MovementState <= EP13MovementState::Run;
+
+	return bResult;
 }

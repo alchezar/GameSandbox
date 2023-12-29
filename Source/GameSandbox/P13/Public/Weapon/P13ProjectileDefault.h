@@ -33,7 +33,8 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE UProjectileMovementComponent* GetBulletMovement() const { return BulletMovement; };
-	
+	void InitBullet(const float NewLifeSpan, const float NewInitSpeed);
+
 protected:
 	UFUNCTION()
 	void OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);

@@ -29,6 +29,7 @@ void UP13CharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	bCrouch = CachedCharacter->GetCharacterMovement()->IsCrouching();
 	bAim = CachedCharacter->GetMovementState() == EP13MovementState::Aim;
 	MovementState = CachedCharacter->GetMovementState();
+	AimRotation = CachedCharacter->GetLookAtCursorDirection().Rotation();
 
 	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
 	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
@@ -42,8 +43,8 @@ float UP13CharAnimInstance::GetMovementDirectionAngle() const
 		return 0.f;
 	}
 	/* As our mesh is rotated 90⁰ we need to get it's right vector as forward. */
-	const FVector ForwardVector = CachedCharacter->GetMesh()->GetRightVector();
 	// const FVector ForwardVector = CachedCharacter->GetActorForwardVector();
+	const FVector ForwardVector = CachedCharacter->GetMesh()->GetRightVector();
 	const FVector VelocityVector = CachedCharacter->GetVelocity().GetSafeNormal2D();
 	const float Angle = FMath::RadiansToDegrees(FMath::Acos(ForwardVector | VelocityVector));
 	const float Sign = FMath::Sign((ForwardVector ^ VelocityVector).Z);
