@@ -133,6 +133,8 @@ struct FP13WeaponInfo : public FTableRowBase
 	float ReloadTime = 2.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	int32 MaxRound = 10;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	int32 ProjectilesPerShot = 1;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Dispersion")
 	FP13WeaponDispersion WeaponDispersion;
@@ -149,16 +151,21 @@ struct FP13WeaponInfo : public FTableRowBase
 	USoundBase* ReloadSound = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	UDecalComponent* DecalOnHit = nullptr;
+	UMaterialInterface* OnHitDecal = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	UNiagaraSystem* EffectFireWeapon = nullptr;
+	UNiagaraSystem* FireEffect = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
-	UAnimMontage* CharFire = nullptr;
+	UAnimMontage* WeaponFireAnim = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
-	UAnimMontage* CharReload = nullptr;
+	UAnimMontage* WeaponReloadAnim = nullptr;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
-	UAnimMontage* CharEquip = nullptr;
+	UAnimMontage* CharFireAnim = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* CharReloadAnim = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
+	UAnimMontage* CharEquipAnim = nullptr;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

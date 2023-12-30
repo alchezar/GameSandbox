@@ -2,9 +2,11 @@
 
 #include "P13/Public/Weapon/P13Weapon.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "Components/ArrowComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
+#include "Kismet/GameplayStatics.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 
 AP13Weapon::AP13Weapon()
@@ -47,7 +49,6 @@ int32 AP13Weapon::GetWeaponRound()
 
 void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const USkeletalMeshComponent* Mesh)
 {
-	OwnerMesh = Mesh;
 	WeaponSettings = WeaponInfo;
 	FinishReload();
 	UpdateWeaponState(NewState);
@@ -55,12 +56,6 @@ void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState 
 
 void AP13Weapon::UpdateWeaponState(const EP13MovementState NewState)
 {
-	// check(OwnerMesh->GetOwner<ACharacter>())
-	//
-	// if (NewState == EP13MovementState::Aim && FMath::IsNearlyZero(OwnerMesh->GetOwner<ACharacter>()->GetVelocity().SizeSquared()), 100.0)
-	// {
-	// 	CurrentDispersion = WeaponSettings->WeaponDispersion.Still;
-	// }
 	if (NewState == EP13MovementState::Aim)
 	{
 		CurrentDispersion = WeaponSettings->WeaponDispersion.Aim;
@@ -140,16 +135,22 @@ void AP13Weapon::Fire()
 		return;
 	}
 
-	if (WeaponSettings->ProjectileSettings.Class)
+	for (int32 Index = 0; Index < WeaponSettings->ProjectilesPerShot; ++Index)
 	{
-		SpawnProjectile();
-	}
-	else
-	{
-		// TODO: Line trace shot.
-	}
+		if (WeaponSettings->ProjectileSettings.Class)
+		{
+			SpawnProjectile();
+		}
+		else
+		{
+			// TODO: Line trace shot.
+		}
 
-	UpdateDispersion();
+		OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim);
+		SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
+		PlayAnimMontage(WeaponSettings->WeaponFireAnim);
+		UpdateDispersion();
+	}
 }
 
 void AP13Weapon::SpawnProjectile() const
@@ -160,15 +161,12 @@ void AP13Weapon::SpawnProjectile() const
 		return;
 	}
 	check(ShootLocation)
-	// check(OwnerMesh.IsValid())
-	// const FRotator MeshRotation = OwnerMesh->GetRightVector().Rotation();
 	const FTransform ShotTransform = FTransform(GetFinalDirection().Rotation(), ShootLocation->GetComponentLocation());
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.Instigator = GetInstigator();
 
-	// auto* Bullet = GetWorld()->SpawnActor<AP13ProjectileDefault>(ProjectileClass, ShotTransform, SpawnParams);
 	auto* Bullet = GetWorld()->SpawnActorDeferred<AP13ProjectileDefault>(ProjectileClass, ShotTransform, GetOwner(), GetInstigator(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (!Bullet)
 	{
@@ -221,11 +219,54 @@ void AP13Weapon::InitReload()
 	FTimerHandle ReloadTimer;
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &ThisClass::FinishReload, WeaponSettings->ReloadTime);
 
-	//TODO: Reload animation.
+	OnWeaponReload.Broadcast(true, WeaponSettings->CharReloadAnim);
+	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);	
 }
 
 void AP13Weapon::FinishReload()
 {
 	bReloading = false;
 	WeaponCurrentSettings.Round = WeaponSettings->MaxRound;
+	OnWeaponReload.Broadcast(false, nullptr);
+	StopAnimMontage(WeaponSettings->WeaponReloadAnim);
+}
+
+void AP13Weapon::SpawnEffectsAtLocation(USoundBase* SoundBase, UNiagaraSystem* NiagaraSystem, const FVector& Location) const
+{
+	UGameplayStatics::SpawnSoundAtLocation(this, SoundBase, Location);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, NiagaraSystem, Location);
+}
+
+float AP13Weapon::PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate, const FName StartSectionName)
+{
+	UAnimInstance* WeaponAnimInstance = MeshWeapon->GetAnimInstance();
+	if (!WeaponAnimInstance)
+	{
+		return 0.f;
+	}
+	const float Duration = WeaponAnimInstance->Montage_Play(AnimMontage, InPlayRate);
+	if (Duration <= 0)
+	{
+		return 0.f;
+	}
+	if (StartSectionName != NAME_None)
+	{
+		WeaponAnimInstance->Montage_JumpToSection(StartSectionName, AnimMontage);
+	}
+	return Duration;
+}
+
+void AP13Weapon::StopAnimMontage(const UAnimMontage* AnimMontage)
+{
+	UAnimInstance* WeaponAnimInstance = MeshWeapon->GetAnimInstance();
+	if (!WeaponAnimInstance)
+	{
+		return;
+	}
+	const UAnimMontage* MontageToStop = AnimMontage ? AnimMontage : WeaponAnimInstance->GetCurrentActiveMontage();
+	if (!MontageToStop || WeaponAnimInstance->Montage_GetIsStopped(MontageToStop))
+	{
+		return;
+	}
+	WeaponAnimInstance->Montage_Stop(MontageToStop->BlendOut.GetBlendTime(), MontageToStop);
 }

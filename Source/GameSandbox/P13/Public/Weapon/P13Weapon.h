@@ -9,6 +9,9 @@
 
 class UArrowComponent;
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponReloadSignature, const bool /* bStart */,  UAnimMontage* /* CharFireMontage */)
+
 UCLASS()
 class GAMESANDBOX_API AP13Weapon : public AActor
 {
@@ -30,6 +33,7 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
+	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
 	FVector GetShootLocation() const;
 	int32 GetWeaponRound();
 	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const USkeletalMeshComponent* Mesh);
@@ -47,10 +51,17 @@ private:
 	void DisperseReducing();
 	void InitReload();
 	void FinishReload();
+	void SpawnEffectsAtLocation(USoundBase* SoundBase, UNiagaraSystem* NiagaraSystem, const FVector& Location) const;
+	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None);
+	void StopAnimMontage(const UAnimMontage* AnimMontage);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+public:
+	FP13OnWeaponFireSignature OnWeaponFire;
+	FP13OnWeaponReloadSignature OnWeaponReload;
+	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USceneComponent* SceneComponent = nullptr;
@@ -68,7 +79,6 @@ private:
 	FP13WeaponInfo* WeaponSettings;
 	double LastShotTime = 0.0;
 	bool bReloading = false;
-	TSoftObjectPtr<USkeletalMeshComponent> OwnerMesh;
 	FVector ShotTargetLocation = FVector::ZeroVector;
 	float DispersionAngle = 0.f;
 	FP13DispersionType CurrentDispersion;

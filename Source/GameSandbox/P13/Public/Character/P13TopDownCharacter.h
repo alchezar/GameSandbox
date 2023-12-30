@@ -83,7 +83,9 @@ private:
 	void InitWeapon(const FName WeaponID);
 	void ZoomToCursor(const bool bOn);
 	void ZoomToCursorSmoothly() const;
-	bool CheckCharacterCanFire();
+	bool CheckCharacterCanFire() const;
+	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim);
+	void OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *

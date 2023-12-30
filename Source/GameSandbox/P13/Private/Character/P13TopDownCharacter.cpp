@@ -12,7 +12,6 @@
 AP13TopDownCharacter::AP13TopDownCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
-	// bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
@@ -328,6 +327,8 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 	CachedWeapon->WeaponInit(WeaponInfo, MovementState, GetMesh());
+	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
+	CachedWeapon->OnWeaponReload.AddUObject(this, &ThisClass::OnWeaponReloadHandle);
 }
 
 void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
@@ -370,10 +371,28 @@ void AP13TopDownCharacter::ZoomToCursorSmoothly() const
 	CameraBoom->SetRelativeLocation(InterpOffset);
 }
 
-bool AP13TopDownCharacter::CheckCharacterCanFire()
+bool AP13TopDownCharacter::CheckCharacterCanFire() const
 {
 	bool bResult = true;
 	bResult = bResult && MovementState <= EP13MovementState::Run;
 
 	return bResult;
+}
+
+void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim)
+{
+	if (!CachedWeapon.IsValid())
+	{
+		return;
+	}
+	PlayAnimMontage(CharFireAnim);
+}
+
+void AP13TopDownCharacter::OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim)
+{
+	if (!CachedWeapon.IsValid())
+	{
+		return;
+	}
+	bStart ? PlayAnimMontage(CharReloadAnim) : StopAnimMontage();
 }
