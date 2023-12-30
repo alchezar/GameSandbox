@@ -49,6 +49,20 @@ struct FP13MovementSpeed
 };
 
 USTRUCT(BlueprintType)
+struct FP13HitEffects
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<TEnumAsByte<EPhysicalSurface>, UMaterialInterface*> Decals;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<TEnumAsByte<EPhysicalSurface>, UNiagaraSystem*> Particles;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TMap<TEnumAsByte<EPhysicalSurface>, USoundBase*> Sounds;
+	
+};
+
+USTRUCT(BlueprintType)
 struct FP13ProjectileInfo
 {
 	GENERATED_BODY()
@@ -67,6 +81,9 @@ struct FP13ProjectileInfo
 	bool bRadialDamage = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageRadius = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FP13HitEffects OnHit;	
 };
 
 USTRUCT(BlueprintType)

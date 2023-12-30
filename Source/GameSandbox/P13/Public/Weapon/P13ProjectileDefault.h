@@ -33,7 +33,7 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE UProjectileMovementComponent* GetBulletMovement() const { return BulletMovement; };
-	void InitBullet(const float NewLifeSpan, const float NewInitSpeed);
+	void InitBullet(const float NewLifeSpan, const FP13ProjectileInfo& NewBulletSettings);
 
 protected:
 	UFUNCTION()
@@ -43,6 +43,10 @@ protected:
 	UFUNCTION()
 	void OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
+private:
+	void SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp);
+	void ImpactProjectile();
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

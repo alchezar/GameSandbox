@@ -2,8 +2,11 @@
 
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AP13ProjectileDefault::AP13ProjectileDefault()
@@ -50,15 +53,31 @@ void AP13ProjectileDefault::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
-void AP13ProjectileDefault::InitBullet(const float NewLifeSpan, const float NewInitSpeed)
+void AP13ProjectileDefault::InitBullet(const float NewLifeSpan, const FP13ProjectileInfo& NewBulletSettings)
 {
 	InitialLifeSpan = NewLifeSpan;
-	BulletMovement->InitialSpeed = NewInitSpeed;
+	BulletMovement->InitialSpeed = NewBulletSettings.InitSpeed;
+	BulletSettings = NewBulletSettings;
 }
 
 void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) 
 {
+	if (!OtherActor)
+	{
+		return;
+	}
+	
+	SpawnEffectsOnHit(Hit, OtherComp);
 
+	FPointDamageEvent PointDamage;
+	PointDamage.HitInfo = Hit;
+	PointDamage.ShotDirection = GetActorForwardVector();
+	// FRadialDamageEvent RadialDamage;
+	// RadialDamage.Origin = Hit.Location;
+	// RadialDamage.Params = FRadialDamageParams(BulletSettings.Damage, BulletSettings.DamageRadius / 2.f, BulletSettings.DamageRadius, 2.f);
+	ImpactProjectile();
+
+	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
 }
 
 void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
@@ -69,4 +88,33 @@ void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* Over
 void AP13ProjectileDefault::OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex) 
 {
 
+}
+
+void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp)
+{
+	if (!Hit.PhysMaterial.IsValid())
+	{
+		return;
+	}
+	const EPhysicalSurface SurfaceType = Hit.PhysMaterial->SurfaceType;
+	if (BulletSettings.OnHit.Decals.Contains(SurfaceType))
+	{
+		UMaterialInterface* Decal = BulletSettings.OnHit.Decals[SurfaceType];
+		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), OtherComp, NAME_None, Hit.ImpactPoint, Hit.ImpactNormal.Rotation(), EAttachLocation::KeepWorldPosition, 10.f);
+	}
+	if (BulletSettings.OnHit.Particles.Contains(SurfaceType))
+	{
+		UNiagaraSystem* Particle = BulletSettings.OnHit.Particles[SurfaceType];
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, Particle, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+	}
+	if (BulletSettings.OnHit.Sounds.Contains(SurfaceType))
+	{
+		USoundBase* Sound = BulletSettings.OnHit.Sounds[SurfaceType];
+		UGameplayStatics::SpawnSoundAtLocation(this, Sound, Hit.ImpactPoint, FRotator::ZeroRotator, 2.f);
+	}
+}
+
+void AP13ProjectileDefault::ImpactProjectile()
+{
+	Destroy();
 }

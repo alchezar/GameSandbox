@@ -172,7 +172,7 @@ void AP13Weapon::SpawnProjectile() const
 	{
 		return;
 	}
-	Bullet->InitBullet(20.f, WeaponSettings->ProjectileSettings.InitSpeed);
+	Bullet->InitBullet(20.f, WeaponSettings->ProjectileSettings);
 	Bullet->FinishSpawning(ShotTransform);
 }
 
