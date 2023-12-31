@@ -34,13 +34,16 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
+	FORCEINLINE FP13WeaponDynamicInfo GetWeaponDynamicInfo() const { return WeaponCurrentSettings; }
 	FVector GetShootLocation() const;
 	int32 GetWeaponRound();
-	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const USkeletalMeshComponent* Mesh);
+	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
 	void UpdateWeaponState(const EP13MovementState NewState);
+	void UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo);
 	void SetTargetLocation(const FVector& TargetLocation);
 	void SetFireState(const bool bFiring);
 	void TryReloadForce();
+	void AbortReloading();
 
 private:
 	bool CheckWeaponCanFire();
@@ -50,7 +53,7 @@ private:
 	void UpdateDispersion(const bool bRest = false);
 	void DisperseReducing();
 	void InitReload();
-	void FinishReload();
+	void FinishReload(const bool bSuccess = true);
 	void SpawnEffectsAtLocation(USoundBase* SoundBase, UNiagaraSystem* NiagaraSystem, const FVector& Location) const;
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None);
 	void StopAnimMontage(const UAnimMontage* AnimMontage);
@@ -76,6 +79,7 @@ protected:
 private:
 	FTimerHandle FireTimer;
 	FTimerHandle DisperseTimer;
+	FTimerHandle ReloadTimer;
 	FP13WeaponInfo* WeaponSettings;
 	double LastShotTime = 0.0;
 	bool bReloading = false;

@@ -55,6 +55,9 @@ void AP13PlayerController::SetupInputComponent()
 	InputComp->BindAction(FireAction, ETriggerEvent::Completed, this, &ThisClass::FireInput, false);
 
 	InputComp->BindAction(ReloadAction, ETriggerEvent::Started, this, &ThisClass::ReloadInput);
+
+	InputComp->BindAction(NextWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, true);
+	InputComp->BindAction(PreviousWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, false);
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
@@ -155,6 +158,14 @@ void AP13PlayerController::ReloadInput()
 	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
 	{
 		InputInterface->ReloadInput();
+	}
+}
+
+void AP13PlayerController::SwitchWeaponInput(const bool bNext)
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->SwitchWeaponInput(bNext);
 	}
 }
 

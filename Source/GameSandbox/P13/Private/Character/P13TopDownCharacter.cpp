@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P13/Public/Component/Actor/P13InventoryComponent.h"
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Weapon/P13Weapon.h"
@@ -20,11 +21,16 @@ AP13TopDownCharacter::AP13TopDownCharacter()
 	CreateComponents();
 }
 
-void AP13TopDownCharacter::OnConstruction(const FTransform& Transform)
+void AP13TopDownCharacter::PostInitializeComponents()
 {
-	Super::OnConstruction(Transform);
+	Super::PostInitializeComponents();
 
 	SetupCameraBoom();
+
+	if (InventoryComponent)
+	{
+		InventoryComponent->OnSwitchWeapon.AddUObject(this, &ThisClass::InitWeapon);
+	}
 }
 
 void AP13TopDownCharacter::PossessedBy(AController* NewController)
@@ -41,7 +47,11 @@ void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	InitWeapon(CurrentWeaponID);
+	// if (InventoryComponent)
+	// {
+	// 	CurrentWeaponID = InventoryComponent->GetWeaponIdBySlotIndex();
+	// }
+	// InitWeapon(CurrentWeaponID);
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -144,6 +154,30 @@ void AP13TopDownCharacter::ReloadInput()
 	CachedWeapon->TryReloadForce();
 }
 
+void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
+{
+	check(InventoryComponent)
+	if (InventoryComponent->GetWeaponsCount() < 2)
+	{
+		return;
+	}
+	if (!CachedWeapon.IsValid())
+	{
+		return;
+	}
+	CachedWeapon->AbortReloading();
+
+	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetWeaponDynamicInfo();
+	const int32 OldIndex = CurrentWeaponIndex;
+	const int32 NextDirection = bNext ? 1 : -1;
+	const int32 NewIndex = CurrentWeaponIndex + NextDirection;
+	
+	if (InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo))
+	{
+		// CurrentWeaponIndex = /*NewIndex*/;
+	}
+}
+
 void AP13TopDownCharacter::UpdateCharacter()
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;
@@ -181,6 +215,10 @@ void AP13TopDownCharacter::ChangeMovementState(const EP13MovementState NewMoveme
 
 FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
 {
+	if (!CachedWeapon.IsValid())
+	{
+		return FVector::ZeroVector;
+	}
 	return (HitUnderCursor.Location - CachedWeapon->GetShootLocation()).GetSafeNormal();
 }
 
@@ -205,6 +243,8 @@ void AP13TopDownCharacter::CreateComponents()
 
 	TopDownCamera = CreateDefaultSubobject<UCameraComponent>("TopDownCameraComponent");
 	TopDownCamera->SetupAttachment(CameraBoom);
+
+	InventoryComponent = CreateDefaultSubobject<UP13InventoryComponent>("InventoryActorComponent");
 }
 
 void AP13TopDownCharacter::SetupCameraBoom() const
@@ -301,15 +341,19 @@ void AP13TopDownCharacter::ZoomSmoothly(const float DeltaTime, const float Final
 	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, FinalLength, DeltaTime, 1.f);
 }
 
-void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
+void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo)
 {
+	if (CachedWeapon.IsValid())
+	{
+		CachedWeapon->Destroy();
+		CachedWeapon.Reset();
+	}
 	const UP13GameInstance* GameInstance = GetGameInstance<UP13GameInstance>();
 	if (!GameInstance)
 	{
 		return;
 	}
 	FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
-
 	if (!WeaponInfo->Class)
 	{
 		return;
@@ -326,9 +370,17 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID)
 		return;
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-	CachedWeapon->WeaponInit(WeaponInfo, MovementState, GetMesh());
+	CachedWeapon->WeaponInit(WeaponInfo, MovementState, WeaponDynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
 	CachedWeapon->OnWeaponReload.AddUObject(this, &ThisClass::OnWeaponReloadHandle);
+
+	// CurrentWeaponID = WeaponID;
+	PlayAnimMontage(WeaponInfo->CharEquipAnim);
+
+	if (InventoryComponent)
+	{
+		CurrentWeaponIndex = InventoryComponent->GetWeaponSlotIndex(WeaponID);
+	}
 }
 
 void AP13TopDownCharacter::ZoomToCursor(const bool bOn)

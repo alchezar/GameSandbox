@@ -23,10 +23,21 @@ const FName WeaponSocketName = "GripPoint";
 UENUM(BlueprintType)
 enum class EP13MovementState : uint8
 {
-	Aim UMETA(DisplayName = "Aim State"),
-	Walk UMETA(DisplayName = "Walk State"),
-	Run UMETA(DisplayName = "Run State"),
+	Aim    UMETA(DisplayName = "Aim State"),
+	Walk   UMETA(DisplayName = "Walk State"),
+	Run    UMETA(DisplayName = "Run State"),
 	Sprint UMETA(DisplayName = "Spring State")
+};
+
+UENUM(BlueprintType)
+enum class EP13WeaponType : uint8
+{
+	Pistol  UMETA(DisplayName = "Pistol"),
+	Rifle   UMETA(DisplayName = "Assault rifle"),
+	Shotgun UMETA(DisplayName = "ShotGun"),
+	Sniper  UMETA(DisplayName = "Sniper rifle"),
+	Grenade UMETA(DisplayName = "Grenade launcher"),
+	Rocket  UMETA(DisplayName = "Rocket launcher")
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -130,6 +141,34 @@ struct FP13WeaponDynamicInfo
 	int32 Round = 10;
 };
 
+USTRUCT(BlueprintType)
+struct FP13WeaponSlot
+{
+	GENERATED_BODY()
+
+	/*
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 IndexSlot = 0;
+	*/
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FName WeaponID = NAME_None;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FP13WeaponDynamicInfo DynamicInfo;
+};
+
+USTRUCT(BlueprintType)
+struct FP13AmmoSlot
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EP13WeaponType WeaponType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Count = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxCount = 100;
+};
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                               Data table                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -183,6 +222,9 @@ struct FP13WeaponInfo : public FTableRowBase
 	UAnimMontage* CharReloadAnim = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
 	UAnimMontage* CharEquipAnim = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
+	UTexture2D* WeaponIcon = nullptr;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

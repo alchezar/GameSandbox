@@ -33,8 +33,6 @@ void AP13Weapon::BeginPlay()
 void AP13Weapon::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
-	if (GEngine) GEngine->AddOnScreenDebugMessage(0, 2.f, FColor::Cyan, FString::Printf(TEXT("%f"), DispersionAngle));
 }
 
 FVector AP13Weapon::GetShootLocation() const
@@ -47,11 +45,12 @@ int32 AP13Weapon::GetWeaponRound()
 	return WeaponCurrentSettings.Round;
 }
 
-void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const USkeletalMeshComponent* Mesh)
+void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo)
 {
 	WeaponSettings = WeaponInfo;
 	FinishReload();
 	UpdateWeaponState(NewState);
+	UpdateWeaponDynamicInfo(DynamicInfo);
 }
 
 void AP13Weapon::UpdateWeaponState(const EP13MovementState NewState)
@@ -71,6 +70,18 @@ void AP13Weapon::UpdateWeaponState(const EP13MovementState NewState)
 
 	DispersionAngle = CurrentDispersion.Min;
 	// UpdateDispersion();
+}
+
+void AP13Weapon::UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo)
+{
+	if (DynamicInfo)
+	{
+		WeaponCurrentSettings = *DynamicInfo;
+	}
+	else
+	{
+		WeaponCurrentSettings = {WeaponSettings->MaxRound};
+	}
 }
 
 void AP13Weapon::SetTargetLocation(const FVector& TargetLocation)
@@ -112,6 +123,18 @@ void AP13Weapon::TryReloadForce()
 	InitReload();
 }
 
+void AP13Weapon::AbortReloading()
+{
+	if (!bReloading)
+	{
+		return;
+	}
+	
+	bReloading = false;
+	GetWorld()->GetTimerManager().ClearTimer(ReloadTimer);
+	FinishReload(false);
+}
+
 bool AP13Weapon::CheckWeaponCanFire()
 {
 	bool bResult = true;
@@ -145,12 +168,11 @@ void AP13Weapon::Fire()
 		{
 			// TODO: Line trace shot.
 		}
-
-		OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim);
-		SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
-		PlayAnimMontage(WeaponSettings->WeaponFireAnim);
-		UpdateDispersion();
 	}
+	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim);
+	SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
+	PlayAnimMontage(WeaponSettings->WeaponFireAnim);
+	UpdateDispersion();
 }
 
 void AP13Weapon::SpawnProjectile() const
@@ -216,17 +238,21 @@ void AP13Weapon::InitReload()
 {
 	bReloading = true;
 
-	FTimerHandle ReloadTimer;
-	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, this, &ThisClass::FinishReload, WeaponSettings->ReloadTime);
+	FTimerDelegate ReloadDelegate;
+	ReloadDelegate.BindUObject(this, &ThisClass::FinishReload, true);
+	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, ReloadDelegate, WeaponSettings->ReloadTime, false);
 
 	OnWeaponReload.Broadcast(true, WeaponSettings->CharReloadAnim);
 	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);	
 }
 
-void AP13Weapon::FinishReload()
+void AP13Weapon::FinishReload(const bool bSuccess)
 {
+	if (bSuccess)
+	{
+		WeaponCurrentSettings.Round = WeaponSettings->MaxRound;
+	}
 	bReloading = false;
-	WeaponCurrentSettings.Round = WeaponSettings->MaxRound;
 	OnWeaponReload.Broadcast(false, nullptr);
 	StopAnimMontage(WeaponSettings->WeaponReloadAnim);
 }

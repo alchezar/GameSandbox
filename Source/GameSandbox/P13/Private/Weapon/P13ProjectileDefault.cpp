@@ -97,20 +97,23 @@ void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveC
 		return;
 	}
 	const EPhysicalSurface SurfaceType = Hit.PhysMaterial->SurfaceType;
+	const FVector& Location = Hit.ImpactPoint;
+	const FRotator& Rotation = Hit.ImpactNormal.Rotation();
+
 	if (BulletSettings.OnHit.Decals.Contains(SurfaceType))
 	{
 		UMaterialInterface* Decal = BulletSettings.OnHit.Decals[SurfaceType];
-		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), OtherComp, NAME_None, Hit.ImpactPoint, Hit.ImpactNormal.Rotation(), EAttachLocation::KeepWorldPosition, 10.f);
+		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), OtherComp, NAME_None, Location, Rotation, EAttachLocation::KeepWorldPosition, 10.f);
 	}
 	if (BulletSettings.OnHit.Particles.Contains(SurfaceType))
 	{
 		UNiagaraSystem* Particle = BulletSettings.OnHit.Particles[SurfaceType];
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, Particle, Hit.ImpactPoint, Hit.ImpactNormal.Rotation());
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, Particle, Location, Rotation);
 	}
 	if (BulletSettings.OnHit.Sounds.Contains(SurfaceType))
 	{
 		USoundBase* Sound = BulletSettings.OnHit.Sounds[SurfaceType];
-		UGameplayStatics::SpawnSoundAtLocation(this, Sound, Hit.ImpactPoint, FRotator::ZeroRotator, 2.f);
+		UGameplayStatics::SpawnSoundAtLocation(this, Sound, Location, FRotator::ZeroRotator, 2.f);
 	}
 }
 

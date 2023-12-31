@@ -47,6 +47,7 @@ protected:
 	void ZoomInput(const FInputActionValue& Value);
 	void FireInput(bool const bStart);
 	void ReloadInput();
+	void SwitchWeaponInput(const bool bNext);
 
 private:
 	void AddDefaultMappingContext();
@@ -80,7 +81,11 @@ protected:
 	UInputAction* FireAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* ReloadAction = nullptr;
-
+	UPROPERTY(EditAnywhere, Category = "C++ | Input")
+	UInputAction* NextWeaponAction = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++ | Input")
+	UInputAction* PreviousWeaponAction = nullptr;
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")

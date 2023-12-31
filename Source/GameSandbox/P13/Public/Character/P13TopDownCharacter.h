@@ -8,6 +8,7 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13TopDownCharacter.generated.h"
 
+class UP13InventoryComponent;
 class AP13Weapon;
 class USpringArmComponent;
 class UCameraComponent;
@@ -33,7 +34,7 @@ class GAMESANDBOX_API AP13TopDownCharacter : public ACharacter, public IP13Input
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	AP13TopDownCharacter();
-	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
 
 protected:
@@ -54,6 +55,7 @@ public:
 	virtual void RotateTowardMovement(const FVector& Direction) override;
 	virtual void FireInput(const bool bStart) override;
 	virtual void ReloadInput() override;
+	virtual void SwitchWeaponInput(const bool bNext) override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
@@ -80,7 +82,7 @@ private:
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
 	void ZoomSmoothly(const float DeltaTime, const float FinalLength);
-	void InitWeapon(const FName WeaponID);
+	void InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo = nullptr);
 	void ZoomToCursor(const bool bOn);
 	void ZoomToCursorSmoothly() const;
 	bool CheckCharacterCanFire() const;
@@ -95,7 +97,9 @@ protected:
 	UCameraComponent* TopDownCamera;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	USpringArmComponent* CameraBoom;
-
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
+	UP13InventoryComponent* InventoryComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	bool bFlow = true;
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
@@ -119,8 +123,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	FName CurrentWeaponID = "Pistol";
+	// UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
+	// FName CurrentWeaponID = "Pistol";
 
 private:
 	float IKLeftLegOffset = 0.f;
@@ -133,4 +137,5 @@ private:
 	EP13MovementState PreviousMovementState = MovementState;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	FHitResult HitUnderCursor;
+	int32 CurrentWeaponIndex = 0;
 };
