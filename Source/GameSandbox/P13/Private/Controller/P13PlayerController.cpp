@@ -11,6 +11,7 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "P13/Public/Game/P13HeadsUpDisplay.h"
 #include "P13/Public/Intearface/P13InputInterface.h"
 
 AP13PlayerController::AP13PlayerController()
@@ -58,6 +59,16 @@ void AP13PlayerController::SetupInputComponent()
 
 	InputComp->BindAction(NextWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, true);
 	InputComp->BindAction(PreviousWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, false);
+}
+
+void AP13PlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (AP13HeadsUpDisplay* HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>())
+	{
+		HeadsUpDisplay->ShotInGame();
+	}
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)

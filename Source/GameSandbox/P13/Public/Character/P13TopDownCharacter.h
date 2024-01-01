@@ -82,11 +82,11 @@ private:
 	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f);
 	void LegsIKFloorAlignment();
 	void ZoomSmoothly(const float DeltaTime, const float FinalLength);
-	void InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo = nullptr);
+	void InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo, const int32 CurrentIndex);
 	void ZoomToCursor(const bool bOn);
 	void ZoomToCursorSmoothly() const;
 	bool CheckCharacterCanFire() const;
-	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim);
+	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
 	void OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -122,9 +122,6 @@ protected:
 	FP13MovementSpeed MovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
-
-	// UPROPERTY(EditAnywhere, Category = "C++ | Weapon")
-	// FName CurrentWeaponID = "Pistol";
 
 private:
 	float IKLeftLegOffset = 0.f;

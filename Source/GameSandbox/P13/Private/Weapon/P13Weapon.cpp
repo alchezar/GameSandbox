@@ -169,7 +169,7 @@ void AP13Weapon::Fire()
 			// TODO: Line trace shot.
 		}
 	}
-	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim);
+	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, WeaponCurrentSettings.Round);
 	SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
 	PlayAnimMontage(WeaponSettings->WeaponFireAnim);
 	UpdateDispersion();

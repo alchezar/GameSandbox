@@ -27,6 +27,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void SetPawn(APawn* InPawn) override;
 
 public:
 	virtual void Tick(const float DeltaSeconds) override;
@@ -90,8 +91,6 @@ protected:
 	float ShortPressThreshold = 0.15f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	UNiagaraSystem* CursorClickFX = nullptr;
-	// UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
-	// UDecalComponent* CursorDecal = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	UMaterialInterface* CursorMaterial = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
@@ -101,6 +100,5 @@ private:
 	FVector CachedDestination;
 	float FollowTime = 0.f; /* For how long it has been pressed. */
 	FHitResult HitUnderCursor;
-
 	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;
 };

@@ -46,12 +46,6 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// if (InventoryComponent)
-	// {
-	// 	CurrentWeaponID = InventoryComponent->GetWeaponIdBySlotIndex();
-	// }
-	// InitWeapon(CurrentWeaponID);
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -157,7 +151,7 @@ void AP13TopDownCharacter::ReloadInput()
 void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 {
 	check(InventoryComponent)
-	if (InventoryComponent->GetWeaponsCount() < 2)
+	if (InventoryComponent->GetWeaponSlotsCount() < 2)
 	{
 		return;
 	}
@@ -171,11 +165,8 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 	const int32 OldIndex = CurrentWeaponIndex;
 	const int32 NextDirection = bNext ? 1 : -1;
 	const int32 NewIndex = CurrentWeaponIndex + NextDirection;
-	
-	if (InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo))
-	{
-		// CurrentWeaponIndex = /*NewIndex*/;
-	}
+
+	InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo);
 }
 
 void AP13TopDownCharacter::UpdateCharacter()
@@ -341,7 +332,7 @@ void AP13TopDownCharacter::ZoomSmoothly(const float DeltaTime, const float Final
 	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, FinalLength, DeltaTime, 1.f);
 }
 
-void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo)
+void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo, const int32 CurrentIndex)
 {
 	if (CachedWeapon.IsValid())
 	{
@@ -374,13 +365,9 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
 	CachedWeapon->OnWeaponReload.AddUObject(this, &ThisClass::OnWeaponReloadHandle);
 
-	// CurrentWeaponID = WeaponID;
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
 
-	if (InventoryComponent)
-	{
-		CurrentWeaponIndex = InventoryComponent->GetWeaponSlotIndex(WeaponID);
-	}
+	CurrentWeaponIndex = CurrentIndex;
 }
 
 void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
@@ -431,13 +418,14 @@ bool AP13TopDownCharacter::CheckCharacterCanFire() const
 	return bResult;
 }
 
-void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim)
+void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound)
 {
 	if (!CachedWeapon.IsValid())
 	{
 		return;
 	}
 	PlayAnimMontage(CharFireAnim);
+	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CurrentRound});
 }
 
 void AP13TopDownCharacter::OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim)
@@ -446,5 +434,12 @@ void AP13TopDownCharacter::OnWeaponReloadHandle(const bool bStart, UAnimMontage*
 	{
 		return;
 	}
-	bStart ? PlayAnimMontage(CharReloadAnim) : StopAnimMontage();
+	if (!bStart)
+	{
+		StopAnimMontage();;
+		InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CachedWeapon->GetWeaponInfo()->MaxRound});
+		return;
+	}
+	/* bStart = true */
+	PlayAnimMontage(CharReloadAnim);
 }

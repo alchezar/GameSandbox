@@ -32,6 +32,7 @@ enum class EP13MovementState : uint8
 UENUM(BlueprintType)
 enum class EP13WeaponType : uint8
 {
+	Default UMETA(DisplayName = "Default"),
 	Pistol  UMETA(DisplayName = "Pistol"),
 	Rifle   UMETA(DisplayName = "Assault rifle"),
 	Shotgun UMETA(DisplayName = "ShotGun"),
@@ -146,10 +147,6 @@ struct FP13WeaponSlot
 {
 	GENERATED_BODY()
 
-	/*
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 IndexSlot = 0;
-	*/
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName WeaponID = NAME_None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

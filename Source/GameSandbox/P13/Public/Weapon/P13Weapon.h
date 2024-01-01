@@ -9,7 +9,7 @@
 
 class UArrowComponent;
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */, const int32 /*CurrentRound*/)
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponReloadSignature, const bool /* bStart */,  UAnimMontage* /* CharFireMontage */)
 
 UCLASS()
