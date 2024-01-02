@@ -30,7 +30,7 @@ protected:
 	void ShowAllAmmo() const;
 
 private:
-	bool TryCacheInventoryComponent();
+	void CacheInventoryComponent();
 	void ShowStatWidgets();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

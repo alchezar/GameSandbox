@@ -4,8 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "P13/Public/Library/P13Types.h"
 #include "P13SlotWeaponWidget.generated.h"
 
+class UP13GameInstance;
+class UBorder;
 class UImage;
 class UTextBlock;
 struct FP13WeaponSlot;
@@ -25,14 +28,36 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	void InitSlot(const int32 NewWeaponIndex, UTexture2D* NewWeaponImage);
+	void InitSlot(const int32 NewWeaponIndex, const FName NewWeaponID);
+	void OnWeaponChangedHandle(FName WeaponID, const FP13WeaponDynamicInfo* DynamicInfo, int32 WeaponIndex);
+	void OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
+
+private:
+	void TryCacheGameInstance();
+	void UpdateWeaponUsageStatus(const int32 IndexToCompare = 0) const;
+	void UpdateAmmoCount(const int32 NewCount) const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* WeaponIndex = nullptr;  
+	UTextBlock* WeaponIndexText = nullptr;  
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* AmmoCountText = nullptr;  
 	UPROPERTY(meta = (BindWidget))
 	UImage* WeaponImage = nullptr;
+	UPROPERTY(meta = (BindWidget))
+	UBorder* BackgroundBorder;
+
+	UPROPERTY(EditAnywhere, Category = "C++")
+	FLinearColor ActiveBorderColor = {0.f, 0.f, 0.f, 0.75f};
+	UPROPERTY(EditAnywhere, Category = "C++")
+	FLinearColor InactiveBorderColor = {0.f, 0.f, 0.f, 0.25f};
+
+private:
+	int32 CurrentWeaponIndex = 0;
+	int32 MagazineCapacity = 0;
+	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
+	EP13WeaponType WeaponType = EP13WeaponType::Default;
 };

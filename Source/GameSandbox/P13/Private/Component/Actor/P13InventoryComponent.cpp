@@ -25,7 +25,6 @@ void UP13InventoryComponent::BeginPlay()
 		return;
 	}
 	
-	// FP13WeaponDynamicInfo DataInfo = &WeaponSlots[0].DynamicInfo;
 	const FP13WeaponDynamicInfo DataInfo = {GameInstance->GetWeaponInfoByID(WeaponSlots[0].WeaponID)->MaxRound};
 	OnSwitchWeapon.Broadcast(WeaponSlots[0].WeaponID, &DataInfo, 0);
 }
@@ -58,18 +57,27 @@ FP13WeaponDynamicInfo UP13InventoryComponent::GetWeaponDynamicInfo(const int32 I
 	return WeaponSlots[Index].DynamicInfo;
 }
 
-void UP13InventoryComponent::SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo)
+void UP13InventoryComponent::SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo, const bool bIncrease)
 {
-	/* Check if there is a weapon at this index. */
+	/* Check if there is available weapon at this index. */
 	if ((WeaponSlots.Num() - 1 < WeaponIndex) || WeaponSlots[WeaponIndex].WeaponID.IsNone())
 	{
 		return;
 	}
 
 	WeaponSlots[WeaponIndex].DynamicInfo = NewInfo;
-	AmmoSlots[WeaponIndex].Count = NewInfo.Round;
+	int32 RequiredAmmo = NewInfo.Round;
 
-	OnAmmoChanged.Broadcast(AmmoSlots[WeaponIndex].WeaponType, AmmoSlots[WeaponIndex].Count);
+	/* If we reloading */
+	if (bIncrease)
+	{
+		/* Clam required by all available ammo (inventory + magazine). */
+		RequiredAmmo = FMath::Clamp(RequiredAmmo, 0, AmmoSlots[WeaponIndex].Count + AmmoLeft);
+		/* Remove only the lack of ammo from the inventory. */
+		AmmoSlots[WeaponIndex].Count -= (RequiredAmmo - AmmoLeft);
+	}
+
+	OnAmmoChanged.Broadcast(AmmoSlots[WeaponIndex].WeaponType, RequiredAmmo, AmmoSlots[WeaponIndex].Count);
 }
 
 bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo)
@@ -87,8 +95,19 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 
 		return true;
 	}
 	/* Weapon switch wasn't successful. */
-	
+	// ...
 	return false;
+}
+
+int32 UP13InventoryComponent::FindMaxAvailableRound(const int32 NewOldRoundNum, const int32 WeaponIndex, const int32 MaxRound)
+{
+	/* We cache the number of rounds before reload. */
+	AmmoLeft = NewOldRoundNum;
+
+	/* Find max round amount for this reload. */
+	const int32 MaxClamp = AmmoSlots[WeaponIndex].Count + NewOldRoundNum;
+	const int32 MagazineSize = FMath::Clamp(MaxRound, 0, MaxClamp);
+	return MagazineSize;
 }
 
 bool UP13InventoryComponent::TryUpdateSlotsFromData(const UP13GameInstance* GameInstance)
@@ -109,7 +128,7 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData(const UP13GameInstance* Game
 			continue;
 		}
 
-		AmmoSlots[Index].MaxCount = WeaponInfo->MaxRound;
+		/* Also update max ammo counts at begin play, */
 		SetWeaponInfo(Index, {WeaponInfo->MaxRound});
 	}
 	

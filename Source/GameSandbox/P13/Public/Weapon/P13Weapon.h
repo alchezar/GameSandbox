@@ -10,7 +10,8 @@
 class UArrowComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */, const int32 /*CurrentRound*/)
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponReloadSignature, const bool /* bStart */,  UAnimMontage* /* CharFireMontage */)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponReloadStartSignature, UAnimMontage* /* CharFireMontage */, int32 /*OldRoundNum*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadFinishSignature, int32 /*NewRoundNum*/)
 
 UCLASS()
 class GAMESANDBOX_API AP13Weapon : public AActor
@@ -42,17 +43,20 @@ public:
 	void UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo);
 	void SetTargetLocation(const FVector& TargetLocation);
 	void SetFireState(const bool bFiring);
-	void TryReloadForce();
+	void TryReload();
 	void AbortReloading();
+	void PlayWeaponReload();
+	void SetMaxAvailableRound(const int32 NewMaxRound) { MaxAvailableRound = NewMaxRound; }
 
 private:
 	bool CheckWeaponCanFire();
+	bool CheckWeaponCanReload();
 	void Fire();
 	void SpawnProjectile() const;
 	FVector GetFinalDirection() const;
 	void UpdateDispersion(const bool bRest = false);
 	void DisperseReducing();
-	void InitReload();
+	void StartReload();
 	void FinishReload(const bool bSuccess = true);
 	void SpawnEffectsAtLocation(USoundBase* SoundBase, UNiagaraSystem* NiagaraSystem, const FVector& Location) const;
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None);
@@ -63,7 +67,8 @@ private:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FP13OnWeaponFireSignature OnWeaponFire;
-	FP13OnWeaponReloadSignature OnWeaponReload;
+	FP13OnWeaponReloadStartSignature OnWeaponReloadStart;
+	FP13OnWeaponReloadFinishSignature OnWeaponReloadFinish;
 	
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
@@ -86,4 +91,5 @@ private:
 	FVector ShotTargetLocation = FVector::ZeroVector;
 	float DispersionAngle = 0.f;
 	FP13DispersionType CurrentDispersion;
+	int32 MaxAvailableRound = 1;
 };

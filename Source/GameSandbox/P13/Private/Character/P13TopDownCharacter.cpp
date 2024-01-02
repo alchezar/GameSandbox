@@ -98,12 +98,12 @@ void AP13TopDownCharacter::AimInput()
 	if (MovementState == EP13MovementState::Aim)
 	{
 		ChangeMovementState(PreviousMovementState);
-		ZoomToCursor(false);
+		FocusOnCursor(false);
 		return;
 	}
 	PreviousMovementState = MovementState;
 	ChangeMovementState(EP13MovementState::Aim);
-	ZoomToCursor(true);
+	FocusOnCursor(true);
 }
 
 void AP13TopDownCharacter::ZoomInput(const float Axis)
@@ -145,7 +145,7 @@ void AP13TopDownCharacter::ReloadInput()
 	{
 		return;
 	}
-	CachedWeapon->TryReloadForce();
+	CachedWeapon->TryReload();
 }
 
 void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
@@ -210,7 +210,9 @@ FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
 	{
 		return FVector::ZeroVector;
 	}
-	return (HitUnderCursor.Location - CachedWeapon->GetShootLocation()).GetSafeNormal();
+	// return (HitUnderCursor.Location - CachedWeapon->GetShootLocation()).GetSafeNormal();
+	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
+
 }
 
 void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
@@ -363,14 +365,16 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 	CachedWeapon->WeaponInit(WeaponInfo, MovementState, WeaponDynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
-	CachedWeapon->OnWeaponReload.AddUObject(this, &ThisClass::OnWeaponReloadHandle);
+	CachedWeapon->OnWeaponReloadStart.AddUObject(this, &ThisClass::OnWeaponReloadStartHandle);
+	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
+	
 
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
 
 	CurrentWeaponIndex = CurrentIndex;
 }
 
-void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
+void AP13TopDownCharacter::FocusOnCursor(const bool bOn)
 {
 	if (!bOn)
 	{
@@ -380,11 +384,11 @@ void AP13TopDownCharacter::ZoomToCursor(const bool bOn)
 	}
 
 	FTimerDelegate AimDelegate;
-	AimDelegate.BindUObject(this, &ThisClass::ZoomToCursorSmoothly);
+	AimDelegate.BindUObject(this, &ThisClass::FocusOnCursorSmoothly);
 	GetWorld()->GetTimerManager().SetTimer(AimTimer, AimDelegate, GetWorld()->GetDeltaSeconds(), true);
 }
 
-void AP13TopDownCharacter::ZoomToCursorSmoothly() const
+void AP13TopDownCharacter::FocusOnCursorSmoothly() const
 {
 	const FVector UnsafeCursorDirection = HitUnderCursor.Location - GetActorLocation();
 	const FVector DirectionToCursor = UnsafeCursorDirection.GetSafeNormal2D();
@@ -428,18 +432,27 @@ void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const
 	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CurrentRound});
 }
 
-void AP13TopDownCharacter::OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim)
+void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 OldRoundNum)
 {
-	if (!CachedWeapon.IsValid())
+	check(CachedWeapon.IsValid())
+
+	/* Find max round amount for this reload. */
+	const int32 MaxRound = CachedWeapon->GetWeaponInfo()->MaxRound;
+	const int32 MagazineSize = InventoryComponent->FindMaxAvailableRound(OldRoundNum, CurrentWeaponIndex, MaxRound);
+	CachedWeapon->SetMaxAvailableRound(MagazineSize);
+	
+	/* Only start reloading montages when there is enough ammo available. */
+	if (MagazineSize > 0)
 	{
-		return;
+		PlayAnimMontage(CharReloadAnim);
+		CachedWeapon->PlayWeaponReload();
 	}
-	if (!bStart)
-	{
-		StopAnimMontage();;
-		InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CachedWeapon->GetWeaponInfo()->MaxRound});
-		return;
-	}
-	/* bStart = true */
-	PlayAnimMontage(CharReloadAnim);
+}
+
+void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum)
+{
+	check(CachedWeapon.IsValid())
+
+	StopAnimMontage();
+	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {RoundNum}, true);
 }

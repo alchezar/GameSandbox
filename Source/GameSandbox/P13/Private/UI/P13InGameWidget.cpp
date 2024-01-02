@@ -12,11 +12,7 @@ void UP13InGameWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	if (TryCacheInventoryComponent())
-	{
-		// ShowAllWeapons();
-		// ShowAllAmmo();
-	}
+	CacheInventoryComponent();
 }
 
 void UP13InGameWidget::ShowAllWeapons() const
@@ -34,10 +30,10 @@ void UP13InGameWidget::ShowAllWeapons() const
 		{
 			continue;
 		}
-		const auto [WeaponID, DynamicInfo] = InventoryComponentCached->GetWeaponSlot(Index);
-		UTexture2D* WeaponIcon = GameInstance->GetWeaponInfoByID(WeaponID)->WeaponIcon;
-		SlotWeaponWidget->InitSlot(Index, WeaponIcon);
+		SlotWeaponWidget->InitSlot(Index, InventoryComponentCached->GetWeaponSlot(Index).WeaponID);
 		SlotWeaponWidget->AddToViewport();
+		InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
+		InventoryComponentCached->OnAmmoChanged.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnAmmoChangedHandle);
 		
 		WeaponBox->AddChild(SlotWeaponWidget);
 	}
@@ -58,28 +54,25 @@ void UP13InGameWidget::ShowAllAmmo() const
 		}
 		SlotAmmoWidget->InitSlot(InventoryComponentCached->GetAmmoSlot(Index));
 		SlotAmmoWidget->AddToViewport();
+		InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnWeaponChangedHandle);
 		InventoryComponentCached->OnAmmoChanged.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnAmmoChangedHandle);
 		
 		AmmoBox->AddChild(SlotAmmoWidget);
 	}
 }
 
-bool UP13InGameWidget::TryCacheInventoryComponent()
+void UP13InGameWidget::CacheInventoryComponent()
 {
-	// AP13TopDownCharacter* Char = GetOwningPlayerPawn<AP13TopDownCharacter>();
-	// AP13Weapon* CurrentWeapon = Char->GetCachedWeapon();
-	
 	const APawn* PlayerPawn = GetOwningPlayerPawn();
 	if (!PlayerPawn)
 	{
-		return false;
+		return;
 	}
 	InventoryComponentCached = PlayerPawn->FindComponentByClass<UP13InventoryComponent>();
 
 	/* As NativeConstruct of the widgets fires before the BeginPlay of the Inventory,
 	 * we will wait for the Inventory to create our widgets with updated information. */
 	InventoryComponentCached->OnInventoryUpdated.AddUObject(this, &ThisClass::ShowStatWidgets);
-	return true;
 }
 
 void UP13InGameWidget::ShowStatWidgets()

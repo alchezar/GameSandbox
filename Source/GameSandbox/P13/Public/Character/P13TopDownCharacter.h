@@ -83,11 +83,12 @@ private:
 	void LegsIKFloorAlignment();
 	void ZoomSmoothly(const float DeltaTime, const float FinalLength);
 	void InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo, const int32 CurrentIndex);
-	void ZoomToCursor(const bool bOn);
-	void ZoomToCursorSmoothly() const;
+	void FocusOnCursor(const bool bOn);
+	void FocusOnCursorSmoothly() const;
 	bool CheckCharacterCanFire() const;
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
-	void OnWeaponReloadHandle(const bool bStart, UAnimMontage* CharReloadAnim);
+	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 OldRoundNum);
+	void OnWeaponReloadFinishHandle(const int32 RoundNum);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *

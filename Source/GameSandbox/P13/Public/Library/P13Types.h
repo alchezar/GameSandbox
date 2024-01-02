@@ -179,6 +179,8 @@ struct FP13WeaponInfo : public FTableRowBase
 	TSubclassOf<AP13Weapon> Class;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	EP13WeaponType AmmoType = EP13WeaponType::Default;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	float Damage = 20.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = 1.f, ClampMin = 1.f), Category = "State")
 	float RateOfFire = 30.f;
