@@ -60,13 +60,13 @@ void AP13ProjectileDefault::InitBullet(const float NewLifeSpan, const FP13Projec
 	BulletSettings = NewBulletSettings;
 }
 
-void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit) 
+void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	if (!OtherActor)
 	{
 		return;
 	}
-	
+
 	SpawnEffectsOnHit(Hit, OtherComp);
 
 	FPointDamageEvent PointDamage;
@@ -80,14 +80,14 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
 }
 
-void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) 
+void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-
+	
 }
 
-void AP13ProjectileDefault::OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex) 
+void AP13ProjectileDefault::OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
 {
-
+	
 }
 
 void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp)

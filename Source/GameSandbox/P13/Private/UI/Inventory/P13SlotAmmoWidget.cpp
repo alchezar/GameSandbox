@@ -16,7 +16,7 @@ void UP13SlotAmmoWidget::NativeConstruct()
 void UP13SlotAmmoWidget::InitSlot(const FP13AmmoSlot NewAmmoSlot)
 {
 	TryCacheGameInstance();
-	
+
 	if (!AmmoIcons.Contains(NewAmmoSlot.WeaponType))
 	{
 		return;
@@ -35,7 +35,7 @@ void UP13SlotAmmoWidget::OnWeaponChangedHandle(FName WeaponID, const FP13WeaponD
 	{
 		return;
 	}
-	
+
 	UpdateAmmoUsageStatus(WeaponInfo->AmmoType);
 }
 

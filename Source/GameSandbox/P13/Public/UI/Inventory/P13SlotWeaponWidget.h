@@ -42,9 +42,9 @@ private:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* WeaponIndexText = nullptr;  
+	UTextBlock* WeaponIndexText = nullptr;
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* AmmoCountText = nullptr;  
+	UTextBlock* AmmoCountText = nullptr;
 	UPROPERTY(meta = (BindWidget))
 	UImage* WeaponImage = nullptr;
 	UPROPERTY(meta = (BindWidget))

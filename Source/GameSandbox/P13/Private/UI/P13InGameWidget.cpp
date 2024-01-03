@@ -34,7 +34,7 @@ void UP13InGameWidget::ShowAllWeapons() const
 		SlotWeaponWidget->AddToViewport();
 		InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
 		InventoryComponentCached->OnAmmoChanged.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnAmmoChangedHandle);
-		
+
 		WeaponBox->AddChild(SlotWeaponWidget);
 	}
 }
@@ -56,7 +56,7 @@ void UP13InGameWidget::ShowAllAmmo() const
 		SlotAmmoWidget->AddToViewport();
 		InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnWeaponChangedHandle);
 		InventoryComponentCached->OnAmmoChanged.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnAmmoChangedHandle);
-		
+
 		AmmoBox->AddChild(SlotAmmoWidget);
 	}
 }

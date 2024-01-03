@@ -40,11 +40,6 @@ FVector AP13Weapon::GetShootLocation() const
 	return ShootLocation->GetComponentLocation();
 }
 
-int32 AP13Weapon::GetWeaponRound()
-{
-	return WeaponCurrentSettings.Round;
-}
-
 void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo)
 {
 	WeaponSettings = WeaponInfo;
@@ -90,6 +85,8 @@ void AP13Weapon::SetTargetLocation(const FVector& TargetLocation)
 
 void AP13Weapon::SetFireState(const bool bFiring)
 {
+	bTriggerPulled = bFiring;
+
 	if (!bFiring)
 	{
 		/* Stop fire timer when button released. */
@@ -102,6 +99,11 @@ void AP13Weapon::SetFireState(const bool bFiring)
 	/* Check  if there are any reasons why the weapon itself cannot fire. */
 	if (!CheckWeaponCanFire())
 	{
+		/* Play misfire sound only if there is no ammo. */
+		if (WeaponCurrentSettings.Round == 0)
+		{
+			SpawnEffectsAtLocation(WeaponSettings->MisfireSound, nullptr, ShootLocation->GetComponentLocation());
+		}
 		SetFireState(false);
 		return;
 	}
@@ -116,10 +118,20 @@ void AP13Weapon::SetFireState(const bool bFiring)
 
 void AP13Weapon::TryReload()
 {
+	OnWeaponReloadInit.Broadcast(WeaponCurrentSettings.Round);
+
 	if (!CheckWeaponCanReload())
 	{
 		return;
 	}
+
+	/* Stop fire, but save that weapon trigger is still pulled. */
+	if (bTriggerPulled)
+	{
+		SetFireState(false);
+		bTriggerPulled = true;
+	}
+
 	StartReload();
 }
 
@@ -129,7 +141,7 @@ void AP13Weapon::AbortReloading()
 	{
 		return;
 	}
-	
+
 	bReloading = false;
 	GetWorld()->GetTimerManager().ClearTimer(ReloadTimer);
 	FinishReload(false);
@@ -137,7 +149,13 @@ void AP13Weapon::AbortReloading()
 
 void AP13Weapon::PlayWeaponReload()
 {
-	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);	
+	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
+}
+
+void AP13Weapon::SetMaxAvailableRound(const int32 NewMaxRound)
+{
+	const bool bDefault = NewMaxRound < 0;
+	MaxAvailableRound = bDefault ? WeaponSettings->MaxRound : NewMaxRound;
 }
 
 bool AP13Weapon::CheckWeaponCanFire()
@@ -158,8 +176,9 @@ bool AP13Weapon::CheckWeaponCanFire()
 bool AP13Weapon::CheckWeaponCanReload()
 {
 	bool bResult = true;
-	bResult = bResult && (GetWeaponRound() < WeaponSettings->MaxRound);
+	bResult = bResult && (WeaponCurrentSettings.Round < WeaponSettings->MaxRound);
 	bResult = bResult && (MaxAvailableRound > 0);
+	bResult = bResult && (MaxAvailableRound > WeaponCurrentSettings.Round);
 
 	return bResult;
 }
@@ -168,7 +187,6 @@ void AP13Weapon::Fire()
 {
 	if (WeaponCurrentSettings.Round <= 0.f)
 	{
-		SetFireState(false);
 		TryReload();
 		return;
 	}
@@ -257,18 +275,25 @@ void AP13Weapon::StartReload()
 	ReloadDelegate.BindUObject(this, &ThisClass::FinishReload, true);
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, ReloadDelegate, WeaponSettings->ReloadTime, false);
 
-	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim, WeaponCurrentSettings.Round);
+	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
+	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim);
 }
 
 void AP13Weapon::FinishReload(const bool bSuccess)
 {
 	if (bSuccess)
 	{
-		// WeaponCurrentSettings.Round = WeaponSettings->MaxRound;
 		WeaponCurrentSettings.Round = MaxAvailableRound;
 	}
 	bReloading = false;
 
+	/* Recover fire if weapon trigger is still pulled. */
+	if (bTriggerPulled)
+	{
+		SetFireState(true);
+	}
+
+	/* Stop all montages (character and weapon) and update info in UI. */
 	OnWeaponReloadFinish.Broadcast(WeaponCurrentSettings.Round);
 	StopAnimMontage(WeaponSettings->WeaponReloadAnim);
 }

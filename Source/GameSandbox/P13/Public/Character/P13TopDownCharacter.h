@@ -87,7 +87,8 @@ private:
 	void FocusOnCursorSmoothly() const;
 	bool CheckCharacterCanFire() const;
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
-	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 OldRoundNum);
+	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
+	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim);
 	void OnWeaponReloadFinishHandle(const int32 RoundNum);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -100,7 +101,7 @@ protected:
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UP13InventoryComponent* InventoryComponent;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	bool bFlow = true;
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")

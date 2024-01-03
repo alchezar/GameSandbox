@@ -86,7 +86,7 @@ protected:
 	UInputAction* NextWeaponAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* PreviousWeaponAction = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")

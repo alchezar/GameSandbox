@@ -46,7 +46,7 @@ protected:
 private:
 	void SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp);
 	void ImpactProjectile();
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

@@ -10,7 +10,8 @@
 class UArrowComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */, const int32 /*CurrentRound*/)
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponReloadStartSignature, UAnimMontage* /* CharFireMontage */, int32 /*OldRoundNum*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadInitSignature, int32 /*OldRoundNum*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadStartSignature, UAnimMontage* /* CharFireMontage */)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadFinishSignature, int32 /*NewRoundNum*/)
 
 UCLASS()
@@ -37,7 +38,6 @@ public:
 	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
 	FORCEINLINE FP13WeaponDynamicInfo GetWeaponDynamicInfo() const { return WeaponCurrentSettings; }
 	FVector GetShootLocation() const;
-	int32 GetWeaponRound();
 	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
 	void UpdateWeaponState(const EP13MovementState NewState);
 	void UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo);
@@ -46,7 +46,7 @@ public:
 	void TryReload();
 	void AbortReloading();
 	void PlayWeaponReload();
-	void SetMaxAvailableRound(const int32 NewMaxRound) { MaxAvailableRound = NewMaxRound; }
+	void SetMaxAvailableRound(const int32 NewMaxRound = -1);
 
 private:
 	bool CheckWeaponCanFire();
@@ -67,9 +67,10 @@ private:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FP13OnWeaponFireSignature OnWeaponFire;
+	FP13OnWeaponReloadInitSignature OnWeaponReloadInit;
 	FP13OnWeaponReloadStartSignature OnWeaponReloadStart;
 	FP13OnWeaponReloadFinishSignature OnWeaponReloadFinish;
-	
+
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USceneComponent* SceneComponent = nullptr;
@@ -80,7 +81,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Fire")
 	FP13WeaponDynamicInfo WeaponCurrentSettings;
-	
+
 private:
 	FTimerHandle FireTimer;
 	FTimerHandle DisperseTimer;
@@ -91,5 +92,6 @@ private:
 	FVector ShotTargetLocation = FVector::ZeroVector;
 	float DispersionAngle = 0.f;
 	FP13DispersionType CurrentDispersion;
-	int32 MaxAvailableRound = 1;
+	int32 MaxAvailableRound = 0;
+	bool bTriggerPulled = false;
 };

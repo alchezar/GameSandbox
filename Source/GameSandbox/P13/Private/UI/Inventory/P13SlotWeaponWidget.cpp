@@ -15,7 +15,7 @@ void UP13SlotWeaponWidget::NativeConstruct()
 void UP13SlotWeaponWidget::InitSlot(const int32 NewWeaponIndex, const FName NewWeaponID)
 {
 	TryCacheGameInstance();
-	
+
 	CurrentWeaponIndex = NewWeaponIndex;
 	WeaponIndexText->SetText(FText::AsNumber(NewWeaponIndex + 1));
 	WeaponImage->SetBrushFromTexture(GameInstanceCached->GetWeaponInfoByID(NewWeaponID)->WeaponIcon);
@@ -61,7 +61,7 @@ void UP13SlotWeaponWidget::UpdateWeaponUsageStatus(const int32 IndexToCompare) c
 
 	WeaponIndexText->SetColorAndOpacity(bActive ? FColor::Green : FColor::Red);
 	BackgroundBorder->SetBrushColor(bActive ? ActiveBorderColor : InactiveBorderColor);
-	
+
 	AmmoCountText->SetVisibility(bActive ? ESlateVisibility::Visible : ESlateVisibility::Collapsed);
 }
 

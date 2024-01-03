@@ -210,9 +210,7 @@ FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
 	{
 		return FVector::ZeroVector;
 	}
-	// return (HitUnderCursor.Location - CachedWeapon->GetShootLocation()).GetSafeNormal();
 	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
-
 }
 
 void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
@@ -288,7 +286,8 @@ float AP13TopDownCharacter::GetIKSocketOffset(const FName& VirtualBoneName, cons
 
 void AP13TopDownCharacter::LegsIKFloorAlignment()
 {
-	/*if (!CharacterAttribute->GetIsAlive())
+	// TODO: Use code below, when character will has health. 
+	/*if (IsDead)
 	{
 		IKLeftLegOffset = 0.f;
 		IKRightLegOffset = 0.f;
@@ -354,7 +353,7 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Owner = GetOwner();
+	SpawnParams.Owner = this;
 	SpawnParams.Instigator = GetInstigator();
 
 	CachedWeapon = GetWorld()->SpawnActor<AP13Weapon>(WeaponInfo->Class, SpawnParams);
@@ -365,9 +364,9 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 	CachedWeapon->WeaponInit(WeaponInfo, MovementState, WeaponDynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
+	CachedWeapon->OnWeaponReloadInit.AddUObject(this, &ThisClass::OnWeaponReloadInitHandle);
 	CachedWeapon->OnWeaponReloadStart.AddUObject(this, &ThisClass::OnWeaponReloadStartHandle);
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
-	
 
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
 
@@ -432,27 +431,24 @@ void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const
 	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CurrentRound});
 }
 
-void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 OldRoundNum)
+void AP13TopDownCharacter::OnWeaponReloadInitHandle(const int32 OldRoundNum)
 {
 	check(CachedWeapon.IsValid())
+	check(InventoryComponent)
 
-	/* Find max round amount for this reload. */
+	/* Find max ammo amount that we can reload. */
 	const int32 MaxRound = CachedWeapon->GetWeaponInfo()->MaxRound;
 	const int32 MagazineSize = InventoryComponent->FindMaxAvailableRound(OldRoundNum, CurrentWeaponIndex, MaxRound);
 	CachedWeapon->SetMaxAvailableRound(MagazineSize);
-	
-	/* Only start reloading montages when there is enough ammo available. */
-	if (MagazineSize > 0)
-	{
-		PlayAnimMontage(CharReloadAnim);
-		CachedWeapon->PlayWeaponReload();
-	}
+}
+
+void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim)
+{
+	PlayAnimMontage(CharReloadAnim);
 }
 
 void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum)
 {
-	check(CachedWeapon.IsValid())
-
 	StopAnimMontage();
 	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {RoundNum}, true);
 }

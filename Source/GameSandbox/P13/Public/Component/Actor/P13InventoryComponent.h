@@ -12,7 +12,6 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnSwitchWeaponSignature, FName /*Weap
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13WeaponType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
 
-
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP13InventoryComponent : public UActorComponent
 {
@@ -41,14 +40,14 @@ public:
 	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
-	
+
 	void SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
 	bool TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo);
-	int32 FindMaxAvailableRound(const int32 NewOldRoundNum, const int32 WeaponIndex, const int32 MaxRound);
+	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 WeaponIndex, const int32 MaxRound);
 
 private:
 	bool TryUpdateSlotsFromData(const UP13GameInstance* GameInstance);
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

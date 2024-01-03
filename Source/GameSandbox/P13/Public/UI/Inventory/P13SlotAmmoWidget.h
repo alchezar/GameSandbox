@@ -45,7 +45,7 @@ protected:
 	TMap<EP13WeaponType, UTexture2D*> AmmoIcons;
 
 	UPROPERTY(meta = (BindWidget))
-	UTextBlock* AmmoCountText = nullptr;  
+	UTextBlock* AmmoCountText = nullptr;
 	UPROPERTY(meta = (BindWidget))
 	UImage* AmmoImage = nullptr;
 	UPROPERTY(meta = (BindWidget))

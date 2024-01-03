@@ -23,9 +23,9 @@ const FName WeaponSocketName = "GripPoint";
 UENUM(BlueprintType)
 enum class EP13MovementState : uint8
 {
-	Aim    UMETA(DisplayName = "Aim State"),
-	Walk   UMETA(DisplayName = "Walk State"),
-	Run    UMETA(DisplayName = "Run State"),
+	Aim UMETA(DisplayName = "Aim State"),
+	Walk UMETA(DisplayName = "Walk State"),
+	Run UMETA(DisplayName = "Run State"),
 	Sprint UMETA(DisplayName = "Spring State")
 };
 
@@ -33,12 +33,12 @@ UENUM(BlueprintType)
 enum class EP13WeaponType : uint8
 {
 	Default UMETA(DisplayName = "Default"),
-	Pistol  UMETA(DisplayName = "Pistol"),
-	Rifle   UMETA(DisplayName = "Assault rifle"),
+	Pistol UMETA(DisplayName = "Pistol"),
+	Rifle UMETA(DisplayName = "Assault rifle"),
 	Shotgun UMETA(DisplayName = "ShotGun"),
-	Sniper  UMETA(DisplayName = "Sniper rifle"),
+	Sniper UMETA(DisplayName = "Sniper rifle"),
 	Grenade UMETA(DisplayName = "Grenade launcher"),
-	Rocket  UMETA(DisplayName = "Rocket launcher")
+	Rocket UMETA(DisplayName = "Rocket launcher")
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -71,7 +71,6 @@ struct FP13HitEffects
 	TMap<TEnumAsByte<EPhysicalSurface>, UNiagaraSystem*> Particles;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TMap<TEnumAsByte<EPhysicalSurface>, USoundBase*> Sounds;
-	
 };
 
 USTRUCT(BlueprintType)
@@ -95,7 +94,7 @@ struct FP13ProjectileInfo
 	float DamageRadius = 200.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FP13HitEffects OnHit;	
+	FP13HitEffects OnHit;
 };
 
 USTRUCT(BlueprintType)
@@ -204,6 +203,8 @@ struct FP13WeaponInfo : public FTableRowBase
 	USoundBase* FireSound = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
 	USoundBase* ReloadSound = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Sound")
+	USoundBase* MisfireSound = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	UMaterialInterface* OnHitDecal = nullptr;
@@ -214,7 +215,7 @@ struct FP13WeaponInfo : public FTableRowBase
 	UAnimMontage* WeaponFireAnim = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
 	UAnimMontage* WeaponReloadAnim = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
 	UAnimMontage* CharFireAnim = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Anim")
