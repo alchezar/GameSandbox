@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "P13/Public/Intearface/P13PickupInterface.h"
 #include "P13/Public/Library/P13Types.h"
 #include "P13InventoryComponent.generated.h"
 
@@ -11,9 +12,11 @@ class UP13GameInstance;
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnSwitchWeaponSignature, FName /*WeaponID*/, const FP13WeaponDynamicInfo* /*Info*/, const int32 /*CurrentIndex*/)
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13WeaponType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FName /*NewWeaponID*/);
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnNewAmmoTakenSignature, FP13AmmoSlot /*NewAmmoSlot*/)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class GAMESANDBOX_API UP13InventoryComponent : public UActorComponent
+class GAMESANDBOX_API UP13InventoryComponent : public UActorComponent, public IP13PickupInterface
 {
 	GENERATED_BODY()
 
@@ -30,6 +33,16 @@ public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+	 *                               Interface                               *
+	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+public:
+	virtual bool CheckCanTakeAmmo(const FP13AmmoSlot& NewAmmoSlot) override;
+	virtual bool CheckCanTakeWeapon(const FP13WeaponSlot& NewWeaponSlot) override;
+	virtual void TakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) override;
+	virtual void TakeWeaponToInventory(const FName NewWeaponID) override;
+	virtual void SaveItemToInventory() override;
+
+	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
@@ -40,14 +53,13 @@ public:
 	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
-
 	void SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
 	bool TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo);
 	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 WeaponIndex, const int32 MaxRound);
 
 private:
-	bool TryUpdateSlotsFromData(const UP13GameInstance* GameInstance);
-
+	bool TryUpdateSlotsFromData();
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -55,6 +67,8 @@ public:
 	FP13OnSwitchWeaponSignature OnSwitchWeapon;
 	FP13OnAmmoChangedSignature OnAmmoChanged;
 	FP13OnInventoryUpdatedSingature OnInventoryUpdated;
+	FP13OnNewWeaponTakenSignature OnNewWeaponTaken;
+	FP13OnNewAmmoTakenSignature OnNewAmmoTaken;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
@@ -64,4 +78,5 @@ protected:
 
 private:
 	int32 AmmoLeft = 0;
+	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
 };

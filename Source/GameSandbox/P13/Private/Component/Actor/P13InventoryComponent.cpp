@@ -14,24 +14,77 @@ void UP13InventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	/* Find init weapon slots and find init weapons. */
-	const UP13GameInstance* GameInstance = Cast<UP13GameInstance>(GetWorld()->GetGameInstance());
-	if (!GameInstance)
-	{
-		return;
-	}
+	GameInstanceCached = Cast<UP13GameInstance>(GetWorld()->GetGameInstance());
+	check(GameInstanceCached.IsValid())
 
-	if (!TryUpdateSlotsFromData(GameInstance))
+	if (TryUpdateSlotsFromData())
 	{
-		return;
+		const FP13WeaponDynamicInfo DataInfo = {GameInstanceCached->GetWeaponInfoByID(WeaponSlots[0].WeaponID)->MaxRound};
+		OnSwitchWeapon.Broadcast(WeaponSlots[0].WeaponID, &DataInfo, 0);
 	}
-
-	const FP13WeaponDynamicInfo DataInfo = {GameInstance->GetWeaponInfoByID(WeaponSlots[0].WeaponID)->MaxRound};
-	OnSwitchWeapon.Broadcast(WeaponSlots[0].WeaponID, &DataInfo, 0);
 }
 
 void UP13InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+bool UP13InventoryComponent::CheckCanTakeAmmo(const FP13AmmoSlot& NewAmmoSlot)
+{
+	const FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
+	{
+		return Slot.WeaponType == NewAmmoSlot.WeaponType;
+	});
+	bool bResult = true;
+	bResult = bResult && CorrectSlot;
+	bResult = bResult && (CorrectSlot->Count < CorrectSlot->MaxCount);
+	bResult = bResult || !CorrectSlot;
+	
+	return bResult;
+}
+
+bool UP13InventoryComponent::CheckCanTakeWeapon(const FP13WeaponSlot& NewWeaponSlot)
+{
+	const FP13WeaponSlot* CorrectSlot = WeaponSlots.FindByPredicate([&](const FP13WeaponSlot& Slot)
+	{
+		return Slot.WeaponID == NewWeaponSlot.WeaponID;
+	});
+	return !CorrectSlot;
+}
+
+void UP13InventoryComponent::TakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot)
+{
+	FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
+	{
+		return Slot.WeaponType == NewAmmoSlot.WeaponType;
+	});
+
+	/* Add new slot if there was not before. */
+	if (!CorrectSlot)
+	{
+		AmmoSlots.Add(NewAmmoSlot);
+		OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+		return;
+	}
+	
+	CorrectSlot->Count = FMath::Min(CorrectSlot->Count + NewAmmoSlot.Count, CorrectSlot->MaxCount);
+	OnAmmoChanged.Broadcast(CorrectSlot->WeaponType, -1, CorrectSlot->Count);
+}
+
+void UP13InventoryComponent::TakeWeaponToInventory(const FName NewWeaponID)
+{
+	const FP13WeaponInfo* NewWeaponInfo = GameInstanceCached->GetWeaponInfoByID(NewWeaponID);
+	check(NewWeaponInfo)
+	const FP13WeaponDynamicInfo NewWeaponDynamicInfo = {NewWeaponInfo->MaxRound};
+	const FP13WeaponSlot SlotToAdd = {NewWeaponID, NewWeaponDynamicInfo};
+
+	WeaponSlots.Add(SlotToAdd);
+	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponID);
+}
+
+void UP13InventoryComponent::SaveItemToInventory()
+{
+	
 }
 
 int32 UP13InventoryComponent::GetWeaponSlotIndex(const FName WeaponID) const
@@ -110,7 +163,7 @@ int32 UP13InventoryComponent::FindMaxAvailableRound(const int32 OldRoundNum, con
 	return MagazineSize;
 }
 
-bool UP13InventoryComponent::TryUpdateSlotsFromData(const UP13GameInstance* GameInstance)
+bool UP13InventoryComponent::TryUpdateSlotsFromData()
 {
 	/* Find init weapon slots and find init weapons. */
 	for (int32 Index = 0; Index < WeaponSlots.Num(); ++Index)
@@ -120,7 +173,7 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData(const UP13GameInstance* Game
 		{
 			continue;
 		}
-		const FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
+		const FP13WeaponInfo* WeaponInfo = GameInstanceCached->GetWeaponInfoByID(WeaponID);
 		if (!WeaponInfo)
 		{
 			WeaponSlots.RemoveAt(Index);

@@ -38,7 +38,7 @@ void UP13SlotWeaponWidget::OnWeaponChangedHandle(FName WeaponID, const FP13Weapo
 
 void UP13SlotWeaponWidget::OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
 {
-	if (WeaponType != CurrentWeaponType)
+	if (WeaponType != CurrentWeaponType || InWeaponNewCount < 0)
 	{
 		return;
 	}
