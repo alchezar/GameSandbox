@@ -4,7 +4,6 @@
 
 #include "Components/SphereComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
-#include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Intearface/P13PickupInterface.h"
 
 AP13PickupActor::AP13PickupActor()
@@ -24,7 +23,8 @@ void AP13PickupActor::PostInitializeComponents()
 void AP13PickupActor::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	Collision->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 void AP13PickupActor::Tick(const float DeltaTime)
@@ -44,43 +44,46 @@ void AP13PickupActor::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overlap
 	{
 		return;
 	}
-	
-	if (PickupType <= EP13PickupType::Weapon)
+
+	/* Add ammo to the inventory. */
+	if (PickupType == EP13PickupType::Ammo)
 	{
-		/* Add weapon to the inventory. */
-		bool bWeaponPicked = false;
-		if (PickupType == EP13PickupType::Weapon && PickupInterface->CheckCanTakeWeapon(WeaponSlot))
+		if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot))
 		{
-			PickupInterface->TakeWeaponToInventory(WeaponSlot.WeaponID);
-			bWeaponPicked = true;
-			OnPickupSuccess();
-		}
-
-		/* Add ammo to the inventory. */
-		/* Find correct ammo info. If there was not neither weapon no ammo type - slot will be empty. */
-		const FP13AmmoSlot CorrectAmmoSlot = PickupType == EP13PickupType::Ammo ? AmmoSlot : MakeAmmoSlotFromWeaponID(WeaponSlot.WeaponID, bWeaponPicked);
-
-		/* If we are there means CheckCanTakeWeapon == false. */
-		if (PickupType <= EP13PickupType::Weapon && PickupInterface->CheckCanTakeAmmo(CorrectAmmoSlot))
-		{
-			PickupInterface->TakeAmmoToInventory(CorrectAmmoSlot);
-			OnPickupSuccess();
+			return;
 		}
 	}
+
+	/* Add weapon to the inventory. */
+	else if (PickupType == EP13PickupType::Weapon)
+	{
+		const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
+		/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
+		 * try to add an empty one, by resetting count in ammo slot. */
+		AmmoSlot.Count = bWeaponTaken ? 0 : AmmoSlot.Count;
+		/* Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
+		if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot) && !bWeaponTaken)
+		{
+			return;
+		}
+	}
+
+	OnPickupSuccess();
 }
 
 void AP13PickupActor::CreateComponents()
 {
 	SceneRoot = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	SetRootComponent(SceneRoot);
-	
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("PickupStaticMeshComponent");
 	Mesh->SetupAttachment(SceneRoot);
 	Mesh->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	Mesh->SetCollisionObjectType(ECC_WorldDynamic);
 	Mesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Ignore);
 	Mesh->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
-	
+	Mesh->SetSimulatePhysics(true);
+
 	Collision = CreateDefaultSubobject<USphereComponent>("CollisionSphereComponent");
 	Collision->SetupAttachment(SceneRoot);
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -91,18 +94,4 @@ void AP13PickupActor::CreateComponents()
 void AP13PickupActor::OnPickupSuccess()
 {
 	Destroy();
-}
-
-FP13AmmoSlot AP13PickupActor::MakeAmmoSlotFromWeaponID(const FName WeaponID, const bool bEmptySlot) const
-{
-	const UP13GameInstance* GameInstance = GetWorld()->GetGameInstance<UP13GameInstance>();
-	check(GameInstance)
-	
-	const FP13WeaponInfo* DefaultWeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
-	check(DefaultWeaponInfo)
-
-	// const int32 Count = bEmptySlot ? 0 : DefaultWeaponInfo->MaxRound;
-	const int32 Count = bEmptySlot ? 0 : AmmoSlot.Count;
-	const int32 MaxCount = AmmoSlot.MaxCount;
-	return {DefaultWeaponInfo->AmmoType, Count, MaxCount};
 }

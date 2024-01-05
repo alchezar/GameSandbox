@@ -9,10 +9,10 @@
 #include "P13InventoryComponent.generated.h"
 
 class UP13GameInstance;
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnSwitchWeaponSignature, FName /*WeaponID*/, const FP13WeaponDynamicInfo* /*Info*/, const int32 /*CurrentIndex*/)
-DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13WeaponType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponSignature, const FP13WeaponSlot& /*NewWeaponSLot*/, const int32 /*CurrentIndex*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13AmmoType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FName /*NewWeaponID*/);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FP13WeaponSlot& /*NewWeaponSLot*/);
 DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnNewAmmoTakenSignature, FP13AmmoSlot /*NewAmmoSlot*/)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -36,11 +36,8 @@ public:
 	 *                               Interface                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	virtual bool CheckCanTakeAmmo(const FP13AmmoSlot& NewAmmoSlot) override;
-	virtual bool CheckCanTakeWeapon(const FP13WeaponSlot& NewWeaponSlot) override;
-	virtual void TakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) override;
-	virtual void TakeWeaponToInventory(const FName NewWeaponID) override;
-	virtual void SaveItemToInventory() override;
+	virtual bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot) override;
+	virtual bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
@@ -59,7 +56,7 @@ public:
 
 private:
 	bool TryUpdateSlotsFromData();
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

@@ -26,7 +26,7 @@ void UP13InGameWidget::ShowAllWeapons() const
 
 	for (int32 Index = 0; Index < InventoryComponentCached->GetWeaponSlotsCount(); ++Index)
 	{
-		AddNewWeaponSlotWidget(Index, InventoryComponentCached->GetWeaponSlot(Index).WeaponID);
+		AddNewWeaponSlotWidget(Index, InventoryComponentCached->GetWeaponSlot(Index));
 	}
 }
 
@@ -40,6 +40,16 @@ void UP13InGameWidget::ShowAllAmmo() const
 	{
 		AddNewAmmoSlotWidget(InventoryComponentCached->GetAmmoSlot(Index));
 	}
+}
+
+void UP13InGameWidget::OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
+{
+	AddNewWeaponSlotWidget(NewWeaponIndex, NewWeaponSlot);
+}
+
+void UP13InGameWidget::OnNewAmmoTakenHandle(FP13AmmoSlot NewAmmoSlot)
+{
+	AddNewAmmoSlotWidget(NewAmmoSlot);
 }
 
 void UP13InGameWidget::CacheInventoryComponent()
@@ -64,24 +74,14 @@ void UP13InGameWidget::ShowStatWidgets()
 	ShowAllAmmo();
 }
 
-void UP13InGameWidget::OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FName NewWeaponID)
-{
-	AddNewWeaponSlotWidget(NewWeaponIndex, NewWeaponID);
-}
-
-void UP13InGameWidget::OnNewAmmoTakenHandle(FP13AmmoSlot NewAmmoSlot)
-{
-	AddNewAmmoSlotWidget(NewAmmoSlot);
-}
-
-void UP13InGameWidget::AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FName NewWeaponID) const
+void UP13InGameWidget::AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot) const
 {
 	UP13SlotWeaponWidget* SlotWeaponWidget = CreateWidget<UP13SlotWeaponWidget>(GetOwningPlayer(), WeaponSlotClass);
 	if (!SlotWeaponWidget)
 	{
 		return;
 	}
-	SlotWeaponWidget->InitSlot(NewWeaponIndex, NewWeaponID);
+	SlotWeaponWidget->InitSlot(NewWeaponIndex, NewWeaponSlot);
 	SlotWeaponWidget->AddToViewport();
 	InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
 	InventoryComponentCached->OnAmmoChanged.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnAmmoChangedHandle);

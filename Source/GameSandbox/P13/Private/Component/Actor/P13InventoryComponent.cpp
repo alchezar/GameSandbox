@@ -19,8 +19,7 @@ void UP13InventoryComponent::BeginPlay()
 
 	if (TryUpdateSlotsFromData())
 	{
-		const FP13WeaponDynamicInfo DataInfo = {GameInstanceCached->GetWeaponInfoByID(WeaponSlots[0].WeaponID)->MaxRound};
-		OnSwitchWeapon.Broadcast(WeaponSlots[0].WeaponID, &DataInfo, 0);
+		OnSwitchWeapon.Broadcast(WeaponSlots[0], 0);
 	}
 }
 
@@ -29,62 +28,47 @@ void UP13InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-bool UP13InventoryComponent::CheckCanTakeAmmo(const FP13AmmoSlot& NewAmmoSlot)
+bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot)
 {
-	const FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
+	/* Check if we can take weapon.
+	 * If weapon is already exist in the inventory - we can't take it. */
+	if (WeaponSlots.FindByPredicate([&](const FP13WeaponSlot& Slot) { return Slot.WeaponID == NewWeaponSlot.WeaponID; }))
 	{
-		return Slot.WeaponType == NewAmmoSlot.WeaponType;
-	});
-	bool bResult = true;
-	bResult = bResult && CorrectSlot;
-	bResult = bResult && (CorrectSlot->Count < CorrectSlot->MaxCount);
-	bResult = bResult || !CorrectSlot;
-	
-	return bResult;
+		return false;
+	}
+
+	/* Take weapon to the inventory. */
+	WeaponSlots.Add(NewWeaponSlot);
+	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
+	return true;
 }
 
-bool UP13InventoryComponent::CheckCanTakeWeapon(const FP13WeaponSlot& NewWeaponSlot)
+bool UP13InventoryComponent::TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot)
 {
-	const FP13WeaponSlot* CorrectSlot = WeaponSlots.FindByPredicate([&](const FP13WeaponSlot& Slot)
-	{
-		return Slot.WeaponID == NewWeaponSlot.WeaponID;
-	});
-	return !CorrectSlot;
-}
-
-void UP13InventoryComponent::TakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot)
-{
+	/* Try to find a similar slot in the inventory. */
 	FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
 	{
 		return Slot.WeaponType == NewAmmoSlot.WeaponType;
 	});
 
-	/* Add new slot if there was not before. */
+	/* Add a new slot if it didn't exist before. */
 	if (!CorrectSlot)
 	{
 		AmmoSlots.Add(NewAmmoSlot);
 		OnNewAmmoTaken.Broadcast(NewAmmoSlot);
-		return;
+		return true;
+	}
+
+	/* If the ammo is full - we can't add more. */
+	if (CorrectSlot->Count >= CorrectSlot->MaxCount)
+	{
+		return false;
 	}
 	
+	/* Take ammo to the inventory. */
 	CorrectSlot->Count = FMath::Min(CorrectSlot->Count + NewAmmoSlot.Count, CorrectSlot->MaxCount);
 	OnAmmoChanged.Broadcast(CorrectSlot->WeaponType, -1, CorrectSlot->Count);
-}
-
-void UP13InventoryComponent::TakeWeaponToInventory(const FName NewWeaponID)
-{
-	const FP13WeaponInfo* NewWeaponInfo = GameInstanceCached->GetWeaponInfoByID(NewWeaponID);
-	check(NewWeaponInfo)
-	const FP13WeaponDynamicInfo NewWeaponDynamicInfo = {NewWeaponInfo->MaxRound};
-	const FP13WeaponSlot SlotToAdd = {NewWeaponID, NewWeaponDynamicInfo};
-
-	WeaponSlots.Add(SlotToAdd);
-	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponID);
-}
-
-void UP13InventoryComponent::SaveItemToInventory()
-{
-	
+	return true;
 }
 
 int32 UP13InventoryComponent::GetWeaponSlotIndex(const FName WeaponID) const
@@ -144,7 +128,7 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 
 			continue;
 		}
 
-		OnSwitchWeapon.Broadcast(WeaponSlots[Index].WeaponID, &WeaponSlots[Index].DynamicInfo, Index);
+		OnSwitchWeapon.Broadcast(WeaponSlots[Index], Index);
 		return true;
 	}
 	/* Weapon switch wasn't successful. */
@@ -171,6 +155,8 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 		FName WeaponID = WeaponSlots[Index].WeaponID;
 		if (WeaponID.IsNone())
 		{
+			WeaponSlots.RemoveAt(Index);
+			--Index;
 			continue;
 		}
 		const FP13WeaponInfo* WeaponInfo = GameInstanceCached->GetWeaponInfoByID(WeaponID);
@@ -181,8 +167,13 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 			continue;
 		}
 
+		/* Update info in weapon slot at the game beginning. */
+		WeaponSlots[Index].AmmoType = WeaponInfo->AmmoType;
+		WeaponSlots[Index].MaxRound = WeaponInfo->MaxRound;
+
 		/* Also update max ammo counts at begin play, */
 		SetWeaponInfo(Index, {WeaponInfo->MaxRound});
+		
 	}
 
 	if (!WeaponSlots.IsValidIndex(0) || WeaponSlots[0].WeaponID.IsNone())

@@ -26,21 +26,15 @@ void UP13SlotAmmoWidget::InitSlot(const FP13AmmoSlot NewAmmoSlot)
 	MaxAmmoCount = NewAmmoSlot.MaxCount;
 	AmmoImage->SetBrushFromTexture(AmmoIcons[NewAmmoSlot.WeaponType]);
 	UpdateAmmoCount(NewAmmoSlot.Count);
-	UpdateAmmoUsageStatus(EP13WeaponType::Default);
+	UpdateAmmoUsageStatus(EP13AmmoType::Default);
 }
 
-void UP13SlotAmmoWidget::OnWeaponChangedHandle(FName WeaponID, const FP13WeaponDynamicInfo* DynamicInfo, int32 WeaponIndex)
+void UP13SlotAmmoWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex)
 {
-	const FP13WeaponInfo* WeaponInfo = GameInstanceCached->GetWeaponInfoByID(WeaponID);
-	if (!WeaponInfo)
-	{
-		return;
-	}
-
-	UpdateAmmoUsageStatus(WeaponInfo->AmmoType);
+	UpdateAmmoUsageStatus(NewWeaponSlot.AmmoType);
 }
 
-void UP13SlotAmmoWidget::OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
+void UP13SlotAmmoWidget::OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
 {
 	if (WeaponType != CurrentWeaponType || InInventoryNewCount < 0)
 	{
@@ -65,7 +59,7 @@ void UP13SlotAmmoWidget::UpdateAmmoCount(const int32 NewCount) const
 	AmmoCountText->SetColorAndOpacity(NewCount == MaxAmmoCount ? FLinearColor::Green : FLinearColor::White);
 }
 
-void UP13SlotAmmoWidget::UpdateAmmoUsageStatus(const EP13WeaponType TypeToCompare) const
+void UP13SlotAmmoWidget::UpdateAmmoUsageStatus(const EP13AmmoType TypeToCompare) const
 {
 	const bool bActive = WeaponType == TypeToCompare;
 	BackgroundBorder->SetBrushColor(bActive ? ActiveBorderColor : InactiveBorderColor);

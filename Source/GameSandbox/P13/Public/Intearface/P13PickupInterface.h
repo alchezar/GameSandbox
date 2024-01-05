@@ -21,9 +21,6 @@ class GAMESANDBOX_API IP13PickupInterface
 	GENERATED_BODY()
 
 public:
-	virtual bool CheckCanTakeAmmo(const FP13AmmoSlot& NewAmmoSlot) = 0;
-	virtual bool CheckCanTakeWeapon(const FP13WeaponSlot& WeaponSlot) = 0;
-	virtual void SaveItemToInventory() = 0;
-	virtual void TakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) = 0;
-	virtual void TakeWeaponToInventory(const FName NewWeaponID) = 0;
+	virtual bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot) = 0;
+	virtual bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) = 0;
 };

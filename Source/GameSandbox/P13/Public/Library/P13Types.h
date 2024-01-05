@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P13Types.generated.h"
 
+struct FP13WeaponInfo;
 class UNiagaraSystem;
 class AP13Weapon;
 class AP13ProjectileDefault;
@@ -30,7 +31,7 @@ enum class EP13MovementState : uint8
 };
 
 UENUM(BlueprintType)
-enum class EP13WeaponType : uint8
+enum class EP13AmmoType : uint8
 {
 	Default UMETA(DisplayName = "Default"),
 	Pistol UMETA(DisplayName = "Pistol"),
@@ -149,6 +150,10 @@ struct FP13WeaponSlot
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FName WeaponID = NAME_None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EP13AmmoType AmmoType = EP13AmmoType::Default;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 MaxRound = 0;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FP13WeaponDynamicInfo DynamicInfo;
 };
 
@@ -158,7 +163,7 @@ struct FP13AmmoSlot
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EP13WeaponType WeaponType;
+	EP13AmmoType WeaponType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -178,7 +183,7 @@ struct FP13WeaponInfo : public FTableRowBase
 	TSubclassOf<AP13Weapon> Class;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
-	EP13WeaponType AmmoType = EP13WeaponType::Default;
+	EP13AmmoType AmmoType = EP13AmmoType::Default;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
 	float Damage = 20.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (UIMin = 1.f, ClampMin = 1.f), Category = "State")

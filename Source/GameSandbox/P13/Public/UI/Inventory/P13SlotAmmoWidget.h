@@ -29,20 +29,20 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	void InitSlot(const FP13AmmoSlot NewAmmoSlot);
-	void OnWeaponChangedHandle(FName WeaponID, const FP13WeaponDynamicInfo* DynamicInfo, int32 WeaponIndex);
-	void OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
+	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex);
+	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
 
 private:
 	void TryCacheGameInstance();
 	void UpdateAmmoCount(const int32 NewCount) const;
-	void UpdateAmmoUsageStatus(const EP13WeaponType TypeToCompare) const;
+	void UpdateAmmoUsageStatus(const EP13AmmoType TypeToCompare) const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
-	TMap<EP13WeaponType, UTexture2D*> AmmoIcons;
+	TMap<EP13AmmoType, UTexture2D*> AmmoIcons;
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* AmmoCountText = nullptr;
@@ -58,6 +58,6 @@ protected:
 
 private:
 	int32 MaxAmmoCount = 0;
-	EP13WeaponType WeaponType;
+	EP13AmmoType WeaponType;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
 };

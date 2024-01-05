@@ -44,7 +44,6 @@ protected:
 private:
 	void CreateComponents();
 	void OnPickupSuccess();
-	FP13AmmoSlot MakeAmmoSlotFromWeaponID(const FName WeaponID, const bool bEmptySlot = false) const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -65,5 +64,4 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
 	FP13WeaponSlot WeaponSlot;
-
 };

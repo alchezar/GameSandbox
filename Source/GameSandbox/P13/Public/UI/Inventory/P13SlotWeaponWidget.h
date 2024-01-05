@@ -28,9 +28,9 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	void InitSlot(const int32 NewWeaponIndex, const FName NewWeaponID);
-	void OnWeaponChangedHandle(FName WeaponID, const FP13WeaponDynamicInfo* DynamicInfo, int32 WeaponIndex);
-	void OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
+	void InitSlot(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
+	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex);
+	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
 
 private:
 	void TryCacheGameInstance();
@@ -59,5 +59,5 @@ private:
 	int32 CurrentWeaponIndex = 0;
 	int32 MagazineCapacity = 0;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
-	EP13WeaponType WeaponType = EP13WeaponType::Default;
+	EP13AmmoType AmmoType = EP13AmmoType::Default;
 };

@@ -7,6 +7,7 @@
 
 #include "P13InGameWidget.generated.h"
 
+struct FP13WeaponSlot;
 struct FP13AmmoSlot;
 class UP13GameInstance;
 class UP13InventoryComponent;
@@ -32,15 +33,16 @@ protected:
 	void ShowAllWeapons() const;
 	void ShowAllAmmo() const;
 
+protected:
+	void OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
+	void OnNewAmmoTakenHandle(FP13AmmoSlot NewAmmoSlot);
+
 private:
 	void CacheInventoryComponent();
 	void ShowStatWidgets();
-	void OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FName NewWeaponID);
-	void OnNewAmmoTakenHandle(FP13AmmoSlot NewAmmoSlot);
-	
-	void AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FName NewWeaponID) const;
+	void AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot) const;
 	void AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoSlot) const;
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

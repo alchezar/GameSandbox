@@ -12,33 +12,30 @@ void UP13SlotWeaponWidget::NativeConstruct()
 	Super::NativeConstruct();
 }
 
-void UP13SlotWeaponWidget::InitSlot(const int32 NewWeaponIndex, const FName NewWeaponID)
+void UP13SlotWeaponWidget::InitSlot(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
 {
 	TryCacheGameInstance();
 
 	CurrentWeaponIndex = NewWeaponIndex;
 	WeaponIndexText->SetText(FText::AsNumber(NewWeaponIndex + 1));
-	WeaponImage->SetBrushFromTexture(GameInstanceCached->GetWeaponInfoByID(NewWeaponID)->WeaponIcon);
+	WeaponImage->SetBrushFromTexture(GameInstanceCached->GetWeaponInfoByID(NewWeaponSlot.WeaponID)->WeaponIcon);
 
-	if (const FP13WeaponInfo* WeaponInfo = GameInstanceCached->GetWeaponInfoByID(NewWeaponID))
-	{
-		WeaponType = WeaponInfo->AmmoType;
-		MagazineCapacity = WeaponInfo->MaxRound;
-	}
+	AmmoType = NewWeaponSlot.AmmoType; 
+	MagazineCapacity = NewWeaponSlot.MaxRound;
 
 	/* The index of the first active weapon will be 0, so compare with it. */
 	UpdateWeaponUsageStatus();
 	UpdateAmmoCount(MagazineCapacity);
 }
 
-void UP13SlotWeaponWidget::OnWeaponChangedHandle(FName WeaponID, const FP13WeaponDynamicInfo* DynamicInfo, int32 WeaponIndex)
+void UP13SlotWeaponWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex)
 {
 	UpdateWeaponUsageStatus(WeaponIndex);
 }
 
-void UP13SlotWeaponWidget::OnAmmoChangedHandle(const EP13WeaponType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
+void UP13SlotWeaponWidget::OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
 {
-	if (WeaponType != CurrentWeaponType || InWeaponNewCount < 0)
+	if (AmmoType != CurrentWeaponType || InWeaponNewCount < 0)
 	{
 		return;
 	}

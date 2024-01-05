@@ -333,7 +333,7 @@ void AP13TopDownCharacter::ZoomSmoothly(const float DeltaTime, const float Final
 	CameraBoom->TargetArmLength = FMath::FInterpTo(CameraBoom->TargetArmLength, FinalLength, DeltaTime, 1.f);
 }
 
-void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDynamicInfo* WeaponDynamicInfo, const int32 CurrentIndex)
+void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
 {
 	if (CachedWeapon.IsValid())
 	{
@@ -345,7 +345,7 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 	{
 		return;
 	}
-	FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(WeaponID);
+	FP13WeaponInfo* WeaponInfo = GameInstance->GetWeaponInfoByID(NewWeaponSlot.WeaponID);
 	if (!WeaponInfo->Class)
 	{
 		return;
@@ -362,7 +362,7 @@ void AP13TopDownCharacter::InitWeapon(const FName WeaponID, const FP13WeaponDyna
 		return;
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-	CachedWeapon->WeaponInit(WeaponInfo, MovementState, WeaponDynamicInfo);
+	CachedWeapon->WeaponInit(WeaponInfo, MovementState, &NewWeaponSlot.DynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
 	CachedWeapon->OnWeaponReloadInit.AddUObject(this, &ThisClass::OnWeaponReloadInitHandle);
 	CachedWeapon->OnWeaponReloadStart.AddUObject(this, &ThisClass::OnWeaponReloadStartHandle);
