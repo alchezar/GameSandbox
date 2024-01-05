@@ -27,4 +27,5 @@ public:
 	virtual void FireInput(const bool bStart) = 0;
 	virtual void ReloadInput() = 0;
 	virtual void SwitchWeaponInput(bool bNext) = 0;
+	virtual void DropInput() = 0;
 };

@@ -10,3 +10,12 @@ FP13WeaponInfo* UP13GameInstance::GetWeaponInfoByID(const FName WeaponID) const
 	}
 	return WeaponInfoTable->FindRow<FP13WeaponInfo>(WeaponID, nullptr);
 }
+
+FP13WeaponDrop* UP13GameInstance::GetWeaponDropByID(const FName WeaponID) const
+{
+	if (!WeaponDropTable)
+	{
+		return nullptr;
+	}
+	return WeaponDropTable->FindRow<FP13WeaponDrop>(WeaponID, nullptr);
+}

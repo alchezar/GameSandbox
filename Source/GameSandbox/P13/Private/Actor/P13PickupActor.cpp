@@ -13,6 +13,7 @@ AP13PickupActor::AP13PickupActor()
 	CreateComponents();
 }
 
+
 void AP13PickupActor::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
@@ -32,8 +33,26 @@ void AP13PickupActor::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AP13PickupActor::InitDrop(const FP13WeaponDrop* DropWeaponInfo)
+{
+	/* Save init info. */
+	bDropped = true;
+	Mesh->SetStaticMesh(DropWeaponInfo->WeaponMesh);
+	WeaponSlot = DropWeaponInfo->WeaponInfo;
+
+	AmmoSlot = {WeaponSlot.AmmoType, 0, DropWeaponInfo->MaxCount};
+	PickupType = EP13PickupType::Weapon;
+
+	/* Start timer. */
+	GetWorld()->GetTimerManager().SetTimer(DropTimer, ActivationDelay, false);
+}
+
 void AP13PickupActor::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer))
+	{
+		return;
+	}
 	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
 	if (!InventoryComponent)
 	{
@@ -57,6 +76,11 @@ void AP13PickupActor::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overlap
 	/* Add weapon to the inventory. */
 	else if (PickupType == EP13PickupType::Weapon)
 	{
+		/* If weapon wasn't ever picked up before - magazine will be full. */
+		if (!bDropped)
+		{
+			WeaponSlot.DynamicInfo.Round = WeaponSlot.MaxRound;
+		}
 		const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
 		/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
 		 * try to add an empty one, by resetting count in ammo slot. */

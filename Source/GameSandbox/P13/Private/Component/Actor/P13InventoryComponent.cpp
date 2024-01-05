@@ -2,7 +2,9 @@
 
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
 
+#include "P13/Public/Actor/P13PickupActor.h"
 #include "P13/Public/Game/P13GameInstance.h"
+#include "P13/Public/Weapon/P13Weapon.h"
 
 UP13InventoryComponent::UP13InventoryComponent()
 {
@@ -39,6 +41,7 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 
 	/* Take weapon to the inventory. */
 	WeaponSlots.Add(NewWeaponSlot);
+	
 	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
 	return true;
 }
@@ -128,6 +131,7 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 
 			continue;
 		}
 
+		CurrentWeaponIndex = Index;
 		OnSwitchWeapon.Broadcast(WeaponSlots[Index], Index);
 		return true;
 	}
@@ -145,6 +149,37 @@ int32 UP13InventoryComponent::FindMaxAvailableRound(const int32 OldRoundNum, con
 	const int32 MaxClamp = AmmoSlots[WeaponIndex].Count + OldRoundNum;
 	const int32 MagazineSize = FMath::Clamp(MaxRound, 0, MaxClamp);
 	return MagazineSize;
+}
+
+void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon)
+{
+	check(GameInstanceCached)
+	check(CurrentWeapon)
+
+	/* Find and update info about dropped item. */
+	FP13WeaponDrop* DropWeaponInfo = GameInstanceCached->GetWeaponDropByID(WeaponSlots[CurrentWeaponIndex].WeaponID);
+	check(DropWeaponInfo)
+	DropWeaponInfo->WeaponInfo = WeaponSlots[CurrentWeaponIndex];
+	
+	/* Spawn dropped weapon. */
+	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin; 
+	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
+	AP13PickupActor* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickupActor>(AP13PickupActor::StaticClass(), SpawnTransform);
+	if (!DroppedWeapon)
+	{
+		return;
+	}
+	
+	DroppedWeapon->InitDrop(DropWeaponInfo);
+	DroppedWeapon->FinishSpawning(SpawnTransform);
+	const int32 RemoveIndex = CurrentWeaponIndex;
+
+	if (!TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo))
+	{
+		return;
+	}
+	WeaponSlots.RemoveAt(RemoveIndex);
+	OnInventoryUpdated.Broadcast();
 }
 
 bool UP13InventoryComponent::TryUpdateSlotsFromData()
@@ -173,7 +208,6 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 
 		/* Also update max ammo counts at begin play, */
 		SetWeaponInfo(Index, {WeaponInfo->MaxRound});
-		
 	}
 
 	if (!WeaponSlots.IsValidIndex(0) || WeaponSlots[0].WeaponID.IsNone())

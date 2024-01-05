@@ -56,6 +56,7 @@ public:
 	virtual void FireInput(const bool bStart) override;
 	virtual void ReloadInput() override;
 	virtual void SwitchWeaponInput(const bool bNext) override;
+	virtual void DropInput() override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *

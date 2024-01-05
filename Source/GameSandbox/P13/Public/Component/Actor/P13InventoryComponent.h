@@ -53,6 +53,7 @@ public:
 	void SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
 	bool TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo);
 	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 WeaponIndex, const int32 MaxRound);
+	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon);
 
 private:
 	bool TryUpdateSlotsFromData();
@@ -76,4 +77,5 @@ protected:
 private:
 	int32 AmmoLeft = 0;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
+	int32 CurrentWeaponIndex = 0;
 };

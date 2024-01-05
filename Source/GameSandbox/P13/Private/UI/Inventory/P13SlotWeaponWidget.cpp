@@ -22,10 +22,11 @@ void UP13SlotWeaponWidget::InitSlot(const int32 NewWeaponIndex, const FP13Weapon
 
 	AmmoType = NewWeaponSlot.AmmoType; 
 	MagazineCapacity = NewWeaponSlot.MaxRound;
+	MagazineCurrent = NewWeaponSlot.DynamicInfo.Round;
 
 	/* The index of the first active weapon will be 0, so compare with it. */
 	UpdateWeaponUsageStatus();
-	UpdateAmmoCount(MagazineCapacity);
+	UpdateAmmoCount(MagazineCurrent);
 }
 
 void UP13SlotWeaponWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex)

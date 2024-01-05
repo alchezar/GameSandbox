@@ -37,6 +37,9 @@ public:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+public:
+	void InitDrop(const FP13WeaponDrop* DropWeaponInfo);
+
 protected:
 	UFUNCTION()
 	void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -64,4 +67,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
 	FP13WeaponSlot WeaponSlot;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Drop")
+	float ActivationDelay = 3.f;
+
+private:
+	FTimerHandle DropTimer;
+	bool bDropped = false;
 };

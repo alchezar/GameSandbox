@@ -169,6 +169,12 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 	InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo);
 }
 
+void AP13TopDownCharacter::DropInput()
+{
+	check(InventoryComponent)
+	InventoryComponent->DropCurrentWeapon(CachedWeapon.Get());
+}
+
 void AP13TopDownCharacter::UpdateCharacter()
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;

@@ -232,6 +232,19 @@ struct FP13WeaponInfo : public FTableRowBase
 	UTexture2D* WeaponIcon = nullptr;
 };
 
+USTRUCT(BlueprintType)
+struct FP13WeaponDrop : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+	UStaticMesh* WeaponMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+	FP13WeaponSlot WeaponInfo;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
+	int32 MaxCount = 0;
+};
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                 Class                                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

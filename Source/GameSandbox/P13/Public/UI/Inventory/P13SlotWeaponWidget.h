@@ -58,6 +58,7 @@ protected:
 private:
 	int32 CurrentWeaponIndex = 0;
 	int32 MagazineCapacity = 0;
+	int32 MagazineCurrent = 0;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
 	EP13AmmoType AmmoType = EP13AmmoType::Default;
 };

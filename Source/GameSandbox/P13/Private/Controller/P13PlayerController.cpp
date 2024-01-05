@@ -59,6 +59,8 @@ void AP13PlayerController::SetupInputComponent()
 
 	InputComp->BindAction(NextWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, true);
 	InputComp->BindAction(PreviousWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, false);
+
+	InputComp->BindAction(DropAction ,ETriggerEvent::Started, this, &ThisClass::DropInput);
 }
 
 void AP13PlayerController::SetPawn(APawn* InPawn)
@@ -177,6 +179,14 @@ void AP13PlayerController::SwitchWeaponInput(const bool bNext)
 	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
 	{
 		InputInterface->SwitchWeaponInput(bNext);
+	}
+}
+
+void AP13PlayerController::DropInput()
+{
+	if (IP13InputInterface* InputInterface = Cast<IP13InputInterface>(GetPawn()))
+	{
+		InputInterface->DropInput();
 	}
 }
 

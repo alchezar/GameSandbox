@@ -14,8 +14,11 @@ class GAMESANDBOX_API UP13GameInstance : public UGameInstance
 
 public:
 	FP13WeaponInfo* GetWeaponInfoByID(const FName WeaponID) const;
-
+	FP13WeaponDrop* GetWeaponDropByID(const FName WeaponID) const;
+	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
 	UDataTable* WeaponInfoTable = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
+	UDataTable* WeaponDropTable = nullptr;
 };
