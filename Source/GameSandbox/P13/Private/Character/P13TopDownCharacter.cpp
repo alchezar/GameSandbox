@@ -162,9 +162,9 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 	CachedWeapon->AbortReloading();
 
 	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetDynamicInfo();
-	const int32 OldIndex = CurrentWeaponIndex;
+	const int32 OldIndex = InventoryComponent->GetCurrentWeaponIndex();
 	const int32 NextDirection = bNext ? 1 : -1;
-	const int32 NewIndex = CurrentWeaponIndex + NextDirection;
+	const int32 NewIndex = OldIndex + NextDirection;
 
 	InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo);
 }
@@ -375,8 +375,6 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
 
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
-
-	CurrentWeaponIndex = CurrentIndex;
 }
 
 void AP13TopDownCharacter::FocusOnCursor(const bool bOn)
@@ -434,7 +432,7 @@ void AP13TopDownCharacter::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const
 		return;
 	}
 	PlayAnimMontage(CharFireAnim);
-	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {CurrentRound});
+	InventoryComponent->SetWeaponInfo({CurrentRound});
 }
 
 void AP13TopDownCharacter::OnWeaponReloadInitHandle(const int32 OldRoundNum)
@@ -444,7 +442,7 @@ void AP13TopDownCharacter::OnWeaponReloadInitHandle(const int32 OldRoundNum)
 
 	/* Find max ammo amount that we can reload. */
 	const int32 MaxRound = CachedWeapon->GetWeaponInfo()->MaxRound;
-	const int32 MagazineSize = InventoryComponent->FindMaxAvailableRound(OldRoundNum, CurrentWeaponIndex, MaxRound);
+	const int32 MagazineSize = InventoryComponent->FindMaxAvailableRound(OldRoundNum, MaxRound);
 	CachedWeapon->SetMaxAvailableRound(MagazineSize);
 }
 
@@ -456,5 +454,5 @@ void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAni
 void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum)
 {
 	StopAnimMontage();
-	InventoryComponent->SetWeaponInfo(CurrentWeaponIndex, {RoundNum}, true);
+	InventoryComponent->SetWeaponInfo({RoundNum}, true);
 }

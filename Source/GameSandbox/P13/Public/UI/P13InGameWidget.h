@@ -4,16 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-
 #include "P13InGameWidget.generated.h"
 
-struct FP13WeaponSlot;
-struct FP13AmmoSlot;
-class UP13GameInstance;
-class UP13InventoryComponent;
-class UHorizontalBox;
-class UP13SlotAmmoWidget;
-class UP13SlotWeaponWidget;
+class UP13InventoryStatsWidget;
 
 UCLASS()
 class GAMESANDBOX_API UP13InGameWidget : public UUserWidget
@@ -29,35 +22,13 @@ protected:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-protected:
-	void ShowAllWeapons() const;
-	void ShowAllAmmo() const;
-
-protected:
-	void OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
-	void OnNewAmmoTakenHandle(FP13AmmoSlot NewAmmoSlot);
-
 private:
-	void CacheInventoryComponent();
-	void ShowStatWidgets();
-	void AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot) const;
-	void AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoSlot) const;
+	void ShowStatWidgets() const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13SlotWeaponWidget> WeaponSlotClass;
-	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13SlotAmmoWidget> AmmoSlotClass;
-
-	UPROPERTY(meta = (BindWidget))
-	UHorizontalBox* WeaponBox;
-	UPROPERTY(meta = (BindWidget))
-	UHorizontalBox* AmmoBox;
-
-private:
-	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
-	TWeakObjectPtr<UP13InventoryComponent> InventoryComponentCached;
+	TSubclassOf<UP13InventoryStatsWidget> InventoryStatClass;
 };

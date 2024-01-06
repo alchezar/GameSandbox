@@ -28,6 +28,7 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
+	FORCEINLINE EP13AmmoType GetAmmoType() const { return AmmoType; }
 	void InitSlot(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
 	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex);
 	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;

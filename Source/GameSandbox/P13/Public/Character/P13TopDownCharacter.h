@@ -137,5 +137,4 @@ private:
 	EP13MovementState PreviousMovementState = MovementState;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	FHitResult HitUnderCursor;
-	int32 CurrentWeaponIndex = 0;
 };

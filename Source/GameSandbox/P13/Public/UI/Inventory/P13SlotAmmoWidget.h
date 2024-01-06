@@ -29,6 +29,7 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; }
+	FORCEINLINE EP13AmmoType GetAmmoType() const { return AmmoType; }
 	void InitSlot(const FP13AmmoSlot NewAmmoSlot);
 	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex);
 	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount);
@@ -62,4 +63,5 @@ private:
 	int32 MaxAmmoCount = 0;
 	EP13AmmoType WeaponType;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;
+	EP13AmmoType AmmoType = EP13AmmoType::Default;
 };

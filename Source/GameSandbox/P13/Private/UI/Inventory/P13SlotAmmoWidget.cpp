@@ -25,6 +25,7 @@ void UP13SlotAmmoWidget::InitSlot(const FP13AmmoSlot NewAmmoSlot)
 	WeaponType = NewAmmoSlot.WeaponType;
 	AmmoCount = NewAmmoSlot.Count;
 	MaxAmmoCount = NewAmmoSlot.MaxCount;
+	AmmoType = NewAmmoSlot.WeaponType;
 	AmmoImage->SetBrushFromTexture(AmmoIcons[NewAmmoSlot.WeaponType]);
 	UpdateAmmoCount(NewAmmoSlot.Count);
 	UpdateAmmoUsageStatus(EP13AmmoType::Default);

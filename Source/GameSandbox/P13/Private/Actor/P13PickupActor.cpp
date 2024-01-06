@@ -82,9 +82,11 @@ void AP13PickupActor::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overlap
 			WeaponSlot.DynamicInfo.Round = WeaponSlot.MaxRound;
 		}
 		const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
+		
 		/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
 		 * try to add an empty one, by resetting count in ammo slot. */
 		AmmoSlot.Count = bWeaponTaken ? 0 : AmmoSlot.Count;
+		
 		/* Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
 		if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot) && !bWeaponTaken)
 		{

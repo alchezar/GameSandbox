@@ -13,7 +13,7 @@ DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponSignature, const FP13Weap
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13AmmoType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FP13WeaponSlot& /*NewWeaponSLot*/);
-DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnNewAmmoTakenSignature, FP13AmmoSlot /*NewAmmoSlot*/)
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnNewAmmoTakenSignature, const FP13AmmoSlot& /*NewAmmoSlot*/)
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class GAMESANDBOX_API UP13InventoryComponent : public UActorComponent, public IP13PickupInterface
@@ -45,15 +45,17 @@ public:
 public:
 	FORCEINLINE int32 GetWeaponSlotsCount() const { return WeaponSlots.Num(); }
 	FORCEINLINE int32 GetAmmoSlotsCount() const { return AmmoSlots.Num(); }
+	FORCEINLINE int32 GetCurrentWeaponIndex() const { return CurrentWeaponIndex; }
 	FORCEINLINE FP13WeaponSlot GetWeaponSlot(const int32 Index) const { return WeaponSlots[Index]; }
 	FORCEINLINE FP13AmmoSlot GetAmmoSlot(const int32 Index) const { return AmmoSlots[Index]; }
 	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
-	void SetWeaponInfo(const int32 WeaponIndex, const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
+	void SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
 	bool TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo);
-	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 WeaponIndex, const int32 MaxRound);
+	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 MaxRound);
 	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon);
+	void SortAmmoSlots();
 
 private:
 	bool TryUpdateSlotsFromData();
