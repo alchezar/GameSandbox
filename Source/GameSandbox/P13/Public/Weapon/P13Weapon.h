@@ -36,7 +36,6 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
-	FORCEINLINE FP13WeaponDynamicInfo GetWeaponDynamicInfo() const { return WeaponCurrentSettings; }
 	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return MeshWeapon; };
 	FORCEINLINE FP13WeaponDynamicInfo GetDynamicInfo() const { return WeaponCurrentSettings; }
 	FVector GetShootLocation() const;

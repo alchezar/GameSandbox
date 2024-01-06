@@ -28,9 +28,10 @@ public:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
+	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; }
 	void InitSlot(const FP13AmmoSlot NewAmmoSlot);
 	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex);
-	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const;
+	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount);
 
 private:
 	void TryCacheGameInstance();
@@ -57,6 +58,7 @@ protected:
 	FLinearColor InactiveBorderColor = {0.f, 0.f, 0.f, 0.25f};
 
 private:
+	int32 AmmoCount = 0;
 	int32 MaxAmmoCount = 0;
 	EP13AmmoType WeaponType;
 	TSoftObjectPtr<UP13GameInstance> GameInstanceCached;

@@ -105,19 +105,27 @@ void UP13InventoryComponent::SetWeaponInfo(const int32 WeaponIndex, const FP13We
 		return;
 	}
 
+	/* Find correct ammo slot. */
+	FP13AmmoSlot* AmmoSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
+	{
+		return Slot.WeaponType == WeaponSlots[WeaponIndex].AmmoType;
+	});
+	check(AmmoSlot)
+
+	/* Set new dynamic info into weapon slot. */
 	WeaponSlots[WeaponIndex].DynamicInfo = NewInfo;
 	int32 RequiredAmmo = NewInfo.Round;
 
-	/* If we reloading */
+	/* If we reloading, check max available ammo amount for weapon. */
 	if (bIncrease)
 	{
 		/* Clam required by all available ammo (inventory + magazine). */
-		RequiredAmmo = FMath::Clamp(RequiredAmmo, 0, AmmoSlots[WeaponIndex].Count + AmmoLeft);
+		RequiredAmmo = FMath::Clamp(RequiredAmmo, 0, AmmoSlot->Count + AmmoLeft);
 		/* Remove only the lack of ammo from the inventory. */
-		AmmoSlots[WeaponIndex].Count -= (RequiredAmmo - AmmoLeft);
+		AmmoSlot->Count -= (RequiredAmmo - AmmoLeft);
 	}
 
-	OnAmmoChanged.Broadcast(AmmoSlots[WeaponIndex].WeaponType, RequiredAmmo, AmmoSlots[WeaponIndex].Count);
+	OnAmmoChanged.Broadcast(WeaponSlots[WeaponIndex].AmmoType, RequiredAmmo, AmmoSlot->Count);
 }
 
 bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo)
@@ -156,6 +164,12 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon)
 	check(GameInstanceCached)
 	check(CurrentWeapon)
 
+	/* Avoid dropping last weapon. */
+	if (WeaponSlots.Num() <= 1)
+	{
+		return;
+	}
+
 	/* Find and update info about dropped item. */
 	FP13WeaponDrop* DropWeaponInfo = GameInstanceCached->GetWeaponDropByID(WeaponSlots[CurrentWeaponIndex].WeaponID);
 	check(DropWeaponInfo)
@@ -164,22 +178,25 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon)
 	/* Spawn dropped weapon. */
 	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin; 
 	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
+	
 	AP13PickupActor* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickupActor>(AP13PickupActor::StaticClass(), SpawnTransform);
 	if (!DroppedWeapon)
 	{
 		return;
-	}
-	
+	}	
 	DroppedWeapon->InitDrop(DropWeaponInfo);
 	DroppedWeapon->FinishSpawning(SpawnTransform);
+	
 	const int32 RemoveIndex = CurrentWeaponIndex;
-
 	if (!TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo))
 	{
 		return;
 	}
 	WeaponSlots.RemoveAt(RemoveIndex);
+	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
+	
 	OnInventoryUpdated.Broadcast();
+	OnSwitchWeapon.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 }
 
 bool UP13InventoryComponent::TryUpdateSlotsFromData()

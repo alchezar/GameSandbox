@@ -23,6 +23,7 @@ void UP13SlotAmmoWidget::InitSlot(const FP13AmmoSlot NewAmmoSlot)
 	}
 
 	WeaponType = NewAmmoSlot.WeaponType;
+	AmmoCount = NewAmmoSlot.Count;
 	MaxAmmoCount = NewAmmoSlot.MaxCount;
 	AmmoImage->SetBrushFromTexture(AmmoIcons[NewAmmoSlot.WeaponType]);
 	UpdateAmmoCount(NewAmmoSlot.Count);
@@ -34,12 +35,13 @@ void UP13SlotAmmoWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSl
 	UpdateAmmoUsageStatus(NewWeaponSlot.AmmoType);
 }
 
-void UP13SlotAmmoWidget::OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount) const
+void UP13SlotAmmoWidget::OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount)
 {
 	if (WeaponType != CurrentWeaponType || InInventoryNewCount < 0)
 	{
 		return;
 	}
+	AmmoCount = InInventoryNewCount;
 	UpdateAmmoCount(InInventoryNewCount);
 }
 

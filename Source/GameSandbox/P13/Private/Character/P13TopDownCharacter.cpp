@@ -161,7 +161,7 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 	}
 	CachedWeapon->AbortReloading();
 
-	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetWeaponDynamicInfo();
+	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetDynamicInfo();
 	const int32 OldIndex = CurrentWeaponIndex;
 	const int32 NextDirection = bNext ? 1 : -1;
 	const int32 NewIndex = CurrentWeaponIndex + NextDirection;
