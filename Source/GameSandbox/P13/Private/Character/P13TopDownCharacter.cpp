@@ -5,7 +5,9 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
+#include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Weapon/P13Weapon.h"
@@ -31,6 +33,11 @@ void AP13TopDownCharacter::PostInitializeComponents()
 	{
 		InventoryComponent->OnSwitchWeapon.AddUObject(this, &ThisClass::InitWeapon);
 	}
+	if (AttributesComponent)
+	{
+		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
+	}
 }
 
 void AP13TopDownCharacter::PossessedBy(AController* NewController)
@@ -41,6 +48,13 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 	{
 		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
 	}
+}
+
+float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	AttributesComponent->ReceiveDamage(DamageAmount);
+
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 void AP13TopDownCharacter::BeginPlay()
@@ -233,6 +247,19 @@ void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* Play
 	}
 }
 
+void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) 
+{
+	check(DamageDisplayComponent)
+
+	DamageDisplayComponent->DisplayDamage(LastDamage, HealthAlpha);
+}
+
+void AP13TopDownCharacter::OnDeathHandle() 
+{
+	bDead = true;
+}
+
+
 void AP13TopDownCharacter::CreateComponents()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
@@ -242,6 +269,10 @@ void AP13TopDownCharacter::CreateComponents()
 	TopDownCamera->SetupAttachment(CameraBoom);
 
 	InventoryComponent = CreateDefaultSubobject<UP13InventoryComponent>("InventoryActorComponent");
+	AttributesComponent = CreateDefaultSubobject<UP13CharacterAttributesComponent>("CharacterAttributesActorComponent");
+
+	DamageDisplayComponent = CreateDefaultSubobject<UP13DamageDisplayComponent>("DamageDisplaySceneComponent");
+	DamageDisplayComponent->SetupAttachment(RootComponent);
 }
 
 void AP13TopDownCharacter::SetupCameraBoom() const
@@ -292,14 +323,13 @@ float AP13TopDownCharacter::GetIKSocketOffset(const FName& VirtualBoneName, cons
 
 void AP13TopDownCharacter::LegsIKFloorAlignment()
 {
-	// TODO: Use code below, when character will has health. 
-	/*if (IsDead)
+	if (bDead)
 	{
 		IKLeftLegOffset = 0.f;
 		IKRightLegOffset = 0.f;
 		IKHitOffset = 0.f;
 		return;
-	}*/
+	}
 
 	constexpr float MinDistanceThreshold = 12.f;
 	constexpr float IKOffsetInterp = 10.f;

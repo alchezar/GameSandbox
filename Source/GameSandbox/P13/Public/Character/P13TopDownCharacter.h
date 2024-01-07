@@ -8,6 +8,8 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13TopDownCharacter.generated.h"
 
+class UP13DamageDisplayComponent;
+class UP13CharacterAttributesComponent;
 class UP13InventoryComponent;
 class AP13Weapon;
 class USpringArmComponent;
@@ -36,6 +38,7 @@ public:
 	AP13TopDownCharacter();
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -73,6 +76,8 @@ public:
 
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
+	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
+	void OnDeathHandle();
 
 private:
 	void CreateComponents();
@@ -102,7 +107,11 @@ protected:
 	USpringArmComponent* CameraBoom;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UP13InventoryComponent* InventoryComponent;
-
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
+	UP13CharacterAttributesComponent* AttributesComponent;
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
+	UP13DamageDisplayComponent* DamageDisplayComponent;
+	
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	bool bFlow = true;
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
@@ -137,4 +146,5 @@ private:
 	EP13MovementState PreviousMovementState = MovementState;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	FHitResult HitUnderCursor;
+	bool bDead = false;
 };
