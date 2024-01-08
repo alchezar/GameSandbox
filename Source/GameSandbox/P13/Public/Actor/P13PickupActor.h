@@ -67,8 +67,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
 	FP13WeaponSlot WeaponSlot;
-
-	UPROPERTY(EditAnywhere, Category = "C++ | Drop")
+	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
 	float ActivationDelay = 3.f;
 
 private:

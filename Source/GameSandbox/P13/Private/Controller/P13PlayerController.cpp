@@ -9,6 +9,7 @@
 #include "Blueprint/AIBlueprintHelperLibrary.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
 #include "P13/Public/Game/P13HeadsUpDisplay.h"
@@ -73,6 +74,13 @@ void AP13PlayerController::SetPawn(APawn* InPawn)
 	}
 }
 
+void AP13PlayerController::OnUnPossess()
+{
+	Super::OnUnPossess();
+	
+	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
+}
+
 void AP13PlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -88,6 +96,11 @@ void AP13PlayerController::OnInputStarted()
 
 void AP13PlayerController::OnSetDestinationTriggered()
 {
+	if (!GetCanControlledCharacterMove())
+	{
+		return;
+	}
+	
 	/* We flag that the input is being pressed. */
 	FollowTime += GetWorld()->GetDeltaSeconds();
 
@@ -109,6 +122,11 @@ void AP13PlayerController::OnSetDestinationTriggered()
 
 void AP13PlayerController::OnSetDestinationReleased()
 {
+	if (!GetCanControlledCharacterMove())
+	{
+		return;
+	}
+	
 	/* If it was a short press. */
 	if (FollowTime <= ShortPressThreshold)
 	{
@@ -228,6 +246,10 @@ void AP13PlayerController::SpawnCursorDecal()
 
 void AP13PlayerController::UpdateCursorDecalPosition() const
 {
+	if (!GetCanControlledCharacterMove())
+	{
+		return;
+	}
 	if (!CachedCursorDecal.IsValid())
 	{
 		return;
@@ -238,4 +260,23 @@ void AP13PlayerController::UpdateCursorDecalPosition() const
 
 	CachedCursorDecal->SetWorldLocation(CursorLocation);
 	CachedCursorDecal->SetWorldRotation(CursorRotation);
+}
+
+bool AP13PlayerController::GetCanControlledCharacterMove() const
+{
+	const ACharacter* ControlledCharacter = GetCharacter();
+	if (!ControlledCharacter)
+	{
+		return false;
+	}
+	const UCharacterMovementComponent* CharacterMovement = ControlledCharacter->GetCharacterMovement();
+	if (!CharacterMovement)
+	{
+		return false;
+	}
+	if (CharacterMovement->MovementMode == MOVE_None)
+	{
+		return false;
+	}
+	return true;
 }

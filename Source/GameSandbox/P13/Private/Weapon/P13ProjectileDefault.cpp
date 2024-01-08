@@ -2,6 +2,7 @@
 
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 
+#include "GameSandbox.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
 #include "Engine/DamageEvents.h"
@@ -46,6 +47,11 @@ void AP13ProjectileDefault::PostInitializeComponents()
 void AP13ProjectileDefault::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (DamageType == EP13ProjectileDamageType::Grenade)
+	{
+		GetWorld()->GetTimerManager().SetTimer(ExplodeTimer, this, &ThisClass::GiveRadialDamage, BulletSettings.Lifetime);
+	}
 }
 
 void AP13ProjectileDefault::Tick(float DeltaTime)
@@ -69,15 +75,20 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 
 	SpawnEffectsOnHit(Hit, OtherComp);
 
-	FPointDamageEvent PointDamage;
-	PointDamage.HitInfo = Hit;
-	PointDamage.ShotDirection = GetActorForwardVector();
-	// FRadialDamageEvent RadialDamage;
-	// RadialDamage.Origin = Hit.Location;
-	// RadialDamage.Params = FRadialDamageParams(BulletSettings.Damage, BulletSettings.DamageRadius / 2.f, BulletSettings.DamageRadius, 2.f);
+	if (DamageType == EP13ProjectileDamageType::Point)
+	{
+		GivePointDamage(Hit, OtherActor);
+	}
+	else if (DamageType == EP13ProjectileDamageType::Radial)
+	{
+		GiveRadialDamage();
+	}
+	else if (DamageType == EP13ProjectileDamageType::Grenade)
+	{
+		return;
+	}
+	
 	ImpactProjectile();
-
-	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
 }
 
 void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -119,5 +130,22 @@ void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveC
 
 void AP13ProjectileDefault::ImpactProjectile()
 {
+	UGameplayStatics::SpawnEmitterAtLocation(this, ExplodeEffect, GetActorLocation(), GetActorRotation());
 	Destroy();
+}
+
+void AP13ProjectileDefault::GivePointDamage(const FHitResult& Hit, AActor* OtherActor) 
+{
+	FPointDamageEvent PointDamage;
+	PointDamage.HitInfo = Hit;
+	PointDamage.ShotDirection = GetActorForwardVector();
+	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
+}
+
+void AP13ProjectileDefault::GiveRadialDamage() 
+{
+	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), BulletSettings.Damage, 0.f, GetActorLocation(), BulletSettings.DamageRadius / 2.f , BulletSettings.DamageRadius, 1.f, UDamageType::StaticClass(), {this}, this, GetInstigatorController(), ECC_BULLET);
+	
+	DrawDebugCapsule(GetWorld(), GetActorLocation(), BulletSettings.DamageRadius, BulletSettings.DamageRadius, FQuat::Identity, FColor::Red);
+	ImpactProjectile();
 }

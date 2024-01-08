@@ -22,7 +22,7 @@ void UP13DamageDisplayComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 void UP13DamageDisplayComponent::DisplayDamage(const float CurrentDamage, const float HealthAlpha)
 {
-	if (!DamageDisplayWidgetClass)
+	if (!DamageDisplayWidgetClass || FMath::IsNearlyZero(CurrentDamage))
 	{
 		return;
 	}

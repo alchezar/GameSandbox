@@ -28,6 +28,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void SetPawn(APawn* InPawn) override;
+	virtual void OnUnPossess() override;
 
 public:
 	virtual void Tick(const float DeltaSeconds) override;
@@ -57,6 +58,7 @@ private:
 	void FindPointUnderCursor();
 	void SpawnCursorDecal();
 	void UpdateCursorDecalPosition() const;
+	bool GetCanControlledCharacterMove() const;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -89,7 +91,6 @@ protected:
 	UInputAction* PreviousWeaponAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* DropAction = nullptr;
-
 	
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;

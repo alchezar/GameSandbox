@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "P13InGameWidget.generated.h"
+#include "P13HealthWidget.generated.h"
 
-class UP13HealthWidget;
-class UP13InventoryStatsWidget;
+class UProgressBar;
 
 UCLASS()
-class GAMESANDBOX_API UP13InGameWidget : public UUserWidget
+class GAMESANDBOX_API UP13HealthWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                Super                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -23,18 +23,14 @@ protected:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-private:
-	void ShowStatWidgets() const;
-	void ShowHealthWidget() const;
-	UFUNCTION()
-	void OnPawnChangedHandle(APawn* OldPawn, APawn* NewPawn);
-
+protected:
+	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) const;
+	void OnDeathHandle();
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
-	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13InventoryStatsWidget> InventoryStatClass;
-	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13HealthWidget> HealthClass;
+	UPROPERTY(meta = (BindWidget))
+	UProgressBar* HealthBar;
 };

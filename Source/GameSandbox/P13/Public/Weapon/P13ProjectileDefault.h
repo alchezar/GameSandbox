@@ -10,6 +10,14 @@
 class UProjectileMovementComponent;
 class USphereComponent;
 
+UENUM(Blueprintable)
+enum class EP13ProjectileDamageType : uint8
+{
+	Point,
+	Radial,
+	Grenade
+};
+
 UCLASS()
 class GAMESANDBOX_API AP13ProjectileDefault : public AActor
 {
@@ -47,6 +55,9 @@ private:
 	void SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp);
 	void ImpactProjectile();
 
+	void GivePointDamage(const FHitResult& Hit, AActor* OtherActor);
+	void GiveRadialDamage();
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -62,4 +73,13 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Fire")
 	FP13ProjectileInfo BulletSettings;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Damage")
+	EP13ProjectileDamageType DamageType = EP13ProjectileDamageType::Point;
+
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	UParticleSystem* ExplodeEffect = nullptr;
+	
+private:
+	FTimerHandle ExplodeTimer;
 };

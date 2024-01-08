@@ -3,6 +3,7 @@
 #include "P13/Public/Character/P13TopDownCharacter.h"
 
 #include "Camera/CameraComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
@@ -16,6 +17,7 @@ AP13TopDownCharacter::AP13TopDownCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
+	SetCanBeDamaged(true);
 
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
@@ -52,9 +54,10 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 
 float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	AttributesComponent->ReceiveDamage(DamageAmount);
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
+	AttributesComponent->ReceiveDamage(ActualDamage);
 
-	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+	return ActualDamage;
 }
 
 void AP13TopDownCharacter::BeginPlay()
@@ -75,6 +78,11 @@ void AP13TopDownCharacter::Tick(const float DeltaTime)
 
 void AP13TopDownCharacter::MoveInput(const FVector2D MoveVector)
 {
+	if (bDead)
+	{
+		return;
+	}
+	
 	const FVector ForwardDirection = GetActorForwardVector();
 	const FVector RightDirection = GetActorRightVector();
 
@@ -257,6 +265,27 @@ void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const fl
 void AP13TopDownCharacter::OnDeathHandle() 
 {
 	bDead = true;
+
+	StopAnimMontage();
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCapsuleComponent()->DestroyComponent();
+		GetCharacterMovement()->MovementState.bCanJump = false;
+	}
+
+	if (Controller)
+	{
+		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
+	}
+
+	/* Ragdoll */
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	DetachFromControllerPendingDestroy();
+	SetLifeSpan(10.f);
 }
 
 
@@ -295,6 +324,10 @@ void AP13TopDownCharacter::ShakeCamera() const
 
 void AP13TopDownCharacter::UpdateMeshRotation()
 {
+	if (bDead)
+	{
+		return;
+	}
 	if (!HitUnderCursor.bBlockingHit)
 	{
 		return;
