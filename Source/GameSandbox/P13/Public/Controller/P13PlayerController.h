@@ -50,7 +50,7 @@ protected:
 	void FireInput(bool const bStart);
 	void ReloadInput();
 	void SwitchWeaponInput(const bool bNext);
-	void DropInput();
+	void DropInput(const bool bTakeNext);
 
 private:
 	void AddDefaultMappingContext();

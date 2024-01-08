@@ -191,10 +191,10 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 	InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo);
 }
 
-void AP13TopDownCharacter::DropInput()
+void AP13TopDownCharacter::DropInput(const bool bTakeNext)
 {
 	check(InventoryComponent)
-	InventoryComponent->DropCurrentWeapon(CachedWeapon.Get());
+	InventoryComponent->DropCurrentWeapon(CachedWeapon.Get(), bTakeNext);
 }
 
 void AP13TopDownCharacter::UpdateCharacter()
@@ -265,6 +265,10 @@ void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const fl
 void AP13TopDownCharacter::OnDeathHandle() 
 {
 	bDead = true;
+
+	DropInput(false);
+	CachedWeapon->Destroy();
+	CachedWeapon.Reset();
 
 	StopAnimMontage();
 	if (GetCharacterMovement())

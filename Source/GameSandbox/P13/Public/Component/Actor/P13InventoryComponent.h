@@ -54,7 +54,8 @@ public:
 	void SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
 	bool TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo);
 	int32 FindMaxAvailableRound(const int32 OldRoundNum, const int32 MaxRound);
-	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon);
+	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon, const bool bTakeNext = true);
+	void ClearWeaponSlots();
 	void SortAmmoSlots();
 
 private:
