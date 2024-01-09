@@ -243,6 +243,12 @@ struct FP13WeaponDrop : public FTableRowBase
 	FP13WeaponSlot WeaponInfo;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drop")
 	int32 MaxCount = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	UNiagaraSystem* WaitEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	UNiagaraSystem* PickupEffect;	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
+	FLinearColor EffectColor = FLinearColor::White;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

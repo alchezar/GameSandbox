@@ -77,6 +77,7 @@ public:
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
 	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
+	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha);
 	void OnDeathHandle();
 
 private:
@@ -96,6 +97,8 @@ private:
 	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
 	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim);
 	void OnWeaponReloadFinishHandle(const int32 RoundNum);
+	void CreateDynamicMeshMaterials();
+	void UpdateMeshMaterial(const float HealthAlpha);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -127,6 +130,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	TSubclassOf<UCameraShakeBase> ShakeClass = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	UCurveLinearColor* ColorOverLife;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	EP13MovementState MovementState = EP13MovementState::Run;
@@ -147,4 +152,6 @@ private:
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	FHitResult HitUnderCursor;
 	bool bDead = false;
+	UPROPERTY()
+	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
 };

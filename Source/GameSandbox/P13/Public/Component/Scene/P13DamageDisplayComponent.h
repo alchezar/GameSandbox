@@ -30,7 +30,8 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	void DisplayDamage(const float CurrentDamage, const float HealthAlpha);
-		
+	void DisplayShield(const float LastDamage, const float ShieldAlpha);
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

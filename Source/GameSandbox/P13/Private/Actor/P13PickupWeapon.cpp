@@ -21,6 +21,10 @@ void AP13PickupWeapon::InitDrop(const FP13WeaponDrop* DropWeaponInfo)
 	bDropped = true;
 	Mesh->SetStaticMesh(DropWeaponInfo->WeaponMesh);
 	WeaponSlot = DropWeaponInfo->WeaponInfo;
+	
+	WaitEffect = DropWeaponInfo->WaitEffect;
+	PickupEffect = DropWeaponInfo->PickupEffect;
+	EffectColor = DropWeaponInfo->EffectColor;
 
 	AmmoSlot = {WeaponSlot.AmmoType, DropWeaponInfo->WeaponInfo.DynamicInfo.Round, DropWeaponInfo->MaxCount};
 

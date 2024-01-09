@@ -28,9 +28,11 @@ protected:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
+	FORCEINLINE bool GetIsHealthFull() const { return FMath::IsNearlyEqual(Health, MaxHealth); }
 	FORCEINLINE float GetCurrentHealth() const { return Health; }
 	FORCEINLINE void SetMaxHealth(const float NewMaxHealth) { MaxHealth = NewMaxHealth; }
 	virtual void ReceiveDamage(const float Damage);
+	virtual void AddHealth(const float HealthAid);
 
 protected:
 	void OnDead();
@@ -43,7 +45,7 @@ public:
 	FP13OnHealthOverSignature OnHealthOver;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Attribute", meta = (ClampMin = 1.f, UIMin = 1.f))
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Attribute", meta = (ClampMin = 1.f, UIMin = 1.f))
  	float MaxHealth = 100.f;
 
 private:

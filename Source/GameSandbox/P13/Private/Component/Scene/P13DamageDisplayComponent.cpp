@@ -37,3 +37,12 @@ void UP13DamageDisplayComponent::DisplayDamage(const float CurrentDamage, const 
 	DamageDisplayWidget->AddToViewport();
 }
 
+void UP13DamageDisplayComponent::DisplayShield(const float LastDamage, const float ShieldAlpha)
+{
+	if (ShieldAlpha <= 0.f || LastDamage <= 0.f)
+	{
+		return;
+	}
+	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Shield");	
+}
+

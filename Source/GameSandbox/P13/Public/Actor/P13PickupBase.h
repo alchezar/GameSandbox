@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "P13PickupBase.generated.h"
 
+class UNiagaraSystem;
 class IP13PickupInterface;
 class USphereComponent;
 
@@ -45,4 +46,11 @@ protected:
 	UStaticMeshComponent* Mesh;
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USphereComponent* Collision;
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	UNiagaraSystem* WaitEffect;
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	UNiagaraSystem* PickupEffect;	
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	FLinearColor EffectColor = FColor::White;
 };

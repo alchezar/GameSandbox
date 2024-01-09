@@ -11,7 +11,7 @@ void UP13HealthComponent::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
-	OnHealthChanged.Broadcast(Health, 0, 1.f);
+	OnHealthChanged.Broadcast(Health, 0.f, 1.f);
 }
 
 void UP13HealthComponent::ReceiveDamage(const float Damage)
@@ -30,6 +30,16 @@ void UP13HealthComponent::ReceiveDamage(const float Damage)
 		OnHealthOver.Broadcast();
 		OnDead();
 	}
+}
+
+void UP13HealthComponent::AddHealth(const float HealthAid)
+{
+	if (HealthAid <= 0)
+	{
+		return;
+	}
+	Health = FMath::Clamp(Health + HealthAid, 0, MaxHealth);
+	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
 void UP13HealthComponent::OnDead()

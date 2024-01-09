@@ -4,6 +4,7 @@
 
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Curves/CurveLinearColor.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
@@ -37,6 +38,7 @@ void AP13TopDownCharacter::PostInitializeComponents()
 	}
 	if (AttributesComponent)
 	{
+		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
 		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
 	}
@@ -63,6 +65,8 @@ float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	CreateDynamicMeshMaterials();
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -260,6 +264,15 @@ void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const fl
 	check(DamageDisplayComponent)
 
 	DamageDisplayComponent->DisplayDamage(LastDamage, HealthAlpha);
+
+	UpdateMeshMaterial(HealthAlpha);
+}
+
+void AP13TopDownCharacter::OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha)
+{
+	check(DamageDisplayComponent)
+
+	DamageDisplayComponent->DisplayShield(LastDamage, ShieldAlpha) ;
 }
 
 void AP13TopDownCharacter::OnDeathHandle() 
@@ -522,4 +535,25 @@ void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum)
 {
 	StopAnimMontage();
 	InventoryComponent->SetWeaponInfo({RoundNum}, true);
+}
+
+void AP13TopDownCharacter::CreateDynamicMeshMaterials()
+{
+	for (int32 Index = 1; Index <= 3; ++Index)
+	{
+		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
+	}
+}
+
+void AP13TopDownCharacter::UpdateMeshMaterial(const float HealthAlpha)
+{
+	if (!ColorOverLife)
+	{
+		return;
+	}
+	for (auto* DynamicMaterial : DynamicMaterials)
+	{
+		DynamicMaterial->SetVectorParameterValue("MainColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
+		DynamicMaterial->SetVectorParameterValue("PaintColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
+	}
 }

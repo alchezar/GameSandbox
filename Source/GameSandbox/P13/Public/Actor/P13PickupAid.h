@@ -3,37 +3,34 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Blueprint/UserWidget.h"
-#include "P13HealthWidget.generated.h"
+#include "P13PickupBase.h"
+#include "P13PickupAid.generated.h"
 
-class UProgressBar;
-
-UCLASS()
-class GAMESANDBOX_API UP13HealthWidget : public UUserWidget
+UCLASS(Blueprintable)
+class GAMESANDBOX_API AP13PickupAid : public AP13PickupBase
 {
 	GENERATED_BODY()
 
-	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                Super                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+public:
+	AP13PickupAid();
+
 protected:
-	virtual void NativeConstruct() override;
+	virtual void BeginPlay() override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
-	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha) const;
-	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) const;
-	void OnDeathHandle();
+	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
-	UPROPERTY(meta = (BindWidget))
-	UProgressBar* HealthBar;
-	UPROPERTY(meta = (BindWidget))
-	UProgressBar* ShieldBar;
-};
+	UPROPERTY(EditAnywhere, Category = "C++")
+	float HealthAid = 50.f;
+}; 

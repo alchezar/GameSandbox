@@ -19,8 +19,14 @@ void UP13HealthWidget::NativeConstruct()
 	{
 		return;
 	}
+	AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
 	AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 	AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
+}
+
+void UP13HealthWidget::OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha) const
+{
+	ShieldBar->SetPercent(ShieldAlpha);
 }
 
 void UP13HealthWidget::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) const

@@ -2,8 +2,9 @@
 
 #include "P13/Public/Actor/P13PickupBase.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
-#include "P13/Public/Component/Actor/P13InventoryComponent.h"
 
 AP13PickupBase::AP13PickupBase()
 {
@@ -20,6 +21,18 @@ void AP13PickupBase::PostInitializeComponents()
 void AP13PickupBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UNiagaraComponent* WaitParticle = UNiagaraFunctionLibrary::SpawnSystemAttached(WaitEffect, Mesh, NAME_None, Mesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, false))
+	{
+		WaitParticle->SetVariableLinearColor("Color", EffectColor);
+	}
+
+	// if (UNiagaraComponent* WaitParticle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, WaitEffect, Mesh->GetComponentLocation(), FRotator::ZeroRotator, FVector(1.f), false))
+	// {
+	// 	WaitParticle->SetVariableLinearColor("Color", EffectColor);
+	// 	WaitParticle->AttachToComponent(Mesh, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, false));
+	// }	
+	
 }
 
 void AP13PickupBase::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -29,6 +42,10 @@ void AP13PickupBase::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overlapp
 
 void AP13PickupBase::OnPickupSuccess()
 {
+	if (UNiagaraComponent* PickedParticle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, Mesh->GetComponentLocation()))
+	{
+		PickedParticle->SetVariableLinearColor("Color", EffectColor);
+	}
 	Destroy();
 }
 
