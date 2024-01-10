@@ -25,7 +25,8 @@ protected:
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	void InitWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset);
+	void SetupDamageWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset);
+	void SetupShieldWidget(const USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor = FLinearColor::Blue);
 
 private:
 	void UpdateScreenLocation();
@@ -38,15 +39,16 @@ protected:
 	UTextBlock* DamageText;
 	UPROPERTY(meta = (BindWidgetAnim), Transient)
 	UWidgetAnimation* LiftAnim;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	UCurveLinearColor* ColorOverLife;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float ShowTime = 0.5f;
-	
+
 private:
 	TSoftObjectPtr<USceneComponent> CachedComponentToAttach;
 	float HealthAlpha = 0.f;
 	float Lifetime = 0.f;
 	FVector2D RandomOffset = FVector2D::Zero();
+	FLinearColor DefaultColor = FLinearColor::White;
 };

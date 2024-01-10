@@ -11,10 +11,10 @@ void UP13DamageDisplayWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	PlayAnimation(LiftAnim);
-	
+
 	FTimerHandle RemoveTimer;
 	FTimerDelegate RemoveDelegate;
-	RemoveDelegate.BindLambda([&](){ RemoveFromParent(); });
+	RemoveDelegate.BindLambda([&]() { RemoveFromParent(); });
 	GetWorld()->GetTimerManager().SetTimer(RemoveTimer, RemoveDelegate, ShowTime, false);
 }
 
@@ -25,12 +25,21 @@ void UP13DamageDisplayWidget::NativeTick(const FGeometry& MyGeometry, const floa
 	UpdateScreenLocation();
 }
 
-void UP13DamageDisplayWidget::InitWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset)
+void UP13DamageDisplayWidget::SetupDamageWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset)
 {
 	CachedComponentToAttach = ComponentToAttach;
 	DamageText->SetText(FText::AsNumber(CurrentDamage));
 	HealthAlpha = NewHealthAlpha;
 	RandomOffset = NewRandomOffset;
+}
+
+void UP13DamageDisplayWidget::SetupShieldWidget(const USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor)
+{
+	CachedComponentToAttach = ComponentToAttach;
+	DamageText->SetText(FText::FromString(ShieldString));
+	RandomOffset = NewRandomOffset;
+	DefaultColor = NewColor;
+	ColorOverLife = nullptr;
 }
 
 void UP13DamageDisplayWidget::UpdateScreenLocation()
@@ -49,7 +58,7 @@ void UP13DamageDisplayWidget::UpdateScreenLocation()
 	const bool bInViewport = PlayerController->ProjectWorldLocationToScreen(CachedComponentToAttach->GetComponentLocation(), ScreenPosition);
 	const float ViewportScale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
 	const FVector2D AnchorPoint = ScreenPosition / ViewportScale;
-	const FLinearColor DamageColor = ColorOverLife ? ColorOverLife->GetLinearColorValue(HealthAlpha) : FColor::White;
+	const FLinearColor DamageColor = ColorOverLife ? ColorOverLife->GetLinearColorValue(HealthAlpha) : DefaultColor;
 
 	DamageText->SetRenderTranslation(AnchorPoint + RandomOffset);
 	DamageText->SetVisibility(bInViewport ? ESlateVisibility::HitTestInvisible : ESlateVisibility::Collapsed);

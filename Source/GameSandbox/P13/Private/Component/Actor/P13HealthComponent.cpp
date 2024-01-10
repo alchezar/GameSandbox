@@ -4,6 +4,7 @@
 
 UP13HealthComponent::UP13HealthComponent()
 {
+	
 }
 
 void UP13HealthComponent::BeginPlay()
@@ -16,13 +17,13 @@ void UP13HealthComponent::BeginPlay()
 
 void UP13HealthComponent::ReceiveDamage(const float Damage)
 {
-	if (Health <= 0.f)
+	if (FMath::IsNearlyZero(Health) || FMath::IsNearlyZero(Damage))
 	{
 		return;
 	}
-	
+
 	const float HealthBefore = Health;
-	Health = FMath::Clamp(Health - Damage, 0, MaxHealth);
+	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
 	OnHealthChanged.Broadcast(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
 
 	if (FMath::IsNearlyZero(Health))
@@ -34,15 +35,13 @@ void UP13HealthComponent::ReceiveDamage(const float Damage)
 
 void UP13HealthComponent::AddHealth(const float HealthAid)
 {
-	if (HealthAid <= 0)
+	if (FMath::IsNearlyZero(HealthAid))
 	{
 		return;
 	}
-	Health = FMath::Clamp(Health + HealthAid, 0, MaxHealth);
+	Health = FMath::Clamp(Health + HealthAid, 0.f, MaxHealth);
 	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
 void UP13HealthComponent::OnDead()
-{
-	
-}
+{}

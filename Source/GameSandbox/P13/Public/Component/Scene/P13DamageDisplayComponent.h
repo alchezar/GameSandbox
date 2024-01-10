@@ -24,19 +24,19 @@ protected:
 
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	void DisplayDamage(const float CurrentDamage, const float HealthAlpha);
-	void DisplayShield(const float LastDamage, const float ShieldAlpha);
-	
+	void DisplayShield(const float CurrentDamage, const float ShieldAlpha);
+	UP13DamageDisplayWidget* CreateDamageWidget(FVector2D& Offset) const;
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage Display")
 	TSubclassOf<UP13DamageDisplayWidget> DamageDisplayWidgetClass;
-		
 };

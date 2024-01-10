@@ -26,23 +26,42 @@ void UP13DamageDisplayComponent::DisplayDamage(const float CurrentDamage, const 
 	{
 		return;
 	}
-	
+
+	FVector2D Offset;
+	if (UP13DamageDisplayWidget* DamageDisplayWidget = CreateDamageWidget(Offset))
+	{
+		DamageDisplayWidget->SetupDamageWidget(this, CurrentDamage, HealthAlpha, Offset);
+	}
+}
+
+void UP13DamageDisplayComponent::DisplayShield(const float CurrentDamage, const float ShieldAlpha)
+{
+	if (FMath::IsNearlyZero(CurrentDamage) || FMath::IsNearlyZero(ShieldAlpha))
+	{
+		return;
+	}
+
+	FVector2D Offset;
+	if (UP13DamageDisplayWidget* DamageDisplayWidget = CreateDamageWidget(Offset))
+	{
+		DamageDisplayWidget->SetupShieldWidget(this, "Shield", Offset);
+	}
+}
+
+UP13DamageDisplayWidget* UP13DamageDisplayComponent::CreateDamageWidget(FVector2D& Offset) const
+{
+	if (!DamageDisplayWidgetClass)
+	{
+		return nullptr;
+	}
+
 	UP13DamageDisplayWidget* DamageDisplayWidget = CreateWidget<UP13DamageDisplayWidget>(GetWorld(), DamageDisplayWidgetClass);
 	if (!DamageDisplayWidget)
 	{
-		return;
+		return nullptr;
 	}
-	const FVector2D RandomOffset = FVector2D(FMath::RandRange(-20.f, 20.f), FMath::RandRange(-20.f, 20.f));
-	DamageDisplayWidget->InitWidget(this, CurrentDamage, HealthAlpha, RandomOffset);
 	DamageDisplayWidget->AddToViewport();
-}
+	Offset = FVector2D(FMath::RandRange(-20.f, 20.f), FMath::RandRange(-20.f, 20.f));
 
-void UP13DamageDisplayComponent::DisplayShield(const float LastDamage, const float ShieldAlpha)
-{
-	if (ShieldAlpha <= 0.f || LastDamage <= 0.f)
-	{
-		return;
-	}
-	if (GEngine) GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Cyan, "Shield");	
+	return DamageDisplayWidget;
 }
-

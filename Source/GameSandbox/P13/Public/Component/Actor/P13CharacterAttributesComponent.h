@@ -32,23 +32,24 @@ public:
 	virtual void ReceiveDamage(const float Damage) override;
 
 private:
-	void ShieldRestoreTick(const float DeltaTime);
-	
+	void ShieldRecoveryTick(const float DeltaTime);
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FP13OnShieldChangesHandle OnShieldChanged;
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Attribute", meta = (ClampMin = 1.f, UIMin = 1.f))
 	float MaxShield = 50.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Attribute")
-	float RestoreDelay = 5.f;
+	float RecoveryStartDelay = 5.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Attribute")
-	float RestoreTime = 5.f;
+	float RecoveryTime = 5.f;
 
 private:
 	float Shield = 0.f;
-	FTimerHandle RestoreTimer;
-	bool bRestoring = false;
+	FTimerHandle StartRecoveryTimer;
+	bool bRecovering = false;
 };

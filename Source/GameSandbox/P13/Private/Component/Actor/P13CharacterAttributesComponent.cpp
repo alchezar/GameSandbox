@@ -5,7 +5,6 @@
 UP13CharacterAttributesComponent::UP13CharacterAttributesComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	// PrimaryComponentTick.TickInterval = 0.f;
 }
 
 void UP13CharacterAttributesComponent::BeginPlay()
@@ -20,45 +19,44 @@ void UP13CharacterAttributesComponent::TickComponent(float DeltaTime, ELevelTick
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (bRestoring)
+	if (bRecovering)
 	{
-		ShieldRestoreTick(DeltaTime);
+		ShieldRecoveryTick(DeltaTime);
 	}
 }
 
 void UP13CharacterAttributesComponent::ReceiveDamage(const float Damage)
 {
-	if (!Damage)
+	if (FMath::IsNearlyZero(Damage))
 	{
 		return;
 	}
+
 	/* Stop shield restoring when we had damage. */
-	if (bRestoring)
-	{
-		bRestoring = false;
-	}
-	
+	bRecovering = false;
+
 	const float ShieldBefore = Shield;
 	Shield = FMath::Clamp(Shield - Damage, 0.f, MaxShield);
 	OnShieldChanged.Broadcast(Shield, FMath::Min(Damage, ShieldBefore), Shield / MaxShield);
 
-	const float RealDamage = ShieldBefore < Damage ? (Damage - ShieldBefore) : 0.f;
-	Super::ReceiveDamage(RealDamage);
+	const float RealDamage = (ShieldBefore < Damage) ? (Damage - ShieldBefore) : 0.f;
 
 	/* Wait till we can start restore our shield. */
-	FTimerDelegate RestoreDelegate;
-	RestoreDelegate.BindLambda([this]() { bRestoring = true; });	
-	GetWorld()->GetTimerManager().SetTimer(RestoreTimer, RestoreDelegate, RestoreDelay, false);
+	FTimerDelegate StartRecoveryDelegate;
+	StartRecoveryDelegate.BindLambda([this]() { bRecovering = true; });
+	GetWorld()->GetTimerManager().SetTimer(StartRecoveryTimer, StartRecoveryDelegate, RecoveryStartDelay, false);
+
+	Super::ReceiveDamage(RealDamage);
 }
 
-void UP13CharacterAttributesComponent::ShieldRestoreTick(const float DeltaTime)
+void UP13CharacterAttributesComponent::ShieldRecoveryTick(const float DeltaTime)
 {
-	const float TickRestore = DeltaTime / RestoreTime * MaxShield;
-	Shield = FMath::Clamp(Shield + TickRestore, 0, MaxShield);
+	const float TickRestore = DeltaTime / RecoveryTime * MaxShield;
+	Shield = FMath::Clamp(Shield + TickRestore, 0.f, MaxShield);
 	OnShieldChanged.Broadcast(Shield, 0.f, Shield / MaxShield);
 
 	if (FMath::IsNearlyEqual(Shield, MaxShield))
 	{
-		bRestoring = false;
+		bRecovering = false;
 	}
 }
