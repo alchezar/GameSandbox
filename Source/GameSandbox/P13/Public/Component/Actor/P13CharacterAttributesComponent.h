@@ -30,6 +30,7 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	virtual void ReceiveDamage(const float Damage) override;
+	FORCEINLINE bool GetShieldIsActive() const { return Shield > 0.f; }
 
 private:
 	void ShieldRecoveryTick(const float DeltaTime);

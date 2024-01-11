@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "P13/Public/Intearface/P13InputInterface.h"
+#include "P13/Public/Intearface/P13StateEffectInterface.h"
 #include "P13/Public/Library/P13Types.h"
 #include "P13TopDownCharacter.generated.h"
 
@@ -27,7 +28,7 @@ struct FP13CameraHeightClamp
 };
 
 UCLASS(meta = (PrioritizeCategories = "C++"))
-class GAMESANDBOX_API AP13TopDownCharacter : public ACharacter, public IP13InputInterface
+class GAMESANDBOX_API AP13TopDownCharacter : public ACharacter, public IP13InputInterface, public IP13StateEffectInterface
 {
 	GENERATED_BODY()
 
@@ -60,6 +61,13 @@ public:
 	virtual void ReloadInput() override;
 	virtual void SwitchWeaponInput(const bool bNext) override;
 	virtual void DropInput(const bool bTakeNext) override;
+
+public:
+	virtual EPhysicalSurface GetSurfaceType() override;
+	virtual bool GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass = nullptr) const override;
+	virtual void AddActiveStateEffect(UP13StateEffect* StateEffect) override;
+	virtual void RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect) override;
+	virtual TArray<UP13StateEffect*> GetAllActiveStateEffects() const override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
@@ -99,6 +107,7 @@ private:
 	void OnWeaponReloadFinishHandle(const int32 RoundNum);
 	void CreateDynamicMeshMaterials();
 	void UpdateMeshMaterial(const float HealthAlpha);
+	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
@@ -114,7 +123,7 @@ protected:
 	UP13CharacterAttributesComponent* AttributesComponent;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UP13DamageDisplayComponent* DamageDisplayComponent;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	bool bFlow = true;
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
@@ -154,4 +163,6 @@ private:
 	bool bDead = false;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
+	UPROPERTY()
+	TArray<UP13StateEffect*> ActiveStateEffects;
 };

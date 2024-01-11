@@ -8,6 +8,7 @@
 #include "Engine/DamageEvents.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "P13/Public/Intearface/P13StateEffectInterface.h"
 #include "Particles/ParticleSystemComponent.h"
 
 AP13ProjectileDefault::AP13ProjectileDefault()
@@ -73,7 +74,8 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 		return;
 	}
 
-	SpawnEffectsOnHit(Hit, OtherComp);
+	SpawnStateEffect(Hit);
+	SpawnEffectsOnHit(Hit);
 
 	if (DamageType == EP13ProjectileDamageType::Point)
 	{
@@ -82,6 +84,7 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 	else if (DamageType == EP13ProjectileDamageType::Radial)
 	{
 		GiveRadialDamage();
+		return;
 	}
 	else if (DamageType == EP13ProjectileDamageType::Grenade)
 	{
@@ -101,7 +104,7 @@ void AP13ProjectileDefault::OnBulletEndOverlapHandle(UPrimitiveComponent* Overla
 	
 }
 
-void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp)
+void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit)
 {
 	if (!Hit.PhysMaterial.IsValid())
 	{
@@ -114,7 +117,7 @@ void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveC
 	if (BulletSettings.OnHit.Decals.Contains(SurfaceType))
 	{
 		UMaterialInterface* Decal = BulletSettings.OnHit.Decals[SurfaceType];
-		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), OtherComp, NAME_None, Location, Rotation, EAttachLocation::KeepWorldPosition, 10.f);
+		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), Hit.GetComponent(), NAME_None, Location, Rotation, EAttachLocation::KeepWorldPosition, 10.f);
 	}
 	if (BulletSettings.OnHit.Particles.Contains(SurfaceType))
 	{
@@ -148,4 +151,19 @@ void AP13ProjectileDefault::GiveRadialDamage()
 	
 	DrawDebugCapsule(GetWorld(), GetActorLocation(), BulletSettings.DamageRadius, BulletSettings.DamageRadius, FQuat::Identity, FColor::Red);
 	ImpactProjectile();
+}
+
+void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit)
+{
+	const IP13StateEffectInterface* StateEffectInterface = Cast<IP13StateEffectInterface>(Hit.GetActor());
+	if (!StateEffectInterface)
+	{
+		return;
+	}
+	if (!StateEffectInterface->GetCanApplyStateEffect(BulletSettings.StateEffectClass))
+	{
+		return;
+	}
+	
+	UP13Types::AddEffectBySurfaceType(Hit.GetActor(), BulletSettings.StateEffectClass, Hit.PhysMaterial->SurfaceType);
 }

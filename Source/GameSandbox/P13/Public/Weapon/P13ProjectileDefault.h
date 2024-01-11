@@ -41,6 +41,7 @@ public:
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
 	FORCEINLINE UProjectileMovementComponent* GetBulletMovement() const { return BulletMovement; };
+	FORCEINLINE TSubclassOf<UP13StateEffect> GetBulletStateEffect() const { return BulletSettings.StateEffectClass; }
 	void InitBullet(const float NewLifeSpan, const FP13ProjectileInfo& NewBulletSettings);
 
 protected:
@@ -52,12 +53,14 @@ protected:
 	void OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
 
 private:
-	void SpawnEffectsOnHit(const FHitResult& Hit, UPrimitiveComponent* OtherComp);
+	void SpawnEffectsOnHit(const FHitResult& Hit);
 	void ImpactProjectile();
 
 	void GivePointDamage(const FHitResult& Hit, AActor* OtherActor);
 	void GiveRadialDamage();
 
+	void SpawnStateEffect(const FHitResult& Hit);
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -82,4 +85,5 @@ protected:
 	
 private:
 	FTimerHandle ExplodeTimer;
+	FHitResult ProjectileHit;
 };

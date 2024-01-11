@@ -164,7 +164,7 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, 
 	check(CurrentWeapon)
 
 	/* Avoid dropping last weapon. */
-	if (WeaponSlots.Num() <= 1)
+if (WeaponSlots.Num() <= 1)
 	{
 		return;
 	}

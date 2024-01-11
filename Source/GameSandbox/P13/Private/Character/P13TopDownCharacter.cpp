@@ -5,6 +5,7 @@
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveLinearColor.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
@@ -12,6 +13,7 @@
 #include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
+#include "P13/Public/Weapon/P13ProjectileDefault.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
 AP13TopDownCharacter::AP13TopDownCharacter()
@@ -59,6 +61,8 @@ float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
 	AttributesComponent->ReceiveDamage(ActualDamage);
 
+	TakeStateEffectFromRadialDamage(DamageEvent, DamageCauser);
+	
 	return ActualDamage;
 }
 
@@ -199,6 +203,60 @@ void AP13TopDownCharacter::DropInput(const bool bTakeNext)
 {
 	check(InventoryComponent)
 	InventoryComponent->DropCurrentWeapon(CachedWeapon.Get(), bTakeNext);
+}
+
+EPhysicalSurface AP13TopDownCharacter::GetSurfaceType()
+{
+	const UMaterialInterface* MeshMaterial = GetMesh()->GetMaterial(0);
+	if (!MeshMaterial)
+	{
+		return SurfaceType_Default;
+	}
+	
+	const UPhysicalMaterial* PhysMaterial = MeshMaterial->GetPhysicalMaterial();
+	if (!PhysMaterial)
+	{
+		return SurfaceType_Default;
+	}
+	
+	return PhysMaterial->SurfaceType;
+}
+
+bool AP13TopDownCharacter::GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass) const
+{
+	check(AttributesComponent)
+	
+	const bool bNoShield = !AttributesComponent->GetShieldIsActive();
+	const bool bStackable = StateEffectClass && StateEffectClass.GetDefaultObject()->GetIsStackable();
+	const bool bUnique = !ActiveStateEffects.FindByPredicate([&](const UP13StateEffect* CompareEffect)
+	{
+		return CompareEffect->GetClass() == StateEffectClass;
+	});
+	
+	return bNoShield && (bStackable || bUnique);
+}
+
+void AP13TopDownCharacter::AddActiveStateEffect(UP13StateEffect* StateEffect)
+{
+	if (!StateEffect)
+	{
+		return;
+	}
+	ActiveStateEffects.Add(StateEffect);
+}
+
+void AP13TopDownCharacter::RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect)
+{
+	if (!InactiveStateEffect || !ActiveStateEffects.Contains(InactiveStateEffect))
+	{
+		return;
+	}
+	ActiveStateEffects.Remove(InactiveStateEffect);
+}
+
+TArray<UP13StateEffect*> AP13TopDownCharacter::GetAllActiveStateEffects() const
+{
+	return ActiveStateEffects;
 }
 
 void AP13TopDownCharacter::UpdateCharacter()
@@ -556,4 +614,23 @@ void AP13TopDownCharacter::UpdateMeshMaterial(const float HealthAlpha)
 		DynamicMaterial->SetVectorParameterValue("MainColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
 		DynamicMaterial->SetVectorParameterValue("PaintColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
 	}
+}
+
+void AP13TopDownCharacter::TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser)
+{
+	/* Check if current damage is radial. */
+	if (!DamageEvent.IsOfType(FRadialDamageEvent::ClassID))
+	{
+		return;
+	}
+	const AP13ProjectileDefault* Projectile = Cast<AP13ProjectileDefault>(DamageCauser);
+	if (!Projectile)
+	{
+		return;
+	}
+	if (!GetCanApplyStateEffect(Projectile->GetBulletStateEffect()))
+	{
+		return;
+	}
+	UP13Types::AddEffectBySurfaceType(this, Projectile->GetBulletStateEffect(), GetSurfaceType());
 }

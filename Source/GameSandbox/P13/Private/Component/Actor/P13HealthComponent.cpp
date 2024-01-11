@@ -43,5 +43,15 @@ void UP13HealthComponent::AddHealth(const float HealthAid)
 	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
+void UP13HealthComponent::ChangeHealth(const float Power)
+{
+	if (FMath::IsNearlyZero(Power))
+	{
+		return;	
+	}
+
+	Power > 0 ? AddHealth(Power) : ReceiveDamage(FMath::Abs(Power));
+}
+
 void UP13HealthComponent::OnDead()
 {}

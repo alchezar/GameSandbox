@@ -6,6 +6,7 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P13Types.generated.h"
 
+class UP13StateEffect;
 struct FP13WeaponInfo;
 class UNiagaraSystem;
 class AP13Weapon;
@@ -96,6 +97,9 @@ struct FP13ProjectileInfo
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FP13HitEffects OnHit;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UP13StateEffect> StateEffectClass = nullptr;
 };
 
 USTRUCT(BlueprintType)
@@ -262,4 +266,6 @@ class GAMESANDBOX_API UP13Types : public UBlueprintFunctionLibrary
 
 public:
 	UP13Types() {};
+
+	static void AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13StateEffect> StateEffectClass, const EPhysicalSurface SurfaceType);
 };

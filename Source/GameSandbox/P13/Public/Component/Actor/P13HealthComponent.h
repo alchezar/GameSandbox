@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
+#include "P13/Public/Effect/P13StateEffect.h"
 #include "P13HealthComponent.generated.h"
 
 
@@ -33,6 +34,7 @@ public:
 	FORCEINLINE void SetMaxHealth(const float NewMaxHealth) { MaxHealth = NewMaxHealth; }
 	virtual void ReceiveDamage(const float Damage);
 	virtual void AddHealth(const float HealthAid);
+	virtual void ChangeHealth(const float Power);
 
 protected:
 	void OnDead();
