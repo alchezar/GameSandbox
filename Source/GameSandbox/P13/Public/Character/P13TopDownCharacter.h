@@ -51,6 +51,7 @@ public:
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Interface                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* Input */
 public:
 	virtual void MoveInput(const FVector2D MoveVector) override;
 	virtual void SprintInput(const bool bStart) override;
@@ -62,12 +63,12 @@ public:
 	virtual void SwitchWeaponInput(const bool bNext) override;
 	virtual void DropInput(const bool bTakeNext) override;
 
+	/* StateEffect */
 public:
 	virtual EPhysicalSurface GetSurfaceType() override;
 	virtual bool GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass = nullptr) const override;
 	virtual void AddActiveStateEffect(UP13StateEffect* StateEffect) override;
 	virtual void RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect) override;
-	virtual TArray<UP13StateEffect*> GetAllActiveStateEffects() const override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
@@ -78,7 +79,7 @@ public:
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
 	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
-	void UpdateCharacter();
+	void UpdateCharacter() const;
 	void ChangeMovementState(const EP13MovementState NewMovementState);
 	FVector GetLookAtCursorDirection() const;
 

@@ -7,9 +7,9 @@
 #include "P13/Public/Component/Actor/P13HealthComponent.h"
 #include "P13/Public/Intearface/P13StateEffectInterface.h"
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                        State Effect Base Class                        *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                          State Effect Base Class                          *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 UP13StateEffect::UP13StateEffect()
 {}
@@ -24,7 +24,7 @@ void UP13StateEffect::InitObject(AActor* NewActor)
 	{
 		EffectInterface->AddActiveStateEffect(this);
 	}
-	
+
 	CachedActor = NewActor;
 }
 
@@ -34,19 +34,19 @@ void UP13StateEffect::DestroyObject()
 	{
 		return;
 	}
-	
+
 	if (IP13StateEffectInterface* EffectInterface = Cast<IP13StateEffectInterface>(CachedActor))
 	{
 		EffectInterface->RemoveInactiveStateEffect(this);
 	}
-	
+
 	CachedActor.Reset();
 	ConditionalBeginDestroy();
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                      State Effect Single Execute                      *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                       State Effect Single Execute                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void UP13SingleStateEffect::InitObject(AActor* NewActor)
 {
@@ -79,9 +79,9 @@ void UP13SingleStateEffect::ApplyEffect()
 	HealthComponent->ChangeHealth(Power);
 }
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                      State Effect Timer Execute                       *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                         State Effect Timer Execute                        *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 void UP13TimerStateEffect::InitObject(AActor* NewActor)
 {
@@ -91,12 +91,12 @@ void UP13TimerStateEffect::InitObject(AActor* NewActor)
 void UP13TimerStateEffect::DestroyObject()
 {
 	GetWorld()->GetTimerManager().ClearTimer(RateTimer);
-	
+
 	if (ParticleComponent)
 	{
 		ParticleComponent->DestroyComponent();
 	}
-	
+
 	Super::DestroyObject();
 }
 
@@ -119,6 +119,6 @@ void UP13TimerStateEffect::ApplyEffect()
 		DestroyObject();
 		return;
 	}
-	
+
 	Super::ApplyEffect();
 }

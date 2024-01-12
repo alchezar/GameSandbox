@@ -58,11 +58,11 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 
 float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser); 
+	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	AttributesComponent->ReceiveDamage(ActualDamage);
 
 	TakeStateEffectFromRadialDamage(DamageEvent, DamageCauser);
-	
+
 	return ActualDamage;
 }
 
@@ -90,7 +90,7 @@ void AP13TopDownCharacter::MoveInput(const FVector2D MoveVector)
 	{
 		return;
 	}
-	
+
 	const FVector ForwardDirection = GetActorForwardVector();
 	const FVector RightDirection = GetActorRightVector();
 
@@ -212,27 +212,27 @@ EPhysicalSurface AP13TopDownCharacter::GetSurfaceType()
 	{
 		return SurfaceType_Default;
 	}
-	
+
 	const UPhysicalMaterial* PhysMaterial = MeshMaterial->GetPhysicalMaterial();
 	if (!PhysMaterial)
 	{
 		return SurfaceType_Default;
 	}
-	
+
 	return PhysMaterial->SurfaceType;
 }
 
 bool AP13TopDownCharacter::GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass) const
 {
 	check(AttributesComponent)
-	
+
 	const bool bNoShield = !AttributesComponent->GetShieldIsActive();
 	const bool bStackable = StateEffectClass && StateEffectClass.GetDefaultObject()->GetIsStackable();
 	const bool bUnique = !ActiveStateEffects.FindByPredicate([&](const UP13StateEffect* CompareEffect)
 	{
 		return CompareEffect->GetClass() == StateEffectClass;
 	});
-	
+
 	return bNoShield && (bStackable || bUnique);
 }
 
@@ -254,12 +254,7 @@ void AP13TopDownCharacter::RemoveInactiveStateEffect(UP13StateEffect* InactiveSt
 	ActiveStateEffects.Remove(InactiveStateEffect);
 }
 
-TArray<UP13StateEffect*> AP13TopDownCharacter::GetAllActiveStateEffects() const
-{
-	return ActiveStateEffects;
-}
-
-void AP13TopDownCharacter::UpdateCharacter()
+void AP13TopDownCharacter::UpdateCharacter() const
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;
 
@@ -317,7 +312,7 @@ void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* Play
 	}
 }
 
-void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) 
+void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
 {
 	check(DamageDisplayComponent)
 
@@ -330,10 +325,10 @@ void AP13TopDownCharacter::OnShieldChangedHandle(const float NewShield, const fl
 {
 	check(DamageDisplayComponent)
 
-	DamageDisplayComponent->DisplayShield(LastDamage, ShieldAlpha) ;
+	DamageDisplayComponent->DisplayShield(LastDamage, ShieldAlpha);
 }
 
-void AP13TopDownCharacter::OnDeathHandle() 
+void AP13TopDownCharacter::OnDeathHandle()
 {
 	bDead = true;
 
@@ -362,7 +357,6 @@ void AP13TopDownCharacter::OnDeathHandle()
 	DetachFromControllerPendingDestroy();
 	SetLifeSpan(10.f);
 }
-
 
 void AP13TopDownCharacter::CreateComponents()
 {

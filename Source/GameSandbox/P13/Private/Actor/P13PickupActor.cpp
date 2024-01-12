@@ -2,102 +2,53 @@
 
 #include "P13/Public/Actor/P13PickupActor.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/SphereComponent.h"
+#include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
-#include "P13/Public/Intearface/P13PickupInterface.h"
 
-AP13PickupActor::AP13PickupActor()
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                              PickingUp Base                               *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma region Base
+
+AP13PickingUpBase::AP13PickingUpBase()
 {
-	PrimaryActorTick.bCanEverTick = true;
-
 	CreateComponents();
 }
 
-
-void AP13PickupActor::PostInitializeComponents()
+void AP13PickingUpBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnCollisionBeginOverlapHandle);
 }
 
-void AP13PickupActor::BeginPlay()
+void AP13PickingUpBase::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Collision->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	ActivateParticles();
 }
 
-void AP13PickupActor::Tick(const float DeltaTime)
+void AP13PickingUpBase::OnPickupSuccess()
 {
-	Super::Tick(DeltaTime);
+	if (UNiagaraComponent* PickedParticle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, Mesh->GetComponentLocation()))
+	{
+		PickedParticle->SetVariableLinearColor("Color", EffectColor);
+	}
+	Destroy();
 }
 
-void AP13PickupActor::InitDrop(const FP13WeaponDrop* DropWeaponInfo)
+void AP13PickingUpBase::ActivateParticles()
 {
-	/* Save init info. */
-	bDropped = true;
-	Mesh->SetStaticMesh(DropWeaponInfo->WeaponMesh);
-	WeaponSlot = DropWeaponInfo->WeaponInfo;
-
-	AmmoSlot = {WeaponSlot.AmmoType, 0, DropWeaponInfo->MaxCount};
-	PickupType = EP13PickupType::Weapon;
-
-	/* Start timer. */
-	GetWorld()->GetTimerManager().SetTimer(DropTimer, ActivationDelay, false);
+	if (UNiagaraComponent* WaitParticle = UNiagaraFunctionLibrary::SpawnSystemAttached(WaitEffect, Mesh, NAME_None, Mesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::KeepWorldPosition, false))
+	{
+		WaitParticle->SetVariableLinearColor("Color", EffectColor);
+	}
 }
 
-void AP13PickupActor::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer))
-	{
-		return;
-	}
-	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
-	if (!InventoryComponent)
-	{
-		return;
-	}
-	IP13PickupInterface* PickupInterface = Cast<IP13PickupInterface>(InventoryComponent);
-	if (!PickupInterface)
-	{
-		return;
-	}
-
-	/* Add ammo to the inventory. */
-	if (PickupType == EP13PickupType::Ammo)
-	{
-		if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot))
-		{
-			return;
-		}
-	}
-
-	/* Add weapon to the inventory. */
-	else if (PickupType == EP13PickupType::Weapon)
-	{
-		/* If weapon wasn't ever picked up before - magazine will be full. */
-		if (!bDropped)
-		{
-			WeaponSlot.DynamicInfo.Round = WeaponSlot.MaxRound;
-		}
-		const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
-		
-		/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
-		 * try to add an empty one, by resetting count in ammo slot. */
-		AmmoSlot.Count = bWeaponTaken ? 0 : AmmoSlot.Count;
-		
-		/* Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
-		if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot) && !bWeaponTaken)
-		{
-			return;
-		}
-	}
-
-	OnPickupSuccess();
-}
-
-void AP13PickupActor::CreateComponents()
+void AP13PickingUpBase::CreateComponents()
 {
 	SceneRoot = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	SetRootComponent(SceneRoot);
@@ -117,7 +68,146 @@ void AP13PickupActor::CreateComponents()
 	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
-void AP13PickupActor::OnPickupSuccess()
+#pragma endregion Base
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                              PickingUp Aid                                *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma region Aid
+
+AP13PickingUpAid::AP13PickingUpAid()
 {
-	Destroy();
+	Mesh->SetSimulatePhysics(false);
 }
+
+void AP13PickingUpAid::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Super::OnCollisionBeginOverlapHandle(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+
+	UP13CharacterAttributesComponent* AttributesComponent = OtherActor->FindComponentByClass<UP13CharacterAttributesComponent>();
+	if (!AttributesComponent || AttributesComponent->GetIsHealthFull())
+	{
+		return;
+	}
+	AttributesComponent->AddHealth(HealthAid);
+
+	OnPickupSuccess();
+}
+
+#pragma endregion Aid
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                              PickingUp Ammo                               *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma region Ammo
+
+void AP13PickingUpAmmo::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Collision->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+}
+
+void AP13PickingUpAmmo::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
+	if (!InventoryComponent)
+	{
+		return;
+	}
+	IP13PickupInterface* PickupInterface = Cast<IP13PickupInterface>(InventoryComponent);
+	if (!PickupInterface)
+	{
+		return;
+	}
+
+	/* Try to add ammo to the inventory. */
+	if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot))
+	{
+		return;
+	}
+	OnPickupSuccess();
+}
+
+#pragma endregion Ammo
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                             PickingUp Weapon                              *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#pragma region Weapon
+
+void AP13PickingUpWeapon::BeginPlay()
+{
+	Super::BeginPlay();
+
+	/* If weapon wasn't ever picked up before - magazine will be full. */
+	if (!bDropped)
+	{
+		WeaponSlot.DynamicInfo.Round = WeaponSlot.MaxRound;
+	}
+}
+
+void AP13PickingUpWeapon::InitDrop(const FP13WeaponDrop* DropWeaponInfo)
+{
+	/* Save init info. */
+	bDropped = true;
+	Mesh->SetStaticMesh(DropWeaponInfo->WeaponMesh);
+	WeaponSlot = DropWeaponInfo->WeaponInfo;
+
+	WaitEffect = DropWeaponInfo->WaitEffect;
+	PickupEffect = DropWeaponInfo->PickupEffect;
+	EffectColor = DropWeaponInfo->EffectColor;
+
+	AmmoSlot = {WeaponSlot.AmmoType, DropWeaponInfo->WeaponInfo.DynamicInfo.Round, DropWeaponInfo->MaxCount};
+
+	/* Start timer. */
+	GetWorld()->GetTimerManager().SetTimer(DropTimer, this, &ThisClass::MakePickableAfterDrop, ActivationDelay, false);
+}
+
+void AP13PickingUpWeapon::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer))
+	{
+		return;
+	}
+	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
+	if (!InventoryComponent)
+	{
+		return;
+	}
+	IP13PickupInterface* PickupInterface = Cast<IP13PickupInterface>(InventoryComponent);
+	if (!PickupInterface)
+	{
+		return;
+	}
+
+	/* Try to add weapon to the inventory. */
+	const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
+
+	/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
+	 * try to add an empty one, by resetting count in ammo slot. */
+	AmmoSlot.Count = bWeaponTaken ? 0 : AmmoSlot.Count;
+
+	/* Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
+	if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot) && !bWeaponTaken)
+	{
+		return;
+	}
+	OnPickupSuccess();
+}
+
+void AP13PickingUpWeapon::ActivateParticles()
+{
+	if (!bDropped)
+	{
+		Super::ActivateParticles();
+	}
+}
+
+void AP13PickingUpWeapon::MakePickableAfterDrop()
+{
+	bDropped = false;
+	ActivateParticles();
+}
+
+#pragma endregion Weapon

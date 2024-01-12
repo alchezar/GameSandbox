@@ -6,9 +6,9 @@
 #include "UObject/Object.h"
 #include "P13StateEffect.generated.h"
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                        State Effect Base Class                        *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                          State Effect Base Class                          *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 class UNiagaraComponent;
 class UNiagaraSystem;
@@ -20,7 +20,7 @@ class GAMESANDBOX_API UP13StateEffect : public UObject
 
 public:
 	UP13StateEffect();
-	
+
 public:
 	FORCEINLINE TArray<TEnumAsByte<EPhysicalSurface>> GetPossibleInteractSurfaces() const { return PossibleInteractSurfaces; }
 	FORCEINLINE bool GetIsStackable() const { return bStackable; }
@@ -28,7 +28,7 @@ public:
 	virtual void DestroyObject();
 
 public:
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TArray<TEnumAsByte<EPhysicalSurface>> PossibleInteractSurfaces;
@@ -38,10 +38,9 @@ protected:
 	TWeakObjectPtr<AActor> CachedActor;
 };
 
-
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                      State Effect Single Execute                      *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                       State Effect Single Execute                         *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 UCLASS()
 class UP13SingleStateEffect : public UP13StateEffect
@@ -56,7 +55,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
-	float Power = 20.f;	
+	float Power = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UNiagaraSystem* Particle;
 
@@ -64,9 +63,9 @@ protected:
 	UNiagaraComponent* ParticleComponent;
 };
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                      State Effect Timer Execute                       *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                         State Effect Timer Execute                        *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 UCLASS()
 class UP13TimerStateEffect : public UP13SingleStateEffect
@@ -81,7 +80,7 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
-	float Duration = 5.f;	
+	float Duration = 5.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float Rate = 1.f;
 

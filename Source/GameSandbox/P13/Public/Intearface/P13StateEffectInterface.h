@@ -22,5 +22,4 @@ public:
 	virtual bool GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass = nullptr) const = 0;
 	virtual void AddActiveStateEffect(UP13StateEffect* StateEffect) = 0;
 	virtual void RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect) = 0;
-	virtual TArray<UP13StateEffect*> GetAllActiveStateEffects() const = 0;
 };

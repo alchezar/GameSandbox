@@ -60,7 +60,7 @@ private:
 	void GiveRadialDamage();
 
 	void SpawnStateEffect(const FHitResult& Hit);
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -82,7 +82,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UParticleSystem* ExplodeEffect = nullptr;
-	
+
 private:
 	FTimerHandle ExplodeTimer;
 	FHitResult ProjectileHit;

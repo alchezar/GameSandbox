@@ -13,7 +13,6 @@ class GAMESANDBOX_API UP13HealthWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                Super                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -27,7 +26,7 @@ protected:
 	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha) const;
 	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) const;
 	void OnDeathHandle();
-	
+
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

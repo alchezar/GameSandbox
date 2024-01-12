@@ -250,7 +250,7 @@ struct FP13WeaponDrop : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	UNiagaraSystem* WaitEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
-	UNiagaraSystem* PickupEffect;	
+	UNiagaraSystem* PickupEffect;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effect")
 	FLinearColor EffectColor = FLinearColor::White;
 };
