@@ -255,6 +255,19 @@ struct FP13WeaponDrop : public FTableRowBase
 	FLinearColor EffectColor = FLinearColor::White;
 };
 
+USTRUCT(BlueprintType)
+struct FP13LevelSelect : public  FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FName Address;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FText Name;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	UTexture2D* Icon;
+};
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                                 Class                                 *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */

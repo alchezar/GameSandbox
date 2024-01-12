@@ -3,34 +3,45 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "P13PickupBase.h"
-#include "P13PickupAid.generated.h"
+#include "Blueprint/UserWidget.h"
+#include "P13LevelButtonWidget.generated.h"
 
-UCLASS(Blueprintable)
-class GAMESANDBOX_API AP13PickupAid : public AP13PickupBase
+struct FP13LevelSelect;
+class UButton;
+class UImage;
+class UTextBlock;
+
+UCLASS()
+class GAMESANDBOX_API UP13LevelButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                Super                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-
-public:
-	AP13PickupAid();
-
 protected:
-	virtual void BeginPlay() override;
-
+	virtual void NativeConstruct() override;
+	
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+public:
+	void InitLevelButton(const FP13LevelSelect* NewLevel);
+
 protected:
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	
+	UFUNCTION()
+	void OnLevelButtonPressed();
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
-	UPROPERTY(EditAnywhere, Category = "C++")
-	float HealthAid = 50.f;
-}; 
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* LevelName;
+	UPROPERTY(meta = (BindWidget))
+	UImage* LevelIcon;
+	UPROPERTY(meta = (BindWidget))
+	UButton* LevelButton;
+
+private:
+	FName LevelAddress;
+};

@@ -3,11 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "P13PickupAmmo.h"
-#include "P13PickupWeapon.generated.h"
+#include "GameFramework/GameModeBase.h"
+#include "P13GameModeMenu.generated.h"
+
+class UP13MainMenuWidget;
 
 UCLASS()
-class GAMESANDBOX_API AP13PickupWeapon : public AP13PickupAmmo
+class GAMESANDBOX_API AP13GameModeMenu : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -15,30 +17,26 @@ class GAMESANDBOX_API AP13PickupWeapon : public AP13PickupAmmo
 	 *                                Super                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 public:
-	AP13PickupWeapon();
-
+	AP13GameModeMenu(){}
+	
 protected:
 	virtual void BeginPlay() override;
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                                 This                                  *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-public:
-	void InitDrop(const FP13WeaponDrop* DropWeaponInfo);
-	
-protected:
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+private:
+	void ShowMainMenu();
+	void SetMenuInputMode();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
 	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 protected:
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
-	FP13WeaponSlot WeaponSlot;
-	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))
-	float ActivationDelay = 3.f;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP13MainMenuWidget> MainMenuWidgetClass;
 
 private:
-	FTimerHandle DropTimer;
-	bool bDropped = false;
+	UPROPERTY()
+	UP13MainMenuWidget* MainMenuWidget = nullptr;
 };
