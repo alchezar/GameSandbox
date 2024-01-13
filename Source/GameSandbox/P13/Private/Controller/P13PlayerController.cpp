@@ -77,6 +77,7 @@ void AP13PlayerController::SetPawn(APawn* InPawn)
 void AP13PlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
+	SetGameInputMode();	
 	
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 }
@@ -279,4 +280,13 @@ bool AP13PlayerController::GetCanControlledCharacterMove() const
 		return false;
 	}
 	return true;
+}
+
+void AP13PlayerController::SetGameInputMode()
+{
+	FInputModeGameOnly GIMode;
+	GIMode.SetConsumeCaptureMouseDown(false);
+	
+	SetInputMode(GIMode);
+	bShowMouseCursor = false;
 }

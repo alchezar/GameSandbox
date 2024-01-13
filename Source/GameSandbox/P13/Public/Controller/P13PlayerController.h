@@ -59,6 +59,7 @@ private:
 	void SpawnCursorDecal();
 	void UpdateCursorDecalPosition() const;
 	bool GetCanControlledCharacterMove() const;
+	void SetGameInputMode();
 
 	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
 	 *                               Variables                               *
