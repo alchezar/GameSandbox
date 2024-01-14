@@ -9,7 +9,10 @@
 #include "P13InventoryComponent.generated.h"
 
 class UP13GameInstance;
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponSignature, const FP13WeaponSlot& /*NewWeaponSLot*/, const int32 /*CurrentIndex*/)
+class AP13Weapon;
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponStartSignature, const FP13WeaponSlot& /*NewWeaponSLot*/, const int32 /*CurrentIndex*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponFinishSignature, const int32 /*NewWeaponIndex*/, AP13Weapon* /*NewWeapon*/)
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13AmmoType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FP13WeaponSlot& /*NewWeaponSLot*/);
@@ -20,9 +23,7 @@ class GAMESANDBOX_API UP13InventoryComponent : public UActorComponent, public IP
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	UP13InventoryComponent();
 
@@ -32,16 +33,12 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Interface                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Interface ----------------------------- */
 public:
 	virtual bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot) override;
 	virtual bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE int32 GetWeaponSlotsCount() const { return WeaponSlots.Num(); }
 	FORCEINLINE int32 GetAmmoSlotsCount() const { return AmmoSlots.Num(); }
@@ -61,11 +58,10 @@ public:
 private:
 	bool TryUpdateSlotsFromData();
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 public:
-	FP13OnSwitchWeaponSignature OnSwitchWeapon;
+	FP13OnSwitchWeaponStartSignature OnSwitchWeaponStart;
+	FP13OnSwitchWeaponFinishSignature OnSwitchWeaponFinish;
 	FP13OnAmmoChangedSignature OnAmmoChanged;
 	FP13OnInventoryUpdatedSingature OnInventoryUpdated;
 	FP13OnNewWeaponTakenSignature OnNewWeaponTaken;

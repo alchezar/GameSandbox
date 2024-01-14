@@ -14,16 +14,12 @@ class GAMESANDBOX_API UP13DamageDisplayWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 	virtual void NativeTick(const FGeometry& MyGeometry, const float InDeltaTime) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	void SetupDamageWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset);
 	void SetupShieldWidget(const USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor = FLinearColor::Blue);
@@ -31,9 +27,7 @@ public:
 private:
 	void UpdateScreenLocation();
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* DamageText;

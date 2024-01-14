@@ -13,26 +13,20 @@ class GAMESANDBOX_API AP13GameModeMenu : public AGameModeBase
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
-	AP13GameModeMenu(){}
-	
+	AP13GameModeMenu() {}
+
 protected:
 	virtual void BeginPlay() override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 private:
 	void ShowMainMenu();
 	void SetMenuInputMode();
 	void SetGameInputMode();
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13MenuWidget> MainMenuWidgetClass;

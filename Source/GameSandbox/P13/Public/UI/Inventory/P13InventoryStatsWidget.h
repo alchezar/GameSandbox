@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P13InventoryStatsWidget.generated.h"
 
+class AP13Weapon;
 class UP13InventoryComponent;
 class UP13GameInstance;
 class UHorizontalBox;
@@ -19,15 +20,11 @@ class GAMESANDBOX_API UP13InventoryStatsWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 protected:
 	void ShowAllWeapons() const;
 	void ShowAllAmmo() const;
@@ -39,10 +36,9 @@ private:
 	void ShowStatWidgets();
 	void AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot) const;
 	void AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoSlot) const;
+	void OnWeaponSwitchFinishHandle(const int32 WeaponIndex, AP13Weapon* NewWeapon);
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13SlotWeaponWidget> WeaponSlotClass;

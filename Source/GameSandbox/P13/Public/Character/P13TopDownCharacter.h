@@ -32,9 +32,7 @@ class GAMESANDBOX_API AP13TopDownCharacter : public ACharacter, public IP13Input
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13TopDownCharacter();
 	virtual void PostInitializeComponents() override;
@@ -48,9 +46,7 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void Tick(const float DeltaTime) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Interface                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Interface ----------------------------- */
 	/* Input */
 public:
 	virtual void MoveInput(const FVector2D MoveVector) override;
@@ -70,9 +66,7 @@ public:
 	virtual void AddActiveStateEffect(UP13StateEffect* StateEffect) override;
 	virtual void RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
 	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
@@ -104,15 +98,13 @@ private:
 	bool CheckCharacterCanFire() const;
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
 	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
-	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim);
-	void OnWeaponReloadFinishHandle(const int32 RoundNum);
+	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime);
+	void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess);
 	void CreateDynamicMeshMaterials();
 	void UpdateMeshMaterial(const float HealthAlpha);
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UCameraComponent* TopDownCamera;

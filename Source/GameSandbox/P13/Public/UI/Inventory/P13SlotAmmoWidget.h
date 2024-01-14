@@ -18,15 +18,11 @@ class GAMESANDBOX_API UP13SlotAmmoWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	virtual void NativeConstruct() override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE int32 GetAmmoCount() const { return AmmoCount; }
 	FORCEINLINE EP13AmmoType GetAmmoType() const { return AmmoType; }
@@ -39,9 +35,7 @@ private:
 	void UpdateAmmoCount(const int32 NewCount) const;
 	void UpdateAmmoUsageStatus(const EP13AmmoType TypeToCompare) const;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TMap<EP13AmmoType, UTexture2D*> AmmoIcons;

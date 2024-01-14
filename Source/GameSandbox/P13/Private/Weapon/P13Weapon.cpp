@@ -40,9 +40,10 @@ FVector AP13Weapon::GetShootLocation() const
 	return ShootLocation->GetComponentLocation();
 }
 
-void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo)
+void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const int32 NewWeaponIndex, const FP13WeaponDynamicInfo* DynamicInfo)
 {
 	WeaponSettings = WeaponInfo;
+	WeaponIndex = NewWeaponIndex;
 	FinishReload();
 	UpdateWeaponState(NewState);
 	UpdateWeaponDynamicInfo(DynamicInfo);
@@ -276,7 +277,7 @@ void AP13Weapon::StartReload()
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, ReloadDelegate, WeaponSettings->ReloadTime, false);
 
 	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
-	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim);
+	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim, WeaponIndex, WeaponSettings->ReloadTime);
 }
 
 void AP13Weapon::FinishReload(const bool bSuccess)
@@ -288,13 +289,10 @@ void AP13Weapon::FinishReload(const bool bSuccess)
 	bReloading = false;
 
 	/* Recover fire if weapon trigger is still pulled. */
-	if (bTriggerPulled)
-	{
-		SetFireState(true);
-	}
+	SetFireState(bTriggerPulled);
 
 	/* Stop all montages (character and weapon) and update info in UI. */
-	OnWeaponReloadFinish.Broadcast(WeaponCurrentSettings.Round);
+	OnWeaponReloadFinish.Broadcast(WeaponCurrentSettings.Round, WeaponIndex, bSuccess);
 	StopAnimMontage(WeaponSettings->WeaponReloadAnim);
 }
 

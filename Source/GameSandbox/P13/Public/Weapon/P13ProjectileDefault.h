@@ -23,9 +23,7 @@ class GAMESANDBOX_API AP13ProjectileDefault : public AActor
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13ProjectileDefault();
 	virtual void PostInitializeComponents() override;
@@ -36,9 +34,7 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE UProjectileMovementComponent* GetBulletMovement() const { return BulletMovement; };
 	FORCEINLINE TSubclassOf<UP13StateEffect> GetBulletStateEffect() const { return BulletSettings.StateEffectClass; }
@@ -61,9 +57,7 @@ private:
 
 	void SpawnStateEffect(const FHitResult& Hit);
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	USphereComponent* BulletCollision;

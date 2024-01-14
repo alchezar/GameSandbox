@@ -7,11 +7,12 @@
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/UI/Inventory/P13SlotAmmoWidget.h"
 #include "P13/Public/UI/Inventory/P13SlotWeaponWidget.h"
+#include "P13/Public/Weapon/P13Weapon.h"
 
 void UP13InventoryStatsWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	GameInstanceCached = GetWorld()->GetGameInstance<UP13GameInstance>();
 	check(GameInstanceCached.IsValid())
 
@@ -69,6 +70,7 @@ void UP13InventoryStatsWidget::CacheInventoryComponent()
 	InventoryComponentCached->OnInventoryUpdated.AddUObject(this, &ThisClass::ShowStatWidgets);
 	InventoryComponentCached->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
 	InventoryComponentCached->OnNewAmmoTaken.AddUObject(this, &ThisClass::OnNewAmmoTakenHandle);
+	InventoryComponentCached->OnSwitchWeaponFinish.AddUObject(this, &ThisClass::OnWeaponSwitchFinishHandle);
 }
 
 void UP13InventoryStatsWidget::ShowStatWidgets()
@@ -86,7 +88,7 @@ void UP13InventoryStatsWidget::AddNewWeaponSlotWidget(const int32 NewWeaponIndex
 	}
 	SlotWeaponWidget->InitSlot(NewWeaponIndex, NewWeaponSlot);
 	SlotWeaponWidget->AddToViewport();
-	InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
+	InventoryComponentCached->OnSwitchWeaponStart.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
 	InventoryComponentCached->OnAmmoChanged.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnAmmoChangedHandle);
 
 	WeaponBox->AddChild(SlotWeaponWidget);
@@ -101,8 +103,32 @@ void UP13InventoryStatsWidget::AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoS
 	}
 	SlotAmmoWidget->InitSlot(NewAmmoSlot);
 	SlotAmmoWidget->AddToViewport();
-	InventoryComponentCached->OnSwitchWeapon.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnWeaponChangedHandle);
+	InventoryComponentCached->OnSwitchWeaponStart.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnWeaponChangedHandle);
 	InventoryComponentCached->OnAmmoChanged.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnAmmoChangedHandle);
 
 	AmmoBox->AddChild(SlotAmmoWidget);
+}
+
+void UP13InventoryStatsWidget::OnWeaponSwitchFinishHandle(const int32 WeaponIndex, AP13Weapon* NewWeapon)
+{
+	if (!NewWeapon)
+	{
+		return;
+	}
+
+	for (auto* SlotWeapon : WeaponBox->GetAllChildren())
+	{
+		UP13SlotWeaponWidget* SlotWeaponWidget = Cast<UP13SlotWeaponWidget>(SlotWeapon);
+		if (!SlotWeaponWidget)
+		{
+			continue;
+		}
+		if (SlotWeaponWidget->GetCurrentWeaponIndex() != WeaponIndex)
+		{
+			continue;
+		}
+
+		NewWeapon->OnWeaponReloadStart.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponStartReloadingHandle);
+		NewWeapon->OnWeaponReloadFinish.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponFinishReloadingHandle);
+	}
 }

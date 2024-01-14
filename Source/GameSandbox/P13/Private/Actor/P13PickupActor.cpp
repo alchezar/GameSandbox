@@ -11,7 +11,6 @@
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Base                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Base
 
 AP13PickingUpBase::AP13PickingUpBase()
 {
@@ -68,12 +67,9 @@ void AP13PickingUpBase::CreateComponents()
 	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
-#pragma endregion Base
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Aid                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Aid
 
 AP13PickingUpAid::AP13PickingUpAid()
 {
@@ -94,12 +90,9 @@ void AP13PickingUpAid::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overla
 	OnPickupSuccess();
 }
 
-#pragma endregion Aid
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Ammo                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Ammo
 
 void AP13PickingUpAmmo::BeginPlay()
 {
@@ -129,12 +122,9 @@ void AP13PickingUpAmmo::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overl
 	OnPickupSuccess();
 }
 
-#pragma endregion Ammo
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                             PickingUp Weapon                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Weapon
 
 void AP13PickingUpWeapon::BeginPlay()
 {
@@ -209,5 +199,3 @@ void AP13PickingUpWeapon::MakePickableAfterDrop()
 	bDropped = false;
 	ActivateParticles();
 }
-
-#pragma endregion Weapon

@@ -13,9 +13,7 @@ class GAMESANDBOX_API UP13CharacterAttributesComponent : public UP13HealthCompon
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	UP13CharacterAttributesComponent();
 
@@ -25,9 +23,7 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	virtual void ReceiveDamage(const float Damage) override;
 	FORCEINLINE bool GetShieldIsActive() const { return Shield > 0.f; }
@@ -35,9 +31,7 @@ public:
 private:
 	void ShieldRecoveryTick(const float DeltaTime);
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnShieldChangesHandle OnShieldChanged;
 

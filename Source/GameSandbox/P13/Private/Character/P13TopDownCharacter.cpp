@@ -36,7 +36,7 @@ void AP13TopDownCharacter::PostInitializeComponents()
 
 	if (InventoryComponent)
 	{
-		InventoryComponent->OnSwitchWeapon.AddUObject(this, &ThisClass::InitWeapon);
+		InventoryComponent->OnSwitchWeaponStart.AddUObject(this, &ThisClass::InitWeapon);
 	}
 	if (AttributesComponent)
 	{
@@ -500,13 +500,16 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 		return;
 	}
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-	CachedWeapon->WeaponInit(WeaponInfo, MovementState, &NewWeaponSlot.DynamicInfo);
+	CachedWeapon->WeaponInit(WeaponInfo, MovementState, CurrentIndex, &NewWeaponSlot.DynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
 	CachedWeapon->OnWeaponReloadInit.AddUObject(this, &ThisClass::OnWeaponReloadInitHandle);
 	CachedWeapon->OnWeaponReloadStart.AddUObject(this, &ThisClass::OnWeaponReloadStartHandle);
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
 
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
+
+	AP13Weapon* Weapon = CachedWeapon.Get();
+	InventoryComponent->OnSwitchWeaponFinish.Broadcast(CurrentIndex, Weapon);
 }
 
 void AP13TopDownCharacter::FocusOnCursor(const bool bOn)
@@ -578,12 +581,12 @@ void AP13TopDownCharacter::OnWeaponReloadInitHandle(const int32 OldRoundNum)
 	CachedWeapon->SetMaxAvailableRound(MagazineSize);
 }
 
-void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim)
+void AP13TopDownCharacter::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime)
 {
 	PlayAnimMontage(CharReloadAnim);
 }
 
-void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum)
+void AP13TopDownCharacter::OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess)
 {
 	StopAnimMontage();
 	InventoryComponent->SetWeaponInfo({RoundNum}, true);

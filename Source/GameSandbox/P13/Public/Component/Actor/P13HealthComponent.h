@@ -4,9 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "P13/Public/Effect/P13StateEffect.h"
 #include "P13HealthComponent.generated.h"
-
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnHealthChangedSignature, float /*NewHealth*/, float /*LastDamage*/, float /*HealthAlpha*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnHealthOverSignature)
@@ -16,18 +14,14 @@ class GAMESANDBOX_API UP13HealthComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	UP13HealthComponent();
 
 protected:
 	virtual void BeginPlay() override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE bool GetIsHealthFull() const { return FMath::IsNearlyEqual(Health, MaxHealth); }
 	FORCEINLINE float GetCurrentHealth() const { return Health; }
@@ -38,17 +32,15 @@ public:
 
 protected:
 	void OnDead();
-	
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnHealthChangedSignature OnHealthChanged;
 	FP13OnHealthOverSignature OnHealthOver;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Attribute", meta = (ClampMin = 1.f, UIMin = 1.f))
- 	float MaxHealth = 100.f;
+	float MaxHealth = 100.f;
 
 private:
 	float Health = 0.f;

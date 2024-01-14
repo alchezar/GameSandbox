@@ -13,9 +13,8 @@ class GAMESANDBOX_API UP13DamageDisplayComponent : public USceneComponent
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
+
 public:
 	UP13DamageDisplayComponent();
 
@@ -25,17 +24,13 @@ protected:
 public:
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	void DisplayDamage(const float CurrentDamage, const float HealthAlpha);
 	void DisplayShield(const float CurrentDamage, const float ShieldAlpha);
 	UP13DamageDisplayWidget* CreateDamageWidget(FVector2D& Offset) const;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage Display")
 	TSubclassOf<UP13DamageDisplayWidget> DamageDisplayWidgetClass;

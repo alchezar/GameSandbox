@@ -18,9 +18,7 @@ class GAMESANDBOX_API AP13PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13PlayerController();
 
@@ -33,9 +31,7 @@ protected:
 public:
 	virtual void Tick(const float DeltaSeconds) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 protected:
 	void OnInputStarted();
 	/* Triggered every frame when the input is held down. */
@@ -61,9 +57,7 @@ private:
 	bool GetCanControlledCharacterMove() const;
 	void SetGameInputMode();
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnHitUnderCursorChangedSignature OnHitUnderCursorChanged;
 
@@ -92,7 +86,7 @@ protected:
 	UInputAction* PreviousWeaponAction = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputAction* DropAction = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")
 	float ShortPressThreshold = 0.15f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Cursor")

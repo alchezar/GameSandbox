@@ -15,7 +15,6 @@ class USphereComponent;
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Base                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Base
 
 UCLASS(Abstract, NotBlueprintable)
 class GAMESANDBOX_API AP13PickingUpBase : public AActor
@@ -57,12 +56,9 @@ protected:
 	FLinearColor EffectColor = FColor::White;
 };
 
-#pragma endregion Base
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                               PickingUp Aid                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Aid
 
 UCLASS(Blueprintable)
 class GAMESANDBOX_API AP13PickingUpAid : public AP13PickingUpBase
@@ -83,12 +79,9 @@ protected:
 	float HealthAid = 50.f;
 };
 
-#pragma endregion Aid
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Ammo                               *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Ammo
 
 UCLASS(Blueprintable)
 class GAMESANDBOX_API AP13PickingUpAmmo : public AP13PickingUpBase
@@ -112,12 +105,9 @@ protected:
 	FP13AmmoSlot AmmoSlot = {EP13AmmoType::Default, 0, 0};
 };
 
-#pragma endregion Ammo
-
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                             PickingUp Weapon                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-#pragma region Weapon
 
 UCLASS()
 class GAMESANDBOX_API AP13PickingUpWeapon : public AP13PickingUpAmmo
@@ -152,5 +142,3 @@ private:
 	FTimerHandle DropTimer;
 	bool bDropped = false;
 };
-
-#pragma endregion Weapon

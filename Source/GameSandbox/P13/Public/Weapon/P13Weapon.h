@@ -11,17 +11,15 @@ class UArrowComponent;
 
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnWeaponFireSignature, UAnimMontage* /* CharFireMontage */, const int32 /*CurrentRound*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadInitSignature, int32 /*OldRoundNum*/)
-DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadStartSignature, UAnimMontage* /* CharFireMontage */)
-DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnWeaponReloadFinishSignature, int32 /*NewRoundNum*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnWeaponReloadStartSignature, UAnimMontage* /* CharFireMontage */, int32 /*WeaponIndex*/, float /*ReloadingTime*/)
+DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnWeaponReloadFinishSignature, int32 /*NewRoundNum*/, int32/*WeaponIndex*/, const bool /*bSuccess*/)
 
 UCLASS()
 class GAMESANDBOX_API AP13Weapon : public AActor
 {
 	GENERATED_BODY()
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                Super                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13Weapon();
 
@@ -31,15 +29,13 @@ protected:
 public:
 	virtual void Tick(const float DeltaTime) override;
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                                 This                                  *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
 	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return MeshWeapon; };
 	FORCEINLINE FP13WeaponDynamicInfo GetDynamicInfo() const { return WeaponCurrentSettings; }
 	FVector GetShootLocation() const;
-	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
+	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const int32 NewWeaponIndex, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
 	void UpdateWeaponState(const EP13MovementState NewState);
 	void UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo);
 	void SetTargetLocation(const FVector& TargetLocation);
@@ -63,9 +59,7 @@ private:
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None);
 	void StopAnimMontage(const UAnimMontage* AnimMontage);
 
-	/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
-	 *                               Variables                               *
-	 * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnWeaponFireSignature OnWeaponFire;
 	FP13OnWeaponReloadInitSignature OnWeaponReloadInit;
@@ -95,4 +89,5 @@ private:
 	FP13DispersionType CurrentDispersion;
 	int32 MaxAvailableRound = 0;
 	bool bTriggerPulled = false;
+	int32 WeaponIndex = 0;
 };

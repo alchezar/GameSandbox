@@ -40,7 +40,7 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 	WeaponSlots.Add(NewWeaponSlot);
 
 	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
-	OnSwitchWeapon.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
 
@@ -139,7 +139,7 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 
 		}
 
 		CurrentWeaponIndex = Index;
-		OnSwitchWeapon.Broadcast(WeaponSlots[Index], Index);
+		OnSwitchWeaponStart.Broadcast(WeaponSlots[Index], Index);
 		return true;
 	}
 	/* Weapon switch wasn't successful. */
@@ -203,7 +203,7 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, 
 	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
 
 	OnInventoryUpdated.Broadcast();
-	OnSwitchWeapon.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 }
 
 void UP13InventoryComponent::ClearWeaponSlots()
@@ -269,6 +269,6 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 
 	SortAmmoSlots();
 	OnInventoryUpdated.Broadcast();
-	OnSwitchWeapon.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
