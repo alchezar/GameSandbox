@@ -12,7 +12,9 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "P13/Public/Game/P13GameMode.h"
 #include "P13/Public/Game/P13HeadsUpDisplay.h"
+#include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Intearface/P13InputInterface.h"
 
 AP13PlayerController::AP13PlayerController()
@@ -27,6 +29,7 @@ void AP13PlayerController::BeginPlay()
 	Super::BeginPlay();
 	AddDefaultMappingContext();
 	SpawnCursorDecal();
+	SetNewInputMode();
 }
 
 void AP13PlayerController::SetupInputComponent()
@@ -67,19 +70,45 @@ void AP13PlayerController::SetupInputComponent()
 void AP13PlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
+}
 
-	if (AP13HeadsUpDisplay* HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>())
+void AP13PlayerController::OnPossess(APawn* InPawn)
+{
+	Super::OnPossess(InPawn);
+	
+	if (!InPawn)
 	{
-		HeadsUpDisplay->ShotInGame();
+		return;
 	}
+
+	/* When we Possess the player - cache HUD and show main widget. */
+	HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>();
+	if (!HeadsUpDisplay)
+	{
+		return;
+	}
+	HeadsUpDisplay->ShowInGame();
 }
 
 void AP13PlayerController::OnUnPossess()
 {
 	Super::OnUnPossess();
-	SetGameInputMode();	
+
+	if (HeadsUpDisplay)
+	{
+		HeadsUpDisplay->ClearInGame();
+	}
 	
+	if (TryRespawnOnUnPossess())
+	{
+		return;
+	}
+	
+	/* After the final UnPossess we need to show End Game widget. */
+	SetNewInputMode(false);	
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
+
+	HeadsUpDisplay->ShowEndGame();		
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
@@ -282,11 +311,45 @@ bool AP13PlayerController::GetCanControlledCharacterMove() const
 	return true;
 }
 
-void AP13PlayerController::SetGameInputMode()
+void AP13PlayerController::SetNewInputMode(const bool bGame)
 {
-	FInputModeGameOnly GIMode;
-	GIMode.SetConsumeCaptureMouseDown(false);
+	if (bGame)
+	{
+		FInputModeGameOnly GIMode;
+		GIMode.SetConsumeCaptureMouseDown(false);
+		
+		SetInputMode(GIMode);
+		bShowMouseCursor = false;
+		return;
+	}
 	
-	SetInputMode(GIMode);
-	bShowMouseCursor = false;
+	/* Means UI. */		
+	FInputModeUIOnly UIMode;
+	UIMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
+	
+	SetInputMode(UIMode);
+	bShowMouseCursor = true;
+}
+
+bool AP13PlayerController::TryRespawnOnUnPossess()
+{
+	AP13GameMode* GameMode = GetWorld()->GetAuthGameMode<AP13GameMode>();
+	if (!GameMode)
+	{
+		return false;
+	}
+	
+	const AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>();
+	if (!DeadPlayerState)
+	{
+		 return false;
+	}
+	
+	if (!DeadPlayerState->GetPlayerCanRespawn())
+	{
+		return false;
+	}
+	
+	GameMode->Respawn(this);
+	return true;
 }

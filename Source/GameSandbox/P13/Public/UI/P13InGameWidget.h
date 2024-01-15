@@ -19,11 +19,13 @@ protected:
 	virtual void NativeConstruct() override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	void HideInGameWidgets();
+	void RemoveInGameWidget();
+	
 private:
-	void ShowStatWidgets() const;
-	void ShowHealthWidget() const;
-	UFUNCTION()
-	void OnPawnChangedHandle(APawn* OldPawn, APawn* NewPawn);
+	void ShowStatWidgets();
+	void ShowHealthWidget();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -31,4 +33,10 @@ protected:
 	TSubclassOf<UP13InventoryStatsWidget> InventoryStatClass;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13HealthWidget> HealthClass;
+
+private:
+	UPROPERTY()
+	UP13InventoryStatsWidget* InventoryStatsWidget = nullptr;
+	UPROPERTY()
+	UP13HealthWidget* HealthWidget = nullptr;
 };

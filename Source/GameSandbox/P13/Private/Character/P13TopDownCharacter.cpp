@@ -13,6 +13,7 @@
 #include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
+#include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
@@ -66,11 +67,19 @@ float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& D
 	return ActualDamage;
 }
 
+void AP13TopDownCharacter::UnPossessed()
+{
+	Super::UnPossessed();
+}
+
 void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
+	
 	CreateDynamicMeshMaterials();
+
+	// TODO after death Inventory stat widget doesn't update properly
+	UpdateInventoryAfterRespawn();
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -298,6 +307,12 @@ FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
 	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
 }
 
+void AP13TopDownCharacter::UpdateInventoryAfterRespawn() const 
+{
+	check(InventoryComponent)
+	InventoryComponent->TryUpdateSlotsFromData();
+}
+
 void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
 {
 	if (PlayerController != Controller)
@@ -347,14 +362,19 @@ void AP13TopDownCharacter::OnDeathHandle()
 
 	if (Controller)
 	{
+		/* Remove 1 life from player state. */
+		AP13PlayerState* DeadPlayerState = Controller->GetPlayerState<AP13PlayerState>();
+		check(DeadPlayerState)
+		DeadPlayerState->OnPlayerDied();
+		
 		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
+		Controller->UnPossess();
 	}
 
 	/* Ragdoll */
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetAllBodiesSimulatePhysics(true);
 	GetMesh()->SetCollisionProfileName("Ragdoll");
-	DetachFromControllerPendingDestroy();
 	SetLifeSpan(10.f);
 }
 

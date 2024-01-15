@@ -6,6 +6,7 @@
 #include "GameFramework/HUD.h"
 #include "P13HeadsUpDisplay.generated.h"
 
+class UP13EndGameWidget;
 class UP13InGameWidget;
 
 UCLASS()
@@ -16,19 +17,22 @@ class GAMESANDBOX_API AP13HeadsUpDisplay : public AHUD
 	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13HeadsUpDisplay();
-	UP13InGameWidget* GetInGameWidget() const { return InGameWidgetCached.Get(); }
 
 protected:
 	virtual void BeginPlay() override;
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	void ShotInGame();
+	void ShowInGame();
+	void ShowEndGame();
+	void ClearInGame();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13InGameWidget> InGameWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP13EndGameWidget> EndGameWidgetClass;
 
 private:
 	TWeakObjectPtr<UP13InGameWidget> InGameWidgetCached;

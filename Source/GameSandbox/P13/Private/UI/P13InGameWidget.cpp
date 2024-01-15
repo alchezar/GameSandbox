@@ -11,30 +11,36 @@ void UP13InGameWidget::NativeConstruct()
 	
 	ShowStatWidgets();
 	ShowHealthWidget();
-
-	if (APlayerController* PlayerController = GetOwningPlayer())
-	{
-		PlayerController->OnPossessedPawnChanged.AddDynamic(this, &ThisClass::OnPawnChangedHandle);
-	}
 }
 
-void UP13InGameWidget::ShowStatWidgets() const
+void UP13InGameWidget::HideInGameWidgets()
 {
-	if (auto* InventoryStatsWidget = CreateWidget<UP13InventoryStatsWidget>(GetOwningPlayer(), InventoryStatClass))
-	{
-		InventoryStatsWidget->AddToViewport();
-	}
+	InventoryStatsWidget->SetVisibility(ESlateVisibility::Collapsed);
+	HealthWidget->SetVisibility(ESlateVisibility::Collapsed);
 }
 
-void UP13InGameWidget::ShowHealthWidget() const
+void UP13InGameWidget::RemoveInGameWidget()
 {
-	if (auto* HealthWidget = CreateWidget<UP13HealthWidget>(GetOwningPlayer(), HealthClass))
-	{
-		HealthWidget->AddToViewport();
-	}
+	InventoryStatsWidget->RemoveFromParent();
+	HealthWidget->RemoveFromParent();
 }
 
-void UP13InGameWidget::OnPawnChangedHandle(APawn* OldPawn, APawn* NewPawn)
+void UP13InGameWidget::ShowStatWidgets()
 {
-	ShowHealthWidget();
+	InventoryStatsWidget = CreateWidget<UP13InventoryStatsWidget>(this, InventoryStatClass);
+	if (!InventoryStatsWidget)
+	{
+		return;
+	}
+	InventoryStatsWidget->AddToViewport();
+}
+
+void UP13InGameWidget::ShowHealthWidget()
+{
+	HealthWidget = CreateWidget<UP13HealthWidget>(this, HealthClass);
+	if (!HealthWidget)
+	{
+		return;
+	}
+	HealthWidget->AddToViewport();
 }

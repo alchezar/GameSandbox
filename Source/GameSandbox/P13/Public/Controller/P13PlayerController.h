@@ -7,6 +7,7 @@
 #include "GameFramework/PlayerController.h"
 #include "P13PlayerController.generated.h"
 
+class AP13HeadsUpDisplay;
 class UNiagaraSystem;
 class UInputAction;
 class UInputMappingContext;
@@ -26,6 +27,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 	virtual void SetPawn(APawn* InPawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
 public:
@@ -55,7 +57,8 @@ private:
 	void SpawnCursorDecal();
 	void UpdateCursorDecalPosition() const;
 	bool GetCanControlledCharacterMove() const;
-	void SetGameInputMode();
+	void SetNewInputMode(const bool bGame = true);
+	bool TryRespawnOnUnPossess();
 
 	/* ----------------------------- Variables ----------------------------- */
 public:
@@ -101,4 +104,6 @@ private:
 	float FollowTime = 0.f; /* For how long it has been pressed. */
 	FHitResult HitUnderCursor;
 	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;
+	UPROPERTY()
+	AP13HeadsUpDisplay* HeadsUpDisplay = nullptr;
 };

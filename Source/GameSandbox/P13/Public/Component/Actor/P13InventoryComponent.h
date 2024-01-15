@@ -54,8 +54,6 @@ public:
 	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon, const bool bTakeNext = true);
 	void ClearWeaponSlots();
 	void SortAmmoSlots();
-
-private:
 	bool TryUpdateSlotsFromData();
 
 	/* ----------------------------- Variables ----------------------------- */

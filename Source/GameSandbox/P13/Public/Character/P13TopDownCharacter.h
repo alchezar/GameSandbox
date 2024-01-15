@@ -38,6 +38,7 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void UnPossessed() override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -73,9 +74,12 @@ public:
 	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
 	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
+	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+	FORCEINLINE UP13InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	void UpdateCharacter() const;
 	void ChangeMovementState(const EP13MovementState NewMovementState);
 	FVector GetLookAtCursorDirection() const;
+	void UpdateInventoryAfterRespawn() const;
 
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
