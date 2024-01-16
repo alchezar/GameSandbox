@@ -37,7 +37,7 @@ void AP13TopDownCharacter::PostInitializeComponents()
 
 	if (InventoryComponent)
 	{
-		InventoryComponent->OnSwitchWeaponStart.AddUObject(this, &ThisClass::InitWeapon);
+		InventoryComponent->OnCurrentWeaponUpdated.AddUObject(this, &ThisClass::InitWeapon);
 	}
 	if (AttributesComponent)
 	{
@@ -55,6 +55,8 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 	{
 		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
 	}
+
+	UpdateInventoryAfterRespawn();
 }
 
 float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -75,7 +77,7 @@ void AP13TopDownCharacter::UnPossessed()
 void AP13TopDownCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CreateDynamicMeshMaterials();
 
 	// TODO after death Inventory stat widget doesn't update properly
@@ -307,10 +309,10 @@ FVector AP13TopDownCharacter::GetLookAtCursorDirection() const
 	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
 }
 
-void AP13TopDownCharacter::UpdateInventoryAfterRespawn() const 
+void AP13TopDownCharacter::UpdateInventoryAfterRespawn() const
 {
 	check(InventoryComponent)
-	InventoryComponent->TryUpdateSlotsFromData();
+	InventoryComponent->RefreshSlots();
 }
 
 void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
@@ -347,31 +349,34 @@ void AP13TopDownCharacter::OnDeathHandle()
 {
 	bDead = true;
 
+	/* Drop current weapon and remove it from the inventory. */
 	DropInput(false);
 	CachedWeapon->Destroy();
 	CachedWeapon.Reset();
 
+	/* Remove 1 life from player state and save player inventory */
+	if (AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>())
+	{
+		DeadPlayerState->OnPlayerDied();
+		DeadPlayerState->SavePlayerInventory(InventoryComponent->GetAllWeaponSlots(), InventoryComponent->GetAllAmmoSlots());
+	}
+
+	if (Controller)
+	{
+		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
+		Controller->UnPossess();
+	}
+
+	/* Disable movement. */
 	StopAnimMontage();
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->StopMovementImmediately();
 		GetCharacterMovement()->DisableMovement();
-		GetCapsuleComponent()->DestroyComponent();
 		GetCharacterMovement()->MovementState.bCanJump = false;
 	}
 
-	if (Controller)
-	{
-		/* Remove 1 life from player state. */
-		AP13PlayerState* DeadPlayerState = Controller->GetPlayerState<AP13PlayerState>();
-		check(DeadPlayerState)
-		DeadPlayerState->OnPlayerDied();
-		
-		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
-		Controller->UnPossess();
-	}
-
-	/* Ragdoll */
+	/* Ragdoll. */
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetAllBodiesSimulatePhysics(true);
 	GetMesh()->SetCollisionProfileName("Ragdoll");
@@ -529,7 +534,7 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 	PlayAnimMontage(WeaponInfo->CharEquipAnim);
 
 	AP13Weapon* Weapon = CachedWeapon.Get();
-	InventoryComponent->OnSwitchWeaponFinish.Broadcast(CurrentIndex, Weapon);
+	InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, Weapon);
 }
 
 void AP13TopDownCharacter::FocusOnCursor(const bool bOn)

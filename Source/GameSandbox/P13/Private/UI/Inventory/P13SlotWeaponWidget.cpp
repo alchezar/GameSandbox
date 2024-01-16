@@ -30,7 +30,7 @@ void UP13SlotWeaponWidget::InitSlot(const int32 NewWeaponIndex, const FP13Weapon
 	UpdateAmmoCount(MagazineCurrent);
 }
 
-void UP13SlotWeaponWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex)
+void UP13SlotWeaponWidget::OnCurrentWeaponUpdatedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex)
 {
 	UpdateWeaponUsageStatus(WeaponIndex);
 

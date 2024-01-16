@@ -30,9 +30,9 @@ protected:
 	void ShowAllAmmo() const;
 	void OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
 	void OnNewAmmoTakenHandle(const FP13AmmoSlot& NewAmmoSlot);
+	void CacheInventoryComponent();
 
 private:
-	void CacheInventoryComponent();
 	void ShowStatWidgets();
 	void AddNewWeaponSlotWidget(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot) const;
 	void AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoSlot) const;

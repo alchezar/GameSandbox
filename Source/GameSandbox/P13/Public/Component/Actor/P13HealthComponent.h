@@ -25,6 +25,7 @@ protected:
 public:
 	FORCEINLINE bool GetIsHealthFull() const { return FMath::IsNearlyEqual(Health, MaxHealth); }
 	FORCEINLINE float GetCurrentHealth() const { return Health; }
+	FORCEINLINE float GetCurrentHealthAlpha() const { return Health / MaxHealth; }
 	FORCEINLINE void SetMaxHealth(const float NewMaxHealth) { MaxHealth = NewMaxHealth; }
 	virtual void ReceiveDamage(const float Damage);
 	virtual void AddHealth(const float HealthAid);

@@ -28,7 +28,7 @@ public:
 	FORCEINLINE EP13AmmoType GetAmmoType() const { return AmmoType; }
 	FORCEINLINE int32 GetCurrentWeaponIndex() const { return CurrentWeaponIndex; }
 	void InitSlot(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
-	void OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex);
+	void OnCurrentWeaponUpdatedHandle(const FP13WeaponSlot& NewWeaponSlot, const int32 WeaponIndex);
 	void OnAmmoChangedHandle(const EP13AmmoType CurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount);
 	void OnWeaponStartReloadingHandle(UAnimMontage* CharFireMontage, const int32 WeaponIndex, const float ReloadingTime);
 	void OnWeaponFinishReloadingHandle(const int32 NewRoundNum, const int32 WeaponIndex, const bool bSuccess);

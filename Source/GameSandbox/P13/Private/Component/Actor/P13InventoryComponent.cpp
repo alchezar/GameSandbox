@@ -4,6 +4,7 @@
 
 #include "P13/Public/Actor/P13PickupActor.h"
 #include "P13/Public/Game/P13GameInstance.h"
+#include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
 UP13InventoryComponent::UP13InventoryComponent()
@@ -16,9 +17,6 @@ void UP13InventoryComponent::BeginPlay()
 	Super::BeginPlay();
 
 	/* Find init weapon slots and find init weapons. */
-	GameInstanceCached = Cast<UP13GameInstance>(GetWorld()->GetGameInstance());
-	check(GameInstanceCached.IsValid())
-
 	TryUpdateSlotsFromData();
 }
 
@@ -40,7 +38,7 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 	WeaponSlots.Add(NewWeaponSlot);
 
 	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
-	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
 
@@ -139,7 +137,7 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 
 		}
 
 		CurrentWeaponIndex = Index;
-		OnSwitchWeaponStart.Broadcast(WeaponSlots[Index], Index);
+		OnCurrentWeaponUpdated.Broadcast(WeaponSlots[Index], Index);
 		return true;
 	}
 	/* Weapon switch wasn't successful. */
@@ -181,16 +179,15 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, 
 	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin;
 	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
 
-	AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform);
-	if (!DroppedWeapon)
+	if (AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform))
 	{
-		return;
+		DroppedWeapon->InitDrop(DropWeaponInfo);
+		DroppedWeapon->FinishSpawning(SpawnTransform);
 	}
-	DroppedWeapon->InitDrop(DropWeaponInfo);
-	DroppedWeapon->FinishSpawning(SpawnTransform);
 
 	if (!bTakeNext)
 	{
+		WeaponSlots.RemoveAt(CurrentWeaponIndex);
 		return;
 	}
 
@@ -203,7 +200,7 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, 
 	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
 
 	OnInventoryUpdated.Broadcast();
-	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 }
 
 void UP13InventoryComponent::ClearWeaponSlots()
@@ -236,8 +233,29 @@ void UP13InventoryComponent::SortAmmoSlots()
 	}
 }
 
+void UP13InventoryComponent::RefreshSlots()
+{
+	if (!TryLoadSlotsFromPlayerState())
+	{
+		TryUpdateSlotsFromData();
+	}
+}
+
+void UP13InventoryComponent::CacheGameInstance()
+{
+	if (GameInstanceCached.IsValid())
+	{
+		return;
+	}
+
+	GameInstanceCached = Cast<UP13GameInstance>(GetWorld()->GetGameInstance());
+	check(GameInstanceCached.IsValid())
+}
+
 bool UP13InventoryComponent::TryUpdateSlotsFromData()
 {
+	CacheGameInstance();
+
 	/* Find init weapon slots and find init weapons. */
 	for (int32 Index = 0; Index < WeaponSlots.Num(); ++Index)
 	{
@@ -248,6 +266,7 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 			--Index;
 			continue;
 		}
+
 		const FP13WeaponInfo* WeaponInfo = GameInstanceCached->GetWeaponInfoByID(WeaponID);
 		if (!WeaponInfo)
 		{
@@ -269,6 +288,32 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 
 	SortAmmoSlots();
 	OnInventoryUpdated.Broadcast();
-	OnSwitchWeaponStart.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
+	return true;
+}
+
+bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
+{
+	const APawn* PawnOwner = GetOwner<APawn>();
+	if (!PawnOwner)
+	{
+		return false;
+	}
+	AP13PlayerState* PlayerState = PawnOwner->GetPlayerState<AP13PlayerState>();
+	if (!PlayerState)
+	{
+		return false;
+	}
+	if (!PlayerState->GetCanLoadPlayerInventory())
+	{
+		return false;
+	}
+
+	WeaponSlots = PlayerState->GetSavedWeaponSlots();
+	AmmoSlots = PlayerState->GetSavedAmmoSlots();
+
+	OnInventoryUpdated.Broadcast();
+	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
+
 	return true;
 }

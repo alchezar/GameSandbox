@@ -6,6 +6,9 @@
 #include "GameFramework/PlayerState.h"
 #include "P13PlayerState.generated.h"
 
+struct FP13AmmoSlot;
+struct FP13WeaponSlot;
+
 UCLASS()
 class GAMESANDBOX_API AP13PlayerState : public APlayerState
 {
@@ -20,11 +23,18 @@ protected:
 	
 	/* ------------------------------- This -------------------------------- */
 public:
+	bool GetCanLoadPlayerInventory() const;
 	bool GetPlayerCanRespawnAfterDeath();
 	bool GetPlayerCanRespawn() const;
 	void OnPlayerDied();
-	void ResetLives();
 	
+	TArray<FP13WeaponSlot> GetSavedWeaponSlots();
+	TArray<FP13AmmoSlot> GetSavedAmmoSlots();
+	void SavePlayerInventory(const TArray<FP13WeaponSlot>& WeaponSlots, const TArray<FP13AmmoSlot>& AmmoSlots);
+
+private:
+	void ResetLives();
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
@@ -32,4 +42,6 @@ protected:
 
 private:
 	int32 CurrentLives = 0;
+	TArray<FP13WeaponSlot> LastLifeWeaponSlots = {};
+	TArray<FP13AmmoSlot> LastLifeAmmoSlots = {};
 };

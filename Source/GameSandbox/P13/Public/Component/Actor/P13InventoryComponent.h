@@ -11,8 +11,8 @@
 class UP13GameInstance;
 class AP13Weapon;
 
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponStartSignature, const FP13WeaponSlot& /*NewWeaponSLot*/, const int32 /*CurrentIndex*/)
-DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponFinishSignature, const int32 /*NewWeaponIndex*/, AP13Weapon* /*NewWeapon*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnCurrentWeaponUpdatedSignature, const FP13WeaponSlot& /*NewWeaponSLot*/, const int32 /*CurrentIndex*/)
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnSwitchWeaponSignature, const int32 /*NewWeaponIndex*/, AP13Weapon* /*NewWeapon*/)
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP13OnAmmoChangedSignature, EP13AmmoType /*AmmoType*/, int32 /*NewWeaponAmmoCount*/, int32 /*NewInventoryAmmoCount*/)
 DECLARE_MULTICAST_DELEGATE(FP13OnInventoryUpdatedSingature);
 DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnNewWeaponTakenSignature, const int32 /*NewWeaponIndex*/, const FP13WeaponSlot& /*NewWeaponSLot*/);
@@ -45,6 +45,8 @@ public:
 	FORCEINLINE int32 GetCurrentWeaponIndex() const { return CurrentWeaponIndex; }
 	FORCEINLINE FP13WeaponSlot GetWeaponSlot(const int32 Index) const { return WeaponSlots[Index]; }
 	FORCEINLINE FP13AmmoSlot GetAmmoSlot(const int32 Index) const { return AmmoSlots[Index]; }
+	FORCEINLINE TArray<FP13WeaponSlot> GetAllWeaponSlots() const { return WeaponSlots; }
+	FORCEINLINE TArray<FP13AmmoSlot> GetAllAmmoSlots() const { return AmmoSlots; } 
 	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
@@ -54,12 +56,17 @@ public:
 	void DropCurrentWeapon(const AP13Weapon* CurrentWeapon, const bool bTakeNext = true);
 	void ClearWeaponSlots();
 	void SortAmmoSlots();
+	void RefreshSlots();
+
+private:
+	void CacheGameInstance();
 	bool TryUpdateSlotsFromData();
+	bool TryLoadSlotsFromPlayerState();
 
 	/* ----------------------------- Variables ----------------------------- */
 public:
-	FP13OnSwitchWeaponStartSignature OnSwitchWeaponStart;
-	FP13OnSwitchWeaponFinishSignature OnSwitchWeaponFinish;
+	FP13OnCurrentWeaponUpdatedSignature OnCurrentWeaponUpdated;
+	FP13OnSwitchWeaponSignature OnSwitchWeapon;
 	FP13OnAmmoChangedSignature OnAmmoChanged;
 	FP13OnInventoryUpdatedSingature OnInventoryUpdated;
 	FP13OnNewWeaponTakenSignature OnNewWeaponTaken;

@@ -70,7 +70,7 @@ void UP13InventoryStatsWidget::CacheInventoryComponent()
 	InventoryComponentCached->OnInventoryUpdated.AddUObject(this, &ThisClass::ShowStatWidgets);
 	InventoryComponentCached->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
 	InventoryComponentCached->OnNewAmmoTaken.AddUObject(this, &ThisClass::OnNewAmmoTakenHandle);
-	InventoryComponentCached->OnSwitchWeaponFinish.AddUObject(this, &ThisClass::OnWeaponSwitchFinishHandle);
+	InventoryComponentCached->OnSwitchWeapon.AddUObject(this, &ThisClass::OnWeaponSwitchFinishHandle);
 }
 
 void UP13InventoryStatsWidget::ShowStatWidgets()
@@ -88,7 +88,7 @@ void UP13InventoryStatsWidget::AddNewWeaponSlotWidget(const int32 NewWeaponIndex
 	}
 	SlotWeaponWidget->InitSlot(NewWeaponIndex, NewWeaponSlot);
 	SlotWeaponWidget->AddToViewport();
-	InventoryComponentCached->OnSwitchWeaponStart.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnWeaponChangedHandle);
+	InventoryComponentCached->OnCurrentWeaponUpdated.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnCurrentWeaponUpdatedHandle);
 	InventoryComponentCached->OnAmmoChanged.AddUObject(SlotWeaponWidget, &UP13SlotWeaponWidget::OnAmmoChangedHandle);
 
 	WeaponBox->AddChild(SlotWeaponWidget);
@@ -103,7 +103,7 @@ void UP13InventoryStatsWidget::AddNewAmmoSlotWidget(const FP13AmmoSlot& NewAmmoS
 	}
 	SlotAmmoWidget->InitSlot(NewAmmoSlot);
 	SlotAmmoWidget->AddToViewport();
-	InventoryComponentCached->OnSwitchWeaponStart.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnWeaponChangedHandle);
+	InventoryComponentCached->OnCurrentWeaponUpdated.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnCurrentWeaponUpdatedHandle);
 	InventoryComponentCached->OnAmmoChanged.AddUObject(SlotAmmoWidget, &UP13SlotAmmoWidget::OnAmmoChangedHandle);
 
 	AmmoBox->AddChild(SlotAmmoWidget);

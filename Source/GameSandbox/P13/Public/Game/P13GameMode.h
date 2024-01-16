@@ -17,13 +17,14 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 	
 	/* ------------------------------- This -------------------------------- */
 public:
 	void Respawn(AController* NewPlayer);
+
+private:
+	FString GetCurrentPhaseString() const;
 	
 	/* ----------------------------- Variables ----------------------------- */
-protected:
-	// UPROPERTY(EditAnywhere, Category = "C++")
-	// TSubclassOf<UP13MenuWidget> MainMenuWidgetClass;
 };

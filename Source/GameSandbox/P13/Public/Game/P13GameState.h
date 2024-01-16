@@ -14,7 +14,8 @@ enum class EP13LevelPhase : uint8
 	Phase3,
 	Phase4,
 	Phase5,
-	Phase6
+	Phase6,
+	MAX UMETA(Hidden)
 };
 
 UCLASS()
@@ -35,6 +36,10 @@ public:
 	void GoToNextPhase();
 	
 	/* ----------------------------- Variables ----------------------------- */
+protected:
+	UPROPERTY(EditAnywhere, Category = "C++")
+	EP13LevelPhase StartLevelPhase = EP13LevelPhase::Phase1;
+	
 private:
 	EP13LevelPhase LevelPhase = EP13LevelPhase::Phase1;
 };

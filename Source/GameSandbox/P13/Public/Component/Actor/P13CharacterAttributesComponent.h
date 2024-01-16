@@ -25,8 +25,10 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	virtual void ReceiveDamage(const float Damage) override;
 	FORCEINLINE bool GetShieldIsActive() const { return Shield > 0.f; }
+	FORCEINLINE float GetCurrentShield() const { return Shield; }
+	FORCEINLINE float GetCurrentShieldAlpha() const { return Shield / MaxShield; }
+	virtual void ReceiveDamage(const float Damage) override;
 
 private:
 	void ShieldRecoveryTick(const float DeltaTime);

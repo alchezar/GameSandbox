@@ -64,7 +64,7 @@ void AP13PlayerController::SetupInputComponent()
 	InputComp->BindAction(NextWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, true);
 	InputComp->BindAction(PreviousWeaponAction, ETriggerEvent::Started, this, &ThisClass::SwitchWeaponInput, false);
 
-	InputComp->BindAction(DropAction ,ETriggerEvent::Started, this, &ThisClass::DropInput, true);
+	InputComp->BindAction(DropAction, ETriggerEvent::Started, this, &ThisClass::DropInput, true);
 }
 
 void AP13PlayerController::SetPawn(APawn* InPawn)
@@ -74,8 +74,6 @@ void AP13PlayerController::SetPawn(APawn* InPawn)
 
 void AP13PlayerController::OnPossess(APawn* InPawn)
 {
-	Super::OnPossess(InPawn);
-	
 	if (!InPawn)
 	{
 		return;
@@ -88,6 +86,9 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 		return;
 	}
 	HeadsUpDisplay->ShowInGame();
+
+	/* Super must be called after creating stat widgets in HUD, to correctly update inventory in Pawn::PossessedBy(...) event. */
+	Super::OnPossess(InPawn);
 }
 
 void AP13PlayerController::OnUnPossess()
@@ -98,17 +99,17 @@ void AP13PlayerController::OnUnPossess()
 	{
 		HeadsUpDisplay->ClearInGame();
 	}
-	
+
 	if (TryRespawnOnUnPossess())
 	{
 		return;
 	}
-	
+
 	/* After the final UnPossess we need to show End Game widget. */
-	SetNewInputMode(false);	
+	SetNewInputMode(false);
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 
-	HeadsUpDisplay->ShowEndGame();		
+	HeadsUpDisplay->ShowEndGame();
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
@@ -130,7 +131,7 @@ void AP13PlayerController::OnSetDestinationTriggered()
 	{
 		return;
 	}
-	
+
 	/* We flag that the input is being pressed. */
 	FollowTime += GetWorld()->GetDeltaSeconds();
 
@@ -156,7 +157,7 @@ void AP13PlayerController::OnSetDestinationReleased()
 	{
 		return;
 	}
-	
+
 	/* If it was a short press. */
 	if (FollowTime <= ShortPressThreshold)
 	{
@@ -178,9 +179,7 @@ void AP13PlayerController::MoveInput(const FInputActionValue& Value)
 }
 
 void AP13PlayerController::LookInput(const FInputActionValue& Value)
-{
-	
-}
+{}
 
 void AP13PlayerController::SprintInput(const bool bStart)
 {
@@ -317,16 +316,16 @@ void AP13PlayerController::SetNewInputMode(const bool bGame)
 	{
 		FInputModeGameOnly GIMode;
 		GIMode.SetConsumeCaptureMouseDown(false);
-		
+
 		SetInputMode(GIMode);
 		bShowMouseCursor = false;
 		return;
 	}
-	
-	/* Means UI. */		
+
+	/* Means UI. */
 	FInputModeUIOnly UIMode;
 	UIMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
-	
+
 	SetInputMode(UIMode);
 	bShowMouseCursor = true;
 }
@@ -338,18 +337,18 @@ bool AP13PlayerController::TryRespawnOnUnPossess()
 	{
 		return false;
 	}
-	
+
 	const AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>();
 	if (!DeadPlayerState)
 	{
-		 return false;
+		return false;
 	}
-	
+
 	if (!DeadPlayerState->GetPlayerCanRespawn())
 	{
 		return false;
 	}
-	
+
 	GameMode->Respawn(this);
 	return true;
 }

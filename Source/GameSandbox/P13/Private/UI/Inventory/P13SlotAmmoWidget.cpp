@@ -31,7 +31,7 @@ void UP13SlotAmmoWidget::InitSlot(const FP13AmmoSlot NewAmmoSlot)
 	UpdateAmmoUsageStatus(EP13AmmoType::Default);
 }
 
-void UP13SlotAmmoWidget::OnWeaponChangedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex)
+void UP13SlotAmmoWidget::OnCurrentWeaponUpdatedHandle(const FP13WeaponSlot& NewWeaponSlot, int32 WeaponIndex)
 {
 	UpdateAmmoUsageStatus(NewWeaponSlot.AmmoType);
 }
