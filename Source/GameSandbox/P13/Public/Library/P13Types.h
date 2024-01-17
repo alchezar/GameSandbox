@@ -261,11 +261,13 @@ struct FP13LevelSelect : public  FTableRowBase
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName Address;
+	FName RealName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FText Name;
+	FText ShowName;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	UTexture2D* Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TArray<int32> PhaseWinScore;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

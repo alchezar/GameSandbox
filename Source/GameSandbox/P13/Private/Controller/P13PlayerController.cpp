@@ -109,7 +109,7 @@ void AP13PlayerController::OnUnPossess()
 	SetNewInputMode(false);
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 
-	HeadsUpDisplay->ShowEndGame();
+	HeadsUpDisplay->ShowEndGame(false);
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
@@ -118,6 +118,16 @@ void AP13PlayerController::Tick(const float DeltaSeconds)
 
 	FindPointUnderCursor();
 	UpdateCursorDecalPosition();
+}
+
+void AP13PlayerController::OnGameWon()
+{
+	check(HeadsUpDisplay)
+	
+	HeadsUpDisplay->ShowEndGame(true);
+	
+	SetNewInputMode(false);
+	Pause();
 }
 
 void AP13PlayerController::OnInputStarted()

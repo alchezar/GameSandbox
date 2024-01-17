@@ -34,10 +34,10 @@ AActor* AP13GameMode::ChoosePlayerStart_Implementation(AController* Player)
 
 void AP13GameMode::Respawn(AController* NewPlayer)
 {
-	AP13GameState* CurrentGameState = GetGameState<AP13GameState>();
-	check(CurrentGameState)
-
-	CurrentGameState->GoToNextPhase();
+	if (AP13GameState* CurrentGameState = GetGameState<AP13GameState>())
+	{
+		CurrentGameState->GoToNextPhase();
+	}
 
 	AActor* BestPlayerStart = FindPlayerStart(NewPlayer, GetCurrentPhaseString());
 	if (!BestPlayerStart)

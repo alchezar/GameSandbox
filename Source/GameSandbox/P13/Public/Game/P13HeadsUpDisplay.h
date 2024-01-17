@@ -24,7 +24,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void ShowInGame();
-	void ShowEndGame();
+	void ShowEndGame(const bool bWin);
 	void ClearInGame();
 
 	/* ----------------------------- Variables ----------------------------- */

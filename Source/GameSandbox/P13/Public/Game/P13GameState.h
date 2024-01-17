@@ -6,6 +6,8 @@
 #include "GameFramework/GameState.h"
 #include "P13GameState.generated.h"
 
+struct FP13LevelSelect;
+
 UENUM(BlueprintType)
 enum class EP13LevelPhase : uint8
 {
@@ -22,7 +24,7 @@ UCLASS()
 class GAMESANDBOX_API AP13GameState : public AGameState
 {
 	GENERATED_BODY()
-	
+
 	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13GameState();
@@ -34,12 +36,21 @@ protected:
 public:
 	FORCEINLINE EP13LevelPhase GetLastLevelPhase() const { return LevelPhase; }
 	void GoToNextPhase();
+	void CheckWinCondition(const int32 TotalScore);
+
+private:
+	void SaveWinScores();
 	
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	EP13LevelPhase StartLevelPhase = EP13LevelPhase::Phase1;
-	
+
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UDataTable* LevelSelectTable = nullptr;
+
 private:
 	EP13LevelPhase LevelPhase = EP13LevelPhase::Phase1;
+	TArray<FP13LevelSelect*> Levels;
+	TArray<int32> WinScores = {};
 };

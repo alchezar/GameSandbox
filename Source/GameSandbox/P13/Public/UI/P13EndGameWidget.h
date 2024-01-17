@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P13EndGameWidget.generated.h"
 
+class UTextBlock;
 class UButton;
 
 UCLASS()
@@ -18,6 +19,9 @@ protected:
 	virtual void NativeConstruct() override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	void InitWidget(const bool bWin);
+	
 protected:
 	UFUNCTION()
 	void OnRestartButtonClicked();
@@ -34,7 +38,13 @@ protected:
 	UButton* MenuButton;
 	UPROPERTY(meta = (BindWidget))
 	UButton* ExitButton;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* MessageText;
 
 	UPROPERTY(EditAnywhere, Category = "C++")	
 	FName MenuLevelName;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	FString WinMessage = "You WIN!!!";
+	UPROPERTY(EditAnywhere, Category = "C++")
+	FString LooseMessage = "You LOOSE!";
 };

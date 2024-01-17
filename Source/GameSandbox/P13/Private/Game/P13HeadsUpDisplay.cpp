@@ -27,7 +27,7 @@ void AP13HeadsUpDisplay::ShowInGame()
 	InGameWidgetCached->AddToViewport();
 }
 
-void AP13HeadsUpDisplay::ShowEndGame()
+void AP13HeadsUpDisplay::ShowEndGame(const bool bWin)
 {
 	if (!EndGameWidgetClass)
 	{
@@ -38,6 +38,7 @@ void AP13HeadsUpDisplay::ShowEndGame()
 	
 	UP13EndGameWidget* EndGameWidget = CreateWidget<UP13EndGameWidget>(GetOwningPlayerController(), EndGameWidgetClass);
 	check(EndGameWidget)
+	EndGameWidget->InitWidget(bWin);
 	EndGameWidget->AddToViewport(1);
 }
 

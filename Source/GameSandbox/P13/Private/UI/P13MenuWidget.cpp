@@ -98,8 +98,8 @@ void UP13LevelSelectWidget::NativeConstruct()
 
 void UP13LevelSelectWidget::InitLevelButton(const FP13LevelSelect* NewLevel)
 {
-	LevelAddress = NewLevel->Address;
-	LevelName->SetText(NewLevel->Name);
+	LevelAddress = NewLevel->RealName;
+	LevelName->SetText(NewLevel->ShowName);
 	LevelIcon->SetBrushFromTexture(NewLevel->Icon);
 }
 

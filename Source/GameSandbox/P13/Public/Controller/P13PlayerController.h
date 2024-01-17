@@ -34,6 +34,9 @@ public:
 	virtual void Tick(const float DeltaSeconds) override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	void OnGameWon();
+	
 protected:
 	void OnInputStarted();
 	/* Triggered every frame when the input is held down. */

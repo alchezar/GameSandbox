@@ -3,6 +3,7 @@
 #include "P13/Public/UI/P13EndGameWidget.h"
 
 #include "Components/Button.h"
+#include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
 
 void UP13EndGameWidget::NativeConstruct()
@@ -14,11 +15,13 @@ void UP13EndGameWidget::NativeConstruct()
 	ExitButton->OnClicked.AddDynamic(this, &ThisClass::OnExitButtonClicked);
 }
 
+void UP13EndGameWidget::InitWidget(const bool bWin)
+{
+	MessageText->SetText(FText::FromString(bWin ? WinMessage : LooseMessage));	
+}
+
 void UP13EndGameWidget::OnRestartButtonClicked() 
 {
-	// const FString LevelName = GetWorld()->GetCurrentLevel()->GetName();
-	// UGameplayStatics::OpenLevel(GetWorld(), *LevelName);
-
 	if (APlayerController* PlayerController = GetOwningPlayer())
 	{
 		const FString MapName = GetWorld()->GetMapName();
