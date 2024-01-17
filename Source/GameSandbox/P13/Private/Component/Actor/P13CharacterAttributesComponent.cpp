@@ -25,7 +25,7 @@ void UP13CharacterAttributesComponent::TickComponent(float DeltaTime, ELevelTick
 	}
 }
 
-void UP13CharacterAttributesComponent::ReceiveDamage(const float Damage)
+void UP13CharacterAttributesComponent::ReceiveDamage(const float Damage, AController* Causer)
 {
 	if (FMath::IsNearlyZero(Damage))
 	{
@@ -46,7 +46,7 @@ void UP13CharacterAttributesComponent::ReceiveDamage(const float Damage)
 	StartRecoveryDelegate.BindLambda([this]() { bRecovering = true; });
 	GetWorld()->GetTimerManager().SetTimer(StartRecoveryTimer, StartRecoveryDelegate, RecoveryStartDelay, false);
 
-	Super::ReceiveDamage(RealDamage);
+	Super::ReceiveDamage(RealDamage, Causer);
 }
 
 void UP13CharacterAttributesComponent::ShieldRecoveryTick(const float DeltaTime)

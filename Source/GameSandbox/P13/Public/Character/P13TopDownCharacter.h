@@ -85,7 +85,7 @@ protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
 	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
 	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha);
-	void OnDeathHandle();
+	void OnDeathHandle(AController* Causer);
 
 private:
 	void CreateComponents();

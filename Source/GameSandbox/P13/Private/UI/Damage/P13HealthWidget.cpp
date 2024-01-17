@@ -36,7 +36,7 @@ void UP13HealthWidget::OnHealthChangedHandle(const float NewHealth, const float 
 	HealthBar->SetPercent(HealthAlpha);
 }
 
-void UP13HealthWidget::OnDeathHandle()
+void UP13HealthWidget::OnDeathHandle(AController* Causer)
 {
 	RemoveFromParent();
 }

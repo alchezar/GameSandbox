@@ -26,12 +26,13 @@ bool AP13PlayerState::GetPlayerCanRespawnAfterDeath()
 
 bool AP13PlayerState::GetPlayerCanRespawn() const
 {
-	return CurrentLives > 0;
+	return TotalLives > 0;
 }
 
 void AP13PlayerState::OnPlayerDied()
 {
-	CurrentLives = FMath::Max(--CurrentLives, 0);
+	TotalLives = FMath::Max(--TotalLives, 0);
+	OnLivesChanged.Broadcast(TotalLives);
 }
 
 TArray<FP13WeaponSlot> AP13PlayerState::GetSavedWeaponSlots()
@@ -39,7 +40,7 @@ TArray<FP13WeaponSlot> AP13PlayerState::GetSavedWeaponSlots()
 	/* Guarantee, that we can't use saved slot more than one time. */
 	TArray<FP13WeaponSlot> WeaponSlotsCopy = LastLifeWeaponSlots;
 	LastLifeWeaponSlots.Empty();
-	return WeaponSlotsCopy ;
+	return WeaponSlotsCopy;
 }
 
 TArray<FP13AmmoSlot> AP13PlayerState::GetSavedAmmoSlots()
@@ -47,7 +48,7 @@ TArray<FP13AmmoSlot> AP13PlayerState::GetSavedAmmoSlots()
 	/* Guarantee, that we can't use saved slot more than one time. */
 	TArray<FP13AmmoSlot> AmmoSlotsCopy = LastLifeAmmoSlots;
 	LastLifeAmmoSlots.Empty();
-	return AmmoSlotsCopy ;
+	return AmmoSlotsCopy;
 }
 
 void AP13PlayerState::SavePlayerInventory(const TArray<FP13WeaponSlot>& WeaponSlots, const TArray<FP13AmmoSlot>& AmmoSlots)
@@ -56,7 +57,23 @@ void AP13PlayerState::SavePlayerInventory(const TArray<FP13WeaponSlot>& WeaponSl
 	LastLifeAmmoSlots = AmmoSlots;
 }
 
+void AP13PlayerState::AddScore(const int32 NewScore)
+{
+	if (NewScore <= 0)
+	{
+		return;
+	}
+	TotalScore += NewScore;
+	OnScoreChanged.Broadcast(TotalScore);
+}
+
+void AP13PlayerState::SaveTotalTime(const int32 LastLifeTime)
+{
+	TotalTime = LastLifeTime;
+}
+
 void AP13PlayerState::ResetLives()
 {
-	CurrentLives = MaxLives;
+	TotalLives = MaxLives;
+	OnLivesChanged.Broadcast(TotalLives);
 }

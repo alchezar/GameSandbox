@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P13InGameWidget.generated.h"
 
+class UP13PlayerStatsWidget;
 class UP13HealthWidget;
 class UP13InventoryStatsWidget;
 
@@ -22,10 +23,11 @@ protected:
 public:
 	void HideInGameWidgets();
 	void RemoveInGameWidget();
-	
+
 private:
-	void ShowStatWidgets();
+	void ShowInventoryStatWidget();
 	void ShowHealthWidget();
+	void ShowPlayerStatWidget();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -33,10 +35,14 @@ protected:
 	TSubclassOf<UP13InventoryStatsWidget> InventoryStatClass;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13HealthWidget> HealthClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP13PlayerStatsWidget> PlayerStatClass;
 
 private:
 	UPROPERTY()
 	UP13InventoryStatsWidget* InventoryStatsWidget = nullptr;
 	UPROPERTY()
 	UP13HealthWidget* HealthWidget = nullptr;
+	UPROPERTY()
+	UP13PlayerStatsWidget* PlayerStatWidget = nullptr;
 };

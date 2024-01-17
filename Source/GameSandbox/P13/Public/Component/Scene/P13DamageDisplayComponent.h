@@ -14,7 +14,6 @@ class GAMESANDBOX_API UP13DamageDisplayComponent : public USceneComponent
 	GENERATED_BODY()
 
 	/* ------------------------------- Super ------------------------------- */
-
 public:
 	UP13DamageDisplayComponent();
 
@@ -29,6 +28,9 @@ public:
 	void DisplayDamage(const float CurrentDamage, const float HealthAlpha);
 	void DisplayShield(const float CurrentDamage, const float ShieldAlpha);
 	UP13DamageDisplayWidget* CreateDamageWidget(FVector2D& Offset) const;
+
+protected:
+	void OnOwnerHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

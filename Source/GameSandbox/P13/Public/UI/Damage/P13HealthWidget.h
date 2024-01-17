@@ -21,7 +21,7 @@ protected:
 protected:
 	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha) const;
 	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha) const;
-	void OnDeathHandle();
+	void OnDeathHandle(AController* Causer);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

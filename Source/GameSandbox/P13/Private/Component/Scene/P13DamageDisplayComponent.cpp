@@ -3,6 +3,7 @@
 #include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 
 #include "Blueprint/UserWidget.h"
+#include "P13/Public/Component/Actor/P13HealthComponent.h"
 #include "P13/Public/UI/Damage/P13DamageDisplayWidget.h"
 
 UP13DamageDisplayComponent::UP13DamageDisplayComponent()
@@ -13,6 +14,11 @@ UP13DamageDisplayComponent::UP13DamageDisplayComponent()
 void UP13DamageDisplayComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	if (UP13HealthComponent* HealthComponent = GetOwner() ? GetOwner()->FindComponentByClass<UP13HealthComponent>() : nullptr)
+	{
+		HealthComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnOwnerHealthChangedHandle);
+	}
 }
 
 void UP13DamageDisplayComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -64,4 +70,9 @@ UP13DamageDisplayWidget* UP13DamageDisplayComponent::CreateDamageWidget(FVector2
 	Offset = FVector2D(FMath::RandRange(-20.f, 20.f), FMath::RandRange(-20.f, 20.f));
 
 	return DamageDisplayWidget;
+}
+
+void UP13DamageDisplayComponent::OnOwnerHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
+{
+	DisplayDamage(LastDamage, HealthAlpha);
 }

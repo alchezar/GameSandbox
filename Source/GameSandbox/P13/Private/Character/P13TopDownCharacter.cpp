@@ -39,12 +39,6 @@ void AP13TopDownCharacter::PostInitializeComponents()
 	{
 		InventoryComponent->OnCurrentWeaponUpdated.AddUObject(this, &ThisClass::InitWeapon);
 	}
-	if (AttributesComponent)
-	{
-		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
-		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
-		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
-	}
 }
 
 void AP13TopDownCharacter::PossessedBy(AController* NewController)
@@ -62,7 +56,7 @@ void AP13TopDownCharacter::PossessedBy(AController* NewController)
 float AP13TopDownCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	AttributesComponent->ReceiveDamage(ActualDamage);
+	// AttributesComponent->ReceiveDamage(ActualDamage);
 
 	TakeStateEffectFromRadialDamage(DamageEvent, DamageCauser);
 
@@ -79,9 +73,14 @@ void AP13TopDownCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	CreateDynamicMeshMaterials();
-
-	// TODO after death Inventory stat widget doesn't update properly
 	UpdateInventoryAfterRespawn();
+	
+	if (AttributesComponent)
+	{
+		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
+		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
+	}
 }
 
 void AP13TopDownCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -331,10 +330,8 @@ void AP13TopDownCharacter::OnHitUnderCursorChangedHandle(APlayerController* Play
 
 void AP13TopDownCharacter::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
 {
-	check(DamageDisplayComponent)
-
-	DamageDisplayComponent->DisplayDamage(LastDamage, HealthAlpha);
-
+	// check(DamageDisplayComponent)
+	// DamageDisplayComponent->DisplayDamage(LastDamage, HealthAlpha);
 	UpdateMeshMaterial(HealthAlpha);
 }
 
@@ -345,7 +342,7 @@ void AP13TopDownCharacter::OnShieldChangedHandle(const float NewShield, const fl
 	DamageDisplayComponent->DisplayShield(LastDamage, ShieldAlpha);
 }
 
-void AP13TopDownCharacter::OnDeathHandle()
+void AP13TopDownCharacter::OnDeathHandle(AController* Causer)
 {
 	bDead = true;
 

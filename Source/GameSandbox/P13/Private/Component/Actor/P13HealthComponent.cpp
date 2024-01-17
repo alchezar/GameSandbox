@@ -3,9 +3,7 @@
 #include "P13/Public/Component/Actor/P13HealthComponent.h"
 
 UP13HealthComponent::UP13HealthComponent()
-{
-	
-}
+{}
 
 void UP13HealthComponent::BeginPlay()
 {
@@ -13,9 +11,14 @@ void UP13HealthComponent::BeginPlay()
 
 	Health = MaxHealth;
 	OnHealthChanged.Broadcast(Health, 0.f, 1.f);
+
+	if (AActor* Owner = GetOwner())
+	{
+		Owner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnOwnerTakeAnyDamageHandle);
+	}
 }
 
-void UP13HealthComponent::ReceiveDamage(const float Damage)
+void UP13HealthComponent::ReceiveDamage(const float Damage, AController* Causer)
 {
 	if (FMath::IsNearlyZero(Health) || FMath::IsNearlyZero(Damage))
 	{
@@ -28,7 +31,7 @@ void UP13HealthComponent::ReceiveDamage(const float Damage)
 
 	if (FMath::IsNearlyZero(Health))
 	{
-		OnHealthOver.Broadcast();
+		OnHealthOver.Broadcast(Causer);
 		OnDead();
 	}
 }
@@ -47,10 +50,15 @@ void UP13HealthComponent::ChangeHealth(const float Power)
 {
 	if (FMath::IsNearlyZero(Power))
 	{
-		return;	
+		return;
 	}
 
 	Power > 0 ? AddHealth(Power) : ReceiveDamage(FMath::Abs(Power));
+}
+
+void UP13HealthComponent::OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	ReceiveDamage(Damage, InstigatedBy);
 }
 
 void UP13HealthComponent::OnDead()
