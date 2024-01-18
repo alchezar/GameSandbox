@@ -211,8 +211,20 @@ void AP13TopDownCharacter::SwitchWeaponInput(const bool bNext)
 
 void AP13TopDownCharacter::DropInput(const bool bTakeNext)
 {
+	CurrentWeaponType = EP13AmmoType::Default;
+	
 	check(InventoryComponent)
-	InventoryComponent->DropCurrentWeapon(CachedWeapon.Get(), bTakeNext);
+	if (InventoryComponent->TryDropCurrentWeapon(CachedWeapon.Get(), bTakeNext))
+	{
+		return;
+	}
+	InventoryComponent->OnInventoryUpdated.Broadcast();
+	
+	if (CachedWeapon.IsValid())
+	{
+		CachedWeapon->Destroy();
+		CachedWeapon.Reset();
+	}
 }
 
 EPhysicalSurface AP13TopDownCharacter::GetSurfaceType()
@@ -348,8 +360,6 @@ void AP13TopDownCharacter::OnDeathHandle(AController* Causer)
 
 	/* Drop current weapon and remove it from the inventory. */
 	DropInput(false);
-	CachedWeapon->Destroy();
-	CachedWeapon.Reset();
 
 	/* Remove 1 life from player state and save player inventory */
 	if (AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>())
@@ -497,6 +507,11 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 {
 	if (CachedWeapon.IsValid())
 	{
+		/* Don't do anything if we just picked up another weapon. */
+		if (CurrentIndex == CachedWeapon->GetWeaponIndex())
+		{
+			return;
+		}
 		CachedWeapon->Destroy();
 		CachedWeapon.Reset();
 	}
@@ -510,6 +525,8 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 	{
 		return;
 	}
+
+	PlayAnimMontage(WeaponInfo->CharEquipAnim);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -528,10 +545,8 @@ void AP13TopDownCharacter::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const
 	CachedWeapon->OnWeaponReloadStart.AddUObject(this, &ThisClass::OnWeaponReloadStartHandle);
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
 
-	PlayAnimMontage(WeaponInfo->CharEquipAnim);
-
-	AP13Weapon* Weapon = CachedWeapon.Get();
-	InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, Weapon);
+	CurrentWeaponType = WeaponInfo->AmmoType;
+	InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, CachedWeapon.Get());
 }
 
 void AP13TopDownCharacter::FocusOnCursor(const bool bOn)

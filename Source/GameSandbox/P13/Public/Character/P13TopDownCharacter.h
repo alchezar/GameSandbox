@@ -76,6 +76,7 @@ public:
 	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
 	FORCEINLINE USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	FORCEINLINE UP13InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	FORCEINLINE EP13AmmoType GetCurrentWeaponType() const { return CurrentWeaponType; }
 	void UpdateCharacter() const;
 	void ChangeMovementState(const EP13MovementState NewMovementState);
 	FVector GetLookAtCursorDirection() const;
@@ -162,4 +163,5 @@ private:
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
 	UPROPERTY()
 	TArray<UP13StateEffect*> ActiveStateEffects;
+	EP13AmmoType CurrentWeaponType = EP13AmmoType::Default;
 };

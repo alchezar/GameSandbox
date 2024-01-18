@@ -125,13 +125,13 @@ void UP13InventoryComponent::SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, 
 	OnAmmoChanged.Broadcast(WeaponSlots[CurrentWeaponIndex].AmmoType, RequiredAmmo, AmmoSlot->Count);
 }
 
-bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, int32 OldIndex, FP13WeaponDynamicInfo OldInfo)
+bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const int32 OldIndex, FP13WeaponDynamicInfo OldInfo)
 {
 	const int32 CorrectIndex = NewIndex >= 0 ? NewIndex % WeaponSlots.Num() : WeaponSlots.Num() + NewIndex;
 
 	for (int32 Index = 0; Index < WeaponSlots.Num(); ++Index)
 	{
-		if ((Index != CorrectIndex) || WeaponSlots[Index].WeaponID.IsNone())
+		if ((CorrectIndex == OldIndex) || (Index != CorrectIndex) || !WeaponSlots.IsValidIndex(Index) || WeaponSlots[Index].WeaponID.IsNone())
 		{
 			continue;
 		}
@@ -156,18 +156,18 @@ int32 UP13InventoryComponent::FindMaxAvailableRound(const int32 OldRoundNum, con
 	return MagazineSize;
 }
 
-void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, const bool bTakeNext)
+bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapon, bool bTakeNext)
 {
 	check(GameInstanceCached)
 	if (!CurrentWeapon)
 	{
-		return;
+		return false;
 	}
 
-	/* Avoid dropping last weapon. */
-	if (WeaponSlots.Num() <= 1)
+	/* If we dropping the last weapon, don't try to take next one. */
+	if (WeaponSlots.Num() == 1)
 	{
-		return;
+		bTakeNext = false;
 	}
 
 	/* Find and update info about dropped item. */
@@ -188,19 +188,21 @@ void UP13InventoryComponent::DropCurrentWeapon(const AP13Weapon* CurrentWeapon, 
 	if (!bTakeNext)
 	{
 		WeaponSlots.RemoveAt(CurrentWeaponIndex);
-		return;
+		OnInventoryUpdated.Broadcast();
+		return false;
 	}
 
 	const int32 RemoveIndex = CurrentWeaponIndex;
 	if (!TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo))
 	{
-		return;
+		return false;
 	}
 	WeaponSlots.RemoveAt(RemoveIndex);
 	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
 
 	OnInventoryUpdated.Broadcast();
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	return true;
 }
 
 void UP13InventoryComponent::ClearWeaponSlots()

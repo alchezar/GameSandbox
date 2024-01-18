@@ -4,21 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
+#include "P13/Public/Library/P13Types.h"
 #include "P13GameState.generated.h"
 
 struct FP13LevelSelect;
 
-UENUM(BlueprintType)
-enum class EP13LevelPhase : uint8
-{
-	Phase1,
-	Phase2,
-	Phase3,
-	Phase4,
-	Phase5,
-	Phase6,
-	MAX UMETA(Hidden)
-};
+DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnPhaseChangedSignature, EP13LevelPhase /*Phase*/)
 
 UCLASS()
 class GAMESANDBOX_API AP13GameState : public AGameState
@@ -42,6 +33,9 @@ private:
 	void SaveWinScores();
 	
 	/* ----------------------------- Variables ----------------------------- */
+public:
+	FP13OnPhaseChangedSignature OnPhaseChanged;
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	EP13LevelPhase StartLevelPhase = EP13LevelPhase::Phase1;

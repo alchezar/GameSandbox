@@ -34,6 +34,7 @@ public:
 	FORCEINLINE FP13WeaponInfo* GetWeaponInfo() const { return WeaponSettings; }
 	FORCEINLINE USkeletalMeshComponent* GetMesh() const { return MeshWeapon; };
 	FORCEINLINE FP13WeaponDynamicInfo GetDynamicInfo() const { return WeaponCurrentSettings; }
+	FORCEINLINE int32 GetWeaponIndex() const { return WeaponIndex; }
 	FVector GetShootLocation() const;
 	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const int32 NewWeaponIndex, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
 	void UpdateWeaponState(const EP13MovementState NewState);

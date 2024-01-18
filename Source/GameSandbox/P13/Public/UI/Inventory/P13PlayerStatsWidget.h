@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "Components/TextBlock.h"
+#include "P13/Public/Library/P13Types.h"
 #include "P13PlayerStatsWidget.generated.h"
 
 class AP13PlayerState;
@@ -26,6 +27,7 @@ private:
 	void OnPlayerScoreChangedHandle(const int32 NewScore);
 	void OnPlayerLivesChangedHandle(const int32 NewLives);
 	void OnOneSecondPassed();
+	void OnGamePhaseChangedHandle(const EP13LevelPhase LevelPhase);
 
 private:
 	static FString NumberToTime(const int32 Time);
@@ -38,6 +40,8 @@ protected:
 	UTextBlock* ScoreText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* LivesText;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* PhaseText;
 
 private:
 	int32 SecondsFromStart = 0;

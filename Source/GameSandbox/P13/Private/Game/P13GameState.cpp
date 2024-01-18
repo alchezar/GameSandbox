@@ -13,12 +13,17 @@ AP13GameState::AP13GameState()
 void AP13GameState::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	LevelPhase = StartLevelPhase;
+	OnPhaseChanged.Broadcast(LevelPhase);
+	
 	SaveWinScores();
 }
 
 void AP13GameState::GoToNextPhase()
 {
 	LevelPhase = StaticCast<EP13LevelPhase>((StaticCast<uint8>(LevelPhase) + 1) % StaticCast<uint8>(EP13LevelPhase::MAX));
+	OnPhaseChanged.Broadcast(LevelPhase);
 }
 
 void AP13GameState::CheckWinCondition(const int32 TotalScore)
@@ -54,9 +59,7 @@ void AP13GameState::SaveWinScores()
 	FString CurrentMapName = GetWorld()->GetMapName();
 	CurrentMapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
 	
-	LevelPhase = StartLevelPhase;
 	LevelSelectTable->GetAllRows<FP13LevelSelect>("", Levels);
-
 	FP13LevelSelect** LevelResult = Levels.FindByPredicate([&](const FP13LevelSelect* Level)
 	{
 		return Level->RealName == *CurrentMapName;

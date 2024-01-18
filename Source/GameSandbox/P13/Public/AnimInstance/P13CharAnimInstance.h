@@ -42,6 +42,8 @@ protected:
 	EP13MovementState MovementState;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
 	FRotator AimRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, Category = "C++")
+	EP13AmmoType WeaponType;
 
 	UPROPERTY(BlueprintReadWrite, Transient, Category = "C++")
 	FVector LeftLegOffset = FVector::ZeroVector;

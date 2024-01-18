@@ -25,9 +25,9 @@ const FName WeaponSocketName = "GripPoint";
 UENUM(BlueprintType)
 enum class EP13MovementState : uint8
 {
-	Aim UMETA(DisplayName = "Aim State"),
-	Walk UMETA(DisplayName = "Walk State"),
-	Run UMETA(DisplayName = "Run State"),
+	Aim    UMETA(DisplayName = "Aim State"),
+	Walk   UMETA(DisplayName = "Walk State"),
+	Run    UMETA(DisplayName = "Run State"),
 	Sprint UMETA(DisplayName = "Spring State")
 };
 
@@ -35,12 +35,24 @@ UENUM(BlueprintType)
 enum class EP13AmmoType : uint8
 {
 	Default UMETA(DisplayName = "Default"),
-	Pistol UMETA(DisplayName = "Pistol"),
-	Rifle UMETA(DisplayName = "Assault rifle"),
+	Pistol  UMETA(DisplayName = "Pistol"),
+	Rifle   UMETA(DisplayName = "Assault rifle"),
 	Shotgun UMETA(DisplayName = "ShotGun"),
-	Sniper UMETA(DisplayName = "Sniper rifle"),
+	Sniper  UMETA(DisplayName = "Sniper rifle"),
 	Grenade UMETA(DisplayName = "Grenade launcher"),
-	Rocket UMETA(DisplayName = "Rocket launcher")
+	Rocket  UMETA(DisplayName = "Rocket launcher")
+};
+
+UENUM(BlueprintType)
+enum class EP13LevelPhase : uint8
+{
+	Phase1,
+	Phase2,
+	Phase3,
+	Phase4,
+	Phase5,
+	Phase6,
+	MAX    UMETA(Hidden)
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

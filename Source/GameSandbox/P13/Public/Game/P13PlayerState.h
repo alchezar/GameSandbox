@@ -4,14 +4,15 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
+#include "P13/Public/Library/P13Types.h"
 #include "P13PlayerState.generated.h"
+
+struct FP13AmmoSlot;
+struct FP13WeaponSlot;
 
 DECLARE_MULTICAST_DELEGATE(FP13OnPlyaerStateInitSignature)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnScoreChangedSignature, int32 /*Score*/)
 DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnLivesChangedSignature, int32 /*Lives*/)
-
-struct FP13AmmoSlot;
-struct FP13WeaponSlot;
 
 UCLASS()
 class GAMESANDBOX_API AP13PlayerState : public APlayerState
@@ -49,7 +50,7 @@ public:
 	FP13OnPlyaerStateInitSignature OnPlayerStateInit;
 	FP13OnScoreChangedSignature OnScoreChanged;
 	FP13OnLivesChangedSignature OnLivesChanged;
-
+	
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	int32 MaxLives = 3;

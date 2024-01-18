@@ -2,6 +2,7 @@
 
 #include "P13/Public/UI/Inventory/P13PlayerStatsWidget.h"
 
+#include "P13/Public/Game/P13GameState.h"
 #include "P13/Public/Game/P13PlayerState.h"
 
 void UP13PlayerStatsWidget::NativeConstruct()
@@ -9,22 +10,24 @@ void UP13PlayerStatsWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	PlayerStateCached = GetOwningPlayerState<AP13PlayerState>();
-	if (!PlayerStateCached.IsValid())
+	if (PlayerStateCached.IsValid())
 	{
-		return;
+		PlayerStateCached->OnScoreChanged.AddUObject(this, &ThisClass::OnPlayerScoreChangedHandle);
+		PlayerStateCached->OnLivesChanged.AddUObject(this, &ThisClass::OnPlayerLivesChangedHandle);
+		OnPlayerLivesChangedHandle(PlayerStateCached->GetTotalLives());
+		OnPlayerScoreChangedHandle(PlayerStateCached->GetTotalScore());
+
+		SecondsFromStart = PlayerStateCached->GetTotalTime();
+		OnOneSecondPassed();
+		FTimerHandle EverySecondTimer;
+		GetWorld()->GetTimerManager().SetTimer(EverySecondTimer, this, &ThisClass::OnOneSecondPassed, 1.f, true);
 	}
 
-	PlayerStateCached->OnScoreChanged.AddUObject(this, &ThisClass::OnPlayerScoreChangedHandle);
-	PlayerStateCached->OnLivesChanged.AddUObject(this, &ThisClass::OnPlayerLivesChangedHandle);
-
-	OnPlayerLivesChangedHandle(PlayerStateCached->GetTotalLives());
-	OnPlayerScoreChangedHandle(PlayerStateCached->GetTotalScore());
-
-	SecondsFromStart = PlayerStateCached->GetTotalTime();
-	OnOneSecondPassed();
-
-	FTimerHandle EverySecondTimer;
-	GetWorld()->GetTimerManager().SetTimer(EverySecondTimer, this, &ThisClass::OnOneSecondPassed, 1.f, true);
+	if (AP13GameState* GameState = GetWorld()->GetGameState<AP13GameState>())
+	{
+		GameState->OnPhaseChanged.AddUObject(this, &ThisClass::OnGamePhaseChangedHandle);
+		OnGamePhaseChangedHandle(GameState->GetLastLevelPhase());
+	}
 }
 
 void UP13PlayerStatsWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
@@ -58,10 +61,17 @@ void UP13PlayerStatsWidget::OnOneSecondPassed()
 	const int32 Min = SecondsFromStart / 60;
 	const int32 Sec = SecondsFromStart % 60;
 
-	const FString Time = NumberToTime(Min) + " : " + NumberToTime(Sec);
+	const FString Time = NumberToTime(Min) + ":" + NumberToTime(Sec);
 	TimeText->SetText(FText::FromString(Time));
 
 	++SecondsFromStart;
+}
+
+void UP13PlayerStatsWidget::OnGamePhaseChangedHandle(const EP13LevelPhase LevelPhase)
+{
+	// const FName ValueAsName = UEnum::GetValueAsName(LevelPhase);
+	const FText PhaseNum = FText::AsNumber(StaticCast<uint8>(LevelPhase) + 1);
+	PhaseText->SetText(PhaseNum);
 }
 
 FString UP13PlayerStatsWidget::NumberToTime(const int32 Time)
