@@ -7,6 +7,7 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13CharAnimInstance.generated.h"
 
+class AP13CharacterBase;
 class AP13TopDownCharacter;
 
 UCLASS()
@@ -20,9 +21,6 @@ public:
 	virtual void NativeUpdateAnimation(float DeltaSeconds) override;
 
 	/* ------------------------------- This -------------------------------- */
-protected:
-	FORCEINLINE TWeakObjectPtr<AP13TopDownCharacter> GetCachedCharacter() const { return CachedCharacter; }
-
 private:
 	float GetMovementDirectionAngle() const;
 
@@ -53,5 +51,5 @@ protected:
 	FVector HipOffset = FVector::ZeroVector;
 
 private:
-	TWeakObjectPtr<AP13TopDownCharacter> CachedCharacter;
+	TWeakObjectPtr<AP13CharacterBase> CachedCharacter;
 };

@@ -16,8 +16,9 @@ void UP13InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/* Find init weapon slots and find init weapons. */
-	TryUpdateSlotsFromData();
+	/* We won`t be update our slots here at begin play, because after respawn at this point
+	 * Pawn don`t have neither Controller nor PlayerState. Just wait for Pawn's OnPossess event. */
+	// RefreshSlots();
 }
 
 void UP13InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -301,7 +302,13 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 	{
 		return false;
 	}
-	AP13PlayerState* PlayerState = PawnOwner->GetPlayerState<AP13PlayerState>();
+	const AController* Controller = PawnOwner->Controller;
+	if (!Controller)
+	{
+		return false;
+	}
+	AP13PlayerState* PlayerState = PawnOwner->Controller->GetPlayerState<AP13PlayerState>();
+	// AP13PlayerState* PlayerState = PawnOwner->GetPlayerState<AP13PlayerState>();
 	if (!PlayerState)
 	{
 		return false;

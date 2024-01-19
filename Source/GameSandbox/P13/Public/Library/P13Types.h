@@ -58,6 +58,17 @@ enum class EP13LevelPhase : uint8
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                               Structures                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ 
+USTRUCT(BlueprintType)
+struct FP13CameraHeightClamp
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Min = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Max = 1500.f;
+};
 
 USTRUCT(BlueprintType)
 struct FP13MovementSpeed

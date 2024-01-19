@@ -3,13 +3,13 @@
 #include "P13/Public/AnimInstance/P13CharAnimInstance.h"
 
 #include "GameFramework/CharacterMovementComponent.h"
-#include "P13/Public/Character/P13TopDownCharacter.h"
+#include "P13/Public/Character/P13CharacterBase.h"
 
 void UP13CharAnimInstance::NativeBeginPlay()
 {
 	Super::NativeBeginPlay();
 
-	CachedCharacter = Cast<AP13TopDownCharacter>(TryGetPawnOwner());
+	CachedCharacter = Cast<AP13CharacterBase>(TryGetPawnOwner());
 	check(CachedCharacter.IsValid())
 }
 
