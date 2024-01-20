@@ -93,8 +93,6 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 
 void AP13PlayerController::OnUnPossess()
 {
-	Super::OnUnPossess();
-
 	if (HeadsUpDisplay)
 	{
 		HeadsUpDisplay->ClearInGame();
@@ -110,6 +108,8 @@ void AP13PlayerController::OnUnPossess()
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 
 	HeadsUpDisplay->ShowEndGame(false);
+
+	Super::OnUnPossess();
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)

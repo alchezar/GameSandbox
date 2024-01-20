@@ -13,7 +13,7 @@ AP13CharacterTopDown::AP13CharacterTopDown()
 {
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
-	
+
 	CreateTopDownComponents();
 }
 
@@ -26,7 +26,7 @@ void AP13CharacterTopDown::PostInitializeComponents()
 void AP13CharacterTopDown::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	
+
 	if (AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController))
 	{
 		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
@@ -197,7 +197,7 @@ void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
 	{
 		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
 	}
-	
+
 	Super::OnDeathHandle(Causer);
 }
 

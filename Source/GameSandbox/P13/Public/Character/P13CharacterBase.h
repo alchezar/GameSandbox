@@ -27,7 +27,8 @@ public:
 	virtual void PostInitializeComponents() override;
 	virtual void PossessedBy(AController* NewController) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-
+	virtual void UnPossessed() override;
+	
 protected:
 	virtual void BeginPlay() override;
 
@@ -77,6 +78,7 @@ private:
 	void CreateDynamicMeshMaterials();
 	void UpdateMeshMaterial(const float HealthAlpha);
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
+	void PlayTakeDamageEffect(const AActor* DamageCauser);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -89,6 +91,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UCurveLinearColor* ColorOverLife;
+	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
+	UAnimMontage* TakeDamageAnim = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	EP13MovementState MovementState = EP13MovementState::Run;
@@ -97,6 +101,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
 
+	TWeakObjectPtr<AController> ControllerCached;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	EP13AmmoType CurrentWeaponType = EP13AmmoType::Default;
 

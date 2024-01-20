@@ -26,7 +26,7 @@ AP13CharacterBase::AP13CharacterBase()
 void AP13CharacterBase::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+
 	if (InventoryComponent)
 	{
 		InventoryComponent->OnCurrentWeaponUpdated.AddUObject(this, &ThisClass::InitWeapon);
@@ -36,7 +36,8 @@ void AP13CharacterBase::PostInitializeComponents()
 void AP13CharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
-	
+
+	ControllerCached = NewController;
 	UpdateInventoryAfterRespawn();
 }
 
@@ -44,16 +45,23 @@ float AP13CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& Dama
 {
 	const float ActualDamage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	TakeStateEffectFromRadialDamage(DamageEvent, DamageCauser);
-	
+	PlayTakeDamageEffect(DamageCauser);
+
 	return ActualDamage;
+}
+
+void AP13CharacterBase::UnPossessed()
+{
+	ControllerCached.Reset();
+	Super::UnPossessed();
 }
 
 void AP13CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	CreateDynamicMeshMaterials();
-	
+
 	if (AttributesComponent)
 	{
 		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
@@ -252,14 +260,13 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 void AP13CharacterBase::DropWeapon(const bool bTakeNext)
 {
 	CurrentWeaponType = EP13AmmoType::Default;
-	
+
 	check(InventoryComponent)
 	if (InventoryComponent->TryDropCurrentWeapon(CachedWeapon.Get(), bTakeNext))
 	{
 		return;
 	}
-	// InventoryComponent->OnInventoryUpdated.Broadcast();
-	
+
 	if (CachedWeapon.IsValid())
 	{
 		CachedWeapon->Destroy();
@@ -410,4 +417,24 @@ void AP13CharacterBase::TakeStateEffectFromRadialDamage(FDamageEvent const& Dama
 		return;
 	}
 	UP13Types::AddEffectBySurfaceType(this, Projectile->GetBulletStateEffect(), GetSurfaceType());
+}
+
+void AP13CharacterBase::PlayTakeDamageEffect(const AActor* DamageCauser)
+{
+	if (ControllerCached.IsValid())
+	{
+		ControllerCached->StopMovement();
+	}
+
+	const FVector ActorDir = GetMesh()->GetForwardVector();
+	const FVector ShotDir = (DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
+	const float ShootAngle = FMath::RadiansToDegrees(FMath::Acos(ActorDir | ShotDir)) * FMath::Sign((ActorDir ^ ShotDir).Z);
+	
+	FString MontageSection = "From";
+	if      (ShootAngle >  -45.f && ShootAngle <  45.f)  MontageSection += "Front";
+	else if (ShootAngle > -135.f && ShootAngle < -45.f)  MontageSection += "Left";
+	else if (ShootAngle >  135.f && ShootAngle < -135.f) MontageSection += "Back";
+	else if (ShootAngle >   45.f && ShootAngle <  135.f) MontageSection += "Right";
+	
+	PlayAnimMontage(TakeDamageAnim, 1.f, *MontageSection);
 }

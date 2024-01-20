@@ -26,8 +26,13 @@ public:
 	/* ------------------------------- This -------------------------------- */
 private:
 	void CreateEnemyComponents();
-	
+	void MoveToPlayer() const;
+
 	/* ----------------------------- Variables ----------------------------- */
+protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UP13ScoreComponent* ScoreComp;
+
+	UPROPERTY(EditAnywhere, Category = "C++")
+	float AcceptanceRadius = 200.f;
 };
