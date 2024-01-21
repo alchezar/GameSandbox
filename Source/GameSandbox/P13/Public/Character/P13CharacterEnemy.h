@@ -24,6 +24,9 @@ public:
 	virtual void Tick(float DeltaTime) override;
 	
 	/* ------------------------------- This -------------------------------- */
+protected:
+	virtual void OnDeathHandle(AController* Causer) override;
+	
 private:
 	void CreateEnemyComponents();
 	void MoveToPlayer() const;

@@ -46,14 +46,14 @@ void UP13HealthComponent::AddHealth(const float HealthAid)
 	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
-void UP13HealthComponent::ChangeHealth(const float Power)
+void UP13HealthComponent::ChangeHealth(const float Power, AController* Causer)
 {
 	if (FMath::IsNearlyZero(Power))
 	{
 		return;
 	}
 
-	Power > 0 ? AddHealth(Power) : ReceiveDamage(FMath::Abs(Power));
+	Power > 0 ? AddHealth(Power) : ReceiveDamage(FMath::Abs(Power), Causer);
 }
 
 void UP13HealthComponent::OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)

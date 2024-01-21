@@ -20,6 +20,14 @@ void AP13GameState::BeginPlay()
 	SaveWinScores();
 }
 
+int32 AP13GameState::GetMaxEnemiesOnPhase()
+{
+	const int32 PhaseNum = StaticCast<uint8>(LevelPhase);
+	check(MaxEnemies.IsValidIndex(PhaseNum))
+	
+	return MaxEnemies[PhaseNum];
+}
+
 void AP13GameState::GoToNextPhase()
 {
 	LevelPhase = StaticCast<EP13LevelPhase>((StaticCast<uint8>(LevelPhase) + 1) % StaticCast<uint8>(EP13LevelPhase::MAX));
@@ -70,4 +78,5 @@ void AP13GameState::SaveWinScores()
 	}
 	
 	WinScores = (*LevelResult)->PhaseWinScore;
+	MaxEnemies = (*LevelResult)->MaxEnemiesPerPhase;
 }

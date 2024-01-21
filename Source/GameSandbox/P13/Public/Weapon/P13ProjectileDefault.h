@@ -55,7 +55,7 @@ private:
 	void GivePointDamage(const FHitResult& Hit, AActor* OtherActor);
 	void GiveRadialDamage();
 
-	void SpawnStateEffect(const FHitResult& Hit);
+	void SpawnStateEffect(const FHitResult& Hit, AController* Causer);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

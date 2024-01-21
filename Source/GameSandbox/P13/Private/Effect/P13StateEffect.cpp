@@ -14,7 +14,7 @@
 UP13StateEffect::UP13StateEffect()
 {}
 
-void UP13StateEffect::InitObject(AActor* NewActor)
+void UP13StateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 {
 	if (!NewActor)
 	{
@@ -26,6 +26,7 @@ void UP13StateEffect::InitObject(AActor* NewActor)
 	}
 
 	CachedActor = NewActor;
+	CachedCauser = NewCauser;
 }
 
 void UP13StateEffect::DestroyObject()
@@ -48,9 +49,9 @@ void UP13StateEffect::DestroyObject()
  *                       State Effect Single Execute                         *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void UP13SingleStateEffect::InitObject(AActor* NewActor)
+void UP13SingleStateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 {
-	Super::InitObject(NewActor);
+	Super::InitObject(NewActor, NewCauser);
 	StartEffect();
 }
 
@@ -76,16 +77,16 @@ void UP13SingleStateEffect::ApplyEffect()
 	{
 		return;
 	}
-	HealthComponent->ChangeHealth(Power);
+	HealthComponent->ChangeHealth(Power, CachedCauser.Get());
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                         State Effect Timer Execute                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void UP13TimerStateEffect::InitObject(AActor* NewActor)
+void UP13TimerStateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 {
-	Super::InitObject(NewActor);
+	Super::InitObject(NewActor, NewCauser);
 }
 
 void UP13TimerStateEffect::DestroyObject()

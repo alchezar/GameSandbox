@@ -29,7 +29,7 @@ public:
 	FORCEINLINE void SetMaxHealth(const float NewMaxHealth) { MaxHealth = NewMaxHealth; }
 	virtual void ReceiveDamage(const float Damage, AController* Causer = nullptr);
 	virtual void AddHealth(const float HealthAid);
-	virtual void ChangeHealth(const float Power);
+	virtual void ChangeHealth(const float Power, AController* Causer);
 	UFUNCTION()
 	void OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 

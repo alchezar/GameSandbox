@@ -291,6 +291,8 @@ struct FP13LevelSelect : public  FTableRowBase
 	UTexture2D* Icon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TArray<int32> PhaseWinScore;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TArray<int32> MaxEnemiesPerPhase;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -305,5 +307,5 @@ class GAMESANDBOX_API UP13Types : public UBlueprintFunctionLibrary
 public:
 	UP13Types() {};
 
-	static void AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13StateEffect> StateEffectClass, const EPhysicalSurface SurfaceType);
+	static void AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13StateEffect> StateEffectClass, const EPhysicalSurface SurfaceType, AController* EffectCauser);
 };

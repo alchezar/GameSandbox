@@ -10,7 +10,6 @@
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
 #include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 #include "P13/Public/Game/P13GameInstance.h"
-#include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
@@ -124,6 +123,11 @@ FVector AP13CharacterBase::GetLookAtCursorDirection() const
 	return GetMesh()->GetForwardVector();
 }
 
+float AP13CharacterBase::GetHealthReserve() const
+{
+	return AttributesComponent->GetCurrentHealth() + AttributesComponent->GetCurrentShield();
+}
+
 void AP13CharacterBase::UpdateCharacter() const
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;
@@ -183,13 +187,6 @@ void AP13CharacterBase::OnDeathHandle(AController* Causer)
 	/* Drop current weapon and remove it from the inventory. */
 	DropWeapon(false);
 
-	/* Remove 1 life from player state and save player inventory */
-	if (AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>())
-	{
-		DeadPlayerState->OnPlayerDied();
-		DeadPlayerState->SavePlayerInventory(InventoryComponent->GetAllWeaponSlots(), InventoryComponent->GetAllAmmoSlots());
-	}
-
 	if (Controller)
 	{
 		Controller->UnPossess();
@@ -239,7 +236,7 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = this;
-	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.Instigator = this;
 
 	CachedWeapon = GetWorld()->SpawnActor<AP13Weapon>(WeaponInfo->Class, SpawnParams);
 	if (!CachedWeapon.IsValid())
@@ -416,7 +413,7 @@ void AP13CharacterBase::TakeStateEffectFromRadialDamage(FDamageEvent const& Dama
 	{
 		return;
 	}
-	UP13Types::AddEffectBySurfaceType(this, Projectile->GetBulletStateEffect(), GetSurfaceType());
+	UP13Types::AddEffectBySurfaceType(this, Projectile->GetBulletStateEffect(), GetSurfaceType(), DamageCauser->GetInstigatorController());
 }
 
 void AP13CharacterBase::PlayTakeDamageEffect(const AActor* DamageCauser)
@@ -426,8 +423,9 @@ void AP13CharacterBase::PlayTakeDamageEffect(const AActor* DamageCauser)
 		ControllerCached->StopMovement();
 	}
 
+	const FVector CauserLocation = DamageCauser ? DamageCauser->GetActorLocation() : GetActorLocation() + GetActorForwardVector();
+	const FVector ShotDir = (CauserLocation  - GetActorLocation()).GetSafeNormal2D();
 	const FVector ActorDir = GetMesh()->GetForwardVector();
-	const FVector ShotDir = (DamageCauser->GetActorLocation() - GetActorLocation()).GetSafeNormal2D();
 	const float ShootAngle = FMath::RadiansToDegrees(FMath::Acos(ActorDir | ShotDir)) * FMath::Sign((ActorDir ^ ShotDir).Z);
 	
 	FString MontageSection = "From";

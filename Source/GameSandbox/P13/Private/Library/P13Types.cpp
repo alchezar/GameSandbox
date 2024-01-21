@@ -4,7 +4,7 @@
 
 #include "P13/Public/Effect/P13StateEffect.h"
 
-void UP13Types::AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13StateEffect> StateEffectClass, const EPhysicalSurface SurfaceType)
+void UP13Types::AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13StateEffect> StateEffectClass, const EPhysicalSurface SurfaceType, AController* EffectCauser)
 {
 	if (!Victim || !StateEffectClass || SurfaceType == SurfaceType_Default)
 	{
@@ -23,6 +23,6 @@ void UP13Types::AddEffectBySurfaceType(AActor* Victim, const TSubclassOf<UP13Sta
 		}
 		UP13StateEffect* NewStateEffect = NewObject<UP13StateEffect>(Victim, StateEffectClass);
 		check(NewStateEffect)
-		NewStateEffect->InitObject(Victim);
+		NewStateEffect->InitObject(Victim, EffectCauser);
 	}
 }

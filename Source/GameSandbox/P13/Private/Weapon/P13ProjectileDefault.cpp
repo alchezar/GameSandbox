@@ -74,7 +74,7 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 		return;
 	}
 
-	SpawnStateEffect(Hit);
+	SpawnStateEffect(Hit, GetInstigatorController());
 	SpawnEffectsOnHit(Hit);
 
 	if (DamageType == EP13ProjectileDamageType::Point)
@@ -153,7 +153,7 @@ void AP13ProjectileDefault::GiveRadialDamage()
 	ImpactProjectile();
 }
 
-void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit)
+void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit, AController* Causer)
 {
 	const IP13StateEffectInterface* StateEffectInterface = Cast<IP13StateEffectInterface>(Hit.GetActor());
 	if (!StateEffectInterface)
@@ -165,5 +165,5 @@ void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit)
 		return;
 	}
 	
-	UP13Types::AddEffectBySurfaceType(Hit.GetActor(), BulletSettings.StateEffectClass, Hit.PhysMaterial->SurfaceType);
+	UP13Types::AddEffectBySurfaceType(Hit.GetActor(), BulletSettings.StateEffectClass, Hit.PhysMaterial->SurfaceType, Causer);
 }

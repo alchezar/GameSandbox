@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
 #include "P13/Public/Controller/P13PlayerController.h"
+#include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Weapon/P13Weapon.h"
 
 AP13CharacterTopDown::AP13CharacterTopDown()
@@ -196,6 +197,13 @@ void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
 	if (Controller)
 	{
 		Controller->SetControlRotation(CameraBoom->GetComponentRotation());
+	}
+
+	/* Remove 1 life from player state and save player inventory */
+	if (AP13PlayerState* DeadPlayerState = GetPlayerState<AP13PlayerState>())
+	{
+		DeadPlayerState->OnPlayerDied();
+		DeadPlayerState->SavePlayerInventory(InventoryComponent->GetAllWeaponSlots(), InventoryComponent->GetAllAmmoSlots());
 	}
 
 	Super::OnDeathHandle(Causer);

@@ -51,6 +51,7 @@ public:
 	FORCEINLINE UP13InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	FORCEINLINE EP13AmmoType GetCurrentWeaponType() const { return CurrentWeaponType; }
 	virtual FVector GetLookAtCursorDirection() const;
+	float GetHealthReserve() const;
 	void SavePreviousMovementState() { PreviousMovementState = MovementState; }
 
 protected:

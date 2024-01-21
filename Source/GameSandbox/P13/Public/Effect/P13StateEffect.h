@@ -24,7 +24,7 @@ public:
 public:
 	FORCEINLINE TArray<TEnumAsByte<EPhysicalSurface>> GetPossibleInteractSurfaces() const { return PossibleInteractSurfaces; }
 	FORCEINLINE bool GetIsStackable() const { return bStackable; }
-	virtual void InitObject(AActor* NewActor);
+	virtual void InitObject(AActor* NewActor, AController* NewCauser);
 	virtual void DestroyObject();
 
 public:
@@ -36,6 +36,7 @@ protected:
 	bool bStackable = false;
 
 	TWeakObjectPtr<AActor> CachedActor;
+	TWeakObjectPtr<AController> CachedCauser;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -48,7 +49,7 @@ class UP13SingleStateEffect : public UP13StateEffect
 	GENERATED_BODY()
 
 public:
-	virtual void InitObject(AActor* NewActor) override;
+	virtual void InitObject(AActor* NewActor, AController* NewCauser) override;
 	virtual void DestroyObject() override;
 	virtual void StartEffect();
 	virtual void ApplyEffect();
@@ -73,7 +74,7 @@ class UP13TimerStateEffect : public UP13SingleStateEffect
 	GENERATED_BODY()
 
 public:
-	virtual void InitObject(AActor* NewActor) override;
+	virtual void InitObject(AActor* NewActor, AController* NewCauser) override;
 	virtual void DestroyObject() override;
 	virtual void StartEffect() override;
 	virtual void ApplyEffect() override;

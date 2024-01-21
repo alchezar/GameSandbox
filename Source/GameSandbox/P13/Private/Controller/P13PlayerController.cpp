@@ -359,6 +359,6 @@ bool AP13PlayerController::TryRespawnOnUnPossess()
 		return false;
 	}
 
-	GameMode->Respawn(this);
+	GameMode->RespawnPlayer(this);
 	return true;
 }

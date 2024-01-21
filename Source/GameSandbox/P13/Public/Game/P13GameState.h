@@ -26,6 +26,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE EP13LevelPhase GetLastLevelPhase() const { return LevelPhase; }
+	int32 GetMaxEnemiesOnPhase();
 	void GoToNextPhase();
 	void CheckWinCondition(const int32 TotalScore);
 
@@ -47,4 +48,5 @@ private:
 	EP13LevelPhase LevelPhase = EP13LevelPhase::Phase1;
 	TArray<FP13LevelSelect*> Levels;
 	TArray<int32> WinScores = {};
+	TArray<int32> MaxEnemies = {};
 };
