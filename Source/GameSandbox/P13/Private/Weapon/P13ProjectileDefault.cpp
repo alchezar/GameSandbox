@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "P13/Public/Intearface/P13StateEffectInterface.h"
 #include "Particles/ParticleSystemComponent.h"
+#include "Perception/AISense_Damage.h"
 
 AP13ProjectileDefault::AP13ProjectileDefault()
 {
@@ -143,6 +144,8 @@ void AP13ProjectileDefault::GivePointDamage(const FHitResult& Hit, AActor* Other
 	PointDamage.HitInfo = Hit;
 	PointDamage.ShotDirection = GetActorForwardVector();
 	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
+	
+	UAISense_Damage::ReportDamageEvent(GetWorld(), OtherActor, GetInstigator(), BulletSettings.Damage, Hit.Location, Hit.ImpactPoint);
 }
 
 void AP13ProjectileDefault::GiveRadialDamage() 

@@ -28,7 +28,7 @@ public:
 	virtual void PossessedBy(AController* NewController) override;
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 	virtual void UnPossessed() override;
-	
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -57,19 +57,22 @@ public:
 protected:
 	void UpdateCharacter() const;
 	void ChangeMovementState(const EP13MovementState NewMovementState);
-	void UpdateInventoryAfterRespawn() const;
+	virtual void UpdateInventoryAfterRespawn();
 
 	void OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
 	void OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha);
 	virtual void OnDeathHandle(AController* Causer);
 
-	void InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
+	virtual void InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
 	void DropWeapon(const bool bTakeNext);
+	void PullTrigger(const bool bStart) const;
+	bool TryReloadWeapon() const;
+	bool TryTakeNextWeapon(const bool bNext) const;
 	bool CheckCharacterCanFire() const;
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
 	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
 	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime);
-	void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess);
+	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess);
 
 private:
 	void CreateBaseComponents();

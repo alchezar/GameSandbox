@@ -38,6 +38,12 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 	/* Take weapon to the inventory. */
 	WeaponSlots.Add(NewWeaponSlot);
 
+	/* If our current weapon hasn't ammo - switch to just taken. */
+	if (WeaponSlots[CurrentWeaponIndex].DynamicInfo.Round == 0)
+	{
+		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);	
+	}
+	
 	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
@@ -126,24 +132,31 @@ void UP13InventoryComponent::SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, 
 	OnAmmoChanged.Broadcast(WeaponSlots[CurrentWeaponIndex].AmmoType, RequiredAmmo, AmmoSlot->Count);
 }
 
-bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const int32 OldIndex, FP13WeaponDynamicInfo OldInfo)
+bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const int32 OldIndex, FP13WeaponDynamicInfo OldInfo, const bool bNext)
 {
 	const int32 CorrectIndex = NewIndex >= 0 ? NewIndex % WeaponSlots.Num() : WeaponSlots.Num() + NewIndex;
 
-	for (int32 Index = 0; Index < WeaponSlots.Num(); ++Index)
+	/* Means we did a full recursion cycle. */
+	if (CorrectIndex == OldIndex)
 	{
-		if ((CorrectIndex == OldIndex) || (Index != CorrectIndex) || !WeaponSlots.IsValidIndex(Index) || WeaponSlots[Index].WeaponID.IsNone())
-		{
-			continue;
-		}
-
-		CurrentWeaponIndex = Index;
-		OnCurrentWeaponUpdated.Broadcast(WeaponSlots[Index], Index);
-		return true;
+		return false;
 	}
-	/* Weapon switch wasn't successful. */
-	// ...
-	return false;
+	
+	if (!WeaponSlots.IsValidIndex(CorrectIndex) || WeaponSlots[CorrectIndex].WeaponID.IsNone())
+	{
+		return false;	
+	}
+
+	/* Don't switch to weapon which has no ammo. */		
+	if (WeaponSlots[CorrectIndex].DynamicInfo.Round + AmmoSlots[CorrectIndex].Count == 0)
+	{
+		const int32 NextDirection = bNext ? 1 : -1;
+		return TrySwitchWeaponToIndex(CorrectIndex + NextDirection, OldIndex, OldInfo);
+	}
+
+	CurrentWeaponIndex = CorrectIndex;
+	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CorrectIndex], CorrectIndex);
+	return true;
 }
 
 int32 UP13InventoryComponent::FindMaxAvailableRound(const int32 OldRoundNum, const int32 MaxRound)

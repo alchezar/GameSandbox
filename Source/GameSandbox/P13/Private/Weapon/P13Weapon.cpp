@@ -8,6 +8,7 @@
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
+#include "Perception/AISense_Hearing.h"
 
 AP13Weapon::AP13Weapon()
 {
@@ -38,6 +39,11 @@ void AP13Weapon::Tick(const float DeltaTime)
 FVector AP13Weapon::GetShootLocation() const
 {
 	return ShootLocation->GetComponentLocation();
+}
+
+float AP13Weapon::GetShootRate() const
+{
+	return 60.f / WeaponSettings->RateOfFire;
 }
 
 void AP13Weapon::WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const int32 NewWeaponIndex, const FP13WeaponDynamicInfo* DynamicInfo)
@@ -112,18 +118,19 @@ void AP13Weapon::SetFireState(const bool bFiring)
 	/* Stop reducing bullet disperse. */
 	GetWorld()->GetTimerManager().ClearTimer(DisperseTimer);
 	/* Start fire. */
-	const float SecondsPerShot = 60.f / WeaponSettings->RateOfFire;
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ThisClass::Fire, SecondsPerShot, true, 0.f);
+	const float SecondsPerShot = GetShootRate();
+	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ThisClass::Fire, SecondsPerShot, true, SecondsPerShot);
+	Fire();
 	LastShotTime = GetWorld()->GetTimeSeconds();
 }
 
-void AP13Weapon::TryReload()
+bool AP13Weapon::TryReload()
 {
 	OnWeaponReloadInit.Broadcast(WeaponCurrentSettings.Round);
 
 	if (!CheckWeaponCanReload())
 	{
-		return;
+		return false;
 	}
 
 	/* Stop fire, but save that weapon trigger is still pulled. */
@@ -134,6 +141,7 @@ void AP13Weapon::TryReload()
 	}
 
 	StartReload();
+	return true;
 }
 
 void AP13Weapon::AbortReloading()
@@ -207,6 +215,8 @@ void AP13Weapon::Fire()
 	SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
 	PlayAnimMontage(WeaponSettings->WeaponFireAnim);
 	UpdateDispersion();
+
+	UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, GetInstigator());
 }
 
 void AP13Weapon::SpawnProjectile() const

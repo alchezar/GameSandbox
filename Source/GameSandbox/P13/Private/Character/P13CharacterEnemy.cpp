@@ -4,14 +4,19 @@
 
 #include "AIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P13/Public/Component/Actor/P13InventoryComponent.h"
 #include "P13/Public/Component/Actor/P13ScoreComponent.h"
 #include "P13/Public/Game/P13GameMode.h"
+#include "P13/Public/Weapon/P13Weapon.h"
 
 AP13CharacterEnemy::AP13CharacterEnemy()
 {
-	bUseControllerRotationYaw = true;
+	// bUseControllerRotationYaw = true;
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
+	GetCharacterMovement()->RotationRate = FRotator(0.f, 180.f, 0.f);
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
+	
 	CreateEnemyComponents();
 }
 
@@ -24,7 +29,36 @@ void AP13CharacterEnemy::BeginPlay()
 void AP13CharacterEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	MoveToPlayer();	
+	// MoveToPlayer();	
+}
+
+void AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
+{
+	if (bReloading || !bNextWeaponAvailable)
+	{
+		return;
+	}
+	
+	if ((CachedWeapon->GetDynamicInfo().Round > 0))
+	{
+		const FVector FixedLocation = TargetLocation - FVector(0.f, 0.f, 90.f);
+		CachedWeapon->SetTargetLocation(FixedLocation);
+		
+		PullTrigger(true);
+		PullTrigger(false);
+		return;
+	}
+	
+	if (TryReloadWeapon())
+	{
+		bReloading = true;
+		return;
+	}
+	
+	if (!TryTakeNextWeapon(true))
+	{
+		bNextWeaponAvailable = false;
+	}
 }
 
 void AP13CharacterEnemy::OnDeathHandle(AController* Causer)
@@ -35,6 +69,40 @@ void AP13CharacterEnemy::OnDeathHandle(AController* Causer)
 	{
 		GameMode->RespawnEnemies();
 	}
+}
+
+void AP13CharacterEnemy::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
+{
+	Super::InitWeapon(NewWeaponSlot, CurrentIndex);
+
+	bNextWeaponAvailable = (CachedWeapon->GetDynamicInfo().Round > 0);
+}
+
+void AP13CharacterEnemy::OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess)
+{
+	Super::OnWeaponReloadFinishHandle(RoundNum, WeaponIndex, bSuccess);
+	bReloading = false;
+}
+
+void AP13CharacterEnemy::OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
+{
+	bNextWeaponAvailable = true;	
+}
+
+void AP13CharacterEnemy::OnAmmoChangedHandle(const EP13AmmoType InCurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount)
+{
+	if (InWeaponNewCount < 0)
+	{
+		bNextWeaponAvailable = true;
+	}
+}
+
+void AP13CharacterEnemy::UpdateInventoryAfterRespawn()
+{
+	Super::UpdateInventoryAfterRespawn();
+
+	InventoryComponent->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
+	InventoryComponent->OnAmmoChanged.AddUObject(this, &ThisClass::OnAmmoChangedHandle);
 }
 
 void AP13CharacterEnemy::CreateEnemyComponents()

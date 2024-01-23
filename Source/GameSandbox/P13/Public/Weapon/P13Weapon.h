@@ -36,12 +36,13 @@ public:
 	FORCEINLINE FP13WeaponDynamicInfo GetDynamicInfo() const { return WeaponCurrentSettings; }
 	FORCEINLINE int32 GetWeaponIndex() const { return WeaponIndex; }
 	FVector GetShootLocation() const;
+	float GetShootRate() const;
 	void WeaponInit(FP13WeaponInfo* WeaponInfo, const EP13MovementState NewState, const int32 NewWeaponIndex, const FP13WeaponDynamicInfo* DynamicInfo = nullptr);
 	void UpdateWeaponState(const EP13MovementState NewState);
 	void UpdateWeaponDynamicInfo(const FP13WeaponDynamicInfo* DynamicInfo);
 	void SetTargetLocation(const FVector& TargetLocation);
 	void SetFireState(const bool bFiring);
-	void TryReload();
+	bool TryReload();
 	void AbortReloading();
 	void PlayWeaponReload();
 	void SetMaxAvailableRound(const int32 NewMaxRound = -1);

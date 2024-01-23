@@ -2,6 +2,8 @@
 
 #include "P13/Public/Component/Actor/P13HealthComponent.h"
 
+#include "Perception/AISense_Damage.h"
+
 UP13HealthComponent::UP13HealthComponent()
 {}
 

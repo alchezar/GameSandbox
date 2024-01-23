@@ -126,42 +126,17 @@ void AP13CharacterTopDown::RotateTowardMovement(const FVector& Direction)
 
 void AP13CharacterTopDown::FireInput(const bool bStart)
 {
-	/* Check  if there are any reasons why the character can't pull the trigger. */
-	if (!CachedWeapon.IsValid() || !CheckCharacterCanFire())
-	{
-		return;
-	}
-	CachedWeapon->SetFireState(bStart);
+	PullTrigger(bStart);
 }
 
 void AP13CharacterTopDown::ReloadInput()
 {
-	if (!CachedWeapon.IsValid())
-	{
-		return;
-	}
-	CachedWeapon->TryReload();
+	TryReloadWeapon();
 }
 
 void AP13CharacterTopDown::SwitchWeaponInput(const bool bNext)
 {
-	check(InventoryComponent)
-	if (InventoryComponent->GetWeaponSlotsCount() < 2)
-	{
-		return;
-	}
-	if (!CachedWeapon.IsValid())
-	{
-		return;
-	}
-	CachedWeapon->AbortReloading();
-
-	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetDynamicInfo();
-	const int32 OldIndex = InventoryComponent->GetCurrentWeaponIndex();
-	const int32 NextDirection = bNext ? 1 : -1;
-	const int32 NewIndex = OldIndex + NextDirection;
-
-	InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo);
+	TryTakeNextWeapon(bNext);
 }
 
 void AP13CharacterTopDown::DropInput(const bool bTakeNext)

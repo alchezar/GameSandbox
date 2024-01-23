@@ -163,7 +163,7 @@ void AP13CharacterBase::ChangeMovementState(const EP13MovementState NewMovementS
 	UpdateCharacter();
 }
 
-void AP13CharacterBase::UpdateInventoryAfterRespawn() const
+void AP13CharacterBase::UpdateInventoryAfterRespawn()
 {
 	check(InventoryComponent)
 	InventoryComponent->RefreshSlots();
@@ -269,6 +269,46 @@ void AP13CharacterBase::DropWeapon(const bool bTakeNext)
 		CachedWeapon->Destroy();
 		CachedWeapon.Reset();
 	}
+}
+
+void AP13CharacterBase::PullTrigger(const bool bStart) const
+{
+	/* Check  if there are any reasons why the character can't pull the trigger. */
+	if (!CachedWeapon.IsValid() || !CheckCharacterCanFire())
+	{
+		return;
+	}
+	CachedWeapon->SetFireState(bStart);
+}
+
+bool AP13CharacterBase::TryReloadWeapon() const
+{
+	if (!CachedWeapon.IsValid())
+	{
+		return false;
+	}
+	return CachedWeapon->TryReload();
+}
+
+bool AP13CharacterBase::TryTakeNextWeapon(const bool bNext) const
+{
+	check(InventoryComponent)
+	if (InventoryComponent->GetWeaponSlotsCount() < 2)
+	{
+		return false;
+	}
+	if (!CachedWeapon.IsValid())
+	{
+		return false;
+	}
+	CachedWeapon->AbortReloading();
+
+	const FP13WeaponDynamicInfo OndInfo = CachedWeapon->GetDynamicInfo();
+	const int32 OldIndex = InventoryComponent->GetCurrentWeaponIndex();
+	const int32 NextDirection = bNext ? 1 : -1;
+	const int32 NewIndex = OldIndex + NextDirection;
+
+	return InventoryComponent->TrySwitchWeaponToIndex(NewIndex, OldIndex, OndInfo, bNext);
 }
 
 bool AP13CharacterBase::CheckCharacterCanFire() const
@@ -424,10 +464,10 @@ void AP13CharacterBase::PlayTakeDamageEffect(const AActor* DamageCauser)
 	}
 
 	const FVector CauserLocation = DamageCauser ? DamageCauser->GetActorLocation() : GetActorLocation() + GetActorForwardVector();
-	const FVector ShotDir = (CauserLocation  - GetActorLocation()).GetSafeNormal2D();
+	const FVector ShotDir = (CauserLocation - GetActorLocation()).GetSafeNormal2D();
 	const FVector ActorDir = GetMesh()->GetForwardVector();
 	const float ShootAngle = FMath::RadiansToDegrees(FMath::Acos(ActorDir | ShotDir)) * FMath::Sign((ActorDir ^ ShotDir).Z);
-	
+
 	FString MontageSection = "From";
 	if      (ShootAngle >  -45.f && ShootAngle <  45.f)  MontageSection += "Front";
 	else if (ShootAngle > -135.f && ShootAngle < -45.f)  MontageSection += "Left";
