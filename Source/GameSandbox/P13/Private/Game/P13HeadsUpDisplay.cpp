@@ -6,23 +6,20 @@
 #include "P13/Public/UI/P13EndGameWidget.h"
 #include "P13/Public/UI/P13InGameWidget.h"
 
-AP13HeadsUpDisplay::AP13HeadsUpDisplay()
-{
-	
-}
+AP13HeadsUpDisplay::AP13HeadsUpDisplay() {}
 
 void AP13HeadsUpDisplay::BeginPlay()
 {
 	Super::BeginPlay();
 }
 
-void AP13HeadsUpDisplay::ShowInGame()
+void AP13HeadsUpDisplay::ShowInGame(APlayerController* PlayerControllerOwner)
 {
 	if (!InGameWidgetClass || InGameWidgetCached.IsValid())
 	{
 		return;
 	}
-	InGameWidgetCached = CreateWidget<UP13InGameWidget>(GetOwningPlayerController(), InGameWidgetClass);
+	InGameWidgetCached = CreateWidget<UP13InGameWidget>(PlayerControllerOwner, InGameWidgetClass);
 	check(InGameWidgetCached.IsValid())
 	InGameWidgetCached->AddToViewport();
 }
@@ -33,9 +30,9 @@ void AP13HeadsUpDisplay::ShowEndGame(const bool bWin)
 	{
 		return;
 	}
-	
+
 	ClearInGame();
-	
+
 	UP13EndGameWidget* EndGameWidget = CreateWidget<UP13EndGameWidget>(GetOwningPlayerController(), EndGameWidgetClass);
 	check(EndGameWidget)
 	EndGameWidget->InitWidget(bWin);
@@ -48,7 +45,7 @@ void AP13HeadsUpDisplay::ClearInGame()
 	{
 		return;
 	}
-	
+
 	InGameWidgetCached->RemoveInGameWidget();
 	InGameWidgetCached->RemoveFromParent();
 	InGameWidgetCached.Reset();

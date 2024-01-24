@@ -7,7 +7,7 @@
 #include "P13InputInterface.generated.h"
 
 struct FInputActionValue;
-// This class does not need to be modified.
+
 UINTERFACE()
 class UP13InputInterface : public UInterface
 {

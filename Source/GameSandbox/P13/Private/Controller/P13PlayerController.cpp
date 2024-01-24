@@ -85,7 +85,7 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 	{
 		return;
 	}
-	HeadsUpDisplay->ShowInGame();
+	HeadsUpDisplay->ShowInGame(this);
 
 	/* Super must be called after creating stat widgets in HUD, to correctly update inventory in Pawn::PossessedBy(...) event. */
 	Super::OnPossess(InPawn);
@@ -93,6 +93,8 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 
 void AP13PlayerController::OnUnPossess()
 {
+	Super::OnUnPossess();
+
 	if (HeadsUpDisplay)
 	{
 		HeadsUpDisplay->ClearInGame();
@@ -108,8 +110,6 @@ void AP13PlayerController::OnUnPossess()
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 
 	HeadsUpDisplay->ShowEndGame(false);
-
-	Super::OnUnPossess();
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
@@ -123,9 +123,9 @@ void AP13PlayerController::Tick(const float DeltaSeconds)
 void AP13PlayerController::OnGameWon()
 {
 	check(HeadsUpDisplay)
-	
+
 	HeadsUpDisplay->ShowEndGame(true);
-	
+
 	SetNewInputMode(false);
 	Pause();
 }

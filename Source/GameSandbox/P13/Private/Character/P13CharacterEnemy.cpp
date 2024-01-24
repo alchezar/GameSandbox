@@ -16,7 +16,7 @@ AP13CharacterEnemy::AP13CharacterEnemy()
 	GetCharacterMovement()->MaxWalkSpeed = 300.f;
 	GetCharacterMovement()->RotationRate = FRotator(0.f, 180.f, 0.f);
 	GetCharacterMovement()->bUseControllerDesiredRotation = true;
-	
+
 	CreateEnemyComponents();
 }
 
@@ -32,33 +32,47 @@ void AP13CharacterEnemy::Tick(float DeltaTime)
 	// MoveToPlayer();	
 }
 
-void AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
+bool AP13CharacterEnemy::GetCanAttack_Implementation() const
 {
-	if (bReloading || !bNextWeaponAvailable)
+	return true;
+}
+
+bool AP13CharacterEnemy::GetCanMove_Implementation() const
+{
+	return true;
+}
+
+bool AP13CharacterEnemy::AttackAttempt_Implementation(const FVector& TargetLocation)
+{
+	return EnemyFireAttempt(TargetLocation);
+}
+
+bool AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
+{
+	if (bReloading || !bNextWeaponAvailable || TargetLocation.IsNearlyZero())
 	{
-		return;
+		return false;
 	}
-	
+
 	if ((CachedWeapon->GetDynamicInfo().Round > 0))
 	{
 		const FVector FixedLocation = TargetLocation - FVector(0.f, 0.f, 90.f);
 		CachedWeapon->SetTargetLocation(FixedLocation);
-		
+
 		PullTrigger(true);
 		PullTrigger(false);
-		return;
+		return true;
 	}
-	
+
 	if (TryReloadWeapon())
 	{
 		bReloading = true;
-		return;
+		return false;
 	}
-	
-	if (!TryTakeNextWeapon(true))
-	{
-		bNextWeaponAvailable = false;
-	}
+
+	/* Remember if we can't take next weapon. */
+	bNextWeaponAvailable = TryTakeNextWeapon(true);
+	return false;
 }
 
 void AP13CharacterEnemy::OnDeathHandle(AController* Causer)
@@ -86,7 +100,7 @@ void AP13CharacterEnemy::OnWeaponReloadFinishHandle(const int32 RoundNum, const 
 
 void AP13CharacterEnemy::OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
 {
-	bNextWeaponAvailable = true;	
+	bNextWeaponAvailable = true;
 }
 
 void AP13CharacterEnemy::OnAmmoChangedHandle(const EP13AmmoType InCurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount)

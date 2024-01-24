@@ -19,6 +19,7 @@ void UP13InventoryComponent::BeginPlay()
 	/* We won`t be update our slots here at begin play, because after respawn at this point
 	 * Pawn don`t have neither Controller nor PlayerState. Just wait for Pawn's OnPossess event. */
 	// RefreshSlots();
+	CacheGameInstance();
 }
 
 void UP13InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -41,9 +42,9 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 	/* If our current weapon hasn't ammo - switch to just taken. */
 	if (WeaponSlots[CurrentWeaponIndex].DynamicInfo.Round == 0)
 	{
-		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);	
+		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);
 	}
-	
+
 	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
@@ -141,13 +142,13 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const 
 	{
 		return false;
 	}
-	
+
 	if (!WeaponSlots.IsValidIndex(CorrectIndex) || WeaponSlots[CorrectIndex].WeaponID.IsNone())
 	{
-		return false;	
+		return false;
 	}
 
-	/* Don't switch to weapon which has no ammo. */		
+	/* Don't switch to weapon which has no ammo. */
 	if (WeaponSlots[CorrectIndex].DynamicInfo.Round + AmmoSlots[CorrectIndex].Count == 0)
 	{
 		const int32 NextDirection = bNext ? 1 : -1;

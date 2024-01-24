@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "P13CharacterBase.h"
+#include "P13/Public/Intearface/P13CombatInterface.h"
 #include "P13CharacterEnemy.generated.h"
 
 class UP13ScoreComponent;
 
 UCLASS()
-class GAMESANDBOX_API AP13CharacterEnemy : public AP13CharacterBase
+class GAMESANDBOX_API AP13CharacterEnemy : public AP13CharacterBase, public IP13CombatInterface
 {
 	GENERATED_BODY()
 
@@ -23,12 +24,15 @@ protected:
 public:
 	virtual void Tick(float DeltaTime) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/* ----------------------------- Interface ----------------------------- */
 public:
-	UFUNCTION(BlueprintCallable)
-	void EnemyFireAttempt(const FVector& TargetLocation);
+	virtual bool GetCanAttack_Implementation() const override;
+	virtual bool GetCanMove_Implementation() const override;
+	virtual bool AttackAttempt_Implementation(const FVector& TargetLocation) override;
 
+	/* ------------------------------- This -------------------------------- */
 protected:
+	bool EnemyFireAttempt(const FVector& TargetLocation);
 	virtual void OnDeathHandle(AController* Causer) override;
 	virtual void InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex) override;
 	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess) override;

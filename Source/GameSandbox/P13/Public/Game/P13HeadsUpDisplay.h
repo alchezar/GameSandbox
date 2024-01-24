@@ -23,7 +23,7 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	void ShowInGame();
+	void ShowInGame(APlayerController* PlayerControllerOwner);
 	void ShowEndGame(const bool bWin);
 	void ClearInGame();
 

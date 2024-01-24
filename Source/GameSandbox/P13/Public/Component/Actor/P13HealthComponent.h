@@ -23,6 +23,9 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	UFUNCTION(BlueprintCallable)
+	FORCEINLINE bool GetIsAlive() const { return Health > 0.f; }
+
 	FORCEINLINE bool GetIsHealthFull() const { return FMath::IsNearlyEqual(Health, MaxHealth); }
 	FORCEINLINE float GetCurrentHealth() const { return Health; }
 	FORCEINLINE float GetCurrentHealthAlpha() const { return Health / MaxHealth; }

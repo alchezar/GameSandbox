@@ -189,7 +189,9 @@ void AP13CharacterBase::OnDeathHandle(AController* Causer)
 
 	if (Controller)
 	{
-		Controller->UnPossess();
+		// Controller->UnPossess();
+		FTimerHandle RespawnTimer;
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, Controller.Get(), &AController::UnPossess, 1.f);
 	}
 
 	/* Disable movement. */
