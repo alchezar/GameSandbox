@@ -2,6 +2,16 @@
 
 #include "P13/Public/Game/P13GameInstance.h"
 
+void UP13GameInstance::CreateSession()
+{
+	
+}
+
+void UP13GameInstance::JoinSession()
+{
+	
+}
+
 FP13WeaponInfo* UP13GameInstance::GetWeaponInfoByID(const FName WeaponID) const
 {
 	if (!WeaponInfoTable)

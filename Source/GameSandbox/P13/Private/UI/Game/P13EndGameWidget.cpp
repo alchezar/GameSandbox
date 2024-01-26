@@ -1,6 +1,6 @@
 // Copyright © 2024, IKinder
 
-#include "P13/Public/UI/P13EndGameWidget.h"
+#include "P13/Public/UI/Game/P13EndGameWidget.h"
 
 #include "Components/Button.h"
 #include "Components/TextBlock.h"

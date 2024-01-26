@@ -8,8 +8,7 @@
 #include "P13/Public/Character/P13CharacterEnemy.h"
 #include "P13/Public/Game/P13GameState.h"
 
-AP13GameMode::AP13GameMode()
-{}
+AP13GameMode::AP13GameMode() {}
 
 void AP13GameMode::BeginPlay()
 {
@@ -66,8 +65,8 @@ void AP13GameMode::OnNewPhaseStartedHandle(EP13LevelPhase NewPhase)
 		}
 		AliveEnemy->TakeDamage(AliveEnemy->GetHealthReserve(), FDamageEvent{}, nullptr, nullptr);
 	}
-	
-	StartSpawningEnemies();	
+
+	StartSpawningEnemies();
 }
 
 void AP13GameMode::CacheGameState()
@@ -76,7 +75,7 @@ void AP13GameMode::CacheGameState()
 	{
 		return;
 	}
-	
+
 	CachedGameState = GetGameState<AP13GameState>();
 	check(CachedGameState)
 	CachedGameState->OnPhaseChanged.AddUObject(this, &ThisClass::OnNewPhaseStartedHandle);
@@ -86,7 +85,7 @@ FString AP13GameMode::GetCurrentPhaseString()
 {
 	CacheGameState();
 
-	const EP13LevelPhase LastLevelPhase = CachedGameState ->GetLastLevelPhase();
+	const EP13LevelPhase LastLevelPhase = CachedGameState->GetLastLevelPhase();
 	return UEnum::GetValueAsString(LastLevelPhase).RightChop(16);
 }
 
@@ -106,7 +105,7 @@ void AP13GameMode::FindAllEnemySpawners()
 
 void AP13GameMode::StartSpawningEnemies()
 {
-	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [this](){ SpawnEnemies(); }, EnemiesSpawnDelay, true, EnemiesSpawnDelay);
+	GetWorld()->GetTimerManager().SetTimer(SpawnTimer, [this]() { SpawnEnemies(); }, EnemiesSpawnDelay, true, EnemiesSpawnDelay);
 }
 
 void AP13GameMode::SpawnEnemies()
@@ -129,11 +128,11 @@ void AP13GameMode::SpawnEnemies()
 bool AP13GameMode::CheckCanSpawnEnemy()
 {
 	const bool bResult = (SpawnedEnemiesNum < CachedGameState->GetMaxEnemiesOnPhase());
-	
+
 	if (!bResult && GetWorld()->GetTimerManager().IsTimerActive(SpawnTimer))
 	{
 		GetWorld()->GetTimerManager().ClearTimer(SpawnTimer);
 	}
-	
+
 	return bResult;
 }
