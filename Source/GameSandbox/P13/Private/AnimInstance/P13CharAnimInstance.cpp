@@ -4,6 +4,7 @@
 
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P13/Public/Character/P13CharacterBase.h"
+#include "P13/Public/Component/Actor/P13LegAlignmentComponent.h"
 
 void UP13CharAnimInstance::NativeBeginPlay()
 {
@@ -32,9 +33,9 @@ void UP13CharAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	AimRotation = CachedCharacter->GetLookAtCursorDirection().Rotation();
 	WeaponType = CachedCharacter->GetCurrentWeaponType();
 
-	LeftLegOffset = FVector(0.f, CachedCharacter->GetIKLeftLegOffset(), 0.f);
-	RightLegOffset = FVector(0.f, CachedCharacter->GetIKRightLegOffset(), 0.f);
-	HipOffset = FVector(0.f, CachedCharacter->GetIKHipOffset(), 0.f);
+	LeftLegOffset = FVector(0.f, CachedCharacter->GetLegAlignmentComponent()->GetIKLeftLegOffset(), 0.f);
+	RightLegOffset = FVector(0.f, CachedCharacter->GetLegAlignmentComponent()->GetIKRightLegOffset(), 0.f);
+	HipOffset = FVector(0.f, CachedCharacter->GetLegAlignmentComponent()->GetIKHipOffset(), 0.f);
 }
 
 float UP13CharAnimInstance::GetMovementDirectionAngle() const

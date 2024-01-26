@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
+#include "P13/Public/Component/Actor/P13LegAlignmentComponent.h"
 #include "P13/Public/Component/Scene/P13DamageDisplayComponent.h"
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
@@ -66,6 +67,10 @@ void AP13CharacterBase::BeginPlay()
 		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
 		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
 		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
+	}
+	if (LegAlignmentComponent)
+	{
+		LegAlignmentComponent->InitLegAlignment("VB VB SK_Jedihunter_root_l_ankle", "VB VB SK_Jedihunter_root_r_ankle");
 	}
 }
 
@@ -183,6 +188,9 @@ void AP13CharacterBase::OnShieldChangedHandle(const float NewShield, const float
 void AP13CharacterBase::OnDeathHandle(AController* Causer)
 {
 	bDead = true;
+
+	check(LegAlignmentComponent)
+	LegAlignmentComponent->LegAlignment(false);
 
 	/* Drop current weapon and remove it from the inventory. */
 	DropWeapon(false);
@@ -358,66 +366,12 @@ void AP13CharacterBase::CreateBaseComponents()
 {
 	InventoryComponent = CreateDefaultSubobject<UP13InventoryComponent>("InventoryActorComponent");
 	AttributesComponent = CreateDefaultSubobject<UP13CharacterAttributesComponent>("CharacterAttributesActorComponent");
+	LegAlignmentComponent = CreateDefaultSubobject<UP13LegAlignmentComponent>("LegAlignmentActorComponent");
 
 	DamageDisplayComponent = CreateDefaultSubobject<UP13DamageDisplayComponent>("DamageDisplaySceneComponent");
 	DamageDisplayComponent->SetupAttachment(RootComponent);
 }
 
-float AP13CharacterBase::GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance, const float FromBoneToBottom) const
-{
-	const FVector SocketLocation = GetMesh()->GetBoneLocation(VirtualBoneName);
-	const FVector TraceStart = SocketLocation + FVector(0.f, 0.f, TraceHalfDistance);
-	const FVector TraceEnd = SocketLocation - FVector(0.f, 0.f, TraceHalfDistance);
-
-	FHitResult HitResult;
-	FCollisionQueryParams Params;
-	Params.AddIgnoredActor(this);
-
-	GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Visibility, Params);
-	if (HitResult.bBlockingHit)
-	{
-		return (SocketLocation - HitResult.ImpactPoint).Z - FromBoneToBottom;
-	}
-	return 0.f;
-}
-
-void AP13CharacterBase::LegsIKFloorAlignment()
-{
-	if (bDead)
-	{
-		IKLeftLegOffset = 0.f;
-		IKRightLegOffset = 0.f;
-		IKHitOffset = 0.f;
-		return;
-	}
-
-	constexpr float MinDistanceThreshold = 12.f;
-	constexpr float IKOffsetInterp = 10.f;
-
-	float LeftOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_l_ankle");
-	float RightOffset = GetIKSocketOffset("VB VB SK_Jedihunter_root_r_ankle");
-	float HipOffset = 0.f;
-
-	if (FMath::Abs(LeftOffset) > MinDistanceThreshold || FMath::Abs(RightOffset) > MinDistanceThreshold)
-	{
-		if (LeftOffset > RightOffset)
-		{
-			HipOffset = LeftOffset;
-			LeftOffset = 0.f;
-			RightOffset -= HipOffset;
-		}
-		else
-		{
-			HipOffset = RightOffset;
-			RightOffset = 0.f;
-			LeftOffset -= HipOffset;
-		}
-	}
-
-	IKLeftLegOffset = FMath::FInterpTo(IKLeftLegOffset, LeftOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
-	IKRightLegOffset = FMath::FInterpTo(IKRightLegOffset, RightOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
-	IKHitOffset = FMath::FInterpTo(GetIKHipOffset(), HipOffset, GetWorld()->GetTimeSeconds(), IKOffsetInterp);
-}
 
 void AP13CharacterBase::CreateDynamicMeshMaterials()
 {

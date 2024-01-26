@@ -47,6 +47,37 @@ bool AP13CharacterEnemy::AttackAttempt_Implementation(const FVector& TargetLocat
 	return EnemyFireAttempt(TargetLocation);
 }
 
+void AP13CharacterEnemy::UpdateInventoryAfterRespawn()
+{
+	Super::UpdateInventoryAfterRespawn();
+
+	InventoryComponent->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
+	InventoryComponent->OnAmmoChanged.AddUObject(this, &ThisClass::OnAmmoChangedHandle);
+}
+
+void AP13CharacterEnemy::OnDeathHandle(AController* Causer)
+{
+	Super::OnDeathHandle(Causer);
+
+	if (AP13GameMode* GameMode = GetWorld()->GetAuthGameMode<AP13GameMode>())
+	{
+		GameMode->RespawnEnemies();
+	}
+}
+
+void AP13CharacterEnemy::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
+{
+	Super::InitWeapon(NewWeaponSlot, CurrentIndex);
+
+	bNextWeaponAvailable = (CachedWeapon->GetDynamicInfo().Round > 0);
+}
+
+void AP13CharacterEnemy::OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess)
+{
+	Super::OnWeaponReloadFinishHandle(RoundNum, WeaponIndex, bSuccess);
+	bReloading = false;
+}
+
 bool AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
 {
 	if (bReloading || !bNextWeaponAvailable || TargetLocation.IsNearlyZero())
@@ -75,29 +106,6 @@ bool AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
 	return false;
 }
 
-void AP13CharacterEnemy::OnDeathHandle(AController* Causer)
-{
-	Super::OnDeathHandle(Causer);
-
-	if (AP13GameMode* GameMode = GetWorld()->GetAuthGameMode<AP13GameMode>())
-	{
-		GameMode->RespawnEnemies();
-	}
-}
-
-void AP13CharacterEnemy::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
-{
-	Super::InitWeapon(NewWeaponSlot, CurrentIndex);
-
-	bNextWeaponAvailable = (CachedWeapon->GetDynamicInfo().Round > 0);
-}
-
-void AP13CharacterEnemy::OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess)
-{
-	Super::OnWeaponReloadFinishHandle(RoundNum, WeaponIndex, bSuccess);
-	bReloading = false;
-}
-
 void AP13CharacterEnemy::OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
 {
 	bNextWeaponAvailable = true;
@@ -109,14 +117,6 @@ void AP13CharacterEnemy::OnAmmoChangedHandle(const EP13AmmoType InCurrentWeaponT
 	{
 		bNextWeaponAvailable = true;
 	}
-}
-
-void AP13CharacterEnemy::UpdateInventoryAfterRespawn()
-{
-	Super::UpdateInventoryAfterRespawn();
-
-	InventoryComponent->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
-	InventoryComponent->OnAmmoChanged.AddUObject(this, &ThisClass::OnAmmoChangedHandle);
 }
 
 void AP13CharacterEnemy::CreateEnemyComponents()

@@ -9,6 +9,7 @@
 
 #include "P13CharacterBase.generated.h"
 
+class UP13LegAlignmentComponent;
 class UP13DamageDisplayComponent;
 class UP13CharacterAttributesComponent;
 class UP13InventoryComponent;
@@ -21,7 +22,7 @@ class GAMESANDBOX_API AP13CharacterBase : public ACharacter, public IP13StateEff
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 public:
 	AP13CharacterBase();
 	virtual void PostInitializeComponents() override;
@@ -42,13 +43,11 @@ public:
 	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE bool GetIsDead() const { return bDead; }
-	FORCEINLINE float GetIKLeftLegOffset() const { return IKLeftLegOffset; }
-	FORCEINLINE float GetIKRightLegOffset() const { return IKRightLegOffset; }
-	FORCEINLINE float GetIKHipOffset() const { return IKHitOffset; }
 	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
 	FORCEINLINE EP13MovementState GetPreviousMovementState() const { return PreviousMovementState; }
 	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
 	FORCEINLINE UP13InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
+	FORCEINLINE UP13LegAlignmentComponent* GetLegAlignmentComponent() const { return LegAlignmentComponent; }
 	FORCEINLINE EP13AmmoType GetCurrentWeaponType() const { return CurrentWeaponType; }
 	virtual FVector GetLookAtCursorDirection() const;
 	float GetHealthReserve() const;
@@ -76,9 +75,6 @@ protected:
 
 private:
 	void CreateBaseComponents();
-	/* Leg alignment. */
-	float GetIKSocketOffset(const FName& VirtualBoneName, const float TraceHalfDistance = 50.f, const float FromBoneToBottom = 10.f) const;
-	void LegsIKFloorAlignment();
 	void CreateDynamicMeshMaterials();
 	void UpdateMeshMaterial(const float HealthAlpha);
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
@@ -92,6 +88,8 @@ protected:
 	UP13CharacterAttributesComponent* AttributesComponent;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UP13DamageDisplayComponent* DamageDisplayComponent;
+	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
+	UP13LegAlignmentComponent* LegAlignmentComponent;
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UCurveLinearColor* ColorOverLife;

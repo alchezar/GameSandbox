@@ -3,8 +3,8 @@
 #include "P13/Public/Game/P13HeadsUpDisplay.h"
 
 #include "Blueprint/UserWidget.h"
-#include "P13/Public/UI/P13EndGameWidget.h"
-#include "P13/Public/UI/P13InGameWidget.h"
+#include "P13/Public/UI/Game/P13EndGameWidget.h"
+#include "P13/Public/UI/Game/P13InGameWidget.h"
 
 AP13HeadsUpDisplay::AP13HeadsUpDisplay() {}
 

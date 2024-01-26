@@ -12,7 +12,7 @@ class GAMESANDBOX_API AP13CharacterTopDown : public AP13CharacterBase, public IP
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 public:
 	AP13CharacterTopDown();
 	virtual void PostInitializeComponents() override;
@@ -37,13 +37,16 @@ public:
 	virtual void SwitchWeaponInput(const bool bNext) override;
 	virtual void DropInput(const bool bTakeNext) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/* ------------------------------- Super ------------------------------- */
 public:
 	virtual FVector GetLookAtCursorDirection() const override;
 
 protected:
-	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
 	virtual void OnDeathHandle(AController* Causer) override;
+	
+	/* ------------------------------- This -------------------------------- */
+protected:
+	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
 
 private:
 	void CreateTopDownComponents();

@@ -153,20 +153,6 @@ FVector AP13CharacterTopDown::GetLookAtCursorDirection() const
 	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
 }
 
-void AP13CharacterTopDown::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
-{
-	if (PlayerController != Controller)
-	{
-		return;
-	}
-	HitUnderCursor = HitResult;
-
-	if (CachedWeapon.IsValid())
-	{
-		CachedWeapon->SetTargetLocation(HitResult.Location);
-	}
-}
-
 void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
 {
 	if (Controller)
@@ -182,6 +168,20 @@ void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
 	}
 
 	Super::OnDeathHandle(Causer);
+}
+
+void AP13CharacterTopDown::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)
+{
+	if (PlayerController != Controller)
+	{
+		return;
+	}
+	HitUnderCursor = HitResult;
+
+	if (CachedWeapon.IsValid())
+	{
+		CachedWeapon->SetTargetLocation(HitResult.Location);
+	}
 }
 
 void AP13CharacterTopDown::CreateTopDownComponents()

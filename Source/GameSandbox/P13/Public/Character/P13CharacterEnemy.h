@@ -14,7 +14,7 @@ class GAMESANDBOX_API AP13CharacterEnemy : public AP13CharacterBase, public IP13
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 public:
 	AP13CharacterEnemy();
 
@@ -30,15 +30,18 @@ public:
 	virtual bool GetCanMove_Implementation() const override;
 	virtual bool AttackAttempt_Implementation(const FVector& TargetLocation) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/* ------------------------------- Super ------------------------------- */
 protected:
-	bool EnemyFireAttempt(const FVector& TargetLocation);
 	virtual void OnDeathHandle(AController* Causer) override;
 	virtual void InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex) override;
 	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess) override;
+	virtual void UpdateInventoryAfterRespawn() override;
+	
+	/* ------------------------------- This -------------------------------- */
+protected:
+	bool EnemyFireAttempt(const FVector& TargetLocation);
 	void OnNewWeaponTakenHandle(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
 	void OnAmmoChangedHandle(const EP13AmmoType InCurrentWeaponType, const int32 InWeaponNewCount, const int32 InInventoryNewCount);
-	virtual void UpdateInventoryAfterRespawn() override;
 
 private:
 	void CreateEnemyComponents();
