@@ -27,20 +27,19 @@ class GAMESANDBOX_API UP13MenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 
 	/* ------------------------------- This -------------------------------- */
 protected:
 	UFUNCTION()
-	void OnPlayButtonPressed();
+	virtual void OnPlayButtonPressed();
 	UFUNCTION()
 	void OnOptionsButtonPressed();
 	UFUNCTION()
 	void OnExitButtonPressed();
 
-private:
 	void ClearLevelsList();
 	void ClearOptionsList();
 
@@ -76,7 +75,7 @@ class GAMESANDBOX_API UP13LevelSelectWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 
@@ -86,7 +85,7 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnLevelButtonPressed();
+	virtual void OnLevelButtonPressed();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -110,7 +109,7 @@ class GAMESANDBOX_API UP13OptionListWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 	
@@ -146,7 +145,7 @@ class GAMESANDBOX_API UP13OptionSliderWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
 	

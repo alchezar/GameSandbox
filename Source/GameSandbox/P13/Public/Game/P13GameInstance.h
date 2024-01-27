@@ -4,9 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "Interfaces/OnlineSessionInterface.h"
 #include "P13/Public/Intearface/P13NetworkInterface.h"
 #include "P13/Public/Library/P13Types.h"
 #include "P13GameInstance.generated.h"
+
+#define SERVER_NAME_KEY "ServerNameKey"
 
 UCLASS()
 class GAMESANDBOX_API UP13GameInstance : public UGameInstance, public IP13NetworkInterface
@@ -16,21 +19,36 @@ class GAMESANDBOX_API UP13GameInstance : public UGameInstance, public IP13Networ
 	/* ------------------------------- Super ------------------------------- */
 public:
 	UP13GameInstance() {}
+	virtual void Init() override;
 	
 	/* ----------------------------- Interface ----------------------------- */
 public:
-	virtual void CreateSession() override;
-	virtual void JoinSession() override;
+	virtual void HostSession(const int32 MaxPlayers, const bool bLan, const FString& CustomServerName) override;
+	virtual void FindSessions(const bool bLan) override;
+	virtual void JoinSession(const FOnlineSessionSearchResult& Result) override;
 	
 	/* ------------------------------- This -------------------------------- */
 public:
 	FP13WeaponInfo* GetWeaponInfoByID(const FName WeaponID) const;
 	FP13WeaponDrop* GetWeaponDropByID(const FName WeaponID) const;
 
+private:
+	void FindSessionInterface();
+	void OnCreateSessionCompleteHandle(FName SessionName, bool bSuccess);
+	void OnFindSessionCompleteHandle(bool bSuccess);
+	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
 	UDataTable* WeaponInfoTable = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
 	UDataTable* WeaponDropTable = nullptr;
+
+private:
+	IOnlineSessionPtr SessionInterface;
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
+	FName CurrentSessionName = "Game";
+	FName LobbyLevelURL = "/Game/Project/P13/Level/LobbyLevel_P13_";
+	int32 MaxPlayersNum = 2;
 };

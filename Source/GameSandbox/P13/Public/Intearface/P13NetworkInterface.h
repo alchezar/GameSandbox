@@ -17,6 +17,11 @@ class GAMESANDBOX_API IP13NetworkInterface
 	GENERATED_BODY()
 
 public:
-	virtual void CreateSession() = 0;
-	virtual void JoinSession() = 0;
+	DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnFindSessionsCompleteHandle, TArray<FOnlineSessionSearchResult> /*SearchResults*/)
+	FP13OnFindSessionsCompleteHandle OnFindSessionsComplete;
+
+public:
+	virtual void HostSession(const int32 MaxPlayers, const bool bLan, const FString& CustomServerName) = 0;
+	virtual void FindSessions(const bool bLan) = 0;
+	virtual void JoinSession(const FOnlineSessionSearchResult& Result) = 0;
 };
