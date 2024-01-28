@@ -190,7 +190,7 @@ struct FP13AmmoSlot
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	EP13AmmoType WeaponType;
+	EP13AmmoType WeaponType = EP13AmmoType::Default;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	int32 Count = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

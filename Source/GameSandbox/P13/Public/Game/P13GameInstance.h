@@ -26,6 +26,7 @@ public:
 	virtual void HostSession(const int32 MaxPlayers, const bool bLan, const FString& CustomServerName) override;
 	virtual void FindSessions(const bool bLan) override;
 	virtual void JoinSession(const FOnlineSessionSearchResult& Result) override;
+	virtual void DestroySession() override;
 	
 	/* ------------------------------- This -------------------------------- */
 public:
@@ -37,6 +38,7 @@ private:
 	void OnCreateSessionCompleteHandle(FName SessionName, bool bSuccess);
 	void OnFindSessionCompleteHandle(bool bSuccess);
 	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnDestroySessionCompleteHandle(FName SessionName, bool bSuccessful);
 	
 	/* ----------------------------- Variables ----------------------------- */
 public:
@@ -49,6 +51,7 @@ private:
 	IOnlineSessionPtr SessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 	FName CurrentSessionName = "Game";
-	FName LobbyLevelURL = "/Game/Project/P13/Level/LobbyLevel_P13_";
+	FName StartLevelName = "MenuLevel_P13_";
+	FName LobbyLevelName = "LobbyLevel_P13_";
 	int32 MaxPlayersNum = 2;
 };

@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "P13GameModeMenu.generated.h"
 
-class UP13MenuWidget;
+class UP13LobbyMenuWidget;
 
 UCLASS()
 class GAMESANDBOX_API AP13GameModeMenu : public AGameModeBase
@@ -29,9 +29,9 @@ private:
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13MenuWidget> MainMenuWidgetClass;
+	TSubclassOf<UP13LobbyMenuWidget> MainMenuWidgetClass;
 
 private:
 	UPROPERTY()
-	UP13MenuWidget* MainMenuWidget = nullptr;
+	UP13LobbyMenuWidget* MainMenuWidget = nullptr;
 };

@@ -60,7 +60,7 @@ void AP13CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CreateDynamicMeshMaterials();
+	// CreateDynamicMeshMaterials();
 
 	if (AttributesComponent)
 	{
@@ -176,7 +176,7 @@ void AP13CharacterBase::UpdateInventoryAfterRespawn()
 
 void AP13CharacterBase::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
 {
-	UpdateMeshMaterial(HealthAlpha);
+	// UpdateMeshMaterial(HealthAlpha);
 }
 
 void AP13CharacterBase::OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha)
@@ -372,27 +372,26 @@ void AP13CharacterBase::CreateBaseComponents()
 	DamageDisplayComponent->SetupAttachment(RootComponent);
 }
 
-
-void AP13CharacterBase::CreateDynamicMeshMaterials()
-{
-	for (int32 Index = 1; Index <= 3; ++Index)
-	{
-		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
-	}
-}
-
-void AP13CharacterBase::UpdateMeshMaterial(const float HealthAlpha)
-{
-	if (!ColorOverLife)
-	{
-		return;
-	}
-	for (auto* DynamicMaterial : DynamicMaterials)
-	{
-		DynamicMaterial->SetVectorParameterValue("MainColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
-		DynamicMaterial->SetVectorParameterValue("PaintColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
-	}
-}
+// void AP13CharacterBase::CreateDynamicMeshMaterials()
+// {
+// 	for (int32 Index = 1; Index <= 3; ++Index)
+// 	{
+// 		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
+// 	}
+// }
+//
+// void AP13CharacterBase::UpdateMeshMaterial(const float HealthAlpha)
+// {
+// 	if (!ColorOverLife)
+// 	{
+// 		return;
+// 	}
+// 	for (auto* DynamicMaterial : DynamicMaterials)
+// 	{
+// 		DynamicMaterial->SetVectorParameterValue("MainColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
+// 		DynamicMaterial->SetVectorParameterValue("PaintColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
+// 	}
+// }
 
 void AP13CharacterBase::TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser)
 {

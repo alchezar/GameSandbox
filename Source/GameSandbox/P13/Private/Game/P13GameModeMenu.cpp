@@ -2,7 +2,7 @@
 
 #include "P13/Public/Game/P13GameModeMenu.h"
 
-#include "P13/Public/UI/Menu/P13MenuWidget.h"
+#include "P13/Public/UI/Menu/P13LobbyWidget.h"
 
 class UP13MenuWidget;
 
@@ -20,7 +20,7 @@ void AP13GameModeMenu::ShowMainMenu()
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	check(PlayerController);
 
-	MainMenuWidget = CreateWidget<UP13MenuWidget>(PlayerController, MainMenuWidgetClass);
+	MainMenuWidget = CreateWidget<UP13LobbyMenuWidget>(PlayerController, MainMenuWidgetClass);
 	check(MainMenuWidget)
 
 	MainMenuWidget->AddToViewport();

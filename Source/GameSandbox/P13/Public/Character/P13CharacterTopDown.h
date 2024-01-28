@@ -76,7 +76,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
 	float SmoothCoefficient = 5.f;
 	UPROPERTY(EditAnywhere, Category = "C++ | Camera")
-	FRotator CameraRotation = FRotator(-80.f, 0.f, 0.f);
+	FRotator CameraRotation = FRotator(0.f, -70.f, 0.f);
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	TSubclassOf<UCameraShakeBase> ShakeClass = nullptr;

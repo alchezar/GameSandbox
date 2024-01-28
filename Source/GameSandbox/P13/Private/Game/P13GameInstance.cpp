@@ -56,6 +56,11 @@ void UP13GameInstance::JoinSession(const FOnlineSessionSearchResult& Result)
 	SessionInterface->JoinSession(0, CurrentSessionName, Result);
 }
 
+void UP13GameInstance::DestroySession()
+{
+	SessionInterface->DestroySession(CurrentSessionName);
+}
+
 FP13WeaponInfo* UP13GameInstance::GetWeaponInfoByID(const FName WeaponID) const
 {
 	if (!WeaponInfoTable)
@@ -90,13 +95,18 @@ void UP13GameInstance::FindSessionInterface()
 	SessionInterface->OnCreateSessionCompleteDelegates.AddUObject(this, &ThisClass::OnCreateSessionCompleteHandle);
 	SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionCompleteHandle);
 	SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::OnJoinSessionCompleteHandle);
+	SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDestroySessionCompleteHandle);
 	
 	CurrentSessionName = GetDefault<APlayerState>()->SessionName;
 }
 
 void UP13GameInstance::OnCreateSessionCompleteHandle(FName SessionName, bool bSuccess)
 {
-	UGameplayStatics::OpenLevel(GetWorld(), LobbyLevelURL, true, "listen");
+	if (!bSuccess)
+	{
+		return;
+	}
+	UGameplayStatics::OpenLevel(GetWorld(), LobbyLevelName, true, "listen");
 }
 
 void UP13GameInstance::OnFindSessionCompleteHandle(bool bSuccess)
@@ -112,4 +122,13 @@ void UP13GameInstance::OnFindSessionCompleteHandle(bool bSuccess)
 void UP13GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
 	UGameplayStatics::OpenLevel(GetWorld(), SessionName);	
+}
+
+void UP13GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool bSuccessful)
+{
+	if (!bSuccessful)
+	{
+		return;
+	}
+	UGameplayStatics::OpenLevel(GetWorld(), StartLevelName);
 }

@@ -75,8 +75,8 @@ protected:
 
 private:
 	void CreateBaseComponents();
-	void CreateDynamicMeshMaterials();
-	void UpdateMeshMaterial(const float HealthAlpha);
+	// void CreateDynamicMeshMaterials();
+	// void UpdateMeshMaterial(const float HealthAlpha);
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
 	void PlayTakeDamageEffect(const AActor* DamageCauser);
 

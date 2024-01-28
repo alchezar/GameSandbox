@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "OnlineSessionSettings.h"
 #include "P13MenuWidget.h"
-#include "P13LobbyMenuWidget.generated.h"
-
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *                                Lobby Menu                                 *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+#include "P13LobbyWidget.generated.h"
 
 class UP13SessionSelectWidget;
 class IP13NetworkInterface;
 class UCircularThrobber;
 class UCheckBox;
 
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                Start Menu                                 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
 UCLASS()
-class GAMESANDBOX_API UP13LobbyMenuWidget : public UP13MenuWidget
+class GAMESANDBOX_API UP13StartMenuWidget : public UP13MenuWidget
 {
 	GENERATED_BODY()
 
@@ -104,4 +104,64 @@ protected:
 
 private:
 	FOnlineSessionSearchResult SelectedResult;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                Lobby Menu                                 *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+UCLASS()
+class UP13LobbyMenuWidget : public UUserWidget
+{
+	GENERATED_BODY()
+
+	/* ------------------------------ Unreal ------------------------------- */
+public:
+	virtual void NativeConstruct() override;
+
+	/* ------------------------------- This -------------------------------- */
+protected:
+	UFUNCTION()
+	void OnReadyButtonClickedHandle();
+	UFUNCTION()
+	void OnExitButtonClickedHandle();
+
+private:
+	void InitWidget();
+
+	/* ----------------------------- Variables ----------------------------- */
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* PlayerNameText;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* PlayerRoleText;
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* StartReadyText;
+	UPROPERTY(meta = (BindWidget))
+	UButton* ReadyButton;
+	UPROPERTY(meta = (BindWidget))
+	UButton* ExitButton;
+};
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                               Color Button                                *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+UCLASS()
+class UP13LevelButtonWidget : public UUserWidget
+{
+	GENERATED_BODY()
+
+	/* ------------------------------ Unreal ------------------------------- */
+public:
+	virtual void NativeConstruct() override;
+
+	/* ------------------------------- This -------------------------------- */
+protected:
+	UFUNCTION()
+	void OnColorButtonClickedHandle();
+
+	/* ----------------------------- Variables ----------------------------- */
+protected:
+	UPROPERTY(meta = (BindWidget))
+	UButton* ColorButton;
+	
 };
