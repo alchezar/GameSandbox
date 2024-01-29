@@ -2,10 +2,11 @@
 
 #include "P13/Public/Game/P13LobbyGameMode.h"
 
-#include "P13/Public/UI/Menu/P13LobbyWidget.h"
+#include "P13/Public/Controller/P13LobbyPlayerController.h"
 
 AP13LobbyGameMode::AP13LobbyGameMode()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	bUseSeamlessTravel = true;
 }
 
@@ -13,32 +14,35 @@ void AP13LobbyGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShowLobbyMenu();
-	// SetMenuInputMode();
 }
 
-void AP13LobbyGameMode::ShowLobbyMenu()
+void AP13LobbyGameMode::OnPostLogin(AController* NewPlayer)
 {
-	check(LobbyMenuWidgetClass)
+	Super::OnPostLogin(NewPlayer);
 
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
-
-	LobbyMenuWidget = CreateWidget<UP13LobbyMenuWidget>(PlayerController, LobbyMenuWidgetClass);
-	check(LobbyMenuWidget)
-
-	LobbyMenuWidget->AddToViewport();
+	if (!NewPlayer->IsA<AP13LobbyPlayerController>())
+	{
+		return;
+	}
+	LobbyPlayerControllers.Add(StaticCast<AP13LobbyPlayerController*>(NewPlayer));
 }
 
-void AP13LobbyGameMode::SetMenuInputMode() const
+void AP13LobbyGameMode::UpdateSelectedLevel(const FText& InLevelName, const FName InLevelAddress)
 {
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
+	LevelAddress = InLevelAddress;
+	
+	for (const AP13LobbyPlayerController* LobbyController : LobbyPlayerControllers)
+	{
+		LobbyController->UpdateSelectedMapName(InLevelName);
+	}
+}
 
-	FInputModeUIOnly UIMode;
-	UIMode.SetWidgetToFocus(LobbyMenuWidget->TakeWidget());
-	UIMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
+void AP13LobbyGameMode::Server_LaunchGame_Implementation()
+{
+	
+}
 
-	PlayerController->SetInputMode(UIMode);
-	PlayerController->bShowMouseCursor = true;
+void AP13LobbyGameMode::SavePlayersColor()
+{
+	
 }

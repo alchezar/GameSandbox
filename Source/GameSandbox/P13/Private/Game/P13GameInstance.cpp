@@ -20,6 +20,7 @@ void UP13GameInstance::HostSession(const int32 MaxPlayers, const bool bLan, cons
 	{
 		return;
 	}
+	CurrentSessionName = *CustomServerName;
 	if (SessionInterface->GetNamedSession(CurrentSessionName))
 	{
 		SessionInterface->DestroySession(CurrentSessionName);

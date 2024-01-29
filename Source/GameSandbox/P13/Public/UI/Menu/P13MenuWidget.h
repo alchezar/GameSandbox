@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "P13/Public/Game/P13GameModeMenu.h"
 #include "P13MenuWidget.generated.h"
 
 struct FP13LevelSelect;
@@ -81,6 +80,7 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	FORCEINLINE FName GetLevelAddress() const { return LevelAddress; }
 	void InitLevelButton(const FP13LevelSelect* NewLevel);
 
 protected:

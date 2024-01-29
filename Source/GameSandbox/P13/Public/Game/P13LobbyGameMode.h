@@ -6,6 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "P13LobbyGameMode.generated.h"
 
+class AP13LobbyPlayerController;
 class UP13LobbyMenuWidget;
 
 UCLASS()
@@ -19,18 +20,20 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void OnPostLogin(AController* NewPlayer) override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	void UpdateSelectedLevel(const FText& InLevelName, const FName InLevelAddress);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_LaunchGame();
+
 private:
-	void ShowLobbyMenu();
-	void SetMenuInputMode() const;
+	void SavePlayersColor();
 
 	/* ----------------------------- Variables ----------------------------- */
-protected:
-	UPROPERTY(EditAnywhere, Category = "C++")
-	TSubclassOf<UP13LobbyMenuWidget> LobbyMenuWidgetClass;
-
 private:
-	UPROPERTY()
-	UP13LobbyMenuWidget* LobbyMenuWidget = nullptr;
+	FName LevelAddress;
+	TArray<AP13LobbyPlayerController*> LobbyPlayerControllers;
 };

@@ -6,8 +6,44 @@
 #include "GameFramework/PlayerController.h"
 #include "P13LobbyPlayerController.generated.h"
 
+class AP13LobbyGameMode;
+class UP13LobbyMenuWidget;
+
 UCLASS()
 class GAMESANDBOX_API AP13LobbyPlayerController : public APlayerController
 {
 	GENERATED_BODY()
+
+	/* ------------------------------ Unreal ------------------------------- */
+public:
+	AP13LobbyPlayerController();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	virtual void BeginPlay() override;
+	
+	/* ------------------------------- This -------------------------------- */
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateClientReady();
+	void OnHostSelectedMap(const FText& SelectedLevelName, const FName SelectedLevelAddress);
+	void UpdateSelectedMapName(const FText& SelectedLevelName) const;
+	
+protected:
+	void ShowLobbyMenu();
+	void SetMenuInputMode();
+	void ListenToGameMode();
+
+	/* ----------------------------- Variables ----------------------------- */
+protected:
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP13LobbyMenuWidget> LobbyMenuWidgetClass;
+
+	UPROPERTY(Replicated)
+	FName CurrentLevelByServer;
+
+private:
+	UPROPERTY()
+	UP13LobbyMenuWidget* LobbyMenuWidget = nullptr;
+	TSoftObjectPtr<AP13LobbyGameMode> CachedLobbyGameMode;
 };

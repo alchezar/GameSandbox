@@ -4,48 +4,12 @@
 
 #include "P13/Public/UI/Menu/P13LobbyWidget.h"
 
-class UP13MenuWidget;
+AP13GameModeMenu::AP13GameModeMenu()
+{
+	bUseSeamlessTravel = true;
+}
 
 void AP13GameModeMenu::BeginPlay()
 {
 	Super::BeginPlay();
-	ShowMainMenu();
-	SetMenuInputMode();
-}
-
-void AP13GameModeMenu::ShowMainMenu()
-{
-	check(MainMenuWidgetClass)
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
-
-	MainMenuWidget = CreateWidget<UP13LobbyMenuWidget>(PlayerController, MainMenuWidgetClass);
-	check(MainMenuWidget)
-
-	MainMenuWidget->AddToViewport();
-}
-
-void AP13GameModeMenu::SetMenuInputMode()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
-
-	FInputModeUIOnly UIMode;
-	UIMode.SetWidgetToFocus(MainMenuWidget->TakeWidget());
-	UIMode.SetLockMouseToViewportBehavior(EMouseLockMode::LockInFullscreen);
-
-	PlayerController->SetInputMode(UIMode);
-	PlayerController->bShowMouseCursor = true;
-}
-
-void AP13GameModeMenu::SetGameInputMode()
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	check(PlayerController);
-
-	FInputModeGameOnly GIMode;
-	GIMode.SetConsumeCaptureMouseDown(false);
-	PlayerController->SetInputMode(GIMode);
-	PlayerController->bShowMouseCursor = false;
 }

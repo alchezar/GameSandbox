@@ -6,9 +6,11 @@
 #include "Components/Button.h"
 #include "Components/CheckBox.h"
 #include "Components/CircularThrobber.h"
+#include "Components/EditableText.h"
 #include "Components/HorizontalBox.h"
 #include "Components/TextBlock.h"
 #include "Components/VerticalBox.h"
+#include "P13/Public/Controller/P13LobbyPlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Game/P13PlayerState.h"
 #include "P13/Public/Intearface/P13NetworkInterface.h"
@@ -24,6 +26,7 @@ void UP13StartMenuWidget::NativeConstruct()
 	HostButton->OnReleased.AddDynamic(this, &ThisClass::OnHostButtonClickedHandle);
 	FindButton->OnReleased.AddDynamic(this, &ThisClass::OnFindButtonClickedHandle);
 	IsLanCheckBox->OnCheckStateChanged.AddDynamic(this, &ThisClass::OnLanStateChangedHandle);
+	SessionNameText->OnTextCommitted.AddDynamic(this, &ThisClass::OnSessionNameCommittedHandle);
 
 	SearchingThrobber->SetVisibility(ESlateVisibility::Hidden);
 	PlayButton->SetIsEnabled(false);
@@ -31,6 +34,8 @@ void UP13StartMenuWidget::NativeConstruct()
 	GameInstanceNetwork = GetWorld()->GetGameInstance<IP13NetworkInterface>();
 	check(GameInstanceNetwork)
 	GameInstanceNetwork->OnFindSessionsComplete.AddUObject(this, &ThisClass::OnFindSessionsCompleteHandle);
+
+	ClearSessionsList();
 }
 
 void UP13StartMenuWidget::OnPlayButtonPressed()
@@ -57,11 +62,21 @@ void UP13StartMenuWidget::OnFindButtonClickedHandle()
 	SearchingThrobber->SetVisibility(ESlateVisibility::Visible);
 	ClearSessionsList();
 	GameInstanceNetwork->FindSessions(IsLanCheckBox->IsChecked());
+
+	
 }
 
 void UP13StartMenuWidget::OnLanStateChangedHandle(bool bChecked)
 {
 	
+}
+
+void UP13StartMenuWidget::OnSessionNameCommittedHandle(const FText& Text, ETextCommit::Type CommitMethod)
+{
+	if (CommitMethod == ETextCommit::Type::OnEnter)
+	{
+		CustomServerName = Text.ToString();	
+	}
 }
 
 void UP13StartMenuWidget::OnFindSessionsCompleteHandle(TArray<FOnlineSessionSearchResult> OnlineSessionSearchResults)
@@ -133,10 +148,37 @@ void UP13LobbyMenuWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	InitWidget();
+	FindLevels();
+}
+
+void UP13LobbyMenuWidget::UpdateLevelName(const FText& SelectedLevelName) const
+{
+	SelectedMapText->SetText(SelectedLevelName);
+}
+
+void UP13LobbyMenuWidget::SelectLevelName(const FText& SelectedLevelName, const FName SelectedLevelAddress)
+{
+	if (!bServer)
+	{
+		return;
+	}
+	
+	CachedLobbyController->OnHostSelectedMap(SelectedLevelName, SelectedLevelAddress);
 }
 
 void UP13LobbyMenuWidget::OnReadyButtonClickedHandle()
 {
+	AP13LobbyPlayerController* LobbyController = GetOwningPlayer<AP13LobbyPlayerController>();
+	check(LobbyController)
+
+	if (!bServer)
+	{
+		LobbyController->Server_UpdateClientReady();
+	}
+	else if (AP13LobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<AP13LobbyGameMode>())
+	{
+		LobbyGameMode->Server_LaunchGame();	
+	}
 	
 }
 
@@ -153,19 +195,86 @@ void UP13LobbyMenuWidget::InitWidget()
 	ReadyButton->OnReleased.AddDynamic(this, &ThisClass::OnReadyButtonClickedHandle);
 	ExitButton->OnReleased.AddDynamic(this, &ThisClass::OnExitButtonClickedHandle);
 
-	const APlayerController* OwningController = GetOwningPlayer();
-	check(OwningController)
-	const AP13PlayerState* PlayerState = OwningController->GetPlayerState<AP13PlayerState>();
+	check(GetOwningPlayer() && GetOwningPlayer()->IsA<AP13LobbyPlayerController>())
+	CachedLobbyController = StaticCast<AP13LobbyPlayerController*>(GetOwningPlayer());
+	
+	const APlayerState* PlayerState = CachedLobbyController->GetPlayerState<APlayerState>();
 	check(PlayerState)
-	const bool bServer = OwningController->GetNetMode() != NM_Client;
+	
+	bServer = CachedLobbyController->GetNetMode() != NM_Client;
 
-	const FString NameString = PlayerState->GetPlayerName().Mid(0, 20);
+	int32 StopIndex = 15;
+	PlayerState->GetPlayerName().FindChar('-', StopIndex);
+	const FString NameString = PlayerState->GetPlayerName().Mid(0, StopIndex);
 	const FString RoleString = bServer ? "Server" : "Host";
 	const FString ReadyString = bServer ? "Start" : "Ready";
 
 	PlayerNameText->SetText(FText::FromString(NameString));
 	PlayerRoleText->SetText(FText::FromString(RoleString));
 	StartReadyText->SetText(FText::FromString(ReadyString));
+
+	if (!bServer)
+	{
+		LevelsHorizontalBox->SetVisibility(ESlateVisibility::Collapsed);
+	}
+}
+
+void UP13LobbyMenuWidget::FindLevels() const
+{
+	if (!bServer)
+	{
+		return;
+	}
+	ClearLevels();
+	
+	APlayerController* LobbyController = GetOwningPlayer();
+	if (!LobbyController)
+	{
+		return;
+	}
+	
+	TArray<FP13LevelSelect*> LevelRows;
+	LevelSelectTable->GetAllRows(nullptr, LevelRows);
+	
+	for (int32 Index = 0; Index < LevelRows.Num(); ++Index)
+	{
+		if (Index == 0)
+		{
+			UpdateLevelName(LevelRows[0]->ShowName);
+		}
+
+		UP13LobbyLevelSelectWidget* LevelButton = CreateWidget<UP13LobbyLevelSelectWidget>(LobbyController, LevelButtonWidgetClass);
+		check(LevelButton)
+
+		LevelButton->InitLobbyLevelButton(LevelRows[Index], this);
+		LevelButton->AddToViewport();
+		LevelsHorizontalBox->AddChild(LevelButton);
+	}
+}
+
+void UP13LobbyMenuWidget::ClearLevels() const
+{
+	LevelsHorizontalBox->ClearChildren();
+}
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ *                                Level Select                               *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+void UP13LobbyLevelSelectWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+}
+
+void UP13LobbyLevelSelectWidget::OnLevelButtonPressed()
+{
+	CachedLobbyMenu->SelectLevelName(LevelName->GetText(), GetLevelAddress());
+}
+
+void UP13LobbyLevelSelectWidget::InitLobbyLevelButton(const FP13LevelSelect* NewLevel, const UP13LobbyMenuWidget* LobbyMenu)
+{
+	InitLevelButton(NewLevel);
+	CachedLobbyMenu = LobbyMenu;
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *

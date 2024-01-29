@@ -7,7 +7,7 @@
 #include "P13LobbyGameState.generated.h"
 
 UCLASS()
-class GAMESANDBOX_API AP13LobbyGameState : public AGameState
+class GAMESANDBOX_API AP13LobbyGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 };
