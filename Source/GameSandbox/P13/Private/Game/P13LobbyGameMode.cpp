@@ -24,22 +24,35 @@ void AP13LobbyGameMode::OnPostLogin(AController* NewPlayer)
 	{
 		return;
 	}
-	LobbyPlayerControllers.Add(StaticCast<AP13LobbyPlayerController*>(NewPlayer));
+	
+	AP13LobbyPlayerController* LobbyPlayerController = StaticCast<AP13LobbyPlayerController*>(NewPlayer);
+	check(LobbyPlayerController)
+	LobbyPlayerController->OnLogin();
+	LobbyPlayerController->UpdateSelectedMapName(LevelName);
+	LobbyPlayerControllers.Add(LobbyPlayerController);
 }
 
-void AP13LobbyGameMode::UpdateSelectedLevel(const FText& InLevelName, const FName InLevelAddress)
+void AP13LobbyGameMode::Server_LaunchGame_Implementation(const FName InLevelAddress)
 {
-	LevelAddress = InLevelAddress;
+	GetWorld()->ServerTravel(InLevelAddress.ToString());
+}
+
+void AP13LobbyGameMode::UpdateSelectedLevelForAll(const FString& InLevelName)
+{
+	LevelName = FText::FromString(InLevelName);
 	
 	for (const AP13LobbyPlayerController* LobbyController : LobbyPlayerControllers)
 	{
-		LobbyController->UpdateSelectedMapName(InLevelName);
+		LobbyController->UpdateSelectedMapName(LevelName);
 	}
 }
 
-void AP13LobbyGameMode::Server_LaunchGame_Implementation()
+void AP13LobbyGameMode::UpdateSelectedColor(const FLinearColor OccupiedColor, const AP13LobbyPlayerController* Occupier)
 {
-	
+	for (const AP13LobbyPlayerController* LobbyController : LobbyPlayerControllers)
+	{
+		LobbyController->UpdateSelectedColorOccupation(OccupiedColor, Occupier);
+	}
 }
 
 void AP13LobbyGameMode::SavePlayersColor()

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "P13/Public/UI/Menu/P13LobbyWidget.h"
 #include "P13LobbyPlayerController.generated.h"
 
 class AP13LobbyGameMode;
@@ -26,11 +27,15 @@ protected:
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateClientReady();
-	void OnHostSelectedMap(const FText& SelectedLevelName, const FName SelectedLevelAddress);
+	void OnHostSelectedMap(const FText& SelectedLevelName) const;
 	void UpdateSelectedMapName(const FText& SelectedLevelName) const;
+	void OnLogin();
+	UFUNCTION(Server, Reliable)
+	void Server_OnPlayerColorSelected(const FLinearColor LinearColor);
+	void UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const;
 	
 protected:
-	void ShowLobbyMenu();
+	bool ShowLobbyMenu();
 	void SetMenuInputMode();
 	void ListenToGameMode();
 

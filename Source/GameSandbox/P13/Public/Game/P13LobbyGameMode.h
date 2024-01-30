@@ -7,7 +7,6 @@
 #include "P13LobbyGameMode.generated.h"
 
 class AP13LobbyPlayerController;
-class UP13LobbyMenuWidget;
 
 UCLASS()
 class GAMESANDBOX_API AP13LobbyGameMode : public AGameModeBase
@@ -24,16 +23,16 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	void UpdateSelectedLevel(const FText& InLevelName, const FName InLevelAddress);
-	
 	UFUNCTION(Server, Reliable)
-	void Server_LaunchGame();
+	void Server_LaunchGame(const FName InLevelAddress);
+	void UpdateSelectedLevelForAll(const FString& InLevelName);
+	void UpdateSelectedColor(const FLinearColor OccupiedColor, const AP13LobbyPlayerController* Occupier);
 
 private:
 	void SavePlayersColor();
 
 	/* ----------------------------- Variables ----------------------------- */
 private:
-	FName LevelAddress;
+	FText LevelName;
 	TArray<AP13LobbyPlayerController*> LobbyPlayerControllers;
 };

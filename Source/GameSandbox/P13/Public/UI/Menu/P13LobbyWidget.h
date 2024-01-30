@@ -8,6 +8,8 @@
 #include "P13/Public/Game/P13LobbyGameMode.h"
 #include "P13LobbyWidget.generated.h"
 
+class UUniformGridPanel;
+class UP13ColorButtonWidget;
 class UEditableText;
 class UP13LobbyLevelSelectWidget;
 class AP13LobbyPlayerController;
@@ -130,6 +132,8 @@ public:
 public:
 	void UpdateLevelName(const FText& SelectedLevelName) const;
 	void SelectLevelName(const FText& SelectedLevelName, FName SelectedLevelAddress);
+	void ReleaseOccupiedColor();
+	void OccupyColor(const FLinearColor NewOccupiedColor);
 
 protected:
 	UFUNCTION()
@@ -139,8 +143,10 @@ protected:
 
 private:
 	void InitWidget();
-	void FindLevels() const;
+	void FindLevels();
+	void CreateColorPalette();
 	void ClearLevels() const;
+	void ClearColors() const;
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -159,15 +165,23 @@ protected:
 	UButton* ExitButton;
 	UPROPERTY(meta = (BindWidget))
 	UHorizontalBox* LevelsHorizontalBox;
+	UPROPERTY(meta = (BindWidget))
+	UUniformGridPanel* ColorsGrid;
 
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UDataTable* LevelSelectTable;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13LobbyLevelSelectWidget> LevelButtonWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<UP13ColorButtonWidget> ColorButtonWidgetClass;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TArray<FLinearColor> ColorVariations;
 
 private:
 	bool bServer = false;
 	TSoftObjectPtr<AP13LobbyPlayerController> CachedLobbyController;
+	FName GameLevelAddress;
+	FLinearColor OccupiedColor = FLinearColor::White;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -201,15 +215,21 @@ private:
  *                               Color Button                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 UCLASS()
-class UP13LevelButtonWidget : public UUserWidget
+class UP13ColorButtonWidget : public UUserWidget
 {
 	GENERATED_BODY()
 
 	/* ------------------------------ Unreal ------------------------------- */
 public:
+	virtual void NativePreConstruct() override;
 	virtual void NativeConstruct() override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	FORCEINLINE FLinearColor GetButtonColor() const { return ButtonColor; }
+	void InitColorButton(FLinearColor LinearColor);
+	void SetIsColorEnabled(const bool bEnable) const;
+	
 protected:
 	UFUNCTION()
 	void OnColorButtonClickedHandle();
@@ -218,5 +238,15 @@ protected:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UButton* ColorButton;
+	UPROPERTY(meta = (BindWidget))
+	UImage* ColorImage;
+	UPROPERTY(meta = (BindWidget))
+	UImage* OccupiedImage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FLinearColor ButtonColor;
+
+private:
+	bool bOccupied = false;
 	
 };

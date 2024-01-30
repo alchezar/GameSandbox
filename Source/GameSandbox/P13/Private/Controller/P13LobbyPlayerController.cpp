@@ -21,9 +21,7 @@ void AP13LobbyPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShowLobbyMenu();
-	SetMenuInputMode();
-	ListenToGameMode();
+	OnLogin();
 }
 
 void AP13LobbyPlayerController::Server_UpdateClientReady_Implementation()
@@ -31,12 +29,12 @@ void AP13LobbyPlayerController::Server_UpdateClientReady_Implementation()
 	
 }
 
-void AP13LobbyPlayerController::OnHostSelectedMap(const FText& SelectedLevelName, const FName SelectedLevelAddress)
+void AP13LobbyPlayerController::OnHostSelectedMap(const FText& SelectedLevelName) const
 {
 	/* We don`t need to mark this method "Server_", anyway it will be called only by the host.
 	 * Because Clients won't see Levels list. */
 	
-	CachedLobbyGameMode->UpdateSelectedLevel(SelectedLevelName, SelectedLevelAddress);
+	CachedLobbyGameMode->UpdateSelectedLevelForAll(SelectedLevelName.ToString());
 }
 
 void AP13LobbyPlayerController::UpdateSelectedMapName(const FText& SelectedLevelName) const
@@ -48,8 +46,41 @@ void AP13LobbyPlayerController::UpdateSelectedMapName(const FText& SelectedLevel
 	LobbyMenuWidget->UpdateLevelName(SelectedLevelName);
 }
 
-void AP13LobbyPlayerController::ShowLobbyMenu()
+void AP13LobbyPlayerController::OnLogin()
 {
+	ShowLobbyMenu();
+	SetMenuInputMode();
+	ListenToGameMode();
+}
+
+void AP13LobbyPlayerController::Server_OnPlayerColorSelected_Implementation(const FLinearColor LinearColor)
+{
+	if (!GetWorld()->GetAuthGameMode() || !CachedLobbyGameMode.Get())
+	{
+		return;
+	}
+	CachedLobbyGameMode->UpdateSelectedColor(LinearColor, this);	
+}
+
+void AP13LobbyPlayerController::UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const
+{
+	if (!LobbyMenuWidget)
+	{
+		return;
+	}
+	if (this == Occupier)
+	{
+		LobbyMenuWidget->ReleaseOccupiedColor();
+	}
+	LobbyMenuWidget->OccupyColor(SelectedColor);
+}
+
+bool AP13LobbyPlayerController::ShowLobbyMenu()
+{
+	if (LobbyMenuWidget)
+	{
+		return false;
+	}
 	check(LobbyMenuWidgetClass)
 
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
@@ -59,6 +90,7 @@ void AP13LobbyPlayerController::ShowLobbyMenu()
 	check(LobbyMenuWidget)
 
 	LobbyMenuWidget->AddToViewport();
+	return true;
 }
 
 void AP13LobbyPlayerController::SetMenuInputMode()

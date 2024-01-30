@@ -7,8 +7,11 @@
 #include "Components/CheckBox.h"
 #include "Components/CircularThrobber.h"
 #include "Components/EditableText.h"
+#include "Components/GridPanel.h"
 #include "Components/HorizontalBox.h"
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Components/UniformGridPanel.h"
 #include "Components/VerticalBox.h"
 #include "P13/Public/Controller/P13LobbyPlayerController.h"
 #include "P13/Public/Game/P13GameInstance.h"
@@ -81,6 +84,7 @@ void UP13StartMenuWidget::OnSessionNameCommittedHandle(const FText& Text, ETextC
 
 void UP13StartMenuWidget::OnFindSessionsCompleteHandle(TArray<FOnlineSessionSearchResult> OnlineSessionSearchResults)
 {
+	SearchingThrobber->SetVisibility(ESlateVisibility::Hidden);
 	ClearSessionsList();
 
 	APlayerController* PlayerController = GetOwningPlayer();
@@ -149,6 +153,7 @@ void UP13LobbyMenuWidget::NativeConstruct()
 
 	InitWidget();
 	FindLevels();
+	CreateColorPalette();
 }
 
 void UP13LobbyMenuWidget::UpdateLevelName(const FText& SelectedLevelName) const
@@ -162,8 +167,42 @@ void UP13LobbyMenuWidget::SelectLevelName(const FText& SelectedLevelName, const 
 	{
 		return;
 	}
-	
-	CachedLobbyController->OnHostSelectedMap(SelectedLevelName, SelectedLevelAddress);
+
+	GameLevelAddress = SelectedLevelAddress;
+	CachedLobbyController->OnLogin();
+	CachedLobbyController->OnHostSelectedMap(SelectedLevelName);
+}
+
+void UP13LobbyMenuWidget::ReleaseOccupiedColor()
+{
+	for (UWidget* ColorButton : ColorsGrid->GetAllChildren())
+	{
+		const UP13ColorButtonWidget* ColorButtonWidget = Cast<UP13ColorButtonWidget>(ColorButton);
+		check(ColorButtonWidget)
+
+		if (ColorButtonWidget->GetButtonColor() != OccupiedColor)
+		{
+			continue;
+		}
+		ColorButtonWidget->SetIsColorEnabled(true);
+		OccupiedColor = FLinearColor::White;
+	}
+}
+
+void UP13LobbyMenuWidget::OccupyColor(const FLinearColor NewOccupiedColor)
+{
+	for (UWidget* ColorButton : ColorsGrid->GetAllChildren())
+	{
+		const UP13ColorButtonWidget* ColorButtonWidget = Cast<UP13ColorButtonWidget>(ColorButton);
+		check(ColorButtonWidget)
+
+		if (ColorButtonWidget->GetButtonColor() != NewOccupiedColor)
+		{
+			continue;
+		}
+		ColorButtonWidget->SetIsColorEnabled(false);
+		OccupiedColor = NewOccupiedColor;
+	}
 }
 
 void UP13LobbyMenuWidget::OnReadyButtonClickedHandle()
@@ -177,7 +216,7 @@ void UP13LobbyMenuWidget::OnReadyButtonClickedHandle()
 	}
 	else if (AP13LobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<AP13LobbyGameMode>())
 	{
-		LobbyGameMode->Server_LaunchGame();	
+		LobbyGameMode->Server_LaunchGame(GameLevelAddress);	
 	}
 	
 }
@@ -215,11 +254,12 @@ void UP13LobbyMenuWidget::InitWidget()
 
 	if (!bServer)
 	{
+		ClearLevels();
 		LevelsHorizontalBox->SetVisibility(ESlateVisibility::Collapsed);
 	}
 }
 
-void UP13LobbyMenuWidget::FindLevels() const
+void UP13LobbyMenuWidget::FindLevels()
 {
 	if (!bServer)
 	{
@@ -240,7 +280,7 @@ void UP13LobbyMenuWidget::FindLevels() const
 	{
 		if (Index == 0)
 		{
-			UpdateLevelName(LevelRows[0]->ShowName);
+			SelectLevelName(LevelRows[0]->ShowName, LevelRows[0]->RealName);
 		}
 
 		UP13LobbyLevelSelectWidget* LevelButton = CreateWidget<UP13LobbyLevelSelectWidget>(LobbyController, LevelButtonWidgetClass);
@@ -252,9 +292,32 @@ void UP13LobbyMenuWidget::FindLevels() const
 	}
 }
 
+void UP13LobbyMenuWidget::CreateColorPalette()
+{
+	ClearColors();
+
+	constexpr int32 Rows = 2;
+	constexpr int32 Columns = 3;
+	
+	// for (const FLinearColor ColorVariant : ColorVariations)
+	for (int32 Index = 0; Index < ColorVariations.Num(); ++Index)
+	{
+		UP13ColorButtonWidget* ColorButtonWidget = CreateWidget<UP13ColorButtonWidget>(CachedLobbyController.Get(), ColorButtonWidgetClass);
+		check(ColorButtonWidget)
+
+		ColorButtonWidget->InitColorButton(ColorVariations[Index]);
+		ColorsGrid->AddChildToUniformGrid(ColorButtonWidget, Index / (Rows + 1), Index % Columns);
+	}
+}
+
 void UP13LobbyMenuWidget::ClearLevels() const
 {
 	LevelsHorizontalBox->ClearChildren();
+}
+
+void UP13LobbyMenuWidget::ClearColors() const
+{
+	ColorsGrid->ClearChildren();
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -281,12 +344,39 @@ void UP13LobbyLevelSelectWidget::InitLobbyLevelButton(const FP13LevelSelect* New
  *                               Color Button                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-void UP13LevelButtonWidget::NativeConstruct()
+void UP13ColorButtonWidget::NativePreConstruct()
 {
-	Super::NativeConstruct();
+	Super::NativePreConstruct();
+	
+	ColorButton->SetColorAndOpacity(ButtonColor);
 }
 
-void UP13LevelButtonWidget::OnColorButtonClickedHandle()
+void UP13ColorButtonWidget::NativeConstruct()
 {
+	Super::NativeConstruct();
+
+	ColorButton->SetColorAndOpacity(ButtonColor);
+	SetIsColorEnabled(true);
 	
+	ColorButton->OnReleased.AddDynamic(this, &ThisClass::OnColorButtonClickedHandle);
+}
+
+void UP13ColorButtonWidget::InitColorButton(const FLinearColor LinearColor)
+{
+	ButtonColor = LinearColor;
+}
+
+void UP13ColorButtonWidget::SetIsColorEnabled(const bool bEnable) const
+{
+	ColorButton->SetIsEnabled(bEnable);
+	OccupiedImage->SetVisibility(bEnable ? ESlateVisibility::Collapsed : ESlateVisibility::Visible);
+}
+
+void UP13ColorButtonWidget::OnColorButtonClickedHandle()
+{
+	AP13LobbyPlayerController* LobbyPlayerController = GetOwningPlayer<AP13LobbyPlayerController>();
+	check(LobbyPlayerController)
+
+	LobbyPlayerController->Server_OnPlayerColorSelected(ButtonColor);
+	SetIsColorEnabled(false);
 }
