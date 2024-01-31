@@ -52,6 +52,10 @@ public:
 	virtual FVector GetLookAtCursorDirection() const;
 	float GetHealthReserve() const;
 	void SavePreviousMovementState() { PreviousMovementState = MovementState; }
+	void CreateDynamicMeshMaterials();
+	void UpdateDynamicMeshMaterials(const FLinearColor NewColor);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
 
 protected:
 	void UpdateCharacter() const;
@@ -75,8 +79,6 @@ protected:
 
 private:
 	void CreateBaseComponents();
-	// void CreateDynamicMeshMaterials();
-	// void UpdateMeshMaterial(const float HealthAlpha);
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
 	void PlayTakeDamageEffect(const AActor* DamageCauser);
 
@@ -91,8 +93,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
 	UP13LegAlignmentComponent* LegAlignmentComponent;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
-	UCurveLinearColor* ColorOverLife;
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UAnimMontage* TakeDamageAnim = nullptr;
 
@@ -109,9 +109,6 @@ protected:
 
 private:
 	bool bDead = false;
-	float IKLeftLegOffset = 0.f;
-	float IKRightLegOffset = 0.f;
-	float IKHitOffset = 0.f;
 	EP13MovementState PreviousMovementState = EP13MovementState::Walk;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;

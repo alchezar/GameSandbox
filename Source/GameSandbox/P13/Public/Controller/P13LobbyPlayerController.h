@@ -32,7 +32,8 @@ public:
 	void OnLogin();
 	UFUNCTION(Server, Reliable)
 	void Server_OnPlayerColorSelected(const FLinearColor LinearColor);
-	void UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const;
+	UFUNCTION(Client, Reliable)
+	void Client_UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const;
 	
 protected:
 	bool ShowLobbyMenu();

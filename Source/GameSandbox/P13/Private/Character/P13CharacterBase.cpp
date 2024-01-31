@@ -133,6 +133,28 @@ float AP13CharacterBase::GetHealthReserve() const
 	return AttributesComponent->GetCurrentHealth() + AttributesComponent->GetCurrentShield();
 }
 
+void AP13CharacterBase::CreateDynamicMeshMaterials()
+{
+	for (int32 Index = 1; Index <= 3; ++Index)
+	{
+		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
+	}
+}
+
+void AP13CharacterBase::UpdateDynamicMeshMaterials(const FLinearColor NewColor)
+{
+	for (auto* DynamicMaterial : DynamicMaterials)
+	{
+		DynamicMaterial->SetVectorParameterValue("MainColor", NewColor);
+		DynamicMaterial->SetVectorParameterValue("PaintColor", NewColor);
+	}
+}
+
+void AP13CharacterBase::Multicast_UpdatePlayerColor_Implementation(const FLinearColor NewColor)
+{
+	UpdateDynamicMeshMaterials(NewColor);
+}
+
 void AP13CharacterBase::UpdateCharacter() const
 {
 	float ResSpeed = GetCharacterMovement()->StaticClass()->GetDefaultObject<UCharacterMovementComponent>()->MaxWalkSpeed;
@@ -371,27 +393,6 @@ void AP13CharacterBase::CreateBaseComponents()
 	DamageDisplayComponent = CreateDefaultSubobject<UP13DamageDisplayComponent>("DamageDisplaySceneComponent");
 	DamageDisplayComponent->SetupAttachment(RootComponent);
 }
-
-// void AP13CharacterBase::CreateDynamicMeshMaterials()
-// {
-// 	for (int32 Index = 1; Index <= 3; ++Index)
-// 	{
-// 		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
-// 	}
-// }
-//
-// void AP13CharacterBase::UpdateMeshMaterial(const float HealthAlpha)
-// {
-// 	if (!ColorOverLife)
-// 	{
-// 		return;
-// 	}
-// 	for (auto* DynamicMaterial : DynamicMaterials)
-// 	{
-// 		DynamicMaterial->SetVectorParameterValue("MainColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
-// 		DynamicMaterial->SetVectorParameterValue("PaintColor", ColorOverLife->GetLinearColorValue(HealthAlpha));
-// 	}
-// }
 
 void AP13CharacterBase::TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser)
 {

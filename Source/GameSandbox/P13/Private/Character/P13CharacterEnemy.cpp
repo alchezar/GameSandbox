@@ -80,7 +80,7 @@ void AP13CharacterEnemy::OnWeaponReloadFinishHandle(const int32 RoundNum, const 
 
 bool AP13CharacterEnemy::EnemyFireAttempt(const FVector& TargetLocation)
 {
-	if (bReloading || !bNextWeaponAvailable || TargetLocation.IsNearlyZero())
+	if (bReloading || !bNextWeaponAvailable || TargetLocation.IsNearlyZero() || !CachedWeapon.IsValid())
 	{
 		return false;
 	}

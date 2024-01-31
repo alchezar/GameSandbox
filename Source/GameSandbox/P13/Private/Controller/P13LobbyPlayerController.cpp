@@ -62,7 +62,7 @@ void AP13LobbyPlayerController::Server_OnPlayerColorSelected_Implementation(cons
 	CachedLobbyGameMode->UpdateSelectedColor(LinearColor, this);	
 }
 
-void AP13LobbyPlayerController::UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const
+void AP13LobbyPlayerController::Client_UpdateSelectedColorOccupation_Implementation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const
 {
 	if (!LobbyMenuWidget)
 	{

@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "P13LobbyGameMode.generated.h"
 
+class AP13CharacterBase;
+class ASkeletalMeshActor;
+class ATargetPoint;
 class AP13LobbyPlayerController;
 
 UCLASS()
@@ -30,9 +33,18 @@ public:
 
 private:
 	void SavePlayersColor();
+	void InitSpawnPoints();
+	ATargetPoint* GetFreeSpawnPoint();
+	void SpawnPlayerPreview(AP13LobbyPlayerController* PreviewOwner);
+	AActor* FindCameraView() const;
 
 	/* ----------------------------- Variables ----------------------------- */
+protected:
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TSubclassOf<AP13CharacterBase> CharBaseClass;
+		
 private:
 	FText LevelName;
 	TArray<AP13LobbyPlayerController*> LobbyPlayerControllers;
+	TMap<ATargetPoint*, bool> SpawnPointsMap;
 };
