@@ -3,9 +3,9 @@
 #include "P13/Public/Character/P13CharacterBase.h"
 
 #include "Components/CapsuleComponent.h"
-#include "Curves/CurveLinearColor.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Net/UnrealNetwork.h"
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
 #include "P13/Public/Component/Actor/P13LegAlignmentComponent.h"
@@ -33,6 +33,30 @@ void AP13CharacterBase::PostInitializeComponents()
 	}
 }
 
+void AP13CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, TrueColor);
+}
+
+void AP13CharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// CreateDynamicMeshMaterials();
+
+	if (AttributesComponent)
+	{
+		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
+		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
+		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
+	}
+	if (LegAlignmentComponent)
+	{
+		LegAlignmentComponent->InitLegAlignment("VB VB SK_Jedihunter_root_l_ankle", "VB VB SK_Jedihunter_root_r_ankle");
+	}
+}
+
 void AP13CharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
@@ -54,24 +78,6 @@ void AP13CharacterBase::UnPossessed()
 {
 	ControllerCached.Reset();
 	Super::UnPossessed();
-}
-
-void AP13CharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-
-	// CreateDynamicMeshMaterials();
-
-	if (AttributesComponent)
-	{
-		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
-		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
-		AttributesComponent->OnHealthOver.AddUObject(this, &ThisClass::OnDeathHandle);
-	}
-	if (LegAlignmentComponent)
-	{
-		LegAlignmentComponent->InitLegAlignment("VB VB SK_Jedihunter_root_l_ankle", "VB VB SK_Jedihunter_root_r_ankle");
-	}
 }
 
 EPhysicalSurface AP13CharacterBase::GetSurfaceType()
@@ -143,16 +149,22 @@ void AP13CharacterBase::CreateDynamicMeshMaterials()
 
 void AP13CharacterBase::UpdateDynamicMeshMaterials(const FLinearColor NewColor)
 {
+	TrueColor = NewColor;
 	for (auto* DynamicMaterial : DynamicMaterials)
 	{
-		DynamicMaterial->SetVectorParameterValue("MainColor", NewColor);
-		DynamicMaterial->SetVectorParameterValue("PaintColor", NewColor);
+		DynamicMaterial->SetVectorParameterValue("MainColor", TrueColor);
+		DynamicMaterial->SetVectorParameterValue("PaintColor", TrueColor);
 	}
 }
 
 void AP13CharacterBase::Multicast_UpdatePlayerColor_Implementation(const FLinearColor NewColor)
 {
 	UpdateDynamicMeshMaterials(NewColor);
+}
+
+void AP13CharacterBase::Multicast_PlayReadyAnimation_Implementation()
+{
+	PlayAnimMontage(ReadyMontage);
 }
 
 void AP13CharacterBase::UpdateCharacter() const

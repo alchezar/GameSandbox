@@ -173,35 +173,30 @@ void UP13LobbyMenuWidget::SelectLevelName(const FText& SelectedLevelName, const 
 	CachedLobbyController->OnHostSelectedMap(SelectedLevelName);
 }
 
-void UP13LobbyMenuWidget::ReleaseOccupiedColor()
+void UP13LobbyMenuWidget::UpdateReselectedColor(const FLinearColor ReleasedColor, const FLinearColor OccupiedColor)
 {
-	for (UWidget* ColorButton : ColorsGrid->GetAllChildren())
-	{
-		const UP13ColorButtonWidget* ColorButtonWidget = Cast<UP13ColorButtonWidget>(ColorButton);
-		check(ColorButtonWidget)
-
-		if (ColorButtonWidget->GetButtonColor() != OccupiedColor)
-		{
-			continue;
-		}
-		ColorButtonWidget->SetIsColorEnabled(true);
-		OccupiedColor = FLinearColor::White;
-	}
+	/* Release color. */
+	SwitchColorOccupation(ReleasedColor, false);
+	/* Occupy color. */
+	SwitchColorOccupation(OccupiedColor, true);
 }
 
-void UP13LobbyMenuWidget::OccupyColor(const FLinearColor NewOccupiedColor)
+void UP13LobbyMenuWidget::SwitchColorOccupation(const FLinearColor Color, const bool bOccupy)
 {
 	for (UWidget* ColorButton : ColorsGrid->GetAllChildren())
 	{
 		const UP13ColorButtonWidget* ColorButtonWidget = Cast<UP13ColorButtonWidget>(ColorButton);
 		check(ColorButtonWidget)
 
-		if (ColorButtonWidget->GetButtonColor() != NewOccupiedColor)
+		if (ColorButtonWidget->GetButtonColor() != Color)
 		{
 			continue;
 		}
-		ColorButtonWidget->SetIsColorEnabled(false);
-		OccupiedColor = NewOccupiedColor;
+		ColorButtonWidget->SetIsColorEnabled(!bOccupy);
+	}
+	if (bOccupy)
+	{
+		CurrentOccupiedColor = Color;
 	}
 }
 
@@ -214,6 +209,8 @@ void UP13LobbyMenuWidget::OnReadyButtonClickedHandle()
 	{
 		LobbyController->Server_UpdateClientReady();
 	}
+
+	/* This will fire only on server. */
 	else if (AP13LobbyGameMode* LobbyGameMode = GetWorld()->GetAuthGameMode<AP13LobbyGameMode>())
 	{
 		LobbyGameMode->Server_LaunchGame(GameLevelAddress);	

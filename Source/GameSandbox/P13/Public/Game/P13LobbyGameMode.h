@@ -22,7 +22,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	virtual void OnPostLogin(AController* NewPlayer) override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 
 	/* ------------------------------- This -------------------------------- */
 public:
@@ -47,4 +48,5 @@ private:
 	FText LevelName;
 	TArray<AP13LobbyPlayerController*> LobbyPlayerControllers;
 	TMap<ATargetPoint*, bool> SpawnPointsMap;
+	FLinearColor DefaultPawnColor = FLinearColor::White;
 };

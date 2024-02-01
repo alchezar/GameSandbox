@@ -32,6 +32,7 @@ public:
 public:
 	FP13WeaponInfo* GetWeaponInfoByID(const FName WeaponID) const;
 	FP13WeaponDrop* GetWeaponDropByID(const FName WeaponID) const;
+	void SavePlayerColor(const FString& PlayerName, const FLinearColor PlayerColor);
 
 private:
 	void FindSessionInterface();
@@ -54,4 +55,6 @@ private:
 	FName StartLevelName = "MenuLevel_P13_";
 	FName LobbyLevelName = "LobbyLevel_P13_";
 	int32 MaxPlayersNum = 2;
+	TMap<FString, FLinearColor> PlayersColorMap;
 };
+

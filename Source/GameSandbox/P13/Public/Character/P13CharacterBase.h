@@ -6,7 +6,6 @@
 #include "GameFramework/Character.h"
 #include "P13/Public/Intearface/P13StateEffectInterface.h"
 #include "P13/Public/Library/P13Types.h"
-
 #include "P13CharacterBase.generated.h"
 
 class UP13LegAlignmentComponent;
@@ -26,12 +25,15 @@ class GAMESANDBOX_API AP13CharacterBase : public ACharacter, public IP13StateEff
 public:
 	AP13CharacterBase();
 	virtual void PostInitializeComponents() override;
-	virtual void PossessedBy(AController* NewController) override;
-	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
-	virtual void UnPossessed() override;
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
+
+public:
+	virtual void PossessedBy(AController* NewController) override;
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	virtual void UnPossessed() override;
 
 	/* ----------------------------- Interface ----------------------------- */
 public:
@@ -49,6 +51,7 @@ public:
 	FORCEINLINE UP13InventoryComponent* GetInventoryComponent() const { return InventoryComponent; }
 	FORCEINLINE UP13LegAlignmentComponent* GetLegAlignmentComponent() const { return LegAlignmentComponent; }
 	FORCEINLINE EP13AmmoType GetCurrentWeaponType() const { return CurrentWeaponType; }
+	FORCEINLINE FLinearColor GetTrueColor() const { return TrueColor; }
 	virtual FVector GetLookAtCursorDirection() const;
 	float GetHealthReserve() const;
 	void SavePreviousMovementState() { PreviousMovementState = MovementState; }
@@ -56,6 +59,8 @@ public:
 	void UpdateDynamicMeshMaterials(const FLinearColor NewColor);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayReadyAnimation();
 
 protected:
 	void UpdateCharacter() const;
@@ -102,6 +107,9 @@ protected:
 	FP13MovementSpeed MovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
+	
+	UPROPERTY(EditAnywhere, Category = "C++ | Preview")
+	UAnimMontage* ReadyMontage = nullptr;
 
 	TWeakObjectPtr<AController> ControllerCached;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
@@ -114,4 +122,6 @@ private:
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
 	UPROPERTY()
 	TArray<UP13StateEffect*> ActiveStateEffects;
+	UPROPERTY(Replicated)
+	FLinearColor TrueColor;
 };

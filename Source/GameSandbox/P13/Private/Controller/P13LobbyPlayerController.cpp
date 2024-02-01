@@ -3,7 +3,9 @@
 #include "P13/Public/Controller/P13LobbyPlayerController.h"
 
 #include "Blueprint/UserWidget.h"
+#include "Engine/TargetPoint.h"
 #include "Net/UnrealNetwork.h"
+#include "P13/Public/Character/P13CharacterBase.h"
 #include "P13/Public/UI/Menu/P13LobbyWidget.h"
 
 AP13LobbyPlayerController::AP13LobbyPlayerController()
@@ -24,9 +26,23 @@ void AP13LobbyPlayerController::BeginPlay()
 	OnLogin();
 }
 
+FLinearColor AP13LobbyPlayerController::GetOccupiedColor() const
+{
+	if (!LobbyMenuWidget)
+	{
+		return FLinearColor::White;
+	}
+	return LobbyMenuWidget->GetCurrentOccupiedColor();
+}
+
 void AP13LobbyPlayerController::Server_UpdateClientReady_Implementation()
 {
-	
+	AP13CharacterBase* ControlledPawn = GetPawn<AP13CharacterBase>();
+	if (!ControlledPawn)
+	{
+		return;
+	}
+	ControlledPawn->Multicast_PlayReadyAnimation();
 }
 
 void AP13LobbyPlayerController::OnHostSelectedMap(const FText& SelectedLevelName) const
@@ -53,26 +69,34 @@ void AP13LobbyPlayerController::OnLogin()
 	ListenToGameMode();
 }
 
-void AP13LobbyPlayerController::Server_OnPlayerColorSelected_Implementation(const FLinearColor LinearColor)
+void AP13LobbyPlayerController::Server_OnPlayerColorSelected_Implementation(const FLinearColor SelectedColor)
 {
 	if (!GetWorld()->GetAuthGameMode() || !CachedLobbyGameMode.Get())
 	{
 		return;
 	}
-	CachedLobbyGameMode->UpdateSelectedColor(LinearColor, this);	
+	CachedLobbyGameMode->UpdateSelectedColor(SelectedColor, this);	
 }
 
-void AP13LobbyPlayerController::Client_UpdateSelectedColorOccupation_Implementation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const
+void AP13LobbyPlayerController::Client_UpdateSelectedColorOccupation_Implementation(const FLinearColor SelectedColor, const FLinearColor ReleasedColor, const AP13LobbyPlayerController* Occupier) const
 {
 	if (!LobbyMenuWidget)
 	{
 		return;
 	}
-	if (this == Occupier)
-	{
-		LobbyMenuWidget->ReleaseOccupiedColor();
-	}
-	LobbyMenuWidget->OccupyColor(SelectedColor);
+	LobbyMenuWidget->UpdateReselectedColor(ReleasedColor, SelectedColor);
+}
+
+void AP13LobbyPlayerController::OccupyTargetPoint(ATargetPoint* InTargetPoint)
+{
+	CachedTargetPoint = InTargetPoint;
+}
+
+ATargetPoint* AP13LobbyPlayerController::ReleaseTargetPoint()
+{
+	ATargetPoint* TargetPoint = CachedTargetPoint.Get();
+	CachedTargetPoint.Reset();
+	return TargetPoint;
 }
 
 bool AP13LobbyPlayerController::ShowLobbyMenu()

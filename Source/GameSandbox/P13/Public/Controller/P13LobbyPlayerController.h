@@ -22,19 +22,22 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 public:
+	FLinearColor GetOccupiedColor() const;
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateClientReady();
 	void OnHostSelectedMap(const FText& SelectedLevelName) const;
 	void UpdateSelectedMapName(const FText& SelectedLevelName) const;
 	void OnLogin();
 	UFUNCTION(Server, Reliable)
-	void Server_OnPlayerColorSelected(const FLinearColor LinearColor);
+	void Server_OnPlayerColorSelected(const FLinearColor SelectedColor);
 	UFUNCTION(Client, Reliable)
-	void Client_UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const AP13LobbyPlayerController* Occupier) const;
-	
+	void Client_UpdateSelectedColorOccupation(const FLinearColor SelectedColor, const FLinearColor ReleasedColor, const AP13LobbyPlayerController* Occupier) const;
+	void OccupyTargetPoint(ATargetPoint* InTargetPoint);
+	ATargetPoint* ReleaseTargetPoint();
+
 protected:
 	bool ShowLobbyMenu();
 	void SetMenuInputMode();
@@ -52,4 +55,5 @@ private:
 	UPROPERTY()
 	UP13LobbyMenuWidget* LobbyMenuWidget = nullptr;
 	TSoftObjectPtr<AP13LobbyGameMode> CachedLobbyGameMode;
+	TWeakObjectPtr<ATargetPoint> CachedTargetPoint;
 };

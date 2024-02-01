@@ -80,6 +80,11 @@ FP13WeaponDrop* UP13GameInstance::GetWeaponDropByID(const FName WeaponID) const
 	return WeaponDropTable->FindRow<FP13WeaponDrop>(WeaponID, nullptr);
 }
 
+void UP13GameInstance::SavePlayerColor(const FString& PlayerName, const FLinearColor PlayerColor)
+{
+	PlayersColorMap.Add(PlayerName, PlayerColor);
+}
+
 void UP13GameInstance::FindSessionInterface()
 {
 	const IOnlineSubsystem* OnlineSubsystem = IOnlineSubsystem::Get();

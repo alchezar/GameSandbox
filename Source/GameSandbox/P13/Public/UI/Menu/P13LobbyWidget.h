@@ -130,12 +130,14 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	FORCEINLINE FLinearColor GetCurrentOccupiedColor() const { return CurrentOccupiedColor; }
 	void UpdateLevelName(const FText& SelectedLevelName) const;
 	void SelectLevelName(const FText& SelectedLevelName, FName SelectedLevelAddress);
-	void ReleaseOccupiedColor();
-	void OccupyColor(const FLinearColor NewOccupiedColor);
+	void UpdateReselectedColor(const FLinearColor ReleasedColor, const FLinearColor OccupiedColor);
 
 protected:
+	void SwitchColorOccupation(FLinearColor Color, const bool bOccupy);
+	
 	UFUNCTION()
 	void OnReadyButtonClickedHandle();
 	UFUNCTION()
@@ -181,7 +183,7 @@ private:
 	bool bServer = false;
 	TSoftObjectPtr<AP13LobbyPlayerController> CachedLobbyController;
 	FName GameLevelAddress;
-	FLinearColor OccupiedColor = FLinearColor::White;
+	FLinearColor CurrentOccupiedColor = FLinearColor::White;
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
