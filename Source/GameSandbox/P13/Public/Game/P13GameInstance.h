@@ -20,18 +20,19 @@ class GAMESANDBOX_API UP13GameInstance : public UGameInstance, public IP13Networ
 public:
 	UP13GameInstance() {}
 	virtual void Init() override;
-	
+
 	/* ----------------------------- Interface ----------------------------- */
 public:
 	virtual void HostSession(const int32 MaxPlayers, const bool bLan, const FString& CustomServerName) override;
 	virtual void FindSessions(const bool bLan) override;
 	virtual void JoinSession(const FOnlineSessionSearchResult& Result) override;
 	virtual void DestroySession() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 public:
 	FP13WeaponInfo* GetWeaponInfoByID(const FName WeaponID) const;
 	FP13WeaponDrop* GetWeaponDropByID(const FName WeaponID) const;
+	const TMap<FString, FLinearColor>& GetPlayersColorsMap() const { return PlayersColorMap; }
 	void SavePlayerColor(const FString& PlayerName, const FLinearColor PlayerColor);
 
 private:
@@ -40,7 +41,7 @@ private:
 	void OnFindSessionCompleteHandle(bool bSuccess);
 	void OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	void OnDestroySessionCompleteHandle(FName SessionName, bool bSuccessful);
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
@@ -57,4 +58,3 @@ private:
 	int32 MaxPlayersNum = 2;
 	TMap<FString, FLinearColor> PlayersColorMap;
 };
-

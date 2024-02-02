@@ -26,7 +26,7 @@ void AP13LobbyGameMode::BeginPlay()
 void AP13LobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-	
+
 	InitSpawnPoints();
 
 	if (!NewPlayer->IsA<AP13LobbyPlayerController>())
@@ -69,6 +69,8 @@ void AP13LobbyGameMode::Logout(AController* Exiting)
 
 void AP13LobbyGameMode::Server_LaunchGame_Implementation(const FName InLevelAddress)
 {
+	SavePlayersColor();
+
 	GetWorld()->ServerTravel(InLevelAddress.ToString());
 }
 
@@ -157,7 +159,7 @@ void AP13LobbyGameMode::SpawnPlayerPreview(AP13LobbyPlayerController* PreviewOwn
 
 	AP13CharacterBase* CharBase = GetWorld()->SpawnActor<AP13CharacterBase>(CharBaseClass, TargetPoint->GetActorTransform());
 	check(CharBase)
-	CharBase->CreateDynamicMeshMaterials();
+	// CharBase->CreateDynamicMeshMaterials();
 
 	PreviewOwner->SetPawn(CharBase);
 	PreviewOwner->OccupyTargetPoint(TargetPoint);

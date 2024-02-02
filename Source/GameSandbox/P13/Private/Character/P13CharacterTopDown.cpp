@@ -32,6 +32,7 @@ void AP13CharacterTopDown::PossessedBy(AController* NewController)
 	{
 		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
 	}
+	TryLoadSavedColor(NewController);
 }
 
 void AP13CharacterTopDown::BeginPlay()
@@ -168,6 +169,16 @@ void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
 	}
 
 	Super::OnDeathHandle(Causer);
+}
+
+void AP13CharacterTopDown::TryLoadSavedColor(AController* NewController)
+{
+	if (const AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController))
+	{
+		TrueColor = PlayerController->GetPawnTrueColor();
+	}
+
+	Super::TryLoadSavedColor(NewController);
 }
 
 void AP13CharacterTopDown::OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult)

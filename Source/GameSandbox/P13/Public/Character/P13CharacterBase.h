@@ -55,7 +55,8 @@ public:
 	virtual FVector GetLookAtCursorDirection() const;
 	float GetHealthReserve() const;
 	void SavePreviousMovementState() { PreviousMovementState = MovementState; }
-	void CreateDynamicMeshMaterials();
+
+	bool TryCreateDynamicMeshMaterials();
 	void UpdateDynamicMeshMaterials(const FLinearColor NewColor);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
@@ -77,10 +78,13 @@ protected:
 	bool TryReloadWeapon() const;
 	bool TryTakeNextWeapon(const bool bNext) const;
 	bool CheckCharacterCanFire() const;
+
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
 	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
 	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime);
 	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess);
+
+	virtual void TryLoadSavedColor(AController* NewController);
 
 private:
 	void CreateBaseComponents();
@@ -107,13 +111,15 @@ protected:
 	FP13MovementSpeed MovementSpeed;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	float RotationRate = 10.f;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Preview")
 	UAnimMontage* ReadyMontage = nullptr;
 
 	TWeakObjectPtr<AController> ControllerCached;
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
 	EP13AmmoType CurrentWeaponType = EP13AmmoType::Default;
+	UPROPERTY(Replicated)
+	FLinearColor TrueColor = FLinearColor::White;
 
 private:
 	bool bDead = false;
@@ -122,6 +128,4 @@ private:
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
 	UPROPERTY()
 	TArray<UP13StateEffect*> ActiveStateEffects;
-	UPROPERTY(Replicated)
-	FLinearColor TrueColor;
 };

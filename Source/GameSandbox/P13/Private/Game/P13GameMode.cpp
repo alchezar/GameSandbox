@@ -4,11 +4,48 @@
 
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "GameFramework/PlayerState.h"
 #include "P13/Public/Actor/P13EnemySpawn.h"
 #include "P13/Public/Character/P13CharacterEnemy.h"
+#include "P13/Public/Controller/P13PlayerController.h"
+#include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Game/P13GameState.h"
 
 AP13GameMode::AP13GameMode() {}
+
+void AP13GameMode::RestartPlayer(AController* NewPlayer)
+{
+	Super::RestartPlayer(NewPlayer);
+
+	/* Save new controller. */
+	LoggedControllers.Add(NewPlayer);
+
+	/* Look for saved pawn color. */
+	const UP13GameInstance* GameInstance = GetGameInstance<UP13GameInstance>();
+	check(GameInstance)
+	const APlayerState* PlayerState = NewPlayer->GetPlayerState<APlayerState>();
+	check(PlayerState)
+
+	const TMap<FString, FLinearColor>& PlayersColorsMap = GameInstance->GetPlayersColorsMap();
+	const FLinearColor* FoundColor = PlayersColorsMap.Find(PlayerState->GetPlayerName());
+	if (!FoundColor)
+	{
+		return;
+	}
+
+	/* Send found color to the controlled pawn. */
+	if (AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewPlayer))
+	{
+		PlayerController->Multicast_UpdatePlayerColor(*FoundColor);
+	}
+}
+
+void AP13GameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	LoggedControllers.Remove(Exiting);
+}
 
 void AP13GameMode::BeginPlay()
 {

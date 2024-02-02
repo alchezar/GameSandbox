@@ -35,11 +35,14 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	FORCEINLINE FLinearColor GetPawnTrueColor() const { return PawnTrueColor; }
 	void OnGameWon();
-	
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdatePlayerColor(const FLinearColor FoundColor);
+
 protected:
 	void OnInputStarted();
-	/* Triggered every frame when the input is held down. */
+	/** Triggered every frame when the input is held down. */
 	void OnSetDestinationTriggered();
 	void OnSetDestinationReleased();
 
@@ -109,4 +112,5 @@ private:
 	TWeakObjectPtr<UDecalComponent> CachedCursorDecal;
 	UPROPERTY()
 	AP13HeadsUpDisplay* HeadsUpDisplay = nullptr;
+	FLinearColor PawnTrueColor = FLinearColor::White;
 };

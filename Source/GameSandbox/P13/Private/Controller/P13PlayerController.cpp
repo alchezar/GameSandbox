@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Pawn.h"
 #include "Kismet/GameplayStatics.h"
+#include "P13/Public/Character/P13CharacterBase.h"
 #include "P13/Public/Game/P13GameMode.h"
 #include "P13/Public/Game/P13HeadsUpDisplay.h"
 #include "P13/Public/Game/P13PlayerState.h"
@@ -128,6 +129,17 @@ void AP13PlayerController::OnGameWon()
 
 	SetNewInputMode(false);
 	Pause();
+}
+
+void AP13PlayerController::Multicast_UpdatePlayerColor_Implementation(const FLinearColor FoundColor)
+{
+	PawnTrueColor = FoundColor;
+
+	/* Send found color to the controlled pawn. */
+	if (AP13CharacterBase* ControlledCharacter = GetPawn<AP13CharacterBase>())
+	{
+		ControlledCharacter->UpdateDynamicMeshMaterials(PawnTrueColor);
+	}
 }
 
 void AP13PlayerController::OnInputStarted()

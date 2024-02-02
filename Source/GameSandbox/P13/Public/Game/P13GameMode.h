@@ -7,6 +7,7 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13GameMode.generated.h"
 
+class AP13PlayerController;
 class AP13GameState;
 class AP13EnemySpawnPoint;
 
@@ -18,6 +19,8 @@ class GAMESANDBOX_API AP13GameMode : public AGameMode
 	/* ------------------------------- Super ------------------------------- */
 public:
 	AP13GameMode();
+	virtual void RestartPlayer(AController* NewPlayer) override;
+	virtual void Logout(AController* Exiting) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -34,7 +37,7 @@ protected:
 private:
 	void CacheGameState();
 	FString GetCurrentPhaseString();
-	
+
 	void FindAllEnemySpawners();
 	void StartSpawningEnemies();
 	void SpawnEnemies();
@@ -50,4 +53,6 @@ private:
 	int32 SpawnedEnemiesNum = 0;
 	FTimerHandle SpawnTimer;
 	TSoftObjectPtr<AP13GameState> CachedGameState;
+	UPROPERTY()
+	TArray<AController*> LoggedControllers;
 };

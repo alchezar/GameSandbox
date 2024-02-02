@@ -43,7 +43,7 @@ void AP13CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// CreateDynamicMeshMaterials();
+	TryCreateDynamicMeshMaterials();
 
 	if (AttributesComponent)
 	{
@@ -63,6 +63,7 @@ void AP13CharacterBase::PossessedBy(AController* NewController)
 
 	ControllerCached = NewController;
 	UpdateInventoryAfterRespawn();
+	TryLoadSavedColor(NewController);
 }
 
 float AP13CharacterBase::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -139,12 +140,18 @@ float AP13CharacterBase::GetHealthReserve() const
 	return AttributesComponent->GetCurrentHealth() + AttributesComponent->GetCurrentShield();
 }
 
-void AP13CharacterBase::CreateDynamicMeshMaterials()
+bool AP13CharacterBase::TryCreateDynamicMeshMaterials()
 {
+	if (!DynamicMaterials.IsEmpty())
+	{
+		return false;
+	}
+
 	for (int32 Index = 1; Index <= 3; ++Index)
 	{
 		DynamicMaterials.Emplace(GetMesh()->CreateAndSetMaterialInstanceDynamic(Index));
 	}
+	return true;
 }
 
 void AP13CharacterBase::UpdateDynamicMeshMaterials(const FLinearColor NewColor)
@@ -287,7 +294,7 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 	{
 		return;
 	}
-	
+
 	CachedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, WeaponSocketName);
 	CachedWeapon->WeaponInit(WeaponInfo, MovementState, CurrentIndex, &NewWeaponSlot.DynamicInfo);
 	CachedWeapon->OnWeaponFire.AddUObject(this, &ThisClass::OnWeaponFiredHandle);
@@ -394,6 +401,12 @@ void AP13CharacterBase::OnWeaponReloadFinishHandle(const int32 RoundNum, const i
 {
 	StopAnimMontage();
 	InventoryComponent->SetWeaponInfo({RoundNum}, true);
+}
+
+void AP13CharacterBase::TryLoadSavedColor(AController* NewController)
+{
+	TryCreateDynamicMeshMaterials();
+	UpdateDynamicMeshMaterials(TrueColor);
 }
 
 void AP13CharacterBase::CreateBaseComponents()

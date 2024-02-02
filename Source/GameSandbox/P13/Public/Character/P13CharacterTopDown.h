@@ -43,7 +43,8 @@ public:
 
 protected:
 	virtual void OnDeathHandle(AController* Causer) override;
-	
+	virtual void TryLoadSavedColor(AController* NewController) override;
+
 	/* ------------------------------- This -------------------------------- */
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
