@@ -2,10 +2,9 @@
 
 #include "P13/Public/Component/Actor/P13HealthComponent.h"
 
-#include "Perception/AISense_Damage.h"
+#include "Net/UnrealNetwork.h"
 
-UP13HealthComponent::UP13HealthComponent()
-{}
+UP13HealthComponent::UP13HealthComponent() {}
 
 void UP13HealthComponent::BeginPlay()
 {
@@ -63,5 +62,11 @@ void UP13HealthComponent::OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float
 	ReceiveDamage(Damage, InstigatedBy);
 }
 
-void UP13HealthComponent::OnDead()
-{}
+void UP13HealthComponent::OnDead() {}
+
+void UP13HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Health)
+}

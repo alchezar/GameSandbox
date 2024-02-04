@@ -12,6 +12,8 @@
 
 AP13CharacterTopDown::AP13CharacterTopDown()
 {
+	bReplicates = true;
+	bAlwaysRelevant = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
 	GetCharacterMovement()->bOrientRotationToMovement = false;
 
@@ -28,11 +30,8 @@ void AP13CharacterTopDown::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
-	if (AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController))
-	{
-		PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
-	}
 	TryLoadSavedColor(NewController);
+	Client_ListenToControllerCursor(NewController);
 }
 
 void AP13CharacterTopDown::BeginPlay()
@@ -40,7 +39,7 @@ void AP13CharacterTopDown::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AP13CharacterTopDown::Tick(float DeltaTime)
+void AP13CharacterTopDown::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	UpdateMeshRotation();
@@ -58,11 +57,8 @@ void AP13CharacterTopDown::MoveInput(const FVector2D MoveVector)
 		return;
 	}
 
-	const FVector ForwardDirection = GetActorForwardVector();
-	const FVector RightDirection = GetActorRightVector();
-
-	AddMovementInput(ForwardDirection, MoveVector.Y);
-	AddMovementInput(RightDirection, MoveVector.X);
+	AddMovementInput(FVector::ForwardVector, MoveVector.Y);
+	AddMovementInput(FVector::RightVector, MoveVector.X);
 }
 
 void AP13CharacterTopDown::SprintInput(const bool bStart)
@@ -78,7 +74,7 @@ void AP13CharacterTopDown::SprintInput(const bool bStart)
 	{
 		SavePreviousMovementState();
 	}
-	ChangeMovementState(bStart ? EP13MovementState::Sprint : GetPreviousMovementState());
+	Server_ChangeMovementState(bStart ? EP13MovementState::Sprint : GetPreviousMovementState());
 }
 
 void AP13CharacterTopDown::AimInput()
@@ -93,17 +89,21 @@ void AP13CharacterTopDown::AimInput()
 	 * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
 	if (MovementState == EP13MovementState::Aim)
 	{
-		ChangeMovementState(GetPreviousMovementState());
+		Server_ChangeMovementState(GetPreviousMovementState());
 		FocusOnCursor(false);
 		return;
 	}
 	SavePreviousMovementState();
-	ChangeMovementState(EP13MovementState::Aim);
+	Server_ChangeMovementState(EP13MovementState::Aim);
 	FocusOnCursor(true);
 }
 
 void AP13CharacterTopDown::ZoomInput(const float Axis)
 {
+	if (!GetController()->IsLocalPlayerController())
+	{
+		return;
+	}
 	ZoomSteps += Axis;
 	float FinalLength = CameraBoom->TargetArmLength + ZoomSteps * ZoomStepDistance;
 	FinalLength = FMath::Clamp(FinalLength, HeightClamp.Min, HeightClamp.Max);
@@ -119,10 +119,10 @@ void AP13CharacterTopDown::ZoomInput(const float Axis)
 
 void AP13CharacterTopDown::RotateTowardMovement(const FVector& Direction)
 {
-	const FRotator OldRotation = GetMesh()->GetComponentRotation();
-	const FRotator NewRotation = Direction.Rotation() - FRotator(0.f, 90.f, 0.f);
-	const FRotator InterpRotation = FMath::RInterpTo(OldRotation, NewRotation, GetWorld()->GetDeltaSeconds(), RotationRate);
-	GetMesh()->SetWorldRotation(InterpRotation);
+	const FRotator OldRotation = GetActorRotation();
+	const FRotator NewRotation = Direction.Rotation();
+	const FRotator IntRotation = FMath::RInterpTo(OldRotation, NewRotation, GetWorld()->GetDeltaSeconds(), RotationRate);
+	SetActorRotation(IntRotation);
 }
 
 void AP13CharacterTopDown::FireInput(const bool bStart)
@@ -199,6 +199,10 @@ void AP13CharacterTopDown::CreateTopDownComponents()
 {
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("CameraBoomSpringArmComponent");
 	CameraBoom->SetupAttachment(RootComponent);
+	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->bInheritPitch = false;
+	CameraBoom->bInheritRoll = false;
+	CameraBoom->bInheritYaw = true;
 
 	TopDownCamera = CreateDefaultSubobject<UCameraComponent>("TopDownCameraComponent");
 	TopDownCamera->SetupAttachment(CameraBoom);
@@ -224,6 +228,10 @@ void AP13CharacterTopDown::ShakeCamera() const
 
 void AP13CharacterTopDown::UpdateMeshRotation()
 {
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
 	if (GetIsDead())
 	{
 		return;
@@ -232,8 +240,9 @@ void AP13CharacterTopDown::UpdateMeshRotation()
 	{
 		return;
 	}
-	const FVector CursorDirection = (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal2D();
-	RotateTowardMovement(CursorDirection);
+	const FVector ThisCursorDirection = (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal2D();
+	RotateTowardMovement(ThisCursorDirection);
+	Server_RotateTowardMovement(ThisCursorDirection);
 }
 
 void AP13CharacterTopDown::ZoomSmoothly(const float DeltaTime, const float FinalLength)
@@ -248,6 +257,10 @@ void AP13CharacterTopDown::ZoomSmoothly(const float DeltaTime, const float Final
 
 void AP13CharacterTopDown::FocusOnCursor(const bool bOn)
 {
+	if (!IsLocallyControlled())
+	{
+		return;
+	}
 	if (!bOn)
 	{
 		GetWorld()->GetTimerManager().ClearTimer(AimTimer);
@@ -284,4 +297,43 @@ void AP13CharacterTopDown::FocusOnCursorSmoothly() const
 
 	const FVector InterpOffset = FMath::VInterpTo(CameraBoom->GetRelativeLocation(), NewOffset, GetWorld()->GetDeltaSeconds(), InterpSpeed);
 	CameraBoom->SetRelativeLocation(InterpOffset);
+}
+
+void AP13CharacterTopDown::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AP13CharacterTopDown::Server_RotateTowardMovement_Implementation(const FVector& Direction)
+{
+	RotateTowardMovement(Direction);
+	Multicast_RotateTowardMovement(Direction);
+}
+
+void AP13CharacterTopDown::Multicast_RotateTowardMovement_Implementation(const FVector& Direction)
+{
+	if (IsLocallyControlled())
+	{
+		return;
+	}
+	RotateTowardMovement(Direction);
+}
+
+void AP13CharacterTopDown::Client_ListenToControllerCursor_Implementation(AController* NewController)
+{
+	AP13PlayerController* PlayerController = Cast<AP13PlayerController>(Controller);
+	if (!PlayerController)
+	{
+		return;
+	}
+	if (!PlayerController->IsLocalPlayerController())
+	{
+		return;
+	}
+	if (PlayerController->OnHitUnderCursorChanged.IsBoundToObject(this))
+	{
+		return;
+	}
+
+	PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
 }

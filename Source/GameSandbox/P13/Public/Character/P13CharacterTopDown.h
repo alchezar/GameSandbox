@@ -7,6 +7,8 @@
 #include "P13/Public/Intearface/P13InputInterface.h"
 #include "P13CharacterTopDown.generated.h"
 
+class AP13PlayerController;
+
 UCLASS()
 class GAMESANDBOX_API AP13CharacterTopDown : public AP13CharacterBase, public IP13InputInterface
 {
@@ -58,6 +60,18 @@ private:
 
 	void FocusOnCursor(const bool bOn);
 	void FocusOnCursorSmoothly() const;
+
+	/* ------------------------------ Network ------------------------------ */
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	UFUNCTION(Server, Unreliable)
+	void Server_RotateTowardMovement(const FVector& Direction);
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_RotateTowardMovement(const FVector& Direction);
+	UFUNCTION(Client, Reliable)
+	void Client_ListenToControllerCursor(AController* NewController);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

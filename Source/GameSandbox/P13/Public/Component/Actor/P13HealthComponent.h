@@ -39,6 +39,10 @@ public:
 protected:
 	void OnDead();
 
+	/* ------------------------------ Network ------------------------------ */
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnHealthChangedSignature OnHealthChanged;
@@ -49,5 +53,6 @@ protected:
 	float MaxHealth = 100.f;
 
 private:
+	UPROPERTY(Replicated)
 	float Health = 0.f;
 };

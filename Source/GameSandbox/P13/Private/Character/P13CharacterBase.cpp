@@ -16,6 +16,7 @@
 
 AP13CharacterBase::AP13CharacterBase()
 {
+	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
 	bUseControllerRotationYaw = false;
 	SetCanBeDamaged(true);
@@ -29,14 +30,8 @@ void AP13CharacterBase::PostInitializeComponents()
 
 	if (InventoryComponent)
 	{
-		InventoryComponent->OnCurrentWeaponUpdated.AddUObject(this, &ThisClass::InitWeapon);
+		InventoryComponent->OnCurrentWeaponUpdated.AddUObject(this, &ThisClass::Server_InitWeapon);
 	}
-}
-
-void AP13CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(ThisClass, TrueColor);
 }
 
 void AP13CharacterBase::BeginPlay()
@@ -206,7 +201,7 @@ void AP13CharacterBase::UpdateCharacter() const
 void AP13CharacterBase::ChangeMovementState(const EP13MovementState NewMovementState)
 {
 	MovementState = NewMovementState;
-	UpdateCharacter();
+	OnRep_MovementState();
 }
 
 void AP13CharacterBase::UpdateInventoryAfterRespawn()
@@ -457,4 +452,34 @@ void AP13CharacterBase::PlayTakeDamageEffect(const AActor* DamageCauser)
 	else if (ShootAngle >   45.f && ShootAngle <  135.f) MontageSection += "Right";
 	
 	PlayAnimMontage(TakeDamageAnim, 1.f, *MontageSection);
+}
+
+void AP13CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, TrueColor)
+	DOREPLIFETIME(ThisClass, MovementState)
+	DOREPLIFETIME(ThisClass, CurrentWeaponType)
+	DOREPLIFETIME(ThisClass, CachedWeapon)
+}
+
+void AP13CharacterBase::Server_ChangeMovementState_Implementation(const EP13MovementState NewMovementState)
+{
+	ChangeMovementState(NewMovementState);
+}
+
+void AP13CharacterBase::OnRep_MovementState()
+{
+	UpdateCharacter();
+}
+
+void AP13CharacterBase::Server_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
+{
+	Multicast_InitWeapon(NewWeaponSlot, CurrentIndex);
+}
+
+void AP13CharacterBase::Multicast_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
+{
+	InitWeapon(NewWeaponSlot, CurrentIndex);
 }

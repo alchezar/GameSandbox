@@ -26,11 +26,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
-	virtual void SetPawn(APawn* InPawn) override;
 	virtual void OnPossess(APawn* InPawn) override;
 	virtual void OnUnPossess() override;
 
 public:
+	virtual void SetPawn(APawn* InPawn) override;
 	virtual void Tick(const float DeltaSeconds) override;
 
 	/* ------------------------------- This -------------------------------- */

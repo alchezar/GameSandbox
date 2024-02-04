@@ -25,7 +25,6 @@ class GAMESANDBOX_API AP13CharacterBase : public ACharacter, public IP13StateEff
 public:
 	AP13CharacterBase();
 	virtual void PostInitializeComponents() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -91,6 +90,20 @@ private:
 	void TakeStateEffectFromRadialDamage(FDamageEvent const& DamageEvent, AActor* DamageCauser);
 	void PlayTakeDamageEffect(const AActor* DamageCauser);
 
+	/* ------------------------------ Network ------------------------------ */
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+protected:
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeMovementState(const EP13MovementState NewMovementState);
+	UFUNCTION()
+	void OnRep_MovementState();
+	UFUNCTION(Server, Reliable)
+	void Server_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++ | Component")
@@ -105,7 +118,7 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Effect")
 	UAnimMontage* TakeDamageAnim = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
+	UPROPERTY(ReplicatedUsing = "OnRep_MovementState", EditAnywhere, Category = "C++ | Movement")
 	EP13MovementState MovementState = EP13MovementState::Run;
 	UPROPERTY(EditAnywhere, Category = "C++ | Movement")
 	FP13MovementSpeed MovementSpeed;
@@ -116,7 +129,9 @@ protected:
 	UAnimMontage* ReadyMontage = nullptr;
 
 	TWeakObjectPtr<AController> ControllerCached;
+	UPROPERTY(Replicated)
 	TWeakObjectPtr<AP13Weapon> CachedWeapon;
+	UPROPERTY(Replicated)
 	EP13AmmoType CurrentWeaponType = EP13AmmoType::Default;
 	UPROPERTY(Replicated)
 	FLinearColor TrueColor = FLinearColor::White;

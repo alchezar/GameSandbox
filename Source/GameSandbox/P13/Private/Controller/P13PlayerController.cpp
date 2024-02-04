@@ -23,6 +23,7 @@ AP13PlayerController::AP13PlayerController()
 	PrimaryActorTick.bCanEverTick = true;
 	bShowMouseCursor = true;
 	DefaultMouseCursor = EMouseCursor::Default;
+	bReplicates = true;
 }
 
 void AP13PlayerController::BeginPlay()
@@ -68,11 +69,6 @@ void AP13PlayerController::SetupInputComponent()
 	InputComp->BindAction(DropAction, ETriggerEvent::Started, this, &ThisClass::DropInput, true);
 }
 
-void AP13PlayerController::SetPawn(APawn* InPawn)
-{
-	Super::SetPawn(InPawn);
-}
-
 void AP13PlayerController::OnPossess(APawn* InPawn)
 {
 	if (!InPawn)
@@ -82,11 +78,10 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 
 	/* When we Possess the player - cache HUD and show main widget. */
 	HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>();
-	if (!HeadsUpDisplay)
+	if (HeadsUpDisplay)
 	{
-		return;
+		HeadsUpDisplay->ShowInGame(this);
 	}
-	HeadsUpDisplay->ShowInGame(this);
 
 	/* Super must be called after creating stat widgets in HUD, to correctly update inventory in Pawn::PossessedBy(...) event. */
 	Super::OnPossess(InPawn);
@@ -110,15 +105,26 @@ void AP13PlayerController::OnUnPossess()
 	SetNewInputMode(false);
 	CachedCursorDecal->SetWorldTransform(FTransform::Identity);
 
-	HeadsUpDisplay->ShowEndGame(false);
+	if (HeadsUpDisplay)
+	{
+		HeadsUpDisplay->ShowEndGame(false);
+	}
+}
+
+void AP13PlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
 }
 
 void AP13PlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	FindPointUnderCursor();
-	UpdateCursorDecalPosition();
+	if (IsLocalController())
+	{
+		FindPointUnderCursor();
+		UpdateCursorDecalPosition();
+	}
 }
 
 void AP13PlayerController::OnGameWon()
@@ -288,7 +294,7 @@ void AP13PlayerController::FindPointUnderCursor()
 
 void AP13PlayerController::SpawnCursorDecal()
 {
-	if (!CursorMaterial)
+	if (!CursorMaterial || !IsLocalController())
 	{
 		return;
 	}
@@ -297,11 +303,7 @@ void AP13PlayerController::SpawnCursorDecal()
 
 void AP13PlayerController::UpdateCursorDecalPosition() const
 {
-	if (!GetCanControlledCharacterMove())
-	{
-		return;
-	}
-	if (!CachedCursorDecal.IsValid())
+	if (!IsLocalController() || !GetCanControlledCharacterMove() || !CachedCursorDecal.IsValid())
 	{
 		return;
 	}
