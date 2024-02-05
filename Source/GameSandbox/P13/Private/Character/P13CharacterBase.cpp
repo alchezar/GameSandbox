@@ -207,7 +207,7 @@ void AP13CharacterBase::ChangeMovementState(const EP13MovementState NewMovementS
 void AP13CharacterBase::UpdateInventoryAfterRespawn()
 {
 	check(InventoryComponent)
-	InventoryComponent->RefreshSlots();
+	InventoryComponent->Server_RefreshSlots();
 }
 
 void AP13CharacterBase::OnHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
@@ -256,6 +256,7 @@ void AP13CharacterBase::OnDeathHandle(AController* Causer)
 
 void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
 {
+	/* On Server. */
 	if (CachedWeapon.IsValid())
 	{
 		/* Don't do anything if we just picked up another weapon. */
@@ -475,11 +476,6 @@ void AP13CharacterBase::OnRep_MovementState()
 }
 
 void AP13CharacterBase::Server_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
-{
-	Multicast_InitWeapon(NewWeaponSlot, CurrentIndex);
-}
-
-void AP13CharacterBase::Multicast_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
 {
 	InitWeapon(NewWeaponSlot, CurrentIndex);
 }

@@ -48,9 +48,10 @@ public:
 	void SetMaxAvailableRound(const int32 NewMaxRound = -1);
 
 private:
-	bool CheckWeaponCanFire();
+	bool CheckWeaponCanFire() const;
 	bool CheckWeaponCanReload();
 	void Fire();
+	void MakeShot();
 	void SpawnProjectile() const;
 	FVector GetFinalDirection() const;
 	void UpdateDispersion(const bool bRest = false);
@@ -60,6 +61,14 @@ private:
 	void SpawnEffectsAtLocation(USoundBase* SoundBase, UNiagaraSystem* NiagaraSystem, const FVector& Location) const;
 	float PlayAnimMontage(UAnimMontage* AnimMontage, const float InPlayRate = 1, const FName StartSectionName = NAME_None);
 	void StopAnimMontage(const UAnimMontage* AnimMontage);
+
+	/* ------------------------------ Network ------------------------------ */
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	UFUNCTION(Server, Reliable)
+	void Server_Fire();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ShotEffect(USoundBase* FireSound, UNiagaraSystem* FireEffect, UAnimMontage* FireAnim);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:
@@ -76,7 +85,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")
 	UArrowComponent* ShootLocation = nullptr;
 
-	UPROPERTY(EditAnywhere, Category = "C++ | Fire")
+	UPROPERTY(Replicated, EditAnywhere, Category = "C++ | Fire")
 	FP13WeaponDynamicInfo WeaponCurrentSettings;
 
 private:
@@ -87,9 +96,11 @@ private:
 	double LastShotTime = 0.0;
 	bool bReloading = false;
 	FVector ShotTargetLocation = FVector::ZeroVector;
+	UPROPERTY(Replicated)
 	float DispersionAngle = 0.f;
 	FP13DispersionType CurrentDispersion;
 	int32 MaxAvailableRound = 0;
 	bool bTriggerPulled = false;
+	UPROPERTY(Replicated)
 	int32 WeaponIndex = 0;
 };

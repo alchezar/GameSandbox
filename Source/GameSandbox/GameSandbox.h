@@ -14,4 +14,15 @@
 #define ECC_BULLET           ECC_GameTraceChannel7
 #define ECC_MELEE            ECC_GameTraceChannel8
 #define ECC_CURSOR           ECC_GameTraceChannel9
+
+#define EARLY_RETURN_IF(Condition) \
+	if (Condition) \
+	{ \
+		return; \
+	} \
 	
+#define EARLY_RETURN_VALUE_IF(Condition, ReturnValue) \
+	if (Condition) \
+	{ \
+		return ReturnValue; \
+	} \

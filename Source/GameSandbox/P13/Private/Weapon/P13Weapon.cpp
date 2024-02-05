@@ -7,13 +7,15 @@
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "P13/Public/Weapon/P13ProjectileDefault.h"
 #include "Perception/AISense_Hearing.h"
 
 AP13Weapon::AP13Weapon()
 {
+	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	SetRootComponent(SceneComponent);
 
@@ -167,8 +169,12 @@ void AP13Weapon::SetMaxAvailableRound(const int32 NewMaxRound)
 	MaxAvailableRound = bDefault ? WeaponSettings->MaxRound : NewMaxRound;
 }
 
-bool AP13Weapon::CheckWeaponCanFire()
+bool AP13Weapon::CheckWeaponCanFire() const
 {
+	if (!WeaponSettings)
+	{
+		return false;
+	}
 	bool bResult = true;
 
 	const double CurrentShotTime = GetWorld()->GetTimeSeconds();
@@ -194,6 +200,11 @@ bool AP13Weapon::CheckWeaponCanReload()
 
 void AP13Weapon::Fire()
 {
+	Server_Fire();
+}
+
+void AP13Weapon::MakeShot()
+{
 	if (WeaponCurrentSettings.Round <= 0.f)
 	{
 		TryReload();
@@ -212,8 +223,6 @@ void AP13Weapon::Fire()
 		}
 	}
 	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
-	SpawnEffectsAtLocation(WeaponSettings->FireSound, WeaponSettings->FireEffect, ShootLocation->GetComponentLocation());
-	PlayAnimMontage(WeaponSettings->WeaponFireAnim);
 	UpdateDispersion();
 
 	UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, GetInstigator());
@@ -227,13 +236,14 @@ void AP13Weapon::SpawnProjectile() const
 		return;
 	}
 	check(ShootLocation)
+	
 	const FTransform ShotTransform = FTransform(GetFinalDirection().Rotation(), ShootLocation->GetComponentLocation());
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	SpawnParams.Owner = GetOwner();
 	SpawnParams.Instigator = GetInstigator();
 
-	auto* Bullet = GetWorld()->SpawnActorDeferred<AP13ProjectileDefault>(ProjectileClass, ShotTransform, GetOwner(), GetInstigator(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	AP13ProjectileDefault* Bullet = GetWorld()->SpawnActorDeferred<AP13ProjectileDefault>(ProjectileClass, ShotTransform, GetOwner(), GetInstigator(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (!Bullet)
 	{
 		return;
@@ -344,4 +354,25 @@ void AP13Weapon::StopAnimMontage(const UAnimMontage* AnimMontage)
 		return;
 	}
 	WeaponAnimInstance->Montage_Stop(MontageToStop->BlendOut.GetBlendTime(), MontageToStop);
+}
+
+void AP13Weapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, WeaponCurrentSettings)
+	DOREPLIFETIME(ThisClass, WeaponIndex)
+	DOREPLIFETIME(ThisClass, DispersionAngle)
+}
+
+void AP13Weapon::Server_Fire_Implementation()
+{
+	MakeShot();
+	Multicast_ShotEffect(WeaponSettings->FireSound, WeaponSettings->FireEffect, WeaponSettings->WeaponFireAnim);
+}
+
+void AP13Weapon::Multicast_ShotEffect_Implementation(USoundBase* FireSound, UNiagaraSystem* FireEffect, UAnimMontage* FireAnim)
+{
+	SpawnEffectsAtLocation(FireSound, FireEffect, ShootLocation->GetComponentLocation());
+	PlayAnimMontage(FireAnim);
 }

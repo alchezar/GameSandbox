@@ -316,13 +316,12 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 	{
 		return false;
 	}
-	const AController* Controller = PawnOwner->Controller;
-	if (!Controller)
+	const AController* PawnController = PawnOwner->Controller;
+	if (!PawnController)
 	{
 		return false;
 	}
-	AP13PlayerState* PlayerState = PawnOwner->Controller->GetPlayerState<AP13PlayerState>();
-	// AP13PlayerState* PlayerState = PawnOwner->GetPlayerState<AP13PlayerState>();
+	AP13PlayerState* PlayerState = PawnController->GetPlayerState<AP13PlayerState>();
 	if (!PlayerState)
 	{
 		return false;
@@ -339,4 +338,9 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
 
 	return true;
+}
+
+void UP13InventoryComponent::Server_RefreshSlots_Implementation()
+{
+	RefreshSlots();		
 }

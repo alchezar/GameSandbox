@@ -15,6 +15,7 @@
 AP13ProjectileDefault::AP13ProjectileDefault()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bReplicates = true;
 
 	BulletCollision = CreateDefaultSubobject<USphereComponent>("BulletCollisionSphereComponent");
 	SetRootComponent(BulletCollision);

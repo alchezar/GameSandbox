@@ -63,6 +63,11 @@ private:
 	bool TryUpdateSlotsFromData();
 	bool TryLoadSlotsFromPlayerState();
 
+	/* ------------------------------ Network ------------------------------ */
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_RefreshSlots();
+	
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnCurrentWeaponUpdatedSignature OnCurrentWeaponUpdated;

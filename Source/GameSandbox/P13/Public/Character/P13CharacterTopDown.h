@@ -72,6 +72,10 @@ protected:
 	void Multicast_RotateTowardMovement(const FVector& Direction);
 	UFUNCTION(Client, Reliable)
 	void Client_ListenToControllerCursor(AController* NewController);
+	UFUNCTION(Server, Reliable)
+	void Server_PullTrigger(const bool bStart) const;
+	UFUNCTION(Server, Unreliable)
+	void Server_UpdateTargetLocation(const FVector& TargetLocation);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -98,6 +102,7 @@ protected:
 
 private:
 	float ZoomSteps = 0.f;
+	bool bTriggerPulled = false;
 	FTimerHandle ScrollTimer;
 	FTimerHandle ZoomTimer;
 	FTimerHandle AimTimer;

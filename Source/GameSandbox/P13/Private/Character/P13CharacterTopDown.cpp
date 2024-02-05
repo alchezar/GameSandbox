@@ -127,7 +127,9 @@ void AP13CharacterTopDown::RotateTowardMovement(const FVector& Direction)
 
 void AP13CharacterTopDown::FireInput(const bool bStart)
 {
-	PullTrigger(bStart);
+	bTriggerPulled = bStart;
+	Server_UpdateTargetLocation(HitUnderCursor.Location);
+	Server_PullTrigger(bStart);
 }
 
 void AP13CharacterTopDown::ReloadInput()
@@ -191,7 +193,11 @@ void AP13CharacterTopDown::OnHitUnderCursorChangedHandle(APlayerController* Play
 
 	if (CachedWeapon.IsValid())
 	{
-		CachedWeapon->SetTargetLocation(HitResult.Location);
+		CachedWeapon->SetTargetLocation(HitUnderCursor.Location);
+	}
+	if (bTriggerPulled)
+	{
+		Server_UpdateTargetLocation(HitUnderCursor.Location);
 	}
 }
 
@@ -336,4 +342,14 @@ void AP13CharacterTopDown::Client_ListenToControllerCursor_Implementation(AContr
 	}
 
 	PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
+}
+
+void AP13CharacterTopDown::Server_PullTrigger_Implementation(const bool bStart) const
+{
+	PullTrigger(bStart);
+}
+
+void AP13CharacterTopDown::Server_UpdateTargetLocation_Implementation(const FVector& TargetLocation)
+{
+	CachedWeapon->SetTargetLocation(TargetLocation);
 }

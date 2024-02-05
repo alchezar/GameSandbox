@@ -101,8 +101,6 @@ protected:
 	void OnRep_MovementState();
 	UFUNCTION(Server, Reliable)
 	void Server_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
