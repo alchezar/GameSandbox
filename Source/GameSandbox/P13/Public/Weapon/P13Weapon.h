@@ -69,6 +69,12 @@ public:
 	void Server_Fire();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_ShotEffect(USoundBase* FireSound, UNiagaraSystem* FireEffect, UAnimMontage* FireAnim);
+	UFUNCTION(Server, Reliable)
+	void Server_InitReload();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAnimMontage(UAnimMontage* Montage);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateWeaponState(const EP13MovementState NewState);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:

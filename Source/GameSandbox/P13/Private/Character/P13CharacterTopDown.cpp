@@ -79,23 +79,7 @@ void AP13CharacterTopDown::SprintInput(const bool bStart)
 
 void AP13CharacterTopDown::AimInput()
 {
-	/* Check if it can start aiming. */
-	if (MovementState > EP13MovementState::Run)
-	{
-		return;
-	}
-
-	/* Cache the previous movement, to apply the correct one after aiming.
-	 * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
-	if (MovementState == EP13MovementState::Aim)
-	{
-		Server_ChangeMovementState(GetPreviousMovementState());
-		FocusOnCursor(false);
-		return;
-	}
-	SavePreviousMovementState();
-	Server_ChangeMovementState(EP13MovementState::Aim);
-	FocusOnCursor(true);
+	Server_ToggleAim();
 }
 
 void AP13CharacterTopDown::ZoomInput(const float Axis)
@@ -134,7 +118,7 @@ void AP13CharacterTopDown::FireInput(const bool bStart)
 
 void AP13CharacterTopDown::ReloadInput()
 {
-	TryReloadWeapon();
+	Server_TryReloadWeapon();
 }
 
 void AP13CharacterTopDown::SwitchWeaponInput(const bool bNext)
@@ -154,6 +138,11 @@ FVector AP13CharacterTopDown::GetLookAtCursorDirection() const
 		return Super::GetLookAtCursorDirection();
 	}
 	return (HitUnderCursor.Location - GetActorLocation()).GetSafeNormal();
+}
+
+void AP13CharacterTopDown::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime)
+{
+	Multicast_PlayAnimation(CharReloadAnim);	
 }
 
 void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
@@ -305,9 +294,36 @@ void AP13CharacterTopDown::FocusOnCursorSmoothly() const
 	CameraBoom->SetRelativeLocation(InterpOffset);
 }
 
+void AP13CharacterTopDown::ToggleAim()
+{
+	/* Check if it can start aiming. */
+	if (MovementState > EP13MovementState::Run)
+	{
+		return;
+	}
+
+	/* Cache the previous movement, to apply the correct one after aiming.
+	 * I can`t hold my middle mouse button pressed, so we will switch aim mode on/off. */
+	if (MovementState == EP13MovementState::Aim)
+	{
+		ChangeMovementState(GetPreviousMovementState());
+		Client_FocusOnCursor(false);
+		return;
+	}
+	
+	SavePreviousMovementState();
+	ChangeMovementState(EP13MovementState::Aim);
+	Client_FocusOnCursor(true);
+}
+
 void AP13CharacterTopDown::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AP13CharacterTopDown::Server_TryReloadWeapon_Implementation()
+{
+	TryReloadWeapon();	
 }
 
 void AP13CharacterTopDown::Server_RotateTowardMovement_Implementation(const FVector& Direction)
@@ -352,4 +368,14 @@ void AP13CharacterTopDown::Server_PullTrigger_Implementation(const bool bStart) 
 void AP13CharacterTopDown::Server_UpdateTargetLocation_Implementation(const FVector& TargetLocation)
 {
 	CachedWeapon->SetTargetLocation(TargetLocation);
+}
+
+void AP13CharacterTopDown::Server_ToggleAim_Implementation()
+{
+	ToggleAim();
+}
+
+void AP13CharacterTopDown::Client_FocusOnCursor_Implementation(const bool bOn)
+{
+	FocusOnCursor(bOn);	
 }

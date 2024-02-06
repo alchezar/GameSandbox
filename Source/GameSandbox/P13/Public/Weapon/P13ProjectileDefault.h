@@ -57,6 +57,12 @@ private:
 
 	void SpawnStateEffect(const FHitResult& Hit, AController* Causer);
 
+	/* ------------------------------ Network ------------------------------ */
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnEffectsOnHit(const FHitResult& Hit);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SpawnEffectsOnHit(UMaterialInterface* Decal, UNiagaraSystem* Particle, USoundBase* Sound, const FVector& Location, const FRotator& Rotation, UPrimitiveComponent* AnchorComp);
+	
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "C++ | Component")

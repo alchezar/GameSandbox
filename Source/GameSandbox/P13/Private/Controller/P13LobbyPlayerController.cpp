@@ -42,7 +42,7 @@ void AP13LobbyPlayerController::Server_UpdateClientReady_Implementation()
 	{
 		return;
 	}
-	ControlledPawn->Multicast_PlayReadyAnimation();
+	ControlledPawn->PlayReadyAnimation();
 }
 
 void AP13LobbyPlayerController::OnHostSelectedMap(const FText& SelectedLevelName) const

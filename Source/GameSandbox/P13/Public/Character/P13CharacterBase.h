@@ -57,10 +57,7 @@ public:
 
 	bool TryCreateDynamicMeshMaterials();
 	void UpdateDynamicMeshMaterials(const FLinearColor NewColor);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayReadyAnimation();
+	void PlayReadyAnimation();
 
 protected:
 	void UpdateCharacter() const;
@@ -80,7 +77,7 @@ protected:
 
 	void OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const int32 CurrentRound);
 	void OnWeaponReloadInitHandle(const int32 OldRoundNum);
-	void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime);
+	virtual void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime);
 	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess);
 
 	virtual void TryLoadSavedColor(AController* NewController);
@@ -94,6 +91,9 @@ private:
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
+	
 protected:
 	UFUNCTION(Server, Reliable)
 	void Server_ChangeMovementState(const EP13MovementState NewMovementState);
@@ -101,6 +101,8 @@ protected:
 	void OnRep_MovementState();
 	UFUNCTION(Server, Reliable)
 	void Server_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayAnimation(UAnimMontage* Anim);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

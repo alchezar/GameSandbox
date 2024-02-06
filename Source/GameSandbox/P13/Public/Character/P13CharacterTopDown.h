@@ -44,6 +44,7 @@ public:
 	virtual FVector GetLookAtCursorDirection() const override;
 
 protected:
+	virtual void OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime) override;
 	virtual void OnDeathHandle(AController* Causer) override;
 	virtual void TryLoadSavedColor(AController* NewController) override;
 
@@ -60,6 +61,7 @@ private:
 
 	void FocusOnCursor(const bool bOn);
 	void FocusOnCursorSmoothly() const;
+	void ToggleAim();
 
 	/* ------------------------------ Network ------------------------------ */
 public:
@@ -76,6 +78,12 @@ protected:
 	void Server_PullTrigger(const bool bStart) const;
 	UFUNCTION(Server, Unreliable)
 	void Server_UpdateTargetLocation(const FVector& TargetLocation);
+	UFUNCTION(Server, Reliable)
+	void Server_TryReloadWeapon();
+	UFUNCTION(Server, Reliable)
+	void Server_ToggleAim();
+	UFUNCTION(Client, Reliable)
+	void Client_FocusOnCursor(const bool bOn);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

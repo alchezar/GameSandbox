@@ -121,8 +121,8 @@ void AP13Weapon::SetFireState(const bool bFiring)
 	GetWorld()->GetTimerManager().ClearTimer(DisperseTimer);
 	/* Start fire. */
 	const float SecondsPerShot = GetShootRate();
-	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ThisClass::Fire, SecondsPerShot, true, SecondsPerShot);
-	Fire();
+	GetWorld()->GetTimerManager().SetTimer(FireTimer, this, &ThisClass::Server_Fire, SecondsPerShot, true, SecondsPerShot);
+	Server_Fire();
 	LastShotTime = GetWorld()->GetTimeSeconds();
 }
 
@@ -200,14 +200,15 @@ bool AP13Weapon::CheckWeaponCanReload()
 
 void AP13Weapon::Fire()
 {
-	Server_Fire();
+	MakeShot();
+	Multicast_ShotEffect(WeaponSettings->FireSound, WeaponSettings->FireEffect, WeaponSettings->WeaponFireAnim);
 }
 
 void AP13Weapon::MakeShot()
 {
 	if (WeaponCurrentSettings.Round <= 0.f)
 	{
-		TryReload();
+		Server_InitReload();
 		return;
 	}
 
@@ -235,19 +236,17 @@ void AP13Weapon::SpawnProjectile() const
 	{
 		return;
 	}
-	check(ShootLocation)
 	
+	check(ShootLocation)
 	const FTransform ShotTransform = FTransform(GetFinalDirection().Rotation(), ShootLocation->GetComponentLocation());
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	SpawnParams.Owner = GetOwner();
-	SpawnParams.Instigator = GetInstigator();
-
+	
 	AP13ProjectileDefault* Bullet = GetWorld()->SpawnActorDeferred<AP13ProjectileDefault>(ProjectileClass, ShotTransform, GetOwner(), GetInstigator(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (!Bullet)
 	{
 		return;
 	}
+	Bullet->SetOwner(GetOwner());	
+	Bullet->SetInstigator(GetInstigator());
 	Bullet->InitBullet(20.f, WeaponSettings->ProjectileSettings);
 	Bullet->FinishSpawning(ShotTransform);
 }
@@ -296,7 +295,7 @@ void AP13Weapon::StartReload()
 	ReloadDelegate.BindUObject(this, &ThisClass::FinishReload, true);
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, ReloadDelegate, WeaponSettings->ReloadTime, false);
 
-	PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
+	Multicast_PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
 	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim, WeaponIndex, WeaponSettings->ReloadTime);
 }
 
@@ -367,12 +366,26 @@ void AP13Weapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifeti
 
 void AP13Weapon::Server_Fire_Implementation()
 {
-	MakeShot();
-	Multicast_ShotEffect(WeaponSettings->FireSound, WeaponSettings->FireEffect, WeaponSettings->WeaponFireAnim);
+	Fire();
 }
 
 void AP13Weapon::Multicast_ShotEffect_Implementation(USoundBase* FireSound, UNiagaraSystem* FireEffect, UAnimMontage* FireAnim)
 {
 	SpawnEffectsAtLocation(FireSound, FireEffect, ShootLocation->GetComponentLocation());
 	PlayAnimMontage(FireAnim);
+}
+
+void AP13Weapon::Server_InitReload_Implementation()
+{
+	TryReload();	
+}
+
+void AP13Weapon::Multicast_PlayAnimMontage_Implementation(UAnimMontage* Montage)
+{
+	PlayAnimMontage(Montage);
+}
+
+void AP13Weapon::Server_UpdateWeaponState_Implementation(const EP13MovementState NewState)
+{
+	UpdateWeaponState(NewState);
 }

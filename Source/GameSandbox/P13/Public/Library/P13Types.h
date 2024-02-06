@@ -114,6 +114,8 @@ struct FP13ProjectileInfo
 	float InitSpeed = 2000.f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bBounce = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool bRadialDamage = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DamageRadius = 200.f;

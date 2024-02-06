@@ -16,6 +16,7 @@ AP13ProjectileDefault::AP13ProjectileDefault()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	SetReplicatingMovement(true);
 
 	BulletCollision = CreateDefaultSubobject<USphereComponent>("BulletCollisionSphereComponent");
 	SetRootComponent(BulletCollision);
@@ -35,7 +36,7 @@ AP13ProjectileDefault::AP13ProjectileDefault()
 	BulletMovement->InitialSpeed = 1.f;
 	BulletMovement->MaxSpeed = 0.f;
 	BulletMovement->bRotationFollowsVelocity = true;
-	BulletMovement->bShouldBounce = true;
+	BulletMovement->bShouldBounce = BulletSettings.bBounce;
 }
 
 void AP13ProjectileDefault::PostInitializeComponents()
@@ -77,7 +78,7 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 	}
 
 	SpawnStateEffect(Hit, GetInstigatorController());
-	SpawnEffectsOnHit(Hit);
+	Server_SpawnEffectsOnHit(Hit);
 
 	if (DamageType == EP13ProjectileDamageType::Point)
 	{
@@ -86,14 +87,11 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 	else if (DamageType == EP13ProjectileDamageType::Radial)
 	{
 		GiveRadialDamage();
-		return;
 	}
 	else if (DamageType == EP13ProjectileDamageType::Grenade)
 	{
-		return;
+		/* Do nothing here, explode timer has started at the begin play. */
 	}
-	
-	ImpactProjectile();
 }
 
 void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -116,21 +114,15 @@ void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit)
 	const FVector& Location = Hit.ImpactPoint;
 	const FRotator& Rotation = Hit.ImpactNormal.Rotation();
 
-	if (BulletSettings.OnHit.Decals.Contains(SurfaceType))
-	{
-		UMaterialInterface* Decal = BulletSettings.OnHit.Decals[SurfaceType];
-		UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), Hit.GetComponent(), NAME_None, Location, Rotation, EAttachLocation::KeepWorldPosition, 10.f);
-	}
-	if (BulletSettings.OnHit.Particles.Contains(SurfaceType))
-	{
-		UNiagaraSystem* Particle = BulletSettings.OnHit.Particles[SurfaceType];
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, Particle, Location, Rotation);
-	}
-	if (BulletSettings.OnHit.Sounds.Contains(SurfaceType))
-	{
-		USoundBase* Sound = BulletSettings.OnHit.Sounds[SurfaceType];
-		UGameplayStatics::SpawnSoundAtLocation(this, Sound, Location, FRotator::ZeroRotator, 2.f);
-	}
+	const bool bDecal = BulletSettings.OnHit.Decals.Contains(SurfaceType);
+	const bool bParticle = BulletSettings.OnHit.Particles.Contains(SurfaceType);
+	const bool bSound = BulletSettings.OnHit.Sounds.Contains(SurfaceType);
+
+	UMaterialInterface* Decal = bDecal ? BulletSettings.OnHit.Decals[SurfaceType] : nullptr;
+	UNiagaraSystem* Particle = bParticle ? BulletSettings.OnHit.Particles[SurfaceType] : nullptr;
+	USoundBase* Sound = bSound ? BulletSettings.OnHit.Sounds[SurfaceType] : nullptr;
+	
+	Multicast_SpawnEffectsOnHit(Decal, Particle, Sound, Location, Rotation, Hit.GetComponent());	
 }
 
 void AP13ProjectileDefault::ImpactProjectile()
@@ -147,6 +139,7 @@ void AP13ProjectileDefault::GivePointDamage(const FHitResult& Hit, AActor* Other
 	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
 	
 	UAISense_Damage::ReportDamageEvent(GetWorld(), OtherActor, GetInstigator(), BulletSettings.Damage, Hit.Location, Hit.ImpactPoint);
+	ImpactProjectile();
 }
 
 void AP13ProjectileDefault::GiveRadialDamage() 
@@ -170,4 +163,16 @@ void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit, AController*
 	}
 	
 	UP13Types::AddEffectBySurfaceType(Hit.GetActor(), BulletSettings.StateEffectClass, Hit.PhysMaterial->SurfaceType, Causer);
+}
+
+void AP13ProjectileDefault::Server_SpawnEffectsOnHit_Implementation(const FHitResult& Hit)
+{
+	SpawnEffectsOnHit(Hit);
+}
+
+void AP13ProjectileDefault::Multicast_SpawnEffectsOnHit_Implementation(UMaterialInterface* Decal, UNiagaraSystem* Particle, USoundBase* Sound, const FVector& Location, const FRotator& Rotation, UPrimitiveComponent* AnchorComp)
+{
+	UGameplayStatics::SpawnDecalAttached(Decal, FVector(10.f), AnchorComp, NAME_None, Location, Rotation, EAttachLocation::KeepWorldPosition, 10.f);
+	UGameplayStatics::SpawnSoundAtLocation(this, Sound, Location, FRotator::ZeroRotator, 2.f);
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, Particle, Location, Rotation);
 }

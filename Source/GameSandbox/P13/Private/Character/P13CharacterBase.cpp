@@ -159,14 +159,9 @@ void AP13CharacterBase::UpdateDynamicMeshMaterials(const FLinearColor NewColor)
 	}
 }
 
-void AP13CharacterBase::Multicast_UpdatePlayerColor_Implementation(const FLinearColor NewColor)
+void AP13CharacterBase::PlayReadyAnimation()
 {
-	UpdateDynamicMeshMaterials(NewColor);
-}
-
-void AP13CharacterBase::Multicast_PlayReadyAnimation_Implementation()
-{
-	PlayAnimMontage(ReadyMontage);
+	Multicast_PlayAnimation(ReadyMontage);
 }
 
 void AP13CharacterBase::UpdateCharacter() const
@@ -192,7 +187,7 @@ void AP13CharacterBase::UpdateCharacter() const
 
 	GetCharacterMovement()->MaxWalkSpeed = ResSpeed;
 
-	if (CachedWeapon.IsValid())
+	if (CachedWeapon.IsValid() && HasAuthority())
 	{
 		CachedWeapon->UpdateWeaponState(MovementState);
 	}
@@ -278,7 +273,7 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 		return;
 	}
 
-	PlayAnimMontage(WeaponInfo->CharEquipAnim);
+	Multicast_PlayAnimation(WeaponInfo->CharEquipAnim);
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -465,6 +460,11 @@ void AP13CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ThisClass, CachedWeapon)
 }
 
+void AP13CharacterBase::Multicast_UpdatePlayerColor_Implementation(const FLinearColor NewColor)
+{
+	UpdateDynamicMeshMaterials(NewColor);
+}
+
 void AP13CharacterBase::Server_ChangeMovementState_Implementation(const EP13MovementState NewMovementState)
 {
 	ChangeMovementState(NewMovementState);
@@ -478,4 +478,9 @@ void AP13CharacterBase::OnRep_MovementState()
 void AP13CharacterBase::Server_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
 {
 	InitWeapon(NewWeaponSlot, CurrentIndex);
+}
+
+void AP13CharacterBase::Multicast_PlayAnimation_Implementation(UAnimMontage* Anim)
+{
+	PlayAnimMontage(Anim);
 }
