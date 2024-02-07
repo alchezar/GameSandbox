@@ -42,6 +42,12 @@ protected:
 	/* ------------------------------ Network ------------------------------ */
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	UFUNCTION(Server, Reliable)
+	void Server_ChangeHealth(const float Power, AController* Causer);
+	UFUNCTION(Server, Reliable)
+	void Server_AddHealth(const float HealthAid);
+	UFUNCTION(Server, Reliable)
+	virtual void Server_ReceiveDamage(const float Damage, AController* Causer = nullptr);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:

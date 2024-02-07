@@ -2,6 +2,8 @@
 
 #include "P13/Public/Character/P13CharacterBase.h"
 
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -96,6 +98,7 @@ EPhysicalSurface AP13CharacterBase::GetSurfaceType()
 bool AP13CharacterBase::GetCanApplyStateEffect(const TSubclassOf<UP13StateEffect> StateEffectClass) const
 {
 	check(AttributesComponent)
+	check(StateEffectClass)
 
 	const bool bNoShield = !AttributesComponent->GetShieldIsActive();
 	const bool bStackable = StateEffectClass && StateEffectClass.GetDefaultObject()->GetIsStackable();
@@ -114,6 +117,16 @@ void AP13CharacterBase::AddActiveStateEffect(UP13StateEffect* StateEffect)
 		return;
 	}
 	ActiveStateEffects.Add(StateEffect);
+
+	if (const UP13SingleStateEffect* EffectToAdd = Cast<UP13SingleStateEffect>(StateEffect))
+	{
+		UNiagaraSystem* Particle = EffectToAdd->GetParticle();
+		if (!Particle)
+		{
+			return;
+		}
+		Multicast_AddStateParticle(Particle, EffectToAdd->GetParticleScale(), EffectToAdd->GetIsAutoDestroy());
+	}
 }
 
 void AP13CharacterBase::RemoveInactiveStateEffect(UP13StateEffect* InactiveStateEffect)
@@ -123,6 +136,8 @@ void AP13CharacterBase::RemoveInactiveStateEffect(UP13StateEffect* InactiveState
 		return;
 	}
 	ActiveStateEffects.Remove(InactiveStateEffect);
+	
+	Multicast_RemoveStateParticle();
 }
 
 FVector AP13CharacterBase::GetLookAtCursorDirection() const
@@ -213,7 +228,7 @@ void AP13CharacterBase::OnHealthChangedHandle(const float NewHealth, const float
 void AP13CharacterBase::OnShieldChangedHandle(const float NewShield, const float LastDamage, const float ShieldAlpha)
 {
 	check(DamageDisplayComponent)
-	DamageDisplayComponent->DisplayShield(LastDamage, ShieldAlpha);
+	DamageDisplayComponent->Server_DisplayShield(LastDamage, ShieldAlpha);
 }
 
 void AP13CharacterBase::OnDeathHandle(AController* Causer)
@@ -458,6 +473,7 @@ void AP13CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(ThisClass, MovementState)
 	DOREPLIFETIME(ThisClass, CurrentWeaponType)
 	DOREPLIFETIME(ThisClass, CachedWeapon)
+	DOREPLIFETIME(ThisClass, ActiveStateEffects)
 }
 
 void AP13CharacterBase::Multicast_UpdatePlayerColor_Implementation(const FLinearColor NewColor)
@@ -483,4 +499,34 @@ void AP13CharacterBase::Server_InitWeapon_Implementation(const FP13WeaponSlot& N
 void AP13CharacterBase::Multicast_PlayAnimation_Implementation(UAnimMontage* Anim)
 {
 	PlayAnimMontage(Anim);
+}
+
+void AP13CharacterBase::Multicast_AddStateParticle_Implementation(UNiagaraSystem* Particle, const float ParticleScale, const bool bAutoDestroy)
+{
+	/* State effect has already spawned particles on the server. */
+	if (HasAuthority() || ParticleComponent)
+	{
+		return;
+	}
+	/* Or make an array of particle components, if we need more than one particles at the same time. */
+	ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		Particle,
+		GetRootComponent(),
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		FVector(ParticleScale),
+		EAttachLocation::SnapToTarget,
+		bAutoDestroy,
+		ENCPoolMethod::None);
+}
+
+void AP13CharacterBase::Multicast_RemoveStateParticle_Implementation()
+{
+	if (HasAuthority() || !ParticleComponent)
+	{
+		return;
+	}
+	ParticleComponent->DestroyComponent();
+	ParticleComponent = nullptr;
 }

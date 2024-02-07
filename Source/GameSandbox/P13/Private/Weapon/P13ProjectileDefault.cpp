@@ -72,7 +72,7 @@ void AP13ProjectileDefault::InitBullet(const float NewLifeSpan, const FP13Projec
 
 void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	if (!OtherActor)
+	if (!HasAuthority() || !OtherActor)
 	{
 		return;
 	}

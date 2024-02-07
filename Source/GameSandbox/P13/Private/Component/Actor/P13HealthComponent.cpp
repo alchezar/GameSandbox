@@ -4,7 +4,10 @@
 
 #include "Net/UnrealNetwork.h"
 
-UP13HealthComponent::UP13HealthComponent() {}
+UP13HealthComponent::UP13HealthComponent()
+{
+	SetIsReplicatedByDefault(true);
+}
 
 void UP13HealthComponent::BeginPlay()
 {
@@ -54,12 +57,12 @@ void UP13HealthComponent::ChangeHealth(const float Power, AController* Causer)
 		return;
 	}
 
-	Power > 0 ? AddHealth(Power) : ReceiveDamage(FMath::Abs(Power), Causer);
+	Power > 0 ? Server_AddHealth(Power) : Server_ReceiveDamage(FMath::Abs(Power), Causer);
 }
 
 void UP13HealthComponent::OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
-	ReceiveDamage(Damage, InstigatedBy);
+	Server_ReceiveDamage(Damage, InstigatedBy);
 }
 
 void UP13HealthComponent::OnDead() {}
@@ -69,4 +72,19 @@ void UP13HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Health)
+}
+
+void UP13HealthComponent::Server_ChangeHealth_Implementation(const float Power, AController* Causer)
+{
+	ChangeHealth(Power, Causer);
+}
+
+void UP13HealthComponent::Server_AddHealth_Implementation(const float HealthAid)
+{
+	AddHealth(HealthAid);
+}
+
+void UP13HealthComponent::Server_ReceiveDamage_Implementation(const float Damage, AController* Causer)
+{
+	ReceiveDamage(Damage, Causer);
 }

@@ -103,6 +103,10 @@ protected:
 	void Server_InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayAnimation(UAnimMontage* Anim);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_AddStateParticle(UNiagaraSystem* Particle, const float ParticleScale, const bool bAutoDestroy);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_RemoveStateParticle();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -141,6 +145,9 @@ private:
 	EP13MovementState PreviousMovementState = EP13MovementState::Walk;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
-	UPROPERTY()
+	
+	UPROPERTY(Replicated)
 	TArray<UP13StateEffect*> ActiveStateEffects;
+	UPROPERTY()
+	UNiagaraComponent* ParticleComponent = nullptr;	
 };

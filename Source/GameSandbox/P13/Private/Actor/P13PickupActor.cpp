@@ -85,7 +85,7 @@ void AP13PickingUpAid::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overla
 	{
 		return;
 	}
-	AttributesComponent->AddHealth(HealthAid);
+	AttributesComponent->Server_AddHealth(HealthAid);
 
 	OnPickupSuccess();
 }

@@ -229,7 +229,7 @@ void AP13Weapon::MakeShot()
 	UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, GetInstigator());
 }
 
-void AP13Weapon::SpawnProjectile() const
+void AP13Weapon::SpawnProjectile()
 {
 	const TSubclassOf<AP13ProjectileDefault> ProjectileClass = WeaponSettings->ProjectileSettings.Class;
 	if (!ProjectileClass)
@@ -245,8 +245,8 @@ void AP13Weapon::SpawnProjectile() const
 	{
 		return;
 	}
-	Bullet->SetOwner(GetOwner());	
-	Bullet->SetInstigator(GetInstigator());
+	Bullet->SetOwner(this);	
+	Bullet->SetInstigator(GetOwner<APawn>());
 	Bullet->InitBullet(20.f, WeaponSettings->ProjectileSettings);
 	Bullet->FinishSpawning(ShotTransform);
 }

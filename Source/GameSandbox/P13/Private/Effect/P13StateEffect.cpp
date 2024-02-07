@@ -62,7 +62,7 @@ void UP13SingleStateEffect::DestroyObject()
 
 void UP13SingleStateEffect::StartEffect()
 {
-	ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Particle, CachedActor->GetRootComponent(), NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, FVector(4.f), EAttachLocation::SnapToTarget, true, ENCPoolMethod::None);
+	SpawnEffectParticles(Particle, CachedActor->GetRootComponent());
 
 	ApplyEffect();
 	DestroyObject();
@@ -77,12 +77,40 @@ void UP13SingleStateEffect::ApplyEffect()
 	{
 		return;
 	}
-	HealthComponent->ChangeHealth(Power, CachedCauser.Get());
+	HealthComponent->Server_ChangeHealth(Power, CachedCauser.Get());
+}
+
+void UP13SingleStateEffect::SpawnEffectParticles(UNiagaraSystem* SystemTemplate, USceneComponent* AttachToComponent)
+{
+	ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(
+		SystemTemplate,
+		AttachToComponent,
+		NAME_None,
+		FVector::ZeroVector,
+		FRotator::ZeroRotator,
+		FVector(Scale),
+		EAttachLocation::SnapToTarget,
+		bAutoDestroy,
+		ENCPoolMethod::None);
+}
+
+void UP13SingleStateEffect::DestroyEffectParticles()
+{
+	if (ParticleComponent)
+	{
+		ParticleComponent->DestroyComponent();
+	}
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                         State Effect Timer Execute                        *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+UP13TimerStateEffect::UP13TimerStateEffect()
+{
+	Scale = 2.f;
+	bAutoDestroy = false;
+}
 
 void UP13TimerStateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 {
@@ -91,11 +119,12 @@ void UP13TimerStateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 
 void UP13TimerStateEffect::DestroyObject()
 {
-	GetWorld()->GetTimerManager().ClearTimer(RateTimer);
+	DestroyEffectParticles();
 
-	if (ParticleComponent)
+	if (const UWorld* World = GetWorld())
 	{
-		ParticleComponent->DestroyComponent();
+		World->GetTimerManager().ClearTimer(RateTimer);
+		World->GetTimerManager().ClearAllTimersForObject(this);
 	}
 
 	Super::DestroyObject();
@@ -105,11 +134,13 @@ void UP13TimerStateEffect::StartEffect()
 {
 	Power /= Duration / Rate;
 
-	GetWorld()->GetTimerManager().SetTimer(DurationTimer, this, &ThisClass::DestroyObject, Duration);
-	GetWorld()->GetTimerManager().SetTimer(RateTimer, this, &ThisClass::ApplyEffect, Rate, true);
+	if (const UWorld* World = GetWorld())
+	{
+		World->GetTimerManager().SetTimer(DurationTimer, this, &ThisClass::DestroyObject, Duration);
+		World->GetTimerManager().SetTimer(RateTimer, this, &ThisClass::ApplyEffect, Rate, true);
+	}
 
-	USceneComponent* ActorRoot = CachedActor->GetRootComponent();
-	ParticleComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(Particle, ActorRoot, NAME_None, FVector::ZeroVector, FRotator::ZeroRotator, FVector(2.f), EAttachLocation::SnapToTarget, false, ENCPoolMethod::None);
+	SpawnEffectParticles(Particle, CachedActor->GetRootComponent());
 }
 
 void UP13TimerStateEffect::ApplyEffect()

@@ -2,9 +2,12 @@
 
 #include "P13/Public/Component/Actor/P13CharacterAttributesComponent.h"
 
+#include "Net/UnrealNetwork.h"
+
 UP13CharacterAttributesComponent::UP13CharacterAttributesComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UP13CharacterAttributesComponent::BeginPlay()
@@ -59,4 +62,11 @@ void UP13CharacterAttributesComponent::ShieldRecoveryTick(const float DeltaTime)
 	{
 		bRecovering = false;
 	}
+}
+
+void UP13CharacterAttributesComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Shield)
 }

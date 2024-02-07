@@ -32,6 +32,17 @@ public:
 protected:
 	void OnOwnerHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha);
 
+	/* ------------------------------ Network ------------------------------ */
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_DisplayDamage(const float CurrentDamage, const float HealthAlpha);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DisplayDamage(const float CurrentDamage, const float HealthAlpha);
+	UFUNCTION(Server, Reliable)
+	void Server_DisplayShield(const float CurrentDamage, const float ShieldAlpha);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_DisplayShield(const float CurrentDamage, const float ShieldAlpha);
+	
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage Display")

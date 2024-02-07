@@ -52,7 +52,7 @@ private:
 	bool CheckWeaponCanReload();
 	void Fire();
 	void MakeShot();
-	void SpawnProjectile() const;
+	void SpawnProjectile();
 	FVector GetFinalDirection() const;
 	void UpdateDispersion(const bool bRest = false);
 	void DisperseReducing();

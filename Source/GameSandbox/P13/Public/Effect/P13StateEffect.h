@@ -49,16 +49,25 @@ class UP13SingleStateEffect : public UP13StateEffect
 	GENERATED_BODY()
 
 public:
+	FORCEINLINE UNiagaraSystem* GetParticle() const { return Particle; }
+	FORCEINLINE float GetParticleScale() const { return Scale; }
+	FORCEINLINE bool GetIsAutoDestroy() const { return bAutoDestroy; }
 	virtual void InitObject(AActor* NewActor, AController* NewCauser) override;
 	virtual void DestroyObject() override;
 	virtual void StartEffect();
 	virtual void ApplyEffect();
-
+	virtual void SpawnEffectParticles(UNiagaraSystem* SystemTemplate, USceneComponent* AttachToComponent);
+	virtual void DestroyEffectParticles();
+	
 protected:
+	UPROPERTY(EditAnywhere, Category = "C++")
+	UNiagaraSystem* Particle;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float Power = 20.f;
 	UPROPERTY(EditAnywhere, Category = "C++")
-	UNiagaraSystem* Particle;
+	float Scale = 4.f;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	bool bAutoDestroy = true;
 
 	UPROPERTY()
 	UNiagaraComponent* ParticleComponent;
@@ -74,6 +83,8 @@ class UP13TimerStateEffect : public UP13SingleStateEffect
 	GENERATED_BODY()
 
 public:
+	UP13TimerStateEffect();
+	
 	virtual void InitObject(AActor* NewActor, AController* NewCauser) override;
 	virtual void DestroyObject() override;
 	virtual void StartEffect() override;

@@ -10,6 +10,7 @@
 UP13InventoryComponent::UP13InventoryComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetIsReplicatedByDefault(true);
 }
 
 void UP13InventoryComponent::BeginPlay()
@@ -342,5 +343,5 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 
 void UP13InventoryComponent::Server_RefreshSlots_Implementation()
 {
-	RefreshSlots();		
+	RefreshSlots();
 }

@@ -33,6 +33,10 @@ public:
 private:
 	void ShieldRecoveryTick(const float DeltaTime);
 
+	/* ------------------------------ Network ------------------------------ */
+public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnShieldChangesHandle OnShieldChanged;
@@ -46,6 +50,7 @@ protected:
 	float RecoveryTime = 5.f;
 
 private:
+	UPROPERTY(Replicated)
 	float Shield = 0.f;
 	FTimerHandle StartRecoveryTimer;
 	bool bRecovering = false;

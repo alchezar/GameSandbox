@@ -74,5 +74,25 @@ UP13DamageDisplayWidget* UP13DamageDisplayComponent::CreateDamageWidget(FVector2
 
 void UP13DamageDisplayComponent::OnOwnerHealthChangedHandle(const float NewHealth, const float LastDamage, const float HealthAlpha)
 {
-	DisplayDamage(LastDamage, HealthAlpha);
+	Server_DisplayDamage(LastDamage, HealthAlpha);
+}
+
+void UP13DamageDisplayComponent::Server_DisplayDamage_Implementation(const float CurrentDamage, const float HealthAlpha)
+{
+	Multicast_DisplayDamage(CurrentDamage, HealthAlpha);
+}
+
+void UP13DamageDisplayComponent::Multicast_DisplayDamage_Implementation(const float CurrentDamage, const float HealthAlpha)
+{
+	DisplayDamage(CurrentDamage, HealthAlpha);
+}
+
+void UP13DamageDisplayComponent::Server_DisplayShield_Implementation(const float CurrentDamage, const float ShieldAlpha)
+{
+	Multicast_DisplayShield(CurrentDamage, ShieldAlpha);
+}
+
+void UP13DamageDisplayComponent::Multicast_DisplayShield_Implementation(const float CurrentDamage, const float ShieldAlpha)
+{
+	DisplayShield(CurrentDamage, ShieldAlpha);
 }
