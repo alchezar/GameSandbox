@@ -13,29 +13,35 @@ void UP13HealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	Health = MaxHealth;
-	OnHealthChanged.Broadcast(Health, 0.f, 1.f);
-
-	if (AActor* Owner = GetOwner())
+	if (GetOwner() && GetOwner()->HasAuthority())
 	{
-		Owner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnOwnerTakeAnyDamageHandle);
+		Health = MaxHealth;
+		// Multicast_ChangeHealth(Health, 0.f, 1.f);
+		OnHealthChanged.Broadcast(Health, 0.f, 1.f);
+
+		if (AActor* Owner = GetOwner())
+		{
+			Owner->OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnOwnerTakeAnyDamageHandle);
+		}
 	}
 }
 
 void UP13HealthComponent::ReceiveDamage(const float Damage, AController* Causer)
 {
-	if (FMath::IsNearlyZero(Health) || FMath::IsNearlyZero(Damage))
+	if (!bAlive || FMath::IsNearlyZero(Damage))
 	{
 		return;
 	}
 
 	const float HealthBefore = Health;
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
+	// Multicast_ChangeHealth(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
 	OnHealthChanged.Broadcast(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
 
 	if (FMath::IsNearlyZero(Health))
 	{
 		OnHealthOver.Broadcast(Causer);
+		// Multicast_HealthOver(Causer);
 		OnDead();
 	}
 }
@@ -47,6 +53,7 @@ void UP13HealthComponent::AddHealth(const float HealthAid)
 		return;
 	}
 	Health = FMath::Clamp(Health + HealthAid, 0.f, MaxHealth);
+	// Multicast_ChangeHealth(Health, 0.f, Health / MaxHealth);
 	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
@@ -65,13 +72,17 @@ void UP13HealthComponent::OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float
 	Server_ReceiveDamage(Damage, InstigatedBy);
 }
 
-void UP13HealthComponent::OnDead() {}
+void UP13HealthComponent::OnDead()
+{
+	bAlive = false;
+}
 
 void UP13HealthComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ThisClass, Health)
+	DOREPLIFETIME(ThisClass, bAlive)
 }
 
 void UP13HealthComponent::Server_ChangeHealth_Implementation(const float Power, AController* Causer)

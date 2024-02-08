@@ -67,6 +67,8 @@ private:
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_RefreshSlots();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
 	
 	/* ----------------------------- Variables ----------------------------- */
 public:

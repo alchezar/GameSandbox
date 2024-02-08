@@ -28,6 +28,8 @@ public:
 	FORCEINLINE bool GetShieldIsActive() const { return Shield > 0.f; }
 	FORCEINLINE float GetCurrentShield() const { return Shield; }
 	FORCEINLINE float GetCurrentShieldAlpha() const { return Shield / MaxShield; }
+
+protected:
 	virtual void ReceiveDamage(const float Damage, AController* Causer = nullptr) override;
 
 private:

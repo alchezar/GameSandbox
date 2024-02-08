@@ -25,6 +25,7 @@ class GAMESANDBOX_API AP13CharacterBase : public ACharacter, public IP13StateEff
 public:
 	AP13CharacterBase();
 	virtual void PostInitializeComponents() override;
+	virtual bool ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -43,7 +44,6 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	FORCEINLINE bool GetIsDead() const { return bDead; }
 	FORCEINLINE EP13MovementState GetMovementState() const { return MovementState; }
 	FORCEINLINE EP13MovementState GetPreviousMovementState() const { return PreviousMovementState; }
 	FORCEINLINE AP13Weapon* GetCachedWeapon() const { return CachedWeapon.Get(); }
@@ -51,6 +51,7 @@ public:
 	FORCEINLINE UP13LegAlignmentComponent* GetLegAlignmentComponent() const { return LegAlignmentComponent; }
 	FORCEINLINE EP13AmmoType GetCurrentWeaponType() const { return CurrentWeaponType; }
 	FORCEINLINE FLinearColor GetTrueColor() const { return TrueColor; }
+	bool GetIsDead() const;
 	virtual FVector GetLookAtCursorDirection() const;
 	float GetHealthReserve() const;
 	void SavePreviousMovementState() { PreviousMovementState = MovementState; }
@@ -107,6 +108,10 @@ protected:
 	void Multicast_AddStateParticle(UNiagaraSystem* Particle, const float ParticleScale, const bool bAutoDestroy);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_RemoveStateParticle();
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnDeadHandle();
+	UFUNCTION(Server, Reliable)
+	void Server_DropWeapon(const bool bTakeNext);
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -141,7 +146,6 @@ protected:
 	FLinearColor TrueColor = FLinearColor::White;
 
 private:
-	bool bDead = false;
 	EP13MovementState PreviousMovementState = EP13MovementState::Walk;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;

@@ -8,6 +8,7 @@ UP13CharacterAttributesComponent::UP13CharacterAttributesComponent()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	SetIsReplicatedByDefault(true);
+	// SetIsReplicated(true);
 }
 
 void UP13CharacterAttributesComponent::BeginPlay()

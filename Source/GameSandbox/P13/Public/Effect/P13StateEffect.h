@@ -20,6 +20,7 @@ class GAMESANDBOX_API UP13StateEffect : public UObject
 
 public:
 	UP13StateEffect();
+	virtual bool IsSupportedForNetworking() const override { return true; }
 
 public:
 	FORCEINLINE TArray<TEnumAsByte<EPhysicalSurface>> GetPossibleInteractSurfaces() const { return PossibleInteractSurfaces; }

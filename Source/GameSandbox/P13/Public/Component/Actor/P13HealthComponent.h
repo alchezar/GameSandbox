@@ -30,13 +30,13 @@ public:
 	FORCEINLINE float GetCurrentHealth() const { return Health; }
 	FORCEINLINE float GetCurrentHealthAlpha() const { return Health / MaxHealth; }
 	FORCEINLINE void SetMaxHealth(const float NewMaxHealth) { MaxHealth = NewMaxHealth; }
+
+protected:
 	virtual void ReceiveDamage(const float Damage, AController* Causer = nullptr);
 	virtual void AddHealth(const float HealthAid);
 	virtual void ChangeHealth(const float Power, AController* Causer);
 	UFUNCTION()
 	void OnOwnerTakeAnyDamageHandle(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
-
-protected:
 	void OnDead();
 
 	/* ------------------------------ Network ------------------------------ */
@@ -61,4 +61,6 @@ protected:
 private:
 	UPROPERTY(Replicated)
 	float Health = 0.f;
+	UPROPERTY(Replicated)
+	bool bAlive = true;
 };

@@ -14,6 +14,7 @@
 
 AP13PickingUpBase::AP13PickingUpBase()
 {
+	bReplicates = true;
 	CreateComponents();
 }
 

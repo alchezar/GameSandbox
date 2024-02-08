@@ -195,11 +195,7 @@ bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapo
 	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin;
 	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
 
-	if (AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform))
-	{
-		DroppedWeapon->InitDrop(DropWeaponInfo);
-		DroppedWeapon->FinishSpawning(SpawnTransform);
-	}
+	Multicast_SpawnDroppedWeapon(SpawnTransform, *DropWeaponInfo);
 
 	if (!bTakeNext)
 	{
@@ -344,4 +340,13 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 void UP13InventoryComponent::Server_RefreshSlots_Implementation()
 {
 	RefreshSlots();
+}
+
+void UP13InventoryComponent::Multicast_SpawnDroppedWeapon_Implementation(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo)
+{
+	if (AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform))
+	{
+		DroppedWeapon->InitDrop(&DropWeaponInfo);
+		DroppedWeapon->FinishSpawning(SpawnTransform);
+	}
 }

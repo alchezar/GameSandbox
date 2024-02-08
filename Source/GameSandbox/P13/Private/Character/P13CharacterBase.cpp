@@ -5,6 +5,7 @@
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
+#include "Engine/ActorChannel.h"
 #include "Engine/DamageEvents.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Net/UnrealNetwork.h"
@@ -36,13 +37,20 @@ void AP13CharacterBase::PostInitializeComponents()
 	}
 }
 
+bool AP13CharacterBase::ReplicateSubobjects(UActorChannel* Channel, FOutBunch* Bunch, FReplicationFlags* RepFlags)
+{
+	bool bWroteSomething = Super::ReplicateSubobjects(Channel, Bunch, RepFlags);
+	bWroteSomething |= Channel->ReplicateSubobject(AttributesComponent, *Bunch, *RepFlags);
+	return bWroteSomething;
+}
+
 void AP13CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
 
 	TryCreateDynamicMeshMaterials();
 
-	if (AttributesComponent)
+	if (HasAuthority() && AttributesComponent)
 	{
 		AttributesComponent->OnShieldChanged.AddUObject(this, &ThisClass::OnShieldChangedHandle);
 		AttributesComponent->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedHandle);
@@ -140,6 +148,11 @@ void AP13CharacterBase::RemoveInactiveStateEffect(UP13StateEffect* InactiveState
 	Multicast_RemoveStateParticle();
 }
 
+bool AP13CharacterBase::GetIsDead() const
+{
+	return !(AttributesComponent->GetIsAlive());
+}
+
 FVector AP13CharacterBase::GetLookAtCursorDirection() const
 {
 	return GetMesh()->GetForwardVector();
@@ -233,35 +246,19 @@ void AP13CharacterBase::OnShieldChangedHandle(const float NewShield, const float
 
 void AP13CharacterBase::OnDeathHandle(AController* Causer)
 {
-	bDead = true;
-
-	check(LegAlignmentComponent)
-	LegAlignmentComponent->LegAlignment(false);
-
+	/* Must executes always on server! */
+	
 	/* Drop current weapon and remove it from the inventory. */
 	DropWeapon(false);
-
+	
 	if (Controller)
 	{
-		// Controller->UnPossess();
+		constexpr float UnpossessDelay = 1.f;
 		FTimerHandle RespawnTimer;
-		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, Controller.Get(), &AController::UnPossess, 1.f);
+		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, Controller.Get(), &AController::UnPossess, UnpossessDelay);
 	}
-
-	/* Disable movement. */
-	StopAnimMontage();
-	if (GetCharacterMovement())
-	{
-		GetCharacterMovement()->StopMovementImmediately();
-		GetCharacterMovement()->DisableMovement();
-		GetCharacterMovement()->MovementState.bCanJump = false;
-	}
-
-	/* Ragdoll. */
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	GetMesh()->SetAllBodiesSimulatePhysics(true);
-	GetMesh()->SetCollisionProfileName("Ragdoll");
-	SetLifeSpan(10.f);
+	
+	Multicast_OnDeadHandle();
 }
 
 void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
@@ -529,4 +526,31 @@ void AP13CharacterBase::Multicast_RemoveStateParticle_Implementation()
 	}
 	ParticleComponent->DestroyComponent();
 	ParticleComponent = nullptr;
+}
+
+void AP13CharacterBase::Multicast_OnDeadHandle_Implementation()
+{
+	/* Stop leg alignment. */
+	check(LegAlignmentComponent)
+	LegAlignmentComponent->LegAlignment(false);
+
+	/* Disable movement. */
+	StopAnimMontage();
+	if (GetCharacterMovement())
+	{
+		GetCharacterMovement()->StopMovementImmediately();
+		GetCharacterMovement()->DisableMovement();
+		GetCharacterMovement()->MovementState.bCanJump = false;
+	}
+	
+	/* Ragdoll. */
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetAllBodiesSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	SetLifeSpan(10.f);
+}
+
+void AP13CharacterBase::Server_DropWeapon_Implementation(const bool bTakeNext)
+{
+	DropWeapon(bTakeNext);
 }

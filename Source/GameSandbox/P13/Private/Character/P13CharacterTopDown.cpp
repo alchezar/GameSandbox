@@ -128,7 +128,7 @@ void AP13CharacterTopDown::SwitchWeaponInput(const bool bNext)
 
 void AP13CharacterTopDown::DropInput(const bool bTakeNext)
 {
-	DropWeapon(bTakeNext);
+	Server_DropWeapon(bTakeNext);
 }
 
 FVector AP13CharacterTopDown::GetLookAtCursorDirection() const
