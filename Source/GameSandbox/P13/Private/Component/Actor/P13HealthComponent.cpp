@@ -16,8 +16,8 @@ void UP13HealthComponent::BeginPlay()
 	if (GetOwner() && GetOwner()->HasAuthority())
 	{
 		Health = MaxHealth;
-		// Multicast_ChangeHealth(Health, 0.f, 1.f);
-		OnHealthChanged.Broadcast(Health, 0.f, 1.f);
+		Multicast_ChangeHealth(Health, 0.f, 1.f);
+		// OnHealthChanged.Broadcast(Health, 0.f, 1.f);
 
 		if (AActor* Owner = GetOwner())
 		{
@@ -35,13 +35,13 @@ void UP13HealthComponent::ReceiveDamage(const float Damage, AController* Causer)
 
 	const float HealthBefore = Health;
 	Health = FMath::Clamp(Health - Damage, 0.f, MaxHealth);
-	// Multicast_ChangeHealth(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
-	OnHealthChanged.Broadcast(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
+	Multicast_ChangeHealth(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
+	// OnHealthChanged.Broadcast(Health, FMath::Min(Damage, HealthBefore), Health / MaxHealth);
 
 	if (FMath::IsNearlyZero(Health))
 	{
-		OnHealthOver.Broadcast(Causer);
-		// Multicast_HealthOver(Causer);
+		// OnHealthOver.Broadcast(Causer);
+		Multicast_HealthOver(Causer);
 		OnDead();
 	}
 }
@@ -53,8 +53,8 @@ void UP13HealthComponent::AddHealth(const float HealthAid)
 		return;
 	}
 	Health = FMath::Clamp(Health + HealthAid, 0.f, MaxHealth);
-	// Multicast_ChangeHealth(Health, 0.f, Health / MaxHealth);
-	OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
+	Multicast_ChangeHealth(Health, 0.f, Health / MaxHealth);
+	// OnHealthChanged.Broadcast(Health, 0.f, Health / MaxHealth);
 }
 
 void UP13HealthComponent::ChangeHealth(const float Power, AController* Causer)
@@ -98,4 +98,14 @@ void UP13HealthComponent::Server_AddHealth_Implementation(const float HealthAid)
 void UP13HealthComponent::Server_ReceiveDamage_Implementation(const float Damage, AController* Causer)
 {
 	ReceiveDamage(Damage, Causer);
+}
+
+void UP13HealthComponent::Multicast_ChangeHealth_Implementation(const float NewHealth, const float LastDamage, const float HealthAlpha)
+{
+	OnHealthChanged.Broadcast(NewHealth, LastDamage, HealthAlpha);
+}
+
+void UP13HealthComponent::Multicast_HealthOver_Implementation(AController* Causer)
+{
+	OnHealthOver.Broadcast(Causer);
 }

@@ -42,8 +42,10 @@ void UP13PlayerStatsWidget::NativeDestruct()
 	/* Widget destructs only after pawn death, without the needed to refer to it's health component.
 	 * Main reason is that OnHealthOver delegate calls UnPosses in pawn,
 	 * which in turn calls this widget destruction, before delegate call and there is no guarantee of the correct calling order. */
-	check(PlayerStateCached.IsValid())
-	PlayerStateCached->SaveTotalTime(SecondsFromStart);
+	if (PlayerStateCached.IsValid())
+	{
+		PlayerStateCached->SaveTotalTime(SecondsFromStart);
+	}
 }
 
 void UP13PlayerStatsWidget::OnPlayerScoreChangedHandle(const int32 NewScore)

@@ -51,6 +51,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 protected:
 	void OnHitUnderCursorChangedHandle(APlayerController* PlayerController, const FHitResult& HitResult);
+	void ShowInterface();
 
 private:
 	void CreateTopDownComponents();

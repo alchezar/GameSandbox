@@ -27,6 +27,7 @@ class GAMESANDBOX_API AP13ProjectileDefault : public AActor
 public:
 	AP13ProjectileDefault();
 	virtual void PostInitializeComponents() override;
+	// virtual void PostNetReceiveVelocity(const FVector& NewVelocity) override;
 
 protected:
 	virtual void BeginPlay() override;

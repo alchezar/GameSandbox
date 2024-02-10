@@ -48,6 +48,12 @@ void AP13ProjectileDefault::PostInitializeComponents()
 	BulletCollision->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnBulletEndOverlapHandle);
 }
 
+// void AP13ProjectileDefault::PostNetReceiveVelocity(const FVector& NewVelocity)
+// {
+// 	// Super::PostNetReceiveVelocity(NewVelocity);
+// 	BulletMovement->Velocity = NewVelocity;
+// }
+
 void AP13ProjectileDefault::BeginPlay()
 {
 	Super::BeginPlay();
@@ -66,8 +72,8 @@ void AP13ProjectileDefault::Tick(float DeltaTime)
 void AP13ProjectileDefault::InitBullet(const float NewLifeSpan, const FP13ProjectileInfo& NewBulletSettings)
 {
 	InitialLifeSpan = NewLifeSpan;
-	BulletMovement->InitialSpeed = NewBulletSettings.InitSpeed;
 	BulletSettings = NewBulletSettings;
+	BulletMovement->InitialSpeed = NewBulletSettings.InitSpeed;
 }
 
 void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)

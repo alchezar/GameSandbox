@@ -31,6 +31,11 @@ void AP13PickingUpBase::BeginPlay()
 	ActivateParticles();
 }
 
+void AP13PickingUpBase::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	Server_BePickedUpCollisionBeginOverlap(OtherActor);	
+}
+
 void AP13PickingUpBase::OnPickupSuccess()
 {
 	if (UNiagaraComponent* PickedParticle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, Mesh->GetComponentLocation()))
@@ -46,6 +51,11 @@ void AP13PickingUpBase::ActivateParticles()
 	{
 		WaitParticle->SetVariableLinearColor("Color", EffectColor);
 	}
+}
+
+void AP13PickingUpBase::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
+{
+	// Multicast_OnPickupSuccess();
 }
 
 void AP13PickingUpBase::CreateComponents()
@@ -68,6 +78,16 @@ void AP13PickingUpBase::CreateComponents()
 	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 }
 
+void AP13PickingUpBase::Multicast_OnPickupSuccess_Implementation()
+{
+	OnPickupSuccess();
+}
+
+void AP13PickingUpBase::Server_BePickedUpCollisionBeginOverlap_Implementation(AActor* Picker)
+{
+	BePickedUpOnCollisionBeginOverlap(Picker);
+}
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                              PickingUp Aid                                *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -77,11 +97,9 @@ AP13PickingUpAid::AP13PickingUpAid()
 	Mesh->SetSimulatePhysics(false);
 }
 
-void AP13PickingUpAid::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP13PickingUpAid::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 {
-	Super::OnCollisionBeginOverlapHandle(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
-
-	UP13CharacterAttributesComponent* AttributesComponent = OtherActor->FindComponentByClass<UP13CharacterAttributesComponent>();
+	UP13CharacterAttributesComponent* AttributesComponent = Picker->FindComponentByClass<UP13CharacterAttributesComponent>();
 	if (!AttributesComponent || AttributesComponent->GetIsHealthFull())
 	{
 		return;
@@ -102,9 +120,9 @@ void AP13PickingUpAmmo::BeginPlay()
 	Collision->AttachToComponent(Mesh, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
-void AP13PickingUpAmmo::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP13PickingUpAmmo::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 {
-	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
+	UP13InventoryComponent* InventoryComponent = Picker->FindComponentByClass<UP13InventoryComponent>();
 	if (!InventoryComponent)
 	{
 		return;
@@ -120,6 +138,7 @@ void AP13PickingUpAmmo::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Overl
 	{
 		return;
 	}
+	
 	OnPickupSuccess();
 }
 
@@ -155,13 +174,21 @@ void AP13PickingUpWeapon::InitDrop(const FP13WeaponDrop* DropWeaponInfo)
 	GetWorld()->GetTimerManager().SetTimer(DropTimer, this, &ThisClass::MakePickableAfterDrop, ActivationDelay, false);
 }
 
-void AP13PickingUpWeapon::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP13PickingUpWeapon::ActivateParticles()
+{
+	if (!bDropped)
+	{
+		Super::ActivateParticles();
+	}
+}
+
+void AP13PickingUpWeapon::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 {
 	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer))
 	{
 		return;
 	}
-	UP13InventoryComponent* InventoryComponent = OtherActor->FindComponentByClass<UP13InventoryComponent>();
+	UP13InventoryComponent* InventoryComponent = Picker->FindComponentByClass<UP13InventoryComponent>();
 	if (!InventoryComponent)
 	{
 		return;
@@ -184,15 +211,8 @@ void AP13PickingUpWeapon::OnCollisionBeginOverlapHandle(UPrimitiveComponent* Ove
 	{
 		return;
 	}
+	
 	OnPickupSuccess();
-}
-
-void AP13PickingUpWeapon::ActivateParticles()
-{
-	if (!bDropped)
-	{
-		Super::ActivateParticles();
-	}
 }
 
 void AP13PickingUpWeapon::MakePickableAfterDrop()

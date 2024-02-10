@@ -36,6 +36,7 @@ public:
 	/* ------------------------------- This -------------------------------- */
 public:
 	FORCEINLINE FLinearColor GetPawnTrueColor() const { return PawnTrueColor; }
+	void ShowHeadsUpDisplay();
 	void OnGameWon();
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdatePlayerColor(const FLinearColor FoundColor);

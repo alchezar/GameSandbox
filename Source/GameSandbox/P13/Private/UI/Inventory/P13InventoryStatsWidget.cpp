@@ -17,6 +17,7 @@ void UP13InventoryStatsWidget::NativeConstruct()
 	check(GameInstanceCached.IsValid())
 
 	CacheInventoryComponent();
+	ShowStatWidgets();
 }
 
 void UP13InventoryStatsWidget::ShowAllWeapons() const
@@ -58,19 +59,16 @@ void UP13InventoryStatsWidget::OnNewAmmoTakenHandle(const FP13AmmoSlot& NewAmmoS
 
 void UP13InventoryStatsWidget::CacheInventoryComponent()
 {
-	const APawn* PlayerPawn = GetOwningPlayerPawn();
-	if (!PlayerPawn)
-	{
-		return;
-	}
-	InventoryComponentCached = PlayerPawn->FindComponentByClass<UP13InventoryComponent>();
-
+	const APawn* NewPawn = GetOwningPlayerPawn();
+	UP13InventoryComponent* NewInventoryComp = NewPawn ? NewPawn->FindComponentByClass<UP13InventoryComponent>() : nullptr;
+	
+	InventoryComponentCached = NewInventoryComp;
 	/* As NativeConstruct of the widgets fires before the BeginPlay of the Inventory,
 	 * we will wait for the Inventory to create our widgets with updated information. */
 	InventoryComponentCached->OnInventoryUpdated.AddUObject(this, &ThisClass::ShowStatWidgets);
 	InventoryComponentCached->OnNewWeaponTaken.AddUObject(this, &ThisClass::OnNewWeaponTakenHandle);
 	InventoryComponentCached->OnNewAmmoTaken.AddUObject(this, &ThisClass::OnNewAmmoTakenHandle);
-	InventoryComponentCached->OnSwitchWeapon.AddUObject(this, &ThisClass::OnWeaponSwitchFinishHandle);
+	InventoryComponentCached->OnSwitchWeapon.AddUObject(this, &ThisClass::OnWeaponSwitchFinishHandle);	
 }
 
 void UP13InventoryStatsWidget::ShowStatWidgets()

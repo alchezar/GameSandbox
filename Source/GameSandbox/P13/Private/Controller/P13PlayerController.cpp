@@ -75,15 +75,7 @@ void AP13PlayerController::OnPossess(APawn* InPawn)
 	{
 		return;
 	}
-
-	/* When we Possess the player - cache HUD and show main widget. */
-	HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>();
-	if (HeadsUpDisplay)
-	{
-		HeadsUpDisplay->ShowInGame(this);
-	}
-
-	/* Super must be called after creating stat widgets in HUD, to correctly update inventory in Pawn::PossessedBy(...) event. */
+	
 	Super::OnPossess(InPawn);
 }
 
@@ -124,6 +116,15 @@ void AP13PlayerController::Tick(const float DeltaSeconds)
 	{
 		FindPointUnderCursor();
 		UpdateCursorDecalPosition();
+	}
+}
+
+void AP13PlayerController::ShowHeadsUpDisplay()
+{
+	HeadsUpDisplay = GetHUD<AP13HeadsUpDisplay>();
+	if (HeadsUpDisplay)
+	{
+		HeadsUpDisplay->ShowInGame(this);
 	}
 }
 

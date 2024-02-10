@@ -46,7 +46,8 @@ bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewW
 		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);
 	}
 
-	OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
+	// OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
+	Client_OnNewWeaponTaken(WeaponSlots.Num() - 1, NewWeaponSlot);
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
@@ -63,7 +64,8 @@ bool UP13InventoryComponent::TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoS
 	if (!CorrectSlot)
 	{
 		AmmoSlots.Add(NewAmmoSlot);
-		OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+		// OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+		Client_OnNewAmmoTaken(NewAmmoSlot);
 		return true;
 	}
 
@@ -195,12 +197,13 @@ bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapo
 	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin;
 	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
 
-	Multicast_SpawnDroppedWeapon(SpawnTransform, *DropWeaponInfo);
+	Client_SpawnDroppedWeapon(SpawnTransform, *DropWeaponInfo);
 
 	if (!bTakeNext)
 	{
 		WeaponSlots.RemoveAt(CurrentWeaponIndex);
-		OnInventoryUpdated.Broadcast();
+		Client_OnInventoryUpdated();
+		// OnInventoryUpdated.Broadcast();
 		return false;
 	}
 
@@ -212,7 +215,8 @@ bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapo
 	WeaponSlots.RemoveAt(RemoveIndex);
 	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
 
-	OnInventoryUpdated.Broadcast();
+	Client_OnInventoryUpdated();
+	// OnInventoryUpdated.Broadcast();
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
@@ -301,7 +305,8 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 	}
 
 	SortAmmoSlots();
-	OnInventoryUpdated.Broadcast();
+	Client_OnInventoryUpdated();
+	// OnInventoryUpdated.Broadcast();
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
 	return true;
 }
@@ -331,7 +336,8 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 	WeaponSlots = PlayerState->GetSavedWeaponSlots();
 	AmmoSlots = PlayerState->GetSavedAmmoSlots();
 
-	OnInventoryUpdated.Broadcast();
+	// OnInventoryUpdated.Broadcast();
+	Client_OnInventoryUpdated();
 	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
 
 	return true;
@@ -342,11 +348,31 @@ void UP13InventoryComponent::Server_RefreshSlots_Implementation()
 	RefreshSlots();
 }
 
-void UP13InventoryComponent::Multicast_SpawnDroppedWeapon_Implementation(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo)
+void UP13InventoryComponent::Client_SpawnDroppedWeapon_Implementation(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo)
 {
 	if (AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform))
 	{
 		DroppedWeapon->InitDrop(&DropWeaponInfo);
 		DroppedWeapon->FinishSpawning(SpawnTransform);
 	}
+}
+
+void UP13InventoryComponent::Client_OnSwitchWeapon_Implementation(const int32 NewWeaponIndex, AP13Weapon* NewWeapon)
+{
+	OnSwitchWeapon.Broadcast(NewWeaponIndex, NewWeapon);	
+}
+
+void UP13InventoryComponent::Client_OnNewAmmoTaken_Implementation(const FP13AmmoSlot& NewAmmoSlot)
+{
+	OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+}
+
+void UP13InventoryComponent::Client_OnNewWeaponTaken_Implementation(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
+{
+	OnNewWeaponTaken.Broadcast(NewWeaponIndex, NewWeaponSlot);
+}
+
+void UP13InventoryComponent::Client_OnInventoryUpdated_Implementation()
+{
+	OnInventoryUpdated.Broadcast();
 }

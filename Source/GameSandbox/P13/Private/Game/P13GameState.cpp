@@ -2,6 +2,7 @@
 
 #include "P13/Public/Game/P13GameState.h"
 
+#include "GameFramework/PlayerState.h"
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Library/P13Types.h"
 
@@ -54,12 +55,15 @@ void AP13GameState::CheckWinCondition(const int32 TotalScore)
 		return;
 	}
 
-	AP13PlayerController* PlayerController = GetWorld()->GetFirstPlayerController<AP13PlayerController>();
-	if (!PlayerController->IsLocalController())
+	for (const TObjectPtr<APlayerState> Player : PlayerArray)
 	{
-		return;
+		AP13PlayerController* OwnerController = Cast<AP13PlayerController>(Player->GetPlayerController());
+		if (!OwnerController || !OwnerController->IsLocalController())
+		{
+			continue;
+		}
+		OwnerController->OnGameWon();
 	}
-	PlayerController->OnGameWon();
 }
 
 void AP13GameState::SaveWinScores()

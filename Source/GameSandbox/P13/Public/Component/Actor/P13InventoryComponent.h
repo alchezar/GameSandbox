@@ -46,7 +46,7 @@ public:
 	FORCEINLINE FP13WeaponSlot GetWeaponSlot(const int32 Index) const { return WeaponSlots[Index]; }
 	FORCEINLINE FP13AmmoSlot GetAmmoSlot(const int32 Index) const { return AmmoSlots[Index]; }
 	FORCEINLINE TArray<FP13WeaponSlot> GetAllWeaponSlots() const { return WeaponSlots; }
-	FORCEINLINE TArray<FP13AmmoSlot> GetAllAmmoSlots() const { return AmmoSlots; } 
+	FORCEINLINE TArray<FP13AmmoSlot> GetAllAmmoSlots() const { return AmmoSlots; }
 	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
@@ -67,9 +67,17 @@ private:
 public:
 	UFUNCTION(Server, Reliable)
 	void Server_RefreshSlots();
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
-	
+	UFUNCTION(Client, Reliable)
+	void Client_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_OnSwitchWeapon(const int32 NewWeaponIndex, AP13Weapon* NewWeapon);
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_OnNewAmmoTaken(const FP13AmmoSlot& NewAmmoSlot);
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_OnNewWeaponTaken(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
+	UFUNCTION(Client, Reliable, BlueprintCallable)
+	void Client_OnInventoryUpdated();
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnCurrentWeaponUpdatedSignature OnCurrentWeaponUpdated;

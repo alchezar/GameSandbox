@@ -32,12 +32,20 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 protected:
 	UFUNCTION()
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) {};
+	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	virtual void OnPickupSuccess();
 	virtual void ActivateParticles();
+	virtual void BePickedUpOnCollisionBeginOverlap(AActor* Picker);
 
 private:
 	void CreateComponents();
+
+	/* ------------------------------ Network ------------------------------ */
+public:
+	UFUNCTION(Server, Reliable)
+	void Server_BePickedUpCollisionBeginOverlap(AActor* Picker);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnPickupSuccess();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -71,7 +79,7 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 protected:
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void BePickedUpOnCollisionBeginOverlap(AActor* Picker) override;
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -97,7 +105,7 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 protected:
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
+	virtual void BePickedUpOnCollisionBeginOverlap(AActor* Picker) override;
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:
@@ -126,11 +134,12 @@ public:
 	void InitDrop(const FP13WeaponDrop* DropWeaponInfo);
 
 protected:
-	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
 	virtual void ActivateParticles() override;
+	virtual void BePickedUpOnCollisionBeginOverlap(AActor* Picker) override;
 
 private:
 	void MakePickableAfterDrop();
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Weapon", meta = (EditCondition = "PickupType == EP13PickupType::Weapon"))

@@ -32,11 +32,17 @@ void AP13CharacterTopDown::PossessedBy(AController* NewController)
 
 	TryLoadSavedColor(NewController);
 	Client_ListenToControllerCursor(NewController);
+
+	/* For the next times after player's death. */
+	ShowInterface();
 }
 
 void AP13CharacterTopDown::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	/* For the first time. */
+	ShowInterface();
 }
 
 void AP13CharacterTopDown::Tick(const float DeltaTime)
@@ -187,6 +193,14 @@ void AP13CharacterTopDown::OnHitUnderCursorChangedHandle(APlayerController* Play
 	if (bTriggerPulled)
 	{
 		Server_UpdateTargetLocation(HitUnderCursor.Location);
+	}
+}
+
+void AP13CharacterTopDown::ShowInterface()
+{
+	if (AP13PlayerController* PlayerController = GetController<AP13PlayerController>())
+	{
+		PlayerController->ShowHeadsUpDisplay();
 	}
 }
 

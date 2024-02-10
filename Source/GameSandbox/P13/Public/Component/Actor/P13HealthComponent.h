@@ -48,6 +48,10 @@ public:
 	void Server_AddHealth(const float HealthAid);
 	UFUNCTION(Server, Reliable)
 	virtual void Server_ReceiveDamage(const float Damage, AController* Causer = nullptr);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_ChangeHealth(const float NewHealth, const float LastDamage, const float HealthAlpha);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_HealthOver(AController* Causer);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:

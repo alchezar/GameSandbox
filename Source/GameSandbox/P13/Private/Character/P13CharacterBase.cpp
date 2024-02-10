@@ -258,6 +258,7 @@ void AP13CharacterBase::OnDeathHandle(AController* Causer)
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, Controller.Get(), &AController::UnPossess, UnpossessDelay);
 	}
 	
+	Multicast_StopAnimation();	
 	Multicast_OnDeadHandle();
 }
 
@@ -306,7 +307,8 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
 
 	CurrentWeaponType = WeaponInfo->AmmoType;
-	InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, CachedWeapon.Get());
+	// InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, CachedWeapon.Get());
+	InventoryComponent->Client_OnSwitchWeapon(CurrentIndex, CachedWeapon.Get());
 }
 
 void AP13CharacterBase::DropWeapon(const bool bTakeNext)
@@ -402,7 +404,7 @@ void AP13CharacterBase::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, 
 
 void AP13CharacterBase::OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess)
 {
-	StopAnimMontage();
+	Multicast_StopAnimation();
 	InventoryComponent->SetWeaponInfo({RoundNum}, true);
 }
 
@@ -488,6 +490,11 @@ void AP13CharacterBase::OnRep_MovementState()
 	UpdateCharacter();
 }
 
+void AP13CharacterBase::Multicast_StopAnimation_Implementation(UAnimMontage* Anim)
+{
+	StopAnimMontage(Anim);
+}
+
 void AP13CharacterBase::Server_InitWeapon_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
 {
 	InitWeapon(NewWeaponSlot, CurrentIndex);
@@ -535,7 +542,6 @@ void AP13CharacterBase::Multicast_OnDeadHandle_Implementation()
 	LegAlignmentComponent->LegAlignment(false);
 
 	/* Disable movement. */
-	StopAnimMontage();
 	if (GetCharacterMovement())
 	{
 		GetCharacterMovement()->StopMovementImmediately();

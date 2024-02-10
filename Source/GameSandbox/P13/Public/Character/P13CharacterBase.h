@@ -105,6 +105,8 @@ protected:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayAnimation(UAnimMontage* Anim);
 	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_StopAnimation(UAnimMontage* Anim = nullptr);
+	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_AddStateParticle(UNiagaraSystem* Particle, const float ParticleScale, const bool bAutoDestroy);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_RemoveStateParticle();
