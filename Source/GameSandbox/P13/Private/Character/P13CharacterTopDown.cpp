@@ -40,9 +40,11 @@ void AP13CharacterTopDown::PossessedBy(AController* NewController)
 void AP13CharacterTopDown::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	ListenToControllerCursor();
 	/* For the first time. */
 	ShowInterface();
+	InventoryComponent->RefreshSlots();
 }
 
 void AP13CharacterTopDown::Tick(const float DeltaTime)
@@ -330,6 +332,25 @@ void AP13CharacterTopDown::ToggleAim()
 	Client_FocusOnCursor(true);
 }
 
+void AP13CharacterTopDown::ListenToControllerCursor(AController* NewController)
+{
+	AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController ? NewController : Controller);
+	if (!PlayerController)
+	{
+		return;
+	}
+	if (!PlayerController->IsLocalPlayerController())
+	{
+		return;
+	}
+	if (PlayerController->OnHitUnderCursorChanged.IsBoundToObject(this))
+	{
+		return;
+	}
+
+	PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
+}
+
 void AP13CharacterTopDown::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -357,21 +378,7 @@ void AP13CharacterTopDown::Multicast_RotateTowardMovement_Implementation(const F
 
 void AP13CharacterTopDown::Client_ListenToControllerCursor_Implementation(AController* NewController)
 {
-	AP13PlayerController* PlayerController = Cast<AP13PlayerController>(Controller);
-	if (!PlayerController)
-	{
-		return;
-	}
-	if (!PlayerController->IsLocalPlayerController())
-	{
-		return;
-	}
-	if (PlayerController->OnHitUnderCursorChanged.IsBoundToObject(this))
-	{
-		return;
-	}
-
-	PlayerController->OnHitUnderCursorChanged.AddUObject(this, &ThisClass::OnHitUnderCursorChangedHandle);
+	ListenToControllerCursor(NewController);
 }
 
 void AP13CharacterTopDown::Server_PullTrigger_Implementation(const bool bStart) const

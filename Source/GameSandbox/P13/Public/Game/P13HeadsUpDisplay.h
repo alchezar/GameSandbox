@@ -24,7 +24,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void ShowInGame(APlayerController* PlayerControllerOwner);
-	void ShowEndGame(const bool bWin);
+	void ShowEndGame(const bool bWin, APlayerController* PlayerControllerOwner);
 	void ClearInGame();
 
 	/* ----------------------------- Variables ----------------------------- */

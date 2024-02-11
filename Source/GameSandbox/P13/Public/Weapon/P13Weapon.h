@@ -75,6 +75,8 @@ public:
 	void Multicast_PlayAnimMontage(UAnimMontage* Montage);
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateWeaponState(const EP13MovementState NewState);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnWeaponFireBroadcast(UAnimMontage* CharFireMontage, const int32 CurrentRound);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:

@@ -7,6 +7,7 @@
 #include "UObject/Interface.h"
 #include "P13PickupInterface.generated.h"
 
+class AP13PickingUpBase;
 struct FP13WeaponSlot;
 struct FP13AmmoSlot;
 
@@ -21,6 +22,6 @@ class GAMESANDBOX_API IP13PickupInterface
 	GENERATED_BODY()
 
 public:
-	virtual bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot) = 0;
-	virtual bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) = 0;
+	virtual void PickupAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor) = 0;
+	virtual void PickupWeaponToInventory(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor) = 0;
 };

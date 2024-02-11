@@ -31,11 +31,6 @@ void AP13PickingUpBase::BeginPlay()
 	ActivateParticles();
 }
 
-void AP13PickingUpBase::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	Server_BePickedUpCollisionBeginOverlap(OtherActor);	
-}
-
 void AP13PickingUpBase::OnPickupSuccess()
 {
 	if (UNiagaraComponent* PickedParticle = UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, PickupEffect, Mesh->GetComponentLocation()))
@@ -43,6 +38,11 @@ void AP13PickingUpBase::OnPickupSuccess()
 		PickedParticle->SetVariableLinearColor("Color", EffectColor);
 	}
 	Destroy();
+}
+
+void AP13PickingUpBase::OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	BePickedUpOnCollisionBeginOverlap(OtherActor);
 }
 
 void AP13PickingUpBase::ActivateParticles()
@@ -55,7 +55,7 @@ void AP13PickingUpBase::ActivateParticles()
 
 void AP13PickingUpBase::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 {
-	// Multicast_OnPickupSuccess();
+	
 }
 
 void AP13PickingUpBase::CreateComponents()
@@ -76,16 +76,6 @@ void AP13PickingUpBase::CreateComponents()
 	Collision->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	Collision->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Collision->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-}
-
-void AP13PickingUpBase::Multicast_OnPickupSuccess_Implementation()
-{
-	OnPickupSuccess();
-}
-
-void AP13PickingUpBase::Server_BePickedUpCollisionBeginOverlap_Implementation(AActor* Picker)
-{
-	BePickedUpOnCollisionBeginOverlap(Picker);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -121,6 +111,7 @@ void AP13PickingUpAmmo::BeginPlay()
 }
 
 void AP13PickingUpAmmo::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
+
 {
 	UP13InventoryComponent* InventoryComponent = Picker->FindComponentByClass<UP13InventoryComponent>();
 	if (!InventoryComponent)
@@ -134,12 +125,7 @@ void AP13PickingUpAmmo::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 	}
 
 	/* Try to add ammo to the inventory. */
-	if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot))
-	{
-		return;
-	}
-	
-	OnPickupSuccess();
+	PickupInterface->PickupAmmoToInventory(AmmoSlot, this);
 }
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -184,7 +170,7 @@ void AP13PickingUpWeapon::ActivateParticles()
 
 void AP13PickingUpWeapon::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 {
-	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer))
+	if (GetWorld()->GetTimerManager().IsTimerActive(DropTimer) || bDropped)
 	{
 		return;
 	}
@@ -198,21 +184,13 @@ void AP13PickingUpWeapon::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
 	{
 		return;
 	}
-
-	/* Try to add weapon to the inventory. */
-	const bool bWeaponTaken = PickupInterface->TryTakeWeaponToInventory(WeaponSlot);
-
-	/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
-	 * try to add an empty one, by resetting count in ammo slot. */
-	AmmoSlot.Count = bWeaponTaken ? 0 : AmmoSlot.Count;
-
-	/* Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
-	if (!PickupInterface->TryTakeAmmoToInventory(AmmoSlot) && !bWeaponTaken)
+	if (WeaponSlot.WeaponID == "None")
 	{
 		return;
 	}
-	
-	OnPickupSuccess();
+
+	/* Try to add weapon to the inventory. */
+	PickupInterface->PickupWeaponToInventory(AmmoSlot, WeaponSlot, this);
 }
 
 void AP13PickingUpWeapon::MakePickableAfterDrop()

@@ -63,6 +63,7 @@ private:
 	void FocusOnCursor(const bool bOn);
 	void FocusOnCursorSmoothly() const;
 	void ToggleAim();
+	void ListenToControllerCursor(AController* NewController = nullptr);
 
 	/* ------------------------------ Network ------------------------------ */
 public:

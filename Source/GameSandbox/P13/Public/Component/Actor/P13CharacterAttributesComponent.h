@@ -38,6 +38,8 @@ private:
 	/* ------------------------------ Network ------------------------------ */
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnShieldChangedBroadcast(const float NewShield, const float LastDamage, const float ShieldAlpha);
 	
 	/* ----------------------------- Variables ----------------------------- */
 public:

@@ -63,6 +63,7 @@ void UP13InventoryStatsWidget::CacheInventoryComponent()
 	UP13InventoryComponent* NewInventoryComp = NewPawn ? NewPawn->FindComponentByClass<UP13InventoryComponent>() : nullptr;
 	
 	InventoryComponentCached = NewInventoryComp;
+	
 	/* As NativeConstruct of the widgets fires before the BeginPlay of the Inventory,
 	 * we will wait for the Inventory to create our widgets with updated information. */
 	InventoryComponentCached->OnInventoryUpdated.AddUObject(this, &ThisClass::ShowStatWidgets);

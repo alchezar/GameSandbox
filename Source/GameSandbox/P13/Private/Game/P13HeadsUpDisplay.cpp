@@ -24,16 +24,16 @@ void AP13HeadsUpDisplay::ShowInGame(APlayerController* PlayerControllerOwner)
 	InGameWidgetCached->AddToViewport();
 }
 
-void AP13HeadsUpDisplay::ShowEndGame(const bool bWin)
+void AP13HeadsUpDisplay::ShowEndGame(const bool bWin, APlayerController* PlayerControllerOwner)
 {
-	if (!EndGameWidgetClass)
+	if (!EndGameWidgetClass || !PlayerControllerOwner || GetWorld()->bIsTearingDown)
 	{
 		return;
 	}
 
 	ClearInGame();
 
-	UP13EndGameWidget* EndGameWidget = CreateWidget<UP13EndGameWidget>(GetOwningPlayerController(), EndGameWidgetClass);
+	UP13EndGameWidget* EndGameWidget = CreateWidget<UP13EndGameWidget>(PlayerControllerOwner, EndGameWidgetClass);
 	check(EndGameWidget)
 	EndGameWidget->InitWidget(bWin);
 	EndGameWidget->AddToViewport(1);

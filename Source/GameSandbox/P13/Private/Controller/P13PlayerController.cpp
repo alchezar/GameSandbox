@@ -99,7 +99,7 @@ void AP13PlayerController::OnUnPossess()
 
 	if (HeadsUpDisplay)
 	{
-		HeadsUpDisplay->ShowEndGame(false);
+		HeadsUpDisplay->ShowEndGame(false, this);
 	}
 }
 
@@ -132,7 +132,7 @@ void AP13PlayerController::OnGameWon()
 {
 	check(HeadsUpDisplay)
 
-	HeadsUpDisplay->ShowEndGame(true);
+	HeadsUpDisplay->ShowEndGame(true, this);
 
 	SetNewInputMode(false);
 	Pause();

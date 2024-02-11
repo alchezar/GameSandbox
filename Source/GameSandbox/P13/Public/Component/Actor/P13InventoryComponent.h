@@ -8,6 +8,7 @@
 #include "P13/Public/Library/P13Types.h"
 #include "P13InventoryComponent.generated.h"
 
+class AP13PickingUpBase;
 class UP13GameInstance;
 class AP13Weapon;
 
@@ -35,8 +36,8 @@ public:
 
 	/* ----------------------------- Interface ----------------------------- */
 public:
-	virtual bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot) override;
-	virtual bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot) override;
+	virtual void PickupAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor) override;
+	virtual void PickupWeaponToInventory(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor) override;
 
 	/* ------------------------------- This -------------------------------- */
 public:
@@ -47,7 +48,6 @@ public:
 	FORCEINLINE FP13AmmoSlot GetAmmoSlot(const int32 Index) const { return AmmoSlots[Index]; }
 	FORCEINLINE TArray<FP13WeaponSlot> GetAllWeaponSlots() const { return WeaponSlots; }
 	FORCEINLINE TArray<FP13AmmoSlot> GetAllAmmoSlots() const { return AmmoSlots; }
-	int32 GetWeaponSlotIndex(const FName WeaponID) const;
 	FName GetWeaponIdBySlotIndex(const int32 Index = 0) const;
 	FP13WeaponDynamicInfo GetWeaponDynamicInfo(const int32 Index);
 	void SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, const bool bIncrease = false);
@@ -62,21 +62,36 @@ private:
 	void CacheGameInstance();
 	bool TryUpdateSlotsFromData();
 	bool TryLoadSlotsFromPlayerState();
-
+	void TakingAmmoToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor);
+	void TakingWeaponToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor);
+	bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot);
+	bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot);
+	
 	/* ------------------------------ Network ------------------------------ */
 public:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	UFUNCTION(Server, Reliable)
 	void Server_RefreshSlots();
-	UFUNCTION(Client, Reliable)
-	void Client_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_OnSwitchWeapon(const int32 NewWeaponIndex, AP13Weapon* NewWeapon);
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_OnNewAmmoTaken(const FP13AmmoSlot& NewAmmoSlot);
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_OnNewWeaponTaken(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
-	UFUNCTION(Client, Reliable, BlueprintCallable)
-	void Client_OnInventoryUpdated();
+	UFUNCTION(Server, Reliable)
+	void Server_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
+	
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnCurrentWeaponUpdatedBroadcast(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnSwitchWeaponBroadcast(const int32 NewWeaponIndex, AP13Weapon* NewWeapon);
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnAmmoChangedBroadcast(EP13AmmoType AmmoType, int32 NewWeaponAmmoCount, int32 NewInventoryAmmoCount);
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnInventoryUpdatedBroadcast();
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnNewWeaponTakenBroadcast(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
+	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
+	void Multicast_OnNewAmmoTakenBroadcast(const FP13AmmoSlot& NewAmmoSlot);
+	
+	UFUNCTION(Server, Reliable)
+	void Server_TakingAmmoToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor);
+	UFUNCTION(Server, Reliable)
+	void Server_TakingWeaponToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor);
 
 	/* ----------------------------- Variables ----------------------------- */
 public:
@@ -88,9 +103,9 @@ public:
 	FP13OnNewAmmoTakenSignature OnNewAmmoTaken;
 
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
 	TArray<FP13WeaponSlot> WeaponSlots;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "C++ | Weapon")
 	TArray<FP13AmmoSlot> AmmoSlots;
 
 private:

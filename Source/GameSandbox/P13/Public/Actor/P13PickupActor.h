@@ -30,10 +30,12 @@ protected:
 	virtual void BeginPlay() override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	virtual void OnPickupSuccess();
+	
 protected:
 	UFUNCTION()
 	virtual void OnCollisionBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	virtual void OnPickupSuccess();
 	virtual void ActivateParticles();
 	virtual void BePickedUpOnCollisionBeginOverlap(AActor* Picker);
 
@@ -42,10 +44,6 @@ private:
 
 	/* ------------------------------ Network ------------------------------ */
 public:
-	UFUNCTION(Server, Reliable)
-	void Server_BePickedUpCollisionBeginOverlap(AActor* Picker);
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_OnPickupSuccess();
 
 	/* ----------------------------- Variables ----------------------------- */
 protected:

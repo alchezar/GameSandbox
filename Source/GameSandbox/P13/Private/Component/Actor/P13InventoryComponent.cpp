@@ -2,6 +2,7 @@
 
 #include "P13/Public/Component/Actor/P13InventoryComponent.h"
 
+#include "Net/UnrealNetwork.h"
 #include "P13/Public/Actor/P13PickupActor.h"
 #include "P13/Public/Game/P13GameInstance.h"
 #include "P13/Public/Game/P13PlayerState.h"
@@ -19,7 +20,6 @@ void UP13InventoryComponent::BeginPlay()
 
 	/* We won`t be update our slots here at begin play, because after respawn at this point
 	 * Pawn don`t have neither Controller nor PlayerState. Just wait for Pawn's OnPossess event. */
-	// RefreshSlots();
 	CacheGameInstance();
 }
 
@@ -28,71 +28,14 @@ void UP13InventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType,
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 }
 
-bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot)
+void UP13InventoryComponent::PickupAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor)
 {
-	/* Check if we can take weapon.
-	 * If weapon is already exist in the inventory - we can't take it. */
-	if (WeaponSlots.FindByPredicate([&](const FP13WeaponSlot& Slot) { return Slot.WeaponID == NewWeaponSlot.WeaponID; }))
-	{
-		return false;
-	}
-
-	/* Take weapon to the inventory. */
-	WeaponSlots.Add(NewWeaponSlot);
-
-	/* If our current weapon hasn't ammo - switch to just taken. */
-	if (WeaponSlots[CurrentWeaponIndex].DynamicInfo.Round == 0)
-	{
-		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);
-	}
-
-	// OnNewWeaponTaken.Broadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
-	Client_OnNewWeaponTaken(WeaponSlots.Num() - 1, NewWeaponSlot);
-	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
-	return true;
+	Server_TakingAmmoToInventoryAttempt(NewAmmoSlot, PickupActor);
 }
 
-bool UP13InventoryComponent::TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot)
+void UP13InventoryComponent::PickupWeaponToInventory(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor)
 {
-	/* Try to find a similar slot in the inventory. */
-	FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
-	{
-		return Slot.WeaponType == NewAmmoSlot.WeaponType;
-	});
-
-	/* Add a new slot if it didn't exist before. */
-	if (!CorrectSlot)
-	{
-		AmmoSlots.Add(NewAmmoSlot);
-		// OnNewAmmoTaken.Broadcast(NewAmmoSlot);
-		Client_OnNewAmmoTaken(NewAmmoSlot);
-		return true;
-	}
-
-	/* If the ammo is full - we can't add more. */
-	if (CorrectSlot->Count >= CorrectSlot->MaxCount)
-	{
-		return false;
-	}
-
-	/* Take ammo to the inventory. */
-	CorrectSlot->Count = FMath::Min(CorrectSlot->Count + NewAmmoSlot.Count, CorrectSlot->MaxCount);
-
-	OnAmmoChanged.Broadcast(CorrectSlot->WeaponType, -1, CorrectSlot->Count);
-	return true;
-}
-
-int32 UP13InventoryComponent::GetWeaponSlotIndex(const FName WeaponID) const
-{
-	for (int32 Index = 0; Index < WeaponSlots.Num(); ++Index)
-	{
-		if (WeaponSlots[Index].WeaponID != WeaponID)
-		{
-			continue;
-		}
-		return Index;
-	}
-	return -1;
+	Server_TakingWeaponToInventoryAttempt(NewAmmoSlot, NewWeaponSlot, PickupActor);
 }
 
 FName UP13InventoryComponent::GetWeaponIdBySlotIndex(const int32 Index) const
@@ -133,7 +76,7 @@ void UP13InventoryComponent::SetWeaponInfo(const FP13WeaponDynamicInfo NewInfo, 
 		AmmoSlot->Count -= (RequiredAmmo - AmmoLeft);
 	}
 
-	OnAmmoChanged.Broadcast(WeaponSlots[CurrentWeaponIndex].AmmoType, RequiredAmmo, AmmoSlot->Count);
+	Multicast_OnAmmoChangedBroadcast(WeaponSlots[CurrentWeaponIndex].AmmoType, RequiredAmmo, AmmoSlot->Count);
 }
 
 bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const int32 OldIndex, FP13WeaponDynamicInfo OldInfo, const bool bNext)
@@ -159,7 +102,7 @@ bool UP13InventoryComponent::TrySwitchWeaponToIndex(const int32 NewIndex, const 
 	}
 
 	CurrentWeaponIndex = CorrectIndex;
-	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CorrectIndex], CorrectIndex);
+	Multicast_OnCurrentWeaponUpdatedBroadcast(WeaponSlots[CorrectIndex], CorrectIndex);
 	return true;
 }
 
@@ -197,13 +140,12 @@ bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapo
 	const FVector SpawnLocation = CurrentWeapon->GetActorLocation() + CurrentWeapon->GetMesh()->GetLocalBounds().Origin;
 	const FTransform SpawnTransform = {CurrentWeapon->GetActorRotation(), SpawnLocation};
 
-	Client_SpawnDroppedWeapon(SpawnTransform, *DropWeaponInfo);
+	Server_SpawnDroppedWeapon(SpawnTransform, *DropWeaponInfo);
 
 	if (!bTakeNext)
 	{
 		WeaponSlots.RemoveAt(CurrentWeaponIndex);
-		Client_OnInventoryUpdated();
-		// OnInventoryUpdated.Broadcast();
+		Multicast_OnInventoryUpdatedBroadcast();
 		return false;
 	}
 
@@ -215,9 +157,8 @@ bool UP13InventoryComponent::TryDropCurrentWeapon(const AP13Weapon* CurrentWeapo
 	WeaponSlots.RemoveAt(RemoveIndex);
 	CurrentWeaponIndex = RemoveIndex < CurrentWeaponIndex ? CurrentWeaponIndex - 1 : CurrentWeaponIndex;
 
-	Client_OnInventoryUpdated();
-	// OnInventoryUpdated.Broadcast();
-	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	Multicast_OnInventoryUpdatedBroadcast();
+	Multicast_OnCurrentWeaponUpdatedBroadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
 	return true;
 }
 
@@ -305,9 +246,8 @@ bool UP13InventoryComponent::TryUpdateSlotsFromData()
 	}
 
 	SortAmmoSlots();
-	Client_OnInventoryUpdated();
-	// OnInventoryUpdated.Broadcast();
-	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
+	Multicast_OnInventoryUpdatedBroadcast();
+	Multicast_OnCurrentWeaponUpdatedBroadcast(WeaponSlots[0], 0);
 	return true;
 }
 
@@ -336,11 +276,95 @@ bool UP13InventoryComponent::TryLoadSlotsFromPlayerState()
 	WeaponSlots = PlayerState->GetSavedWeaponSlots();
 	AmmoSlots = PlayerState->GetSavedAmmoSlots();
 
-	// OnInventoryUpdated.Broadcast();
-	Client_OnInventoryUpdated();
-	OnCurrentWeaponUpdated.Broadcast(WeaponSlots[0], 0);
+	Multicast_OnInventoryUpdatedBroadcast();
+	Multicast_OnCurrentWeaponUpdatedBroadcast(WeaponSlots[0], 0);
 
 	return true;
+}
+
+void UP13InventoryComponent::TakingAmmoToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor)
+{
+	if (PickupActor && TryTakeAmmoToInventory(NewAmmoSlot))
+	{
+		PickupActor->OnPickupSuccess();	
+	}
+}
+
+void UP13InventoryComponent::TakingWeaponToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor)
+{
+	/* Try to add weapon to the inventory. */
+	bool bTaken = TryTakeWeaponToInventory(NewWeaponSlot);
+
+	/* When we successfully took the weapon, but there is no slot for its ammo in the inventory -
+	 * try to add an empty one, by resetting count in ammo slot.
+	 * Or if we already have this weapon in the inventory - simply add one magazine to its ammo slot. */
+	FP13AmmoSlot UpdatedAmmoSlot = NewAmmoSlot;
+	UpdatedAmmoSlot.Count = bTaken ? 0 : NewAmmoSlot.Count;
+	bTaken |= TryTakeAmmoToInventory(UpdatedAmmoSlot);
+
+	if (PickupActor && bTaken)
+	{
+		PickupActor->OnPickupSuccess();
+	}
+}
+
+bool UP13InventoryComponent::TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot)
+{
+	/* Check if we can take weapon.
+	 * If weapon is already exist in the inventory - we can't take it. */
+	if (WeaponSlots.FindByPredicate([&](const FP13WeaponSlot& Slot) { return Slot.WeaponID == NewWeaponSlot.WeaponID; }))
+	{
+		return false;
+	}
+	
+	/* Take weapon to the inventory. */
+	WeaponSlots.Add(NewWeaponSlot);
+	
+	/* If our current weapon hasn't ammo - switch to just taken. */
+	if (WeaponSlots[CurrentWeaponIndex].DynamicInfo.Round == 0)
+	{
+		TrySwitchWeaponToIndex(CurrentWeaponIndex + 1, CurrentWeaponIndex, WeaponSlots[CurrentWeaponIndex].DynamicInfo);
+	}
+	
+	Multicast_OnNewWeaponTakenBroadcast(WeaponSlots.Num() - 1, NewWeaponSlot);
+	Multicast_OnCurrentWeaponUpdatedBroadcast(WeaponSlots[CurrentWeaponIndex], CurrentWeaponIndex);
+	return true;
+}
+
+bool UP13InventoryComponent::TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot)
+{
+	/* Try to find a similar slot in the inventory. */
+	FP13AmmoSlot* CorrectSlot = AmmoSlots.FindByPredicate([&](const FP13AmmoSlot& Slot)
+	{
+		return Slot.WeaponType == NewAmmoSlot.WeaponType;
+	});
+	
+	/* Add a new slot if it didn't exist before. */
+	if (!CorrectSlot)
+	{
+		AmmoSlots.Add(NewAmmoSlot);
+		Multicast_OnNewAmmoTakenBroadcast(NewAmmoSlot);
+		return true;
+	}
+	
+	/* If the ammo is full - we can't add more. */
+	if (CorrectSlot->Count >= CorrectSlot->MaxCount)
+	{
+		return false;
+	}
+	
+	/* Take ammo to the inventory. */
+	CorrectSlot->Count = FMath::Min(CorrectSlot->Count + NewAmmoSlot.Count, CorrectSlot->MaxCount);
+	
+	Multicast_OnAmmoChangedBroadcast(CorrectSlot->WeaponType, -1, CorrectSlot->Count);
+	return true;
+}
+
+void UP13InventoryComponent::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(ThisClass, WeaponSlots)
+	DOREPLIFETIME(ThisClass, AmmoSlots)
 }
 
 void UP13InventoryComponent::Server_RefreshSlots_Implementation()
@@ -348,7 +372,7 @@ void UP13InventoryComponent::Server_RefreshSlots_Implementation()
 	RefreshSlots();
 }
 
-void UP13InventoryComponent::Client_SpawnDroppedWeapon_Implementation(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo)
+void UP13InventoryComponent::Server_SpawnDroppedWeapon_Implementation(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo)
 {
 	if (AP13PickingUpWeapon* DroppedWeapon = GetWorld()->SpawnActorDeferred<AP13PickingUpWeapon>(AP13PickingUpWeapon::StaticClass(), SpawnTransform))
 	{
@@ -357,22 +381,42 @@ void UP13InventoryComponent::Client_SpawnDroppedWeapon_Implementation(const FTra
 	}
 }
 
-void UP13InventoryComponent::Client_OnSwitchWeapon_Implementation(const int32 NewWeaponIndex, AP13Weapon* NewWeapon)
+void UP13InventoryComponent::Multicast_OnCurrentWeaponUpdatedBroadcast_Implementation(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex)
+{
+	OnCurrentWeaponUpdated.Broadcast(NewWeaponSlot, CurrentIndex);	
+}
+
+void UP13InventoryComponent::Multicast_OnSwitchWeaponBroadcast_Implementation(const int32 NewWeaponIndex, AP13Weapon* NewWeapon)
 {
 	OnSwitchWeapon.Broadcast(NewWeaponIndex, NewWeapon);	
 }
 
-void UP13InventoryComponent::Client_OnNewAmmoTaken_Implementation(const FP13AmmoSlot& NewAmmoSlot)
+void UP13InventoryComponent::Multicast_OnAmmoChangedBroadcast_Implementation(EP13AmmoType AmmoType, int32 NewWeaponAmmoCount, int32 NewInventoryAmmoCount)
 {
-	OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+	OnAmmoChanged.Broadcast(AmmoType, NewWeaponAmmoCount, NewInventoryAmmoCount);	
 }
 
-void UP13InventoryComponent::Client_OnNewWeaponTaken_Implementation(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
+void UP13InventoryComponent::Multicast_OnInventoryUpdatedBroadcast_Implementation()
+{
+	OnInventoryUpdated.Broadcast();
+}
+
+void UP13InventoryComponent::Multicast_OnNewWeaponTakenBroadcast_Implementation(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot)
 {
 	OnNewWeaponTaken.Broadcast(NewWeaponIndex, NewWeaponSlot);
 }
 
-void UP13InventoryComponent::Client_OnInventoryUpdated_Implementation()
+void UP13InventoryComponent::Multicast_OnNewAmmoTakenBroadcast_Implementation(const FP13AmmoSlot& NewAmmoSlot)
 {
-	OnInventoryUpdated.Broadcast();
+	OnNewAmmoTaken.Broadcast(NewAmmoSlot);
+}
+
+void UP13InventoryComponent::Server_TakingAmmoToInventoryAttempt_Implementation(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor)
+{
+	TakingAmmoToInventoryAttempt(NewAmmoSlot, PickupActor);
+}
+
+void UP13InventoryComponent::Server_TakingWeaponToInventoryAttempt_Implementation(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor)
+{
+	TakingWeaponToInventoryAttempt(NewAmmoSlot, NewWeaponSlot, PickupActor);	
 }

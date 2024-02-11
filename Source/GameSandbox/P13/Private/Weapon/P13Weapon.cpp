@@ -223,7 +223,8 @@ void AP13Weapon::MakeShot()
 			// TODO: Line trace shot.
 		}
 	}
-	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
+	Multicast_OnWeaponFireBroadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
+	// OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
 	UpdateDispersion();
 
 	UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, GetInstigator());
@@ -388,4 +389,9 @@ void AP13Weapon::Multicast_PlayAnimMontage_Implementation(UAnimMontage* Montage)
 void AP13Weapon::Server_UpdateWeaponState_Implementation(const EP13MovementState NewState)
 {
 	UpdateWeaponState(NewState);
+}
+
+void AP13Weapon::Multicast_OnWeaponFireBroadcast_Implementation(UAnimMontage* CharFireMontage, const int32 CurrentRound)
+{
+	OnWeaponFire.Broadcast(CharFireMontage, CurrentRound);
 }

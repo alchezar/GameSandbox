@@ -307,8 +307,7 @@ void AP13CharacterBase::InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const in
 	CachedWeapon->OnWeaponReloadFinish.AddUObject(this, &ThisClass::OnWeaponReloadFinishHandle);
 
 	CurrentWeaponType = WeaponInfo->AmmoType;
-	// InventoryComponent->OnSwitchWeapon.Broadcast(CurrentIndex, CachedWeapon.Get());
-	InventoryComponent->Client_OnSwitchWeapon(CurrentIndex, CachedWeapon.Get());
+	InventoryComponent->Multicast_OnSwitchWeaponBroadcast(CurrentIndex, CachedWeapon.Get());
 }
 
 void AP13CharacterBase::DropWeapon(const bool bTakeNext)
