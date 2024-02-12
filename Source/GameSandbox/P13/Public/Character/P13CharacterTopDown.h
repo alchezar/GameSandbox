@@ -70,6 +70,8 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
+	UFUNCTION(Server, Reliable)
+	void Server_TakeNextWeapon(const bool bNext) const;
 	UFUNCTION(Server, Unreliable)
 	void Server_RotateTowardMovement(const FVector& Direction);
 	UFUNCTION(NetMulticast, Unreliable)

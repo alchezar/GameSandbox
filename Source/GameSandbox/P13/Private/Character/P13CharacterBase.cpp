@@ -382,7 +382,11 @@ void AP13CharacterBase::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const in
 		return;
 	}
 	PlayAnimMontage(CharFireAnim);
-	InventoryComponent->SetWeaponInfo({CurrentRound});
+	
+	if (HasAuthority())
+	{
+		InventoryComponent->SetWeaponInfo({CurrentRound});
+	}
 }
 
 void AP13CharacterBase::OnWeaponReloadInitHandle(const int32 OldRoundNum)

@@ -78,6 +78,11 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_OnWeaponFireBroadcast(UAnimMontage* CharFireMontage, const int32 CurrentRound);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnWeaponReloadStartBroadcast(UAnimMontage* CharFireMontage, const int32 CurrentWeaponIndex, const float ReloadingTime);
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_OnWeaponReloadFinishBroadcast(const int32 NewRoundNum, const int32 CurrentWeaponIndex, const bool bSuccess);
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnWeaponFireSignature OnWeaponFire;

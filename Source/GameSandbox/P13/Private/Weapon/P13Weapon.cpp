@@ -220,11 +220,11 @@ void AP13Weapon::MakeShot()
 		}
 		else
 		{
-			// TODO: Line trace shot.
+			// Line trace shot.
 		}
 	}
-	Multicast_OnWeaponFireBroadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
-	// OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
+	// Multicast_OnWeaponFireBroadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
+	OnWeaponFire.Broadcast(WeaponSettings->CharFireAnim, --WeaponCurrentSettings.Round);
 	UpdateDispersion();
 
 	UAISense_Hearing::ReportNoiseEvent(GetWorld(), GetActorLocation(), 1.f, GetInstigator());
@@ -297,7 +297,7 @@ void AP13Weapon::StartReload()
 	GetWorld()->GetTimerManager().SetTimer(ReloadTimer, ReloadDelegate, WeaponSettings->ReloadTime, false);
 
 	Multicast_PlayAnimMontage(WeaponSettings->WeaponReloadAnim);
-	OnWeaponReloadStart.Broadcast(WeaponSettings->CharReloadAnim, WeaponIndex, WeaponSettings->ReloadTime);
+	Multicast_OnWeaponReloadStartBroadcast(WeaponSettings->CharReloadAnim, WeaponIndex, WeaponSettings->ReloadTime);
 }
 
 void AP13Weapon::FinishReload(const bool bSuccess)
@@ -312,7 +312,7 @@ void AP13Weapon::FinishReload(const bool bSuccess)
 	SetFireState(bTriggerPulled);
 
 	/* Stop all montages (character and weapon) and update info in UI. */
-	OnWeaponReloadFinish.Broadcast(WeaponCurrentSettings.Round, WeaponIndex, bSuccess);
+	Multicast_OnWeaponReloadFinishBroadcast(WeaponCurrentSettings.Round, WeaponIndex, bSuccess);
 	StopAnimMontage(WeaponSettings->WeaponReloadAnim);
 }
 
@@ -394,4 +394,14 @@ void AP13Weapon::Server_UpdateWeaponState_Implementation(const EP13MovementState
 void AP13Weapon::Multicast_OnWeaponFireBroadcast_Implementation(UAnimMontage* CharFireMontage, const int32 CurrentRound)
 {
 	OnWeaponFire.Broadcast(CharFireMontage, CurrentRound);
+}
+
+void AP13Weapon::Multicast_OnWeaponReloadStartBroadcast_Implementation(UAnimMontage* CharFireMontage, const int32 CurrentWeaponIndex, const float ReloadingTime)
+{
+	OnWeaponReloadStart.Broadcast(CharFireMontage, CurrentWeaponIndex, ReloadingTime);	
+}
+
+void AP13Weapon::Multicast_OnWeaponReloadFinishBroadcast_Implementation(const int32 NewRoundNum, const int32 CurrentWeaponIndex, const bool bSuccess)
+{
+	OnWeaponReloadFinish.Broadcast(NewRoundNum, CurrentWeaponIndex, bSuccess);
 }

@@ -32,8 +32,6 @@ void AP13CharacterTopDown::PossessedBy(AController* NewController)
 
 	TryLoadSavedColor(NewController);
 	Client_ListenToControllerCursor(NewController);
-
-	/* For the next times after player's death. */
 	ShowInterface();
 }
 
@@ -42,7 +40,6 @@ void AP13CharacterTopDown::BeginPlay()
 	Super::BeginPlay();
 
 	ListenToControllerCursor();
-	/* For the first time. */
 	ShowInterface();
 	InventoryComponent->RefreshSlots();
 }
@@ -131,7 +128,7 @@ void AP13CharacterTopDown::ReloadInput()
 
 void AP13CharacterTopDown::SwitchWeaponInput(const bool bNext)
 {
-	TryTakeNextWeapon(bNext);
+	Server_TakeNextWeapon(bNext);
 }
 
 void AP13CharacterTopDown::DropInput(const bool bTakeNext)
@@ -354,6 +351,11 @@ void AP13CharacterTopDown::ListenToControllerCursor(AController* NewController)
 void AP13CharacterTopDown::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+}
+
+void AP13CharacterTopDown::Server_TakeNextWeapon_Implementation(const bool bNext) const
+{
+	TryTakeNextWeapon(bNext);
 }
 
 void AP13CharacterTopDown::Server_TryReloadWeapon_Implementation()
