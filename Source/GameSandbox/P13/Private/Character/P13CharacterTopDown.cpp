@@ -147,7 +147,7 @@ FVector AP13CharacterTopDown::GetLookAtCursorDirection() const
 
 void AP13CharacterTopDown::OnWeaponReloadStartHandle(UAnimMontage* CharReloadAnim, const int32 WeaponIndex, const float ReloadingTime)
 {
-	Multicast_PlayAnimation(CharReloadAnim);	
+	Multicast_PlayAnimation(CharReloadAnim);
 }
 
 void AP13CharacterTopDown::OnDeathHandle(AController* Causer)
@@ -323,7 +323,7 @@ void AP13CharacterTopDown::ToggleAim()
 		Client_FocusOnCursor(false);
 		return;
 	}
-	
+
 	SavePreviousMovementState();
 	ChangeMovementState(EP13MovementState::Aim);
 	Client_FocusOnCursor(true);
@@ -360,7 +360,7 @@ void AP13CharacterTopDown::Server_TakeNextWeapon_Implementation(const bool bNext
 
 void AP13CharacterTopDown::Server_TryReloadWeapon_Implementation()
 {
-	TryReloadWeapon();	
+	TryReloadWeapon();
 }
 
 void AP13CharacterTopDown::Server_RotateTowardMovement_Implementation(const FVector& Direction)
@@ -400,5 +400,5 @@ void AP13CharacterTopDown::Server_ToggleAim_Implementation()
 
 void AP13CharacterTopDown::Client_FocusOnCursor_Implementation(const bool bOn)
 {
-	FocusOnCursor(bOn);	
+	FocusOnCursor(bOn);
 }

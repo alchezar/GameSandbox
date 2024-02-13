@@ -42,7 +42,7 @@ public:
 	void Server_DisplayShield(const float CurrentDamage, const float ShieldAlpha);
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DisplayShield(const float CurrentDamage, const float ShieldAlpha);
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++ | Damage Display")

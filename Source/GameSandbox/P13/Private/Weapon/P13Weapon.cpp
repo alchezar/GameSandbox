@@ -15,7 +15,7 @@ AP13Weapon::AP13Weapon()
 {
 	bReplicates = true;
 	PrimaryActorTick.bCanEverTick = true;
-	
+
 	SceneComponent = CreateDefaultSubobject<USceneComponent>("SceneRootComponent");
 	SetRootComponent(SceneComponent);
 
@@ -237,16 +237,16 @@ void AP13Weapon::SpawnProjectile()
 	{
 		return;
 	}
-	
+
 	check(ShootLocation)
 	const FTransform ShotTransform = FTransform(GetFinalDirection().Rotation(), ShootLocation->GetComponentLocation());
-	
+
 	AP13ProjectileDefault* Bullet = GetWorld()->SpawnActorDeferred<AP13ProjectileDefault>(ProjectileClass, ShotTransform, GetOwner(), GetInstigator(), ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 	if (!Bullet)
 	{
 		return;
 	}
-	Bullet->SetOwner(this);	
+	Bullet->SetOwner(this);
 	Bullet->SetInstigator(GetOwner<APawn>());
 	Bullet->InitBullet(20.f, WeaponSettings->ProjectileSettings);
 	Bullet->FinishSpawning(ShotTransform);
@@ -378,7 +378,7 @@ void AP13Weapon::Multicast_ShotEffect_Implementation(USoundBase* FireSound, UNia
 
 void AP13Weapon::Server_InitReload_Implementation()
 {
-	TryReload();	
+	TryReload();
 }
 
 void AP13Weapon::Multicast_PlayAnimMontage_Implementation(UAnimMontage* Montage)
@@ -398,7 +398,7 @@ void AP13Weapon::Multicast_OnWeaponFireBroadcast_Implementation(UAnimMontage* Ch
 
 void AP13Weapon::Multicast_OnWeaponReloadStartBroadcast_Implementation(UAnimMontage* CharFireMontage, const int32 CurrentWeaponIndex, const float ReloadingTime)
 {
-	OnWeaponReloadStart.Broadcast(CharFireMontage, CurrentWeaponIndex, ReloadingTime);	
+	OnWeaponReloadStart.Broadcast(CharFireMontage, CurrentWeaponIndex, ReloadingTime);
 }
 
 void AP13Weapon::Multicast_OnWeaponReloadFinishBroadcast_Implementation(const int32 NewRoundNum, const int32 CurrentWeaponIndex, const bool bSuccess)

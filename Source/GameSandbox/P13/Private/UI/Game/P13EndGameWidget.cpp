@@ -17,10 +17,10 @@ void UP13EndGameWidget::NativeConstruct()
 
 void UP13EndGameWidget::InitWidget(const bool bWin)
 {
-	MessageText->SetText(FText::FromString(bWin ? WinMessage : LooseMessage));	
+	MessageText->SetText(FText::FromString(bWin ? WinMessage : LooseMessage));
 }
 
-void UP13EndGameWidget::OnRestartButtonClicked() 
+void UP13EndGameWidget::OnRestartButtonClicked()
 {
 	if (APlayerController* PlayerController = GetOwningPlayer())
 	{
@@ -29,12 +29,12 @@ void UP13EndGameWidget::OnRestartButtonClicked()
 	}
 }
 
-void UP13EndGameWidget::OnMenuButtonClicked() 
+void UP13EndGameWidget::OnMenuButtonClicked()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), MenuLevelName);
 }
 
-void UP13EndGameWidget::OnExitButtonClicked() 
+void UP13EndGameWidget::OnExitButtonClicked()
 {
 	if (APlayerController* PlayerController = GetOwningPlayer())
 	{

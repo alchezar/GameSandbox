@@ -36,7 +36,7 @@ protected:
 	virtual void InitWeapon(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex) override;
 	virtual void OnWeaponReloadFinishHandle(const int32 RoundNum, const int32 WeaponIndex, const bool bSuccess) override;
 	virtual void UpdateInventoryAfterRespawn() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 protected:
 	bool EnemyFireAttempt(const FVector& TargetLocation);

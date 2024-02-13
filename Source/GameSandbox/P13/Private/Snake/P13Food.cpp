@@ -6,7 +6,6 @@
 
 AP13Food::AP13Food()
 {
-
 	FoodMesh = CreateDefaultSubobject<UStaticMeshComponent>("FoodStaticMeshComponent");
 	FoodMesh->SetupAttachment(RootComponent);
 	FoodMesh->SetCollisionEnabled(ECollisionEnabled::QueryOnly);

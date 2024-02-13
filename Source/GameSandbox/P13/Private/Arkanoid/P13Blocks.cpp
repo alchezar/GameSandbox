@@ -36,7 +36,7 @@ void AP13Blocks::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPrimitiv
 
 void AP13Blocks::PlaceBlocks()
 {
-	/* Clear previously created blocks to prevent accumulation of created components. */	
+	/* Clear previously created blocks to prevent accumulation of created components. */
 	if (!SpawnedBlocks.IsEmpty())
 	{
 		for (UStaticMeshComponent* Block : SpawnedBlocks)
@@ -49,7 +49,7 @@ void AP13Blocks::PlaceBlocks()
 		}
 		SpawnedBlocks.Empty();
 	}
-	
+
 	/* Spawn updated block components. */
 	for (int Row = 0; Row < NumX; ++Row)
 	{
@@ -60,17 +60,17 @@ void AP13Blocks::PlaceBlocks()
 			{
 				return;
 			}
-			
+
 			SpawnedBlocks.Add(BlockComponent);
 			BlockComponent->SetupAttachment(RootComponent);
 			BlockComponent->SetStaticMesh(BlockMesh);
 			BlockComponent->SetMaterial(0, BlockMaterial);
 			BlockComponent->RegisterComponent();
-			
+
 			const FVector BoxExtent = BlockComponent->Bounds.GetBox().GetSize();
 			const FVector BlockLocation = FVector(Line * BoxExtent.X, Row * BoxExtent.Y, BoxExtent.Z / 2.f);
 			const FVector BlockScale = BoxExtent / Padding;
-			
+
 			BlockComponent->SetRelativeTransform(FTransform(FRotator::ZeroRotator, BlockLocation, BlockScale));
 		}
 	}

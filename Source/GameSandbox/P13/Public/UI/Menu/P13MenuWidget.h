@@ -25,7 +25,7 @@ UCLASS()
 class GAMESANDBOX_API UP13MenuWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
@@ -108,11 +108,11 @@ UCLASS()
 class GAMESANDBOX_API UP13OptionListWidget : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 public:
 	void SetupLines();
@@ -121,17 +121,17 @@ protected:
 	void OnEffectValueChangedHandle(FText SliderName, float NewValue);
 	UFUNCTION()
 	void OnCloseButtonPressedHandle();
-	
+
 private:
 	void CreateOneLine(const FText& OptionName, const FVector2D OptionDiapason, const float CurrentValue);
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UVerticalBox* OptionsVerticalBox;
 	UPROPERTY(meta = (BindWidget))
 	UButton* CloseButton;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UP13OptionSliderWidget> OptionSliderClass;
 };
@@ -148,7 +148,7 @@ class GAMESANDBOX_API UP13OptionSliderWidget : public UUserWidget
 	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeConstruct() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 public:
 	void InitOptionLine(const FText& OptionName, const FVector2D OptionDiapason, const float CurrentValue) const;
@@ -156,21 +156,21 @@ public:
 protected:
 	UFUNCTION()
 	void OnSliderValueChangedHandle(const float Value);
-	
+
 private:
 	FText TextFromFloatWithPrecision(const float FloatValue, const int32 Precision = 2) const;
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	DECLARE_MULTICAST_DELEGATE_TwoParams(FP13OnOptionSliderValueChangedSignature, FText /*SliderName*/, float /*NewValue*/)
-	
+
 	FP13OnOptionSliderValueChangedSignature OnOptionSliderValueChanged;
-	
+
 protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* NameText;
 	UPROPERTY(meta = (BindWidget))
-	USlider* Slider;	
+	USlider* Slider;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ValueText;
 };

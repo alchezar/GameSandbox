@@ -37,7 +37,7 @@ protected:
 	USceneComponent* BallSpawnPoint = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	TSubclassOf<AP13Ball> BallClass = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
 	UInputMappingContext* DefaultContext = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++ | Input")
@@ -45,6 +45,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, Category = "C++ | Param")
 	float PlatformSpeed = 50.f;
+
 private:
 	TWeakObjectPtr<AP13Ball> CachedBall;
 };

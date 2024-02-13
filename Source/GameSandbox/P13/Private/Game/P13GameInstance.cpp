@@ -31,8 +31,8 @@ void UP13GameInstance::HostSession(const int32 MaxPlayers, const bool bLan, cons
 	SessionSettings.bIsLANMatch = bLan;
 	SessionSettings.bShouldAdvertise = true;
 	SessionSettings.bUsesPresence = true;
-	SessionSettings.Set(SERVER_NAME_KEY , CustomServerName,EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-	
+	SessionSettings.Set(SERVER_NAME_KEY, CustomServerName, EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
 	SessionInterface->CreateSession(0, CurrentSessionName, SessionSettings);
 }
 
@@ -102,7 +102,7 @@ void UP13GameInstance::FindSessionInterface()
 	SessionInterface->OnFindSessionsCompleteDelegates.AddUObject(this, &ThisClass::OnFindSessionCompleteHandle);
 	SessionInterface->OnJoinSessionCompleteDelegates.AddUObject(this, &ThisClass::OnJoinSessionCompleteHandle);
 	SessionInterface->OnDestroySessionCompleteDelegates.AddUObject(this, &ThisClass::OnDestroySessionCompleteHandle);
-	
+
 	CurrentSessionName = GetDefault<APlayerState>()->SessionName;
 }
 
@@ -121,13 +121,13 @@ void UP13GameInstance::OnFindSessionCompleteHandle(bool bSuccess)
 	{
 		return;
 	}
-	
+
 	OnFindSessionsComplete.Broadcast(SessionSearch->SearchResults);
 }
 
 void UP13GameInstance::OnJoinSessionCompleteHandle(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	UGameplayStatics::OpenLevel(GetWorld(), SessionName);	
+	UGameplayStatics::OpenLevel(GetWorld(), SessionName);
 }
 
 void UP13GameInstance::OnDestroySessionCompleteHandle(FName SessionName, bool bSuccessful)

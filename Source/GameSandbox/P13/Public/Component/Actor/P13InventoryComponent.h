@@ -66,7 +66,7 @@ private:
 	void TakingWeaponToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, const FP13WeaponSlot& NewWeaponSlot, AP13PickingUpBase* PickupActor);
 	bool TryTakeWeaponToInventory(const FP13WeaponSlot& NewWeaponSlot);
 	bool TryTakeAmmoToInventory(const FP13AmmoSlot& NewAmmoSlot);
-	
+
 	/* ------------------------------ Network ------------------------------ */
 public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -74,7 +74,7 @@ public:
 	void Server_RefreshSlots();
 	UFUNCTION(Server, Reliable)
 	void Server_SpawnDroppedWeapon(const FTransform& SpawnTransform, const FP13WeaponDrop DropWeaponInfo);
-	
+
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void Multicast_OnCurrentWeaponUpdatedBroadcast(const FP13WeaponSlot& NewWeaponSlot, const int32 CurrentIndex);
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
@@ -87,7 +87,7 @@ public:
 	void Multicast_OnNewWeaponTakenBroadcast(const int32 NewWeaponIndex, const FP13WeaponSlot& NewWeaponSlot);
 	UFUNCTION(NetMulticast, Reliable, BlueprintCallable)
 	void Multicast_OnNewAmmoTakenBroadcast(const FP13AmmoSlot& NewAmmoSlot);
-	
+
 	UFUNCTION(Server, Reliable)
 	void Server_TakingAmmoToInventoryAttempt(const FP13AmmoSlot& NewAmmoSlot, AP13PickingUpBase* PickupActor);
 	UFUNCTION(Server, Reliable)

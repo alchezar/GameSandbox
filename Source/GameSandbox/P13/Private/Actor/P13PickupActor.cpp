@@ -53,10 +53,7 @@ void AP13PickingUpBase::ActivateParticles()
 	}
 }
 
-void AP13PickingUpBase::BePickedUpOnCollisionBeginOverlap(AActor* Picker)
-{
-	
-}
+void AP13PickingUpBase::BePickedUpOnCollisionBeginOverlap(AActor* Picker) {}
 
 void AP13PickingUpBase::CreateComponents()
 {

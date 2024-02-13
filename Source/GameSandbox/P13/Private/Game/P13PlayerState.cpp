@@ -6,8 +6,7 @@
 #include "P13/Public/Game/P13GameState.h"
 #include "P13/Public/Library/P13Types.h"
 
-AP13PlayerState::AP13PlayerState()
-{}
+AP13PlayerState::AP13PlayerState() {}
 
 void AP13PlayerState::BeginPlay()
 {
@@ -67,7 +66,7 @@ void AP13PlayerState::AddScore(const int32 NewScore)
 	}
 	TotalScore += NewScore;
 	OnScoreChanged.Broadcast(TotalScore);
-	
+
 	if (AP13GameState* GameState = GetWorld()->GetAuthGameMode()->GetGameState<AP13GameState>())
 	{
 		GameState->CheckWinCondition(TotalScore);

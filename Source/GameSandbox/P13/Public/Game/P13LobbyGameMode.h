@@ -43,7 +43,7 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<AP13CharacterBase> CharBaseClass;
-		
+
 private:
 	FText LevelName;
 	TArray<AP13LobbyPlayerController*> LobbyPlayerControllers;

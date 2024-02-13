@@ -58,7 +58,7 @@ enum class EP13LevelPhase : uint8
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *                               Structures                              *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
- 
+
 USTRUCT(BlueprintType)
 struct FP13CameraHeightClamp
 {
@@ -281,7 +281,7 @@ struct FP13WeaponDrop : public FTableRowBase
 };
 
 USTRUCT(BlueprintType)
-struct FP13LevelSelect : public  FTableRowBase
+struct FP13LevelSelect : public FTableRowBase
 {
 	GENERATED_BODY()
 

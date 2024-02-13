@@ -40,7 +40,6 @@ void AP13SnakeElementBase::ToggleCollision()
 	SnakeElementMesh->SetCollisionEnabled(bCollisionEnabled ? ECollisionEnabled::NoCollision : ECollisionEnabled::QueryOnly);
 }
 
-
 void AP13SnakeElementBase::OnSnakeElementBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	OnSnakeElementBeginOverlap.Broadcast(this, OtherActor);

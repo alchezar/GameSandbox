@@ -33,7 +33,7 @@ public:
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UStaticMeshComponent* RootMesh = nullptr;
-	
+
 	UPROPERTY(EditAnywhere, Category = "C++")
 	float Speed = 10.f;
 	UPROPERTY(EditAnywhere, Category = "C++")

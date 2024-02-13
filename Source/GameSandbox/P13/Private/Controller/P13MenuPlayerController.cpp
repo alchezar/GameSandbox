@@ -5,10 +5,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P13/Public/UI/Menu/P13LobbyWidget.h"
 
-AP13MenuPlayerController::AP13MenuPlayerController()
-{
-	
-}
+AP13MenuPlayerController::AP13MenuPlayerController() {}
 
 void AP13MenuPlayerController::BeginPlay()
 {
@@ -25,11 +22,11 @@ void AP13MenuPlayerController::ShowMainMenu()
 	{
 		return;
 	}
-	
+
 	UP13StartMenuWidget* MainMenuWidget = CreateWidget<UP13StartMenuWidget>(this, MainMenuWidgetClass);
 	if (!MainMenuWidget)
 	{
-		return;	
+		return;
 	}
 
 	MainMenuWidget->AddToViewport();

@@ -58,8 +58,8 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	FName HeadColorName = NAME_None;
 	UPROPERTY(EditAnywhere, Category = "C++")
-	FLinearColor HeadColor = FLinearColor::Black;	
-	
+	FLinearColor HeadColor = FLinearColor::Black;
+
 private:
 	UPROPERTY()
 	TArray<AP13SnakeElementBase*> SnakeElements;

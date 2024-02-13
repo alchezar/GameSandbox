@@ -49,7 +49,7 @@ void AP13LobbyPlayerController::OnHostSelectedMap(const FText& SelectedLevelName
 {
 	/* We don`t need to mark this method "Server_", anyway it will be called only by the host.
 	 * Because Clients won't see Levels list. */
-	
+
 	CachedLobbyGameMode->UpdateSelectedLevelForAll(SelectedLevelName.ToString());
 }
 
@@ -75,7 +75,7 @@ void AP13LobbyPlayerController::Server_OnPlayerColorSelected_Implementation(cons
 	{
 		return;
 	}
-	CachedLobbyGameMode->UpdateSelectedColor(SelectedColor, this);	
+	CachedLobbyGameMode->UpdateSelectedColor(SelectedColor, this);
 }
 
 void AP13LobbyPlayerController::Client_UpdateSelectedColorOccupation_Implementation(const FLinearColor SelectedColor, const FLinearColor ReleasedColor, const AP13LobbyPlayerController* Occupier) const

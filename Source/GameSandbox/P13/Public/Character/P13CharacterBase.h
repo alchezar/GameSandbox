@@ -94,7 +94,7 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_UpdatePlayerColor(const FLinearColor NewColor);
-	
+
 protected:
 	UFUNCTION(Server, Reliable)
 	void Server_ChangeMovementState(const EP13MovementState NewMovementState);
@@ -151,9 +151,9 @@ private:
 	EP13MovementState PreviousMovementState = EP13MovementState::Walk;
 	UPROPERTY()
 	TArray<UMaterialInstanceDynamic*> DynamicMaterials;
-	
+
 	UPROPERTY(Replicated)
 	TArray<UP13StateEffect*> ActiveStateEffects;
 	UPROPERTY()
-	UNiagaraComponent* ParticleComponent = nullptr;	
+	UNiagaraComponent* ParticleComponent = nullptr;
 };

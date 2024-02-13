@@ -144,7 +144,7 @@ void AP13CharacterBase::RemoveInactiveStateEffect(UP13StateEffect* InactiveState
 		return;
 	}
 	ActiveStateEffects.Remove(InactiveStateEffect);
-	
+
 	Multicast_RemoveStateParticle();
 }
 
@@ -247,18 +247,18 @@ void AP13CharacterBase::OnShieldChangedHandle(const float NewShield, const float
 void AP13CharacterBase::OnDeathHandle(AController* Causer)
 {
 	/* Must executes always on server! */
-	
+
 	/* Drop current weapon and remove it from the inventory. */
 	DropWeapon(false);
-	
+
 	if (Controller)
 	{
 		constexpr float UnpossessDelay = 1.f;
 		FTimerHandle RespawnTimer;
 		GetWorld()->GetTimerManager().SetTimer(RespawnTimer, Controller.Get(), &AController::UnPossess, UnpossessDelay);
 	}
-	
-	Multicast_StopAnimation();	
+
+	Multicast_StopAnimation();
 	Multicast_OnDeadHandle();
 }
 
@@ -382,7 +382,7 @@ void AP13CharacterBase::OnWeaponFiredHandle(UAnimMontage* CharFireAnim, const in
 		return;
 	}
 	PlayAnimMontage(CharFireAnim);
-	
+
 	if (HasAuthority())
 	{
 		InventoryComponent->SetWeaponInfo({CurrentRound});
@@ -551,7 +551,7 @@ void AP13CharacterBase::Multicast_OnDeadHandle_Implementation()
 		GetCharacterMovement()->DisableMovement();
 		GetCharacterMovement()->MovementState.bCanJump = false;
 	}
-	
+
 	/* Ragdoll. */
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetAllBodiesSimulatePhysics(true);

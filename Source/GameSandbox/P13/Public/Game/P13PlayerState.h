@@ -50,7 +50,7 @@ public:
 	FP13OnPlyaerStateInitSignature OnPlayerStateInit;
 	FP13OnScoreChangedSignature OnScoreChanged;
 	FP13OnLivesChangedSignature OnLivesChanged;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	int32 MaxLives = 3;

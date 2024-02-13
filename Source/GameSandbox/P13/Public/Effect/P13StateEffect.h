@@ -59,7 +59,7 @@ public:
 	virtual void ApplyEffect();
 	virtual void SpawnEffectParticles(UNiagaraSystem* SystemTemplate, USceneComponent* AttachToComponent);
 	virtual void DestroyEffectParticles();
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	UNiagaraSystem* Particle;
@@ -85,7 +85,7 @@ class UP13TimerStateEffect : public UP13SingleStateEffect
 
 public:
 	UP13TimerStateEffect();
-	
+
 	virtual void InitObject(AActor* NewActor, AController* NewCauser) override;
 	virtual void DestroyObject() override;
 	virtual void StartEffect() override;

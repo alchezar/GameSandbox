@@ -56,7 +56,7 @@ void AP13SnakeBase::SnakeMove()
 	/* First of all we need to know in which direction we are moving. */
 	FVector MoveVector = FVector::ZeroVector;
 	const float MoveSpeed = ElementSize;
-	
+
 	switch (LastMoveDirection)
 	{
 	case EP13MoveDirection::Up:
@@ -81,7 +81,7 @@ void AP13SnakeBase::SnakeMove()
 		return;
 	}
 	SnakeHead->ToggleCollision();
-	
+
 	/* By iterating through the snake elements starting from the tail (last element),
 	 * we set the location of each element to the location of the previous element of the array.
 	 * If the element was spawned invisible - after updating its location we restore visibility. */
@@ -99,7 +99,7 @@ void AP13SnakeBase::SnakeMove()
 	}
 	/* After then, we move head to the new calculated location. */
 	SnakeHead->AddActorWorldOffset(MoveVector);
-	
+
 	/* Return the head ability to collide with objects after snake moving. */
 	SnakeHead->ToggleCollision();
 }

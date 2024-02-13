@@ -66,7 +66,7 @@ void AP13PawnSnake::MoveInput(const FInputActionValue& Value)
 	}
 	const FVector2D MoveVector = Value.Get<FVector2D>();
 	EP13MoveDirection MoveDirection = CachedSnake->GetMoveDirection();
-	
+
 	if (MoveVector.Y > 0.f && MoveDirection != EP13MoveDirection::Down)
 	{
 		MoveDirection = EP13MoveDirection::Up;

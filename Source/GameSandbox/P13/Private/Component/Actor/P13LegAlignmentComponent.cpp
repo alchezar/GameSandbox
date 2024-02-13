@@ -27,7 +27,7 @@ void UP13LegAlignmentComponent::InitLegAlignment(const FName& InLeftVirtualBoneN
 {
 	LeftVirtualBoneName = InLeftVirtualBoneName;
 	RightVirtualBoneName = InRightVirtualBoneName;
-	
+
 	LegAlignment(bStart);
 }
 

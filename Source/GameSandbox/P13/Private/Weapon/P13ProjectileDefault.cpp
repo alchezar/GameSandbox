@@ -101,14 +101,10 @@ void AP13ProjectileDefault::OnBulletHitHandle(UPrimitiveComponent* HitComponent,
 }
 
 void AP13ProjectileDefault::OnBulletBeginOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{
-	
-}
+{}
 
 void AP13ProjectileDefault::OnBulletEndOverlapHandle(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
-{
-	
-}
+{}
 
 void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit)
 {
@@ -127,8 +123,8 @@ void AP13ProjectileDefault::SpawnEffectsOnHit(const FHitResult& Hit)
 	UMaterialInterface* Decal = bDecal ? BulletSettings.OnHit.Decals[SurfaceType] : nullptr;
 	UNiagaraSystem* Particle = bParticle ? BulletSettings.OnHit.Particles[SurfaceType] : nullptr;
 	USoundBase* Sound = bSound ? BulletSettings.OnHit.Sounds[SurfaceType] : nullptr;
-	
-	Multicast_SpawnEffectsOnHit(Decal, Particle, Sound, Location, Rotation, Hit.GetComponent());	
+
+	Multicast_SpawnEffectsOnHit(Decal, Particle, Sound, Location, Rotation, Hit.GetComponent());
 }
 
 void AP13ProjectileDefault::ImpactProjectile()
@@ -137,21 +133,21 @@ void AP13ProjectileDefault::ImpactProjectile()
 	Destroy();
 }
 
-void AP13ProjectileDefault::GivePointDamage(const FHitResult& Hit, AActor* OtherActor) 
+void AP13ProjectileDefault::GivePointDamage(const FHitResult& Hit, AActor* OtherActor)
 {
 	FPointDamageEvent PointDamage;
 	PointDamage.HitInfo = Hit;
 	PointDamage.ShotDirection = GetActorForwardVector();
 	OtherActor->TakeDamage(BulletSettings.Damage, PointDamage, GetInstigatorController(), this);
-	
+
 	UAISense_Damage::ReportDamageEvent(GetWorld(), OtherActor, GetInstigator(), BulletSettings.Damage, Hit.Location, Hit.ImpactPoint);
 	ImpactProjectile();
 }
 
-void AP13ProjectileDefault::GiveRadialDamage() 
+void AP13ProjectileDefault::GiveRadialDamage()
 {
-	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), BulletSettings.Damage, 0.f, GetActorLocation(), BulletSettings.DamageRadius / 2.f , BulletSettings.DamageRadius, 1.f, UDamageType::StaticClass(), {this}, this, GetInstigatorController(), ECC_BULLET);
-	
+	UGameplayStatics::ApplyRadialDamageWithFalloff(GetWorld(), BulletSettings.Damage, 0.f, GetActorLocation(), BulletSettings.DamageRadius / 2.f, BulletSettings.DamageRadius, 1.f, UDamageType::StaticClass(), {this}, this, GetInstigatorController(), ECC_BULLET);
+
 	DrawDebugCapsule(GetWorld(), GetActorLocation(), BulletSettings.DamageRadius, BulletSettings.DamageRadius, FQuat::Identity, FColor::Red);
 	ImpactProjectile();
 }
@@ -167,7 +163,7 @@ void AP13ProjectileDefault::SpawnStateEffect(const FHitResult& Hit, AController*
 	{
 		return;
 	}
-	
+
 	UP13Types::AddEffectBySurfaceType(Hit.GetActor(), BulletSettings.StateEffectClass, Hit.PhysMaterial->SurfaceType, Causer);
 }
 

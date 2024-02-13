@@ -11,8 +11,7 @@
  *                          State Effect Base Class                          *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-UP13StateEffect::UP13StateEffect()
-{}
+UP13StateEffect::UP13StateEffect() {}
 
 void UP13StateEffect::InitObject(AActor* NewActor, AController* NewCauser)
 {

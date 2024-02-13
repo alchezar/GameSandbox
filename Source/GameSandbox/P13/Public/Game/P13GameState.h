@@ -32,11 +32,11 @@ public:
 
 private:
 	void SaveWinScores();
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 public:
 	FP13OnPhaseChangedSignature OnPhaseChanged;
-	
+
 protected:
 	UPROPERTY(EditAnywhere, Category = "C++")
 	EP13LevelPhase StartLevelPhase = EP13LevelPhase::Phase1;

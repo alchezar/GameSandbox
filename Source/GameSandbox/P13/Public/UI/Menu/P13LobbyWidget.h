@@ -34,7 +34,7 @@ protected:
 	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void OnPlayButtonPressed() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 protected:
 	UFUNCTION()
@@ -69,7 +69,7 @@ protected:
 	FString CustomServerName = "ServerName";
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TSubclassOf<UP13SessionSelectWidget> SessionButtonWidgetClass;
-	
+
 private:
 	IP13NetworkInterface* GameInstanceNetwork;
 	FOnlineSessionSearchResult SelectedSessionCached;
@@ -91,20 +91,20 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void InitSessionButton(const FOnlineSessionSearchResult& SessionInfo);
-	
+
 protected:
 	UFUNCTION()
 	void OnSessionButtonPressedHandle();
-	
+
 	/* ----------------------------- Delegates ----------------------------- */
 public:
 	DECLARE_MULTICAST_DELEGATE_OneParam(FP13OnSessionSelectedHandle, const FOnlineSessionSearchResult& /*SelectedResult*/)
 	FP13OnSessionSelectedHandle OnSessionSelected;
-	
+
 	/* ----------------------------- Variables ----------------------------- */
 protected:
 	UPROPERTY(meta = (BindWidget))
-	UButton* SelectButton;	
+	UButton* SelectButton;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* ServerNameText;
 	UPROPERTY(meta = (BindWidget))
@@ -137,7 +137,7 @@ public:
 
 protected:
 	void SwitchColorOccupation(FLinearColor Color, const bool bOccupy);
-	
+
 	UFUNCTION()
 	void OnReadyButtonClickedHandle();
 	UFUNCTION()
@@ -160,7 +160,7 @@ protected:
 	UTextBlock* StartReadyText;
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* SelectedMapText;
-	
+
 	UPROPERTY(meta = (BindWidget))
 	UButton* ReadyButton;
 	UPROPERTY(meta = (BindWidget))
@@ -191,7 +191,7 @@ private:
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 UCLASS()
-class GAMESANDBOX_API UP13LobbyLevelSelectWidget : public UP13LevelSelectWidget 
+class GAMESANDBOX_API UP13LobbyLevelSelectWidget : public UP13LevelSelectWidget
 {
 	GENERATED_BODY()
 
@@ -202,7 +202,7 @@ protected:
 	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void OnLevelButtonPressed() override;
-	
+
 	/* ------------------------------- This -------------------------------- */
 public:
 	void InitLobbyLevelButton(const FP13LevelSelect* NewLevel, const UP13LobbyMenuWidget* LobbyMenu);
@@ -210,7 +210,6 @@ public:
 	/* ----------------------------- Variables ----------------------------- */
 private:
 	TSoftObjectPtr<UP13LobbyMenuWidget> CachedLobbyMenu;
-	
 };
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
@@ -231,7 +230,7 @@ public:
 	FORCEINLINE FLinearColor GetButtonColor() const { return ButtonColor; }
 	void InitColorButton(FLinearColor LinearColor);
 	void SetIsColorEnabled(const bool bEnable) const;
-	
+
 protected:
 	UFUNCTION()
 	void OnColorButtonClickedHandle();
@@ -250,5 +249,4 @@ protected:
 
 private:
 	bool bOccupied = false;
-	
 };

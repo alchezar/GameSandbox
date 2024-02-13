@@ -6,18 +6,15 @@
 #include "P13/Public/Controller/P13PlayerController.h"
 #include "P13/Public/Library/P13Types.h"
 
-AP13GameState::AP13GameState()
-{
-	
-}
+AP13GameState::AP13GameState() {}
 
 void AP13GameState::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	LevelPhase = StartLevelPhase;
 	OnPhaseChanged.Broadcast(LevelPhase);
-	
+
 	SaveWinScores();
 }
 
@@ -25,7 +22,7 @@ int32 AP13GameState::GetMaxEnemiesOnPhase()
 {
 	const int32 PhaseNum = StaticCast<uint8>(LevelPhase);
 	check(MaxEnemies.IsValidIndex(PhaseNum))
-	
+
 	return MaxEnemies[PhaseNum];
 }
 
@@ -70,7 +67,7 @@ void AP13GameState::SaveWinScores()
 {
 	FString CurrentMapName = GetWorld()->GetMapName();
 	CurrentMapName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
-	
+
 	LevelSelectTable->GetAllRows<FP13LevelSelect>("", Levels);
 	FP13LevelSelect** LevelResult = Levels.FindByPredicate([&](const FP13LevelSelect* Level)
 	{
@@ -80,7 +77,7 @@ void AP13GameState::SaveWinScores()
 	{
 		return;
 	}
-	
+
 	WinScores = (*LevelResult)->PhaseWinScore;
 	MaxEnemies = (*LevelResult)->MaxEnemiesPerPhase;
 }

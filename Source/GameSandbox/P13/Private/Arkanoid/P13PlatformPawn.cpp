@@ -62,7 +62,7 @@ void AP13PlatformPawn::AddDefaultMappingContext()
 void AP13PlatformPawn::OnSideInput(const FInputActionValue& Value)
 {
 	const FVector2D MoveVector = Value.Get<FVector2D>();
-	const FVector SideMoveVector = FVector(0.f, MoveVector.X * PlatformSpeed, 0.f); 
+	const FVector SideMoveVector = FVector(0.f, MoveVector.X * PlatformSpeed, 0.f);
 	AddActorWorldOffset(SideMoveVector, true);
 }
 

@@ -11,8 +11,7 @@
  *                             Enemy spawn point                             *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-AP13EnemySpawnPoint::AP13EnemySpawnPoint()
-{}
+AP13EnemySpawnPoint::AP13EnemySpawnPoint() {}
 
 void AP13EnemySpawnPoint::BeginPlay()
 {

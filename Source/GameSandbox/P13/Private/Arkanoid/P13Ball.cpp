@@ -3,7 +3,6 @@
 #include "P13/Public/Arkanoid/P13Ball.h"
 
 #include "GameFramework/KillZVolume.h"
-#include "P13/Public/Arkanoid/P13PlatformPawn.h"
 
 AP13Ball::AP13Ball()
 {

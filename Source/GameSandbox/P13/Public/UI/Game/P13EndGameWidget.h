@@ -21,7 +21,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void InitWidget(const bool bWin);
-	
+
 protected:
 	UFUNCTION()
 	void OnRestartButtonClicked();
@@ -41,7 +41,7 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* MessageText;
 
-	UPROPERTY(EditAnywhere, Category = "C++")	
+	UPROPERTY(EditAnywhere, Category = "C++")
 	FName MenuLevelName;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	FString WinMessage = "You WIN!!!";
