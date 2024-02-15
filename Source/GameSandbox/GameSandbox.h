@@ -8,9 +8,21 @@
 #define SURFACE_BODY         SurfaceType2
 #define SURFACE_HEAD         SurfaceType3
 
-#define ECC_PROJECTILE		 ECC_GameTraceChannel3
-#define ECC_WEAPON			 ECC_GameTraceChannel5
+#define ECC_PROJECTILE       ECC_GameTraceChannel3
+#define ECC_WEAPON           ECC_GameTraceChannel5
 #define ECC_CLIMBING         ECC_GameTraceChannel6
 #define ECC_BULLET           ECC_GameTraceChannel7
 #define ECC_MELEE            ECC_GameTraceChannel8
+#define ECC_CURSOR           ECC_GameTraceChannel9
+
+#define EARLY_RETURN_IF(Condition) \
+	if (Condition) \
+	{ \
+		return; \
+	} \
 	
+#define EARLY_RETURN_VALUE_IF(Condition, ReturnValue) \
+	if (Condition) \
+	{ \
+		return ReturnValue; \
+	} \
