@@ -9,7 +9,7 @@
 class UBoxComponent;
 
 UCLASS()
-class GAMESANDBOX_API AER_Obstacle : public AActor
+class PROJECT03_API AER_Obstacle : public AActor
 {
 	GENERATED_BODY()
 

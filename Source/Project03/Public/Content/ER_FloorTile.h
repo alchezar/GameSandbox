@@ -13,7 +13,7 @@ class UArrowComponent;
 class UBoxComponent;
 
 UCLASS()
-class GAMESANDBOX_API AER_FloorTile : public AActor
+class PROJECT03_API AER_FloorTile : public AActor
 {
 	GENERATED_BODY()
 

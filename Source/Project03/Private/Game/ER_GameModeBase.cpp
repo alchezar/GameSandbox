@@ -1,12 +1,13 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameModeBase.h"
+#include "Game/ER_GameModeBase.h"
+
 #include "Blueprint/UserWidget.h"
+#include "Content/ER_FloorTile.h"
 #include "Kismet/GameplayStatics.h"
-#include "P3/Content/ER_FloorTile.h"
-#include "P3/Player/ER_Character.h"
-#include "P3/UI/ER_GameHud.h"
-#include "P3/UI/ER_GameOver.h"
+#include "Player/ER_Character.h"
+#include "UI/ER_GameHud.h"
+#include "UI/ER_GameOver.h"
 
 AER_GameModeBase::AER_GameModeBase()
 {

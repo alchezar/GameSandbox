@@ -27,15 +27,15 @@ public class GameSandbox : ModuleRules
 			"ChaosSolverEngine",
 			"OnlineSubsystem",
 			"OnlineSubsystemUtils",
-			"OnlineSubsystemSteam",
+			"OnlineSubsystemSteam", 
 			"AnimGraphRuntime"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"EnhancedInput",
-			"Slate",
-			"SlateCore",
+			"EnhancedInput", 
+			"Slate", 
+			"SlateCore", 
 			"AnimGraphRuntime",
 			"OnlineSubsystem",
 			"Json",

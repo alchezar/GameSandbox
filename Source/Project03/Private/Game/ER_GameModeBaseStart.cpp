@@ -1,8 +1,9 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameModeBaseStart.h"
+#include "Game/ER_GameModeBaseStart.h"
+
 #include "Blueprint/UserWidget.h"
-#include "P3/UI/ER_MainMenu.h"
+#include "UI/ER_MainMenu.h"
 
 AER_GameModeBaseStart::AER_GameModeBaseStart()
 {

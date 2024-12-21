@@ -16,8 +16,10 @@ public class Project03 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"EnhancedInput",
+			"UMG"
 		});
 	}
 }

@@ -4,40 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ER_GameOver.generated.h"
+#include "ER_MainMenu.generated.h"
 
-class UTextBlock;
-class AER_GameModeBase;
 class UButton;
+class AER_GameModeBaseStart;
 
 UCLASS()
-class GAMESANDBOX_API UER_GameOver : public UUserWidget
+class PROJECT03_API UER_MainMenu : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-	void ShowFinalScore(const int32 Score);
 
 protected:
 	virtual void NativeConstruct() override;
 	
 private:
 	UFUNCTION()
-	void OnRestartClicked();
+	void OnStartClicked();
 	UFUNCTION()
-	void OnMainClicked();
+	void OnQuitClicked();
 
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UButton* RestartBtn;
+	UButton* StartBtn;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UButton* MainBtn;
-	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UTextBlock* ScoreText;
+	UButton* QuitBtn;
 
 private:
 	UPROPERTY()
-	AER_GameModeBase* GameMode;
+	AER_GameModeBaseStart* GameMode;
 };
-
-

@@ -15,7 +15,7 @@ class USoundBase;
 class AER_GameModeBase;
 
 UCLASS()
-class GAMESANDBOX_API AER_Character : public ACharacter
+class PROJECT03_API AER_Character : public ACharacter
 {
 	GENERATED_BODY()
 

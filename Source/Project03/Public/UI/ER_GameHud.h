@@ -11,7 +11,7 @@ class AER_GameModeBase;
 class UTextBlock;
 
 UCLASS()
-class GAMESANDBOX_API UER_GameHud : public UUserWidget
+class PROJECT03_API UER_GameHud : public UUserWidget
 {
 	GENERATED_BODY()
 

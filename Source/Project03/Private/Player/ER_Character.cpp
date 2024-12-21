@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_Character.h"
+#include "Player/ER_Character.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
@@ -8,7 +9,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "P3/Game/ER_GameModeBase.h"
+#include "Game/ER_GameModeBase.h"
 
 AER_Character::AER_Character()
 {

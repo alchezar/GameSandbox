@@ -1,10 +1,11 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_MainMenu.h"
+#include "UI/ER_MainMenu.h"
+
 #include "Components/Button.h"
+#include "Game/ER_GameModeBaseStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "P3/Game/ER_GameModeBaseStart.h"
 
 void UER_MainMenu::NativeConstruct()
 {

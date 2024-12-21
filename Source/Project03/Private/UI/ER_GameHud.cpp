@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameHud.h"
+#include "UI/ER_GameHud.h"
+
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Kismet/GameplayStatics.h"
-#include "P3/Game/ER_GameModeBase.h"
+#include "Game/ER_GameModeBase.h"
 
 void UER_GameHud::NativeConstruct()
 {
