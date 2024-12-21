@@ -1,12 +1,13 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_PlayerCharacter.h"
+#include "Player/LS_PlayerCharacter.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "P5/Weapon/LS_LightSaber.h"
+#include "Weapon/LS_LightSaber.h"
 
 ALS_PlayerCharacter::ALS_PlayerCharacter()
 {

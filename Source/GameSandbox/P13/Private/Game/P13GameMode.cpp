@@ -3,6 +3,7 @@
 #include "P13/Public/Game/P13GameMode.h"
 
 #include "EngineUtils.h"
+#include "Engine/DamageEvents.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameFramework/PlayerState.h"
 #include "P13/Public/Actor/P13EnemySpawn.h"

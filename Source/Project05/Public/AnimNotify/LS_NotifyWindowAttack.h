@@ -10,7 +10,7 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FLSOnAttackBeginSignature, USkeletalMeshComp
 DECLARE_MULTICAST_DELEGATE_OneParam(FLSOnAttackEndSignature, USkeletalMeshComponent*);
 
 UCLASS()
-class GAMESANDBOX_API ULS_NotifyWindowAttack : public UAnimNotify_PlayMontageNotifyWindow
+class PROJECT05_API ULS_NotifyWindowAttack : public UAnimNotify_PlayMontageNotifyWindow
 {
 	GENERATED_BODY()
 

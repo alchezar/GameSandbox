@@ -3,16 +3,16 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/PlayerController.h"
-#include "LS_PlayerController.generated.h"
+#include "GameFramework/GameModeBase.h"
+#include "LS_GameMode.generated.h"
 
 UCLASS()
-class GAMESANDBOX_API ALS_PlayerController : public APlayerController
+class PROJECT05_API ALS_GameMode : public AGameModeBase
 {
 	GENERATED_BODY()
 
 public:
-	ALS_PlayerController();
+	ALS_GameMode();
 	virtual void Tick(float DeltaTime) override;
 
 protected:

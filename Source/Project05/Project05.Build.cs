@@ -16,8 +16,12 @@ public class Project05 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"AnimGraphRuntime",
+			"ProceduralMeshComponent",
+			"EnhancedInput",
+			"Niagara",
 		});
 	}
 }

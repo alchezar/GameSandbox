@@ -9,7 +9,7 @@
 class UProceduralMeshComponent;
 
 UCLASS()
-class GAMESANDBOX_API ALS_Slicable : public AActor
+class PROJECT05_API ALS_Slicable : public AActor
 {
 	GENERATED_BODY()
 

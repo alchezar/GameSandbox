@@ -1,9 +1,10 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_AnimInstance.h"
-#include "LS_BaseCharacter.h"
-#include "LS_PlayerCharacter.h"
+#include "Player/LS_AnimInstance.h"
+
 #include "GameFramework/PawnMovementComponent.h"
+#include "Player/LS_BaseCharacter.h"
+#include "Player/LS_PlayerCharacter.h"
 
 void ULS_AnimInstance::NativeInitializeAnimation()
 {
