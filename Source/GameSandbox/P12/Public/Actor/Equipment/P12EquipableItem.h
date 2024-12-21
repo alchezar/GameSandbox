@@ -28,7 +28,7 @@ public:
 	FORCEINLINE TSoftObjectPtr<UP12EquipmentComponent> GetCachedEquipment() const { return CachedEquipment; }
 	FORCEINLINE TWeakObjectPtr<AP12BaseCharacter> GetCachedCharacter() const { return CachedCharacter; }
 	FORCEINLINE FName GetDataTableID() const { return DataTableID; }
-	void CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp);
+	void CacheEquipmentComponent(UP12EquipmentComponent* EquipmentComp);
 	virtual void AttachItem(const FName AttachSocketName);
 
 	void Equip();

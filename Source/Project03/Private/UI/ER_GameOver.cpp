@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameOver.h"
-#include "ER_MainMenu.h"
+#include "UI/ER_GameOver.h"
+
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
 #include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
+#include "UI/ER_MainMenu.h"
 
 void UER_GameOver::NativeConstruct()
 {

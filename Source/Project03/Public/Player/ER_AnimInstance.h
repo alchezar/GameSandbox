@@ -10,7 +10,7 @@ class APawn;
 class UPawnMovementComponent;
 
 UCLASS()
-class GAMESANDBOX_API UER_AnimInstance : public UAnimInstance
+class PROJECT03_API UER_AnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 

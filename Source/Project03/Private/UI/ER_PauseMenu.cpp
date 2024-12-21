@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_PauseMenu.h"
+#include "UI/ER_PauseMenu.h"
+
 #include "Components/Button.h"
 #include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"

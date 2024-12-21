@@ -46,7 +46,6 @@ public class GameSandbox : ModuleRules
 		PublicIncludePaths.AddRange(new[]
 		{
 			"GameSandbox",
-			"GameSandbox/P3",
 			"GameSandbox/P4",
 			"GameSandbox/P5",
 			"GameSandbox/P6"

@@ -205,7 +205,7 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	void InitLobbyLevelButton(const FP13LevelSelect* NewLevel, const UP13LobbyMenuWidget* LobbyMenu);
+	void InitLobbyLevelButton(const FP13LevelSelect* NewLevel, UP13LobbyMenuWidget* LobbyMenu);
 
 	/* ----------------------------- Variables ----------------------------- */
 private:

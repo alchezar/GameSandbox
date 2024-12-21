@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Game/ER_GameModeBase.h"
+#include "GameFramework/GameModeBase.h"
 #include "TG_GameMode.generated.h"
 
 class ATG_FirstPersonCharacter;

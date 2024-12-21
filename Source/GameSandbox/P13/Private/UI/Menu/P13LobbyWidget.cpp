@@ -331,7 +331,7 @@ void UP13LobbyLevelSelectWidget::OnLevelButtonPressed()
 	CachedLobbyMenu->SelectLevelName(LevelName->GetText(), GetLevelAddress());
 }
 
-void UP13LobbyLevelSelectWidget::InitLobbyLevelButton(const FP13LevelSelect* NewLevel, const UP13LobbyMenuWidget* LobbyMenu)
+void UP13LobbyLevelSelectWidget::InitLobbyLevelButton(const FP13LevelSelect* NewLevel, UP13LobbyMenuWidget* LobbyMenu)
 {
 	InitLevelButton(NewLevel);
 	CachedLobbyMenu = LobbyMenu;

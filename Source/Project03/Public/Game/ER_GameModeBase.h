@@ -53,7 +53,7 @@ struct FLevelNames
 };
 
 UCLASS()
-class GAMESANDBOX_API AER_GameModeBase : public AGameModeBase
+class PROJECT03_API AER_GameModeBase : public AGameModeBase
 {
 	GENERATED_BODY()
 
@@ -110,7 +110,7 @@ protected:
 
 private:
 	UPROPERTY()
-	UER_GameHud* GameHud;
+	UER_GameHud* GameHud = nullptr;
 	
 	FTimerHandle RestartTimer;
 	int32 TotalCoins = 0;

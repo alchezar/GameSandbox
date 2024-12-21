@@ -1,10 +1,11 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_FloorTile.h"
-#include "ER_CoinItem.h"
-#include "ER_Obstacle.h"
+#include "Content/ER_FloorTile.h"
+
 #include "Components/ArrowComponent.h"
 #include "Components/BoxComponent.h"
+#include "Content/ER_CoinItem.h"
+#include "Content/ER_Obstacle.h"
 #include "Game/ER_GameModeBase.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/ER_Character.h"

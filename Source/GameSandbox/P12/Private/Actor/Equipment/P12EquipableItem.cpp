@@ -29,7 +29,7 @@ void AP12EquipableItem::SetOwner(AActor* NewOwner)
 	}
 }
 
-void AP12EquipableItem::CacheEquipmentComponent(const UP12EquipmentComponent* EquipmentComp)
+void AP12EquipableItem::CacheEquipmentComponent(UP12EquipmentComponent* EquipmentComp)
 {
 	CachedEquipment = EquipmentComp;
 }

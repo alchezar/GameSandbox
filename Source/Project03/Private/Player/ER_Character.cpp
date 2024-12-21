@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_Character.h"
+#include "Player/ER_Character.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"

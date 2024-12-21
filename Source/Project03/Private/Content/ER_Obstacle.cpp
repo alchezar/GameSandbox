@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_Obstacle.h"
+#include "Content/ER_Obstacle.h"
+
 #include "Components/BoxComponent.h"
 #include "Player/ER_Character.h"
 

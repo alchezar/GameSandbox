@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameHud.h"
+#include "UI/ER_GameHud.h"
+
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"

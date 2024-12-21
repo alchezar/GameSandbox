@@ -10,7 +10,7 @@ class USphereComponent;
 class URotatingMovementComponent;
 
 UCLASS()
-class GAMESANDBOX_API AER_CoinItem : public AActor
+class PROJECT03_API AER_CoinItem : public AActor
 {
 	GENERATED_BODY()
 

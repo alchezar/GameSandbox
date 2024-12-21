@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "ER_GameModeBase.h"
+#include "Game/ER_GameModeBase.h"
+
 #include "Blueprint/UserWidget.h"
 #include "Content/ER_FloorTile.h"
 #include "Kismet/GameplayStatics.h"

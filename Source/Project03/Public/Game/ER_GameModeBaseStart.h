@@ -9,7 +9,7 @@
 class UER_MainMenu;
 
 UCLASS()
-class GAMESANDBOX_API AER_GameModeBaseStart : public AGameModeBase
+class PROJECT03_API AER_GameModeBaseStart : public AGameModeBase
 {
 	GENERATED_BODY()
 

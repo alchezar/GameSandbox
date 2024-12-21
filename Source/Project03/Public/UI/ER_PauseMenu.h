@@ -4,32 +4,32 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "ER_MainMenu.generated.h"
+#include "ER_PauseMenu.generated.h"
 
 class UButton;
-class AER_GameModeBaseStart;
+class AER_GameModeBase;
 
 UCLASS()
-class GAMESANDBOX_API UER_MainMenu : public UUserWidget
+class PROJECT03_API UER_PauseMenu : public UUserWidget
 {
 	GENERATED_BODY()
 
 protected:
 	virtual void NativeConstruct() override;
-	
+
 private:
 	UFUNCTION()
-	void OnStartClicked();
+	void OnContinueClicked();
 	UFUNCTION()
-	void OnQuitClicked();
+	void OnMainClicked();
 
 protected:
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UButton* StartBtn;
+	UButton* ContinueBtn;
 	UPROPERTY(BlueprintReadWrite, meta = (BindWidget))
-	UButton* QuitBtn;
+	UButton* MainBtn;
 
 private:
 	UPROPERTY()
-	AER_GameModeBaseStart* GameMode;
+	AER_GameModeBase* GameMode;
 };
