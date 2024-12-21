@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class Project01 : ModuleRules
+public class Project05 : ModuleRules
 {
-	public Project01(ReadOnlyTargetRules Target) : base(Target)
+	public Project05(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -16,10 +16,8 @@ public class Project01 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new[]
+		PrivateDependencyModuleNames.AddRange(new string[] 
 		{
-			"EnhancedInput",
-			"UMG"
 		});
 	}
 }

@@ -2,9 +2,9 @@
 
 using UnrealBuildTool;
 
-public class Project01 : ModuleRules
+public class Project02 : ModuleRules
 {
-	public Project01(ReadOnlyTargetRules Target) : base(Target)
+	public Project02(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
@@ -18,8 +18,12 @@ public class Project01 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"AIModule",
 			"EnhancedInput",
-			"UMG"
+			"NavigationSystem",
+			"Niagara",
+			"PhysicsCore",
+			"UMG",
 		});
 	}
 }
