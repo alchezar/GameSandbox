@@ -16,8 +16,12 @@ public class Project04 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"AIModule",
+			"EnhancedInput",
+			"NavigationSystem",
+			"UMG",
 		});
 	}
 }
