@@ -1,16 +1,15 @@
 // Copyright (C) 2023. IKinder
 
-#include "GameSandbox/P1/Character/PickupTrooper.h"
+#include "Project01/Public/Character/PickupTrooper.h"
 
-#include "BatteryCollectorGameMode.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "Camera/CameraComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "GameSandbox/P1/PickUp/PickupBase.h"
-#include "GameSandbox/P1/PickUp/PickUpBattery.h"
 #include "Kismet/GameplayStatics.h"
+#include "Project01/Public/Character/BatteryCollectorGameMode.h"
+#include "Project01/Public/PickUp/PickupBase.h"
+#include "Project01/Public/PickUp/PickUpBattery.h"
 
 #pragma region Default
 

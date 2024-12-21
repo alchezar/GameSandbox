@@ -1,10 +1,11 @@
 // Copyright (C) 2023, IKinder
 
-#include "GameSandbox/P1/Spawners/BatterySpawnerBase.h"
-#include "Components/BoxComponent.h"
-#include "GameSandbox/P1/PickUp/PickupBase.h"
-#include "Kismet/KismetMathLibrary.h"
+#include "Project01/Public/Spawners/BatterySpawnerBase.h"
+
 #include "Components/BillboardComponent.h"
+#include "Components/BoxComponent.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "Project01/Public/PickUp/PickupBase.h"
 
 #define OUT 
 
@@ -12,7 +13,7 @@ ABatterySpawnerBase::ABatterySpawnerBase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	SceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
+	SceneRoot     = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Root"));
 	RootComponent = SceneRoot;
 
 	SpawnVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Spawn Volume"));
@@ -81,5 +82,4 @@ void ABatterySpawnerBase::SpawnActor()
 
 	const APickUpBase* SpawnedActor = GetWorld()->SpawnActor<APickUpBase>(ActorToSpawn, GetRandomSpawnPoint(), RandomRotation, Params);
 	if (!SpawnedActor) return;
-
 }

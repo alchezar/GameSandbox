@@ -4,11 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "TrooperCharacter.h"
-#include "GameFramework/Character.h"
 #include "PickupTrooper.generated.h"
 
 UCLASS()
-class GAMESANDBOX_API APickupTrooper : public ATrooperCharacter
+class PROJECT01_API APickupTrooper : public ATrooperCharacter
 {
 	GENERATED_BODY()
 

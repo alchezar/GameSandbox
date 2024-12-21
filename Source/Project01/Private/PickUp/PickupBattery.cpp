@@ -1,6 +1,7 @@
 // FCopyright (C) 2023, IKinder
 
-#include "GameSandbox/P1/PickUp/PickUpBattery.h"
+#include "Project01/Public/PickUp/PickUpBattery.h"
+
 #include "GameFramework/Character.h"
 #include "Kismet/GameplayStatics.h"
 #include "Particles/ParticleSystemComponent.h"

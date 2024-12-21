@@ -1,6 +1,6 @@
 // Copyright (C) 2023, IKinder
 
-#include "GameSandbox/P1/PickUp/PickupBase.h"
+#include "Project01/Public/PickUp/PickupBase.h"
 
 APickUpBase::APickUpBase()
 {

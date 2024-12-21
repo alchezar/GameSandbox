@@ -7,7 +7,7 @@
 #include "PickupBase.generated.h"
 
 UCLASS()
-class GAMESANDBOX_API APickUpBase : public AActor
+class PROJECT01_API APickUpBase : public AActor
 {
 	GENERATED_BODY()
 

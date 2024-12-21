@@ -1,14 +1,12 @@
 // Copyright (C) 2023. IKinder
 
-#include "GameSandbox/P1/Character/TrooperCharacter.h"
+#include "Project01/Public/Character/TrooperCharacter.h"
+
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "GameSandbox/P1/PickUp/PickupBase.h"
-
-#define OUT
 
 #pragma region Default
 
