@@ -79,7 +79,7 @@ void UP8GameInstance::RefreshServerList()
 	if (SessionSearch)
 	{
 		SessionSearch->MaxSearchResults = 100;
-		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		SessionSearch->QuerySettings.Set(TEXT("PRESENCESEARCH"), true, EOnlineComparisonOp::Equals);
 		// SessionSearch->bIsLanQuery = true;
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 		/* OnFindSessionCompleteHandle callback when completed. */

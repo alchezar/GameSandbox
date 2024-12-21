@@ -20,7 +20,10 @@ void UP10Library::InteractWithPhysical(AActor* CubeActor, UPrimitiveComponent* C
 		{
 			CubeActor->Destroy();
 		}
-			Scale.GetMin() < 0.5f ? CubeActor->Destroy() : CubeActor->SetActorScale3D(Scale);
+		else
+		{
+			CubeActor->SetActorScale3D(Scale);
+		}
 	}
 
 	/* Set random color on hit component. */

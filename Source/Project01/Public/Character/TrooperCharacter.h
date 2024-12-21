@@ -14,7 +14,7 @@ class UInputMappingContext;
 class UInputAction;
 
 UCLASS()
-class GAMESANDBOX_API ATrooperCharacter : public ACharacter
+class PROJECT01_API ATrooperCharacter : public ACharacter
 {
 	GENERATED_BODY()
 

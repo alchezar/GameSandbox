@@ -705,7 +705,7 @@ void AP12BaseCharacter::InitHealthProgress()
 		return;
 	}
 	OnHealthChange.AddUObject(Widget, &UP12AttributeProgressBarWidget::OnHealthChangedHandle);
-	CharacterAttribute->OnDeath.AddLambda([=]()
+	CharacterAttribute->OnDeath.AddLambda([this]()
 	{
 		HealthBar->SetVisibility(false);
 	});

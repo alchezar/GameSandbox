@@ -21,7 +21,7 @@ enum class EPickupGameState : uint8
 };
 
 UCLASS()
-class GAMESANDBOX_API ABatteryCollectorGameMode : public AGameMode
+class PROJECT01_API ABatteryCollectorGameMode : public AGameMode
 {
 	GENERATED_BODY()
 

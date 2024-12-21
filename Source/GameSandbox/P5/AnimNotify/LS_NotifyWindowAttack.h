@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "AnimGraphRuntime/Public/AnimNotifies/AnimNotify_PlayMontageNotify.h"
+#include "AnimNotifies/AnimNotify_PlayMontageNotify.h"
 #include "LS_NotifyWindowAttack.generated.h"
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FLSOnAttackBeginSignature, USkeletalMeshComponent*);

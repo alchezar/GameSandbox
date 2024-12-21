@@ -1,10 +1,10 @@
 // Copyright (C) 2023, IKinder
 
-#include "GameSandbox/P1/Widget/PlayerHUD.h"
+#include "Project01/Public/Widget/PlayerHUD.h"
+
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
-#include "GameSandbox/P1/Character/BatteryCollectorGameMode.h"
-#include "Kismet/KismetTextLibrary.h"
+#include "Project01/Public/Character/BatteryCollectorGameMode.h"
 
 void UPlayerHUD::NativeConstruct()
 {

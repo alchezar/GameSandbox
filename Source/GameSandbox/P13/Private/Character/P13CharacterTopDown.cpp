@@ -331,7 +331,7 @@ void AP13CharacterTopDown::ToggleAim()
 
 void AP13CharacterTopDown::ListenToControllerCursor(AController* NewController)
 {
-	AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController ? NewController : Controller);
+	AP13PlayerController* PlayerController = Cast<AP13PlayerController>(NewController ? NewController : Controller.Get());
 	if (!PlayerController)
 	{
 		return;

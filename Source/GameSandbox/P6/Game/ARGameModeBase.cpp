@@ -143,7 +143,7 @@ void AARGameModeBase::OnPlayerKilled(AActor* Victim, AActor* Killer)
 	{
 		FTimerHandle RespawnTimer;
 		FTimerDelegate RespawnDelegate;
-		RespawnDelegate.BindLambda([=]()
+		RespawnDelegate.BindLambda([this, Player]()
 		{
 			if (AController* Controller = Player->GetController())
 			{

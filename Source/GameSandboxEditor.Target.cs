@@ -10,5 +10,6 @@ public class GameSandboxEditorTarget : TargetRules
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		ExtraModuleNames.Add("GameSandbox");
+		ExtraModuleNames.Add("Project01");
 	}
 }

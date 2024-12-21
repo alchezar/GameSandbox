@@ -61,7 +61,14 @@ void AP7LightSaber::SwitchWeapon(const bool bOn)
 		Beam->SetVisibility(bOn);
 		if (!WeaponSound.Arm || !WeaponSound.Humming) return;
 		UGameplayStatics::SpawnSoundAtLocation(GetWorld(), WeaponSound.Arm, GetActorLocation());
-		HummingSound ? HummingSound->Play() : HummingSound = UGameplayStatics::SpawnSoundAttached(WeaponSound.Humming, RootComponent);
+		if (HummingSound)
+		{
+			HummingSound->Play();
+		}
+		else
+		{
+			HummingSound = UGameplayStatics::SpawnSoundAttached(WeaponSound.Humming, RootComponent);
+		}
 	}
 	else
 	{

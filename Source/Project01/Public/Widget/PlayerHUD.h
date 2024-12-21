@@ -4,16 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-// #include "Components/ProgressBar.h"
-// #include "Components/TextBlock.h"
-#include "GameSandbox/P1/Character/BatteryCollectorGameMode.h"
+#include "Project01/Public/Character/BatteryCollectorGameMode.h"
 #include "PlayerHUD.generated.h"
 
 class UTextBlock;
 class UProgressBar;
 
 UCLASS()
-class GAMESANDBOX_API UPlayerHUD : public UUserWidget
+class PROJECT01_API UPlayerHUD : public UUserWidget
 {
 	GENERATED_BODY()
 

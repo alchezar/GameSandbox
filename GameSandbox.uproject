@@ -12,6 +12,11 @@
 				"Engine",
 				"UMG"
 			]
+		},
+		{
+			"Name": "Project01",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
 		}
 	],
 	"Plugins": [

@@ -115,7 +115,7 @@ void UP11GameInstance::RefreshServerList()
 	if (SessionSearch)
 	{
 		SessionSearch->MaxSearchResults = 20;
-		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		SessionSearch->QuerySettings.Set(TEXT("PRESENCESEARCH"), true, EOnlineComparisonOp::Equals);
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 		/* After async success -> ThisClass::OnFindSessionCompleteHandle. */
 	}

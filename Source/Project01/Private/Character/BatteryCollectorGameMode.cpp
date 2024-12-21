@@ -1,13 +1,14 @@
 // Copyright (C) 2023. IKinder
 
-#include "GameSandbox/P1/Character/BatteryCollectorGameMode.h"
+#include "Project01/Public/Character/BatteryCollectorGameMode.h"
+
 #include "EngineUtils.h"
 #include "Blueprint/UserWidget.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "GameSandbox/P1/Character/PickupTrooper.h"
-#include "GameSandbox/P1/Spawners/BatterySpawnerBase.h"
-#include "GameSandbox/P1/Widget/PlayerHUD.h"
 #include "Kismet/GameplayStatics.h"
+#include "Project01/Public/Character/PickupTrooper.h"
+#include "Project01/Public/Spawners/BatterySpawnerBase.h"
+#include "Project01/Public/Widget/PlayerHUD.h"
 
 ABatteryCollectorGameMode::ABatteryCollectorGameMode()
 	: Super()

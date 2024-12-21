@@ -5,6 +5,7 @@
 #include "OnlineSessionSettings.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemTypes.h"
+#include "OnlineSubsystemUtils.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
@@ -48,7 +49,7 @@ bool UP12GameInstance::ProcessConsoleExec(const TCHAR* Cmd, FOutputDevice& Ar, U
 	bool bResult = Super::ProcessConsoleExec(Cmd, Ar, Executor);
 	if (!bResult)
 	{
-		TArray<UGameInstanceSubsystem*> Subsystems = GetSubsystemArray<UGameInstanceSubsystem>();
+		TArray<UGameInstanceSubsystem*> Subsystems = GetSubsystemArrayCopy<UGameInstanceSubsystem>();
 		for (UGameInstanceSubsystem* Subsystem : Subsystems)
 		{
 			bResult |= Subsystem->ProcessConsoleExec(Cmd, Ar, Executor);
@@ -215,7 +216,7 @@ void UP12GameInstance::FindSession(TSharedPtr<const FUniqueNetId> UserId, bool b
 	/* We want to set this query settings if bPresence is true */
 	if (bPresence)
 	{
-		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, bPresence, EOnlineComparisonOp::Equals);
+		SessionSearch->QuerySettings.Set(TEXT("PRESENCESEARCH"), bPresence, EOnlineComparisonOp::Equals);
 	}
 	/* Set the delegate to delegate handle of the find session function. */
 	OnFindSessionsCompleteDelegateHandle = Sessions->AddOnFindSessionsCompleteDelegate_Handle(OnFindSessionsCompleteDelegate);

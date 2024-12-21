@@ -11,7 +11,7 @@ class APickUpBase;
 class UBillboardComponent;
 
 UCLASS()
-class GAMESANDBOX_API ABatterySpawnerBase : public AActor
+class PROJECT01_API ABatterySpawnerBase : public AActor
 {
 	GENERATED_BODY()
 

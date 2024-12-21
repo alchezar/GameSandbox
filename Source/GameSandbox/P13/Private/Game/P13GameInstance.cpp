@@ -43,7 +43,7 @@ void UP13GameInstance::FindSessions(const bool bLan)
 	{
 		SessionSearch->bIsLanQuery = bLan;
 		SessionSearch->MaxSearchResults = 20;
-		SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		SessionSearch->QuerySettings.Set(TEXT("PRESENCESEARCH"), true, EOnlineComparisonOp::Equals);
 		SessionInterface->FindSessions(0, SessionSearch.ToSharedRef());
 	}
 }
