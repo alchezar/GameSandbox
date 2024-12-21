@@ -1,15 +1,15 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_LightSaber.h"
-#include "DrawDebugHelpers.h"
+#include "Weapon/LS_LightSaber.h"
+
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/DecalComponent.h"
 #include "Components/PointLightComponent.h"
+#include "Content/LS_Slicable.h"
 #include "Kismet/GameplayStatics.h"
-#include "P5/Content/LS_Slicable.h"
-#include "P5/Player/LS_BaseCharacter.h"
+#include "Player/LS_BaseCharacter.h"
 
 ALS_LightSaber::ALS_LightSaber()
 {

@@ -13,7 +13,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 UCLASS()
-class GAMESANDBOX_API ALS_PlayerCharacter : public ALS_BaseCharacter
+class PROJECT05_API ALS_PlayerCharacter : public ALS_BaseCharacter
 {
 	GENERATED_BODY()
 

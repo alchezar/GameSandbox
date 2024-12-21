@@ -1,6 +1,6 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_NotifyWindowAttack.h"
+#include "AnimNotify/LS_NotifyWindowAttack.h"
 
 ULS_NotifyWindowAttack::ULS_NotifyWindowAttack()
 {

@@ -45,9 +45,10 @@ public class GameSandbox : ModuleRules
 
 		PublicIncludePaths.AddRange(new[]
 		{
-			"GameSandbox"
+			"GameSandbox",
+			"GameSandbox/P6"
 		});
-
+		
 		// DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
 
 		// Uncomment if you are using Slate UI

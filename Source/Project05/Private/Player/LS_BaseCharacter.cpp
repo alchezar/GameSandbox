@@ -1,11 +1,12 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_BaseCharacter.h"
+#include "Player/LS_BaseCharacter.h"
+
+#include "AnimNotify/LS_NotifySaberActivation.h"
+#include "AnimNotify/LS_NotifySaberVisibility.h"
+#include "AnimNotify/LS_NotifyWindowAttack.h"
 #include "GameFramework/PawnMovementComponent.h"
-#include "P5/AnimNotify/LS_NotifySaberActivation.h"
-#include "P5/AnimNotify/LS_NotifySaberVisibility.h"
-#include "P5/AnimNotify/LS_NotifyWindowAttack.h"
-#include "P5/Weapon/LS_LightSaber.h"
+#include "Weapon/LS_LightSaber.h"
 
 ALS_BaseCharacter::ALS_BaseCharacter()
 {

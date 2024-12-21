@@ -1,6 +1,6 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_PlayerController.h"
+#include "Player/LS_PlayerController.h"
 
 ALS_PlayerController::ALS_PlayerController()
 {

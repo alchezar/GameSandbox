@@ -60,7 +60,7 @@ struct FLSPlasmaSpawn
 };
 
 UCLASS()
-class GAMESANDBOX_API ALS_LightSaber : public AActor
+class PROJECT05_API ALS_LightSaber : public AActor
 {
 	GENERATED_BODY()
 

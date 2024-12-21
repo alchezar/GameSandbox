@@ -1,8 +1,9 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_GameMode.h"
-#include "P5/Player/LS_PlayerCharacter.h"
-#include "P5/Player/LS_PlayerController.h"
+#include "Game/LS_GameMode.h"
+
+#include "Player/LS_PlayerCharacter.h"
+#include "Player/LS_PlayerController.h"
 
 ALS_GameMode::ALS_GameMode()
 {

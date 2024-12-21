@@ -9,7 +9,7 @@
 DECLARE_MULTICAST_DELEGATE_OneParam(FLSOnSaberActivationSignature, USkeletalMeshComponent*);
 
 UCLASS()
-class GAMESANDBOX_API ULS_NotifySaberActivation : public UAnimNotify
+class PROJECT05_API ULS_NotifySaberActivation : public UAnimNotify
 {
 	GENERATED_BODY()
 

@@ -1,6 +1,7 @@
 // Copyright (C) 2023, IKinder
 
-#include "LS_Slicable.h"
+#include "Content/LS_Slicable.h"
+
 #include "KismetProceduralMeshLibrary.h"
 #include "ProceduralMeshComponent.h"
 

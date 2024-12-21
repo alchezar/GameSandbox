@@ -22,7 +22,7 @@ struct FTakeLightSaber
 };
 
 UCLASS()
-class GAMESANDBOX_API ALS_BaseCharacter : public ACharacter
+class PROJECT05_API ALS_BaseCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
