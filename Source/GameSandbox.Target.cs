@@ -9,5 +9,6 @@ public class GameSandboxTarget : TargetRules
 		Type = TargetType.Game;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
 		ExtraModuleNames.Add("GameSandbox");
+		ExtraModuleNames.Add("Project14");
 	}
 }

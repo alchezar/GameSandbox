@@ -39,7 +39,7 @@ void AP8Kart::BeginPlay()
 
 	if (HasAuthority())
 	{
-		NetUpdateFrequency = 1.f;
+		SetNetUpdateFrequency(1.f);
 	}
 }
 

@@ -21,8 +21,8 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	void SetupDamageWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset);
-	void SetupShieldWidget(const USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor = FLinearColor::Blue);
+	void SetupDamageWidget(USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset);
+	void SetupShieldWidget(USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor = FLinearColor::Blue);
 
 private:
 	void UpdateScreenLocation();

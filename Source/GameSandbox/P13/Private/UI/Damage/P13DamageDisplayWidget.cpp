@@ -25,7 +25,7 @@ void UP13DamageDisplayWidget::NativeTick(const FGeometry& MyGeometry, const floa
 	UpdateScreenLocation();
 }
 
-void UP13DamageDisplayWidget::SetupDamageWidget(const USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset)
+void UP13DamageDisplayWidget::SetupDamageWidget(USceneComponent* ComponentToAttach, const float CurrentDamage, const float NewHealthAlpha, const FVector2D NewRandomOffset)
 {
 	CachedComponentToAttach = ComponentToAttach;
 	DamageText->SetText(FText::AsNumber(CurrentDamage));
@@ -33,7 +33,7 @@ void UP13DamageDisplayWidget::SetupDamageWidget(const USceneComponent* Component
 	RandomOffset = NewRandomOffset;
 }
 
-void UP13DamageDisplayWidget::SetupShieldWidget(const USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor)
+void UP13DamageDisplayWidget::SetupShieldWidget(USceneComponent* ComponentToAttach, const FString& ShieldString, const FVector2D NewRandomOffset, const FLinearColor& NewColor)
 {
 	CachedComponentToAttach = ComponentToAttach;
 	DamageText->SetText(FText::FromString(ShieldString));

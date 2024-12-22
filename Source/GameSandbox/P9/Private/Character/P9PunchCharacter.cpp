@@ -495,7 +495,7 @@ void AP9PunchCharacter::Log(const EP9LogLevel Level, const FString& Message, con
 	if (GEngine &&(LogOutput == EP9LogOutput::ALL || LogOutput == EP9LogOutput::SCREEN))
 	{
 		/* Default color */
-		FColor LogColor;
+		FColor LogColor = {};
 		/* Flip the color based on the type */
 		if (Level == EP9LogLevel::TRACE)        LogColor = FColor::Green;
 		else if (Level == EP9LogLevel::DEBUG)   LogColor = FColor::Cyan;
