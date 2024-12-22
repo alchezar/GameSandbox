@@ -7,7 +7,8 @@ public class GameSandboxEditorTarget : TargetRules
 	public GameSandboxEditorTarget( TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
-		DefaultBuildSettings = BuildSettingsVersion.Latest;
+		DefaultBuildSettings = BuildSettingsVersion.V2;
+		// IncludeOrderVersion = EngineIncludeOrderVersion.Unreal5_1;
 		ExtraModuleNames.Add("GameSandbox");
 		ExtraModuleNames.Add("Project01");
 		ExtraModuleNames.Add("Project02");
