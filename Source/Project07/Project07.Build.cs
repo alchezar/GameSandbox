@@ -16,8 +16,14 @@ public class Project07 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"UMG",
+			"Niagara",
+			"EnhancedInput",
+			"AIModule",
+			"FieldSystemEngine",
+			"GeometryCollectionEngine"
 		});
 	}
 }
