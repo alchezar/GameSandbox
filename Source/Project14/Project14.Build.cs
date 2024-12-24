@@ -16,8 +16,11 @@ public class Project14 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"Json",
+			"JsonUtilities",
+			"UMG"
 		});
 	}
 }
