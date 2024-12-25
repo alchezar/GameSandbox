@@ -8,11 +8,17 @@
 #include "Misc/AutomationTest.h"
 #include "Tests/P14Utils.h"
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathMaxInt, "Project14.Math.MaxInt", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathMaxInt, "Project14.Math.MaxInt", P14::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathSqrt, "Project14.Math.Sqrt", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathSqrt, "Project14.Math.Sqrt", P14::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathSin, "Project14.Math.Sin", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14MathSin, "Project14.Math.Sin", P14::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
 
 bool FP14MathMaxInt::RunTest(const FString& Parameters)
 {

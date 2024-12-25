@@ -9,11 +9,17 @@
 #include "Science/P14ScienceFuncLib.h"
 #include "Tests/P14Utils.h"
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciSimple, "Project14.Science.FibonacciSimple", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciSimple, "Project14.Science.FibonacciSimple", P14::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciStress, "Project14.Science.FibonacciStress", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::StressFilter | EAutomationTestFlags::LowPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciStress, "Project14.Science.FibonacciStress", P14::TestContext
+	| EAutomationTestFlags::StressFilter
+	| EAutomationTestFlags::LowPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciNegative, "Project14.Science.FibonacciNegative", EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext | EAutomationTestFlags::ProductFilter | EAutomationTestFlags::HighPriority)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciNegative, "Project14.Science.FibonacciNegative", P14::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
 
 bool FP14FibonacciSimple::RunTest(const FString& Parameters)
 {

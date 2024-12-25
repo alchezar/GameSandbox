@@ -11,4 +11,6 @@ namespace P14
 		T2    Expected;
 		float Tolerance = KINDA_SMALL_NUMBER;
 	};
+
+	inline constexpr EAutomationTestFlags TestContext = EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext;
 }
