@@ -20,7 +20,9 @@ public class Project14 : ModuleRules
 		{
 			"Json",
 			"JsonUtilities",
-			"UMG"
+			"UMG",
+			"Niagara",
+			"EnhancedInput"
 		});
 	}
 }

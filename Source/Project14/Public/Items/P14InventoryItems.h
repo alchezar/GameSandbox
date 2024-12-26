@@ -1,0 +1,56 @@
+// Copyright © 2024, Ivan Kinder
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "Tests/P14Types.h"
+#include "P14InventoryItems.generated.h"
+
+class UNiagaraSystem;
+class UTextRenderComponent;
+class USphereComponent;
+
+UCLASS()
+class PROJECT14_API AP14InventoryItems : public AActor
+{
+	GENERATED_BODY()
+
+	/* ------------------------------ Unreal ------------------------------- */
+public:
+	AP14InventoryItems();
+	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+	/* ------------------------------- This -------------------------------- */
+public:
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+private:
+	void LazyInit();
+
+	/* ------------------------------ Fields ------------------------------- */
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	TObjectPtr<USphereComponent> CollisionComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	TObjectPtr<UStaticMeshComponent> MeshComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	TObjectPtr<UTextRenderComponent> TextComponent = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TObjectPtr<UNiagaraSystem> Particles = nullptr;
+	UPROPERTY(EditAnywhere, Category = "C++")
+	TObjectPtr<UMaterialInterface> Material = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	float Radius = 30.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FP14InventoryData InventoryData = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TMap<EP14InventoryItemType, TObjectPtr<UStaticMesh>> MeshesMap = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TArray<FLinearColor> Colors = {};
+
+private:
+	UPROPERTY()
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterial = nullptr;
+};
