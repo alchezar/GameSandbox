@@ -9,12 +9,14 @@ void UP14InventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
+#if !UE_BUILD_SHIPPING
 	for (int32 Index = 0; Index < StaticCast<uint8>(EP14InventoryItemType::MAX); ++Index)
 	{
 		const EP14InventoryItemType ItemType    = StaticCast<EP14InventoryItemType>(Index);
 		const bool                  bLimitCheck = InventoryLimits.Contains(ItemType);
-		checkf(bLimitCheck, TEXT("Limit for %s doesn't exist"), ItemType)
+		checkf(bLimitCheck, TEXT("Limit for %s doesn't exist"), *UEnum::GetValueAsString(ItemType))
 	}
+#endif
 }
 
 bool UP14InventoryComponent::TryAddItem(const FP14InventoryData& InData)
