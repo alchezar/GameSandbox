@@ -18,8 +18,6 @@ public class Project14 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"Json",
-			"JsonUtilities",
 			"UMG",
 			"Niagara",
 			"EnhancedInput"

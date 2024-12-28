@@ -3,7 +3,7 @@
 #pragma once
 #include "Components/P14InventoryComponent.h"
 
-#if (WITH_DEV_AUTOMATION_TESTS || WITH_PERF_AUTOMATION_TESTS)
+#if WITH_AUTOMATION_TESTS
 
 namespace P14::Test
 {

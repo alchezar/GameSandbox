@@ -5,20 +5,20 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Tests/P14Types.h"
-#include "P14InventoryItems.generated.h"
+#include "P14InventoryItem.generated.h"
 
 class UNiagaraSystem;
 class UTextRenderComponent;
 class USphereComponent;
 
-UCLASS()
-class PROJECT14_API AP14InventoryItems : public AActor
+UCLASS(Abstract)
+class PROJECT14_API AP14InventoryItem : public AActor
 {
 	GENERATED_BODY()
 
 	/* ------------------------------ Unreal ------------------------------- */
 public:
-	AP14InventoryItems();
+	AP14InventoryItem();
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 

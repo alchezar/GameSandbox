@@ -1,6 +1,6 @@
 // Copyright © 2024, Ivan Kinder
 
-#include "Items/P14InventoryItems.h"
+#include "Items/P14InventoryItem.h"
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
@@ -10,7 +10,7 @@
 #include "GameFramework/Pawn.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AP14InventoryItems::AP14InventoryItems()
+AP14InventoryItem::AP14InventoryItem()
 {
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>("CollisionSphereComponent");
 	CollisionComponent->SetSphereRadius(Radius);
@@ -29,7 +29,7 @@ AP14InventoryItems::AP14InventoryItems()
 	TextComponent->SetupAttachment(CollisionComponent);
 }
 
-void AP14InventoryItems::OnConstruction(const FTransform& Transform)
+void AP14InventoryItem::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
@@ -49,7 +49,7 @@ void AP14InventoryItems::OnConstruction(const FTransform& Transform)
 	}
 }
 
-void AP14InventoryItems::EndPlay(const EEndPlayReason::Type EndPlayReason)
+void AP14InventoryItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
 	Super::EndPlay(EndPlayReason);
 
@@ -59,7 +59,7 @@ void AP14InventoryItems::EndPlay(const EEndPlayReason::Type EndPlayReason)
 	}
 }
 
-void AP14InventoryItems::NotifyActorBeginOverlap(AActor* OtherActor)
+void AP14InventoryItem::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 
@@ -83,7 +83,7 @@ void AP14InventoryItems::NotifyActorBeginOverlap(AActor* OtherActor)
 	Destroy();
 }
 
-void AP14InventoryItems::LazyInit()
+void AP14InventoryItem::LazyInit()
 {
 	if (Material && !DynamicMaterial && MeshComponent->GetStaticMesh())
 	{

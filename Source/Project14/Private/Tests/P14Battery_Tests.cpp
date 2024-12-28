@@ -1,6 +1,6 @@
 // Copyright © 2024, Ivan Kinder
 
-#if (WITH_DEV_AUTOMATION_TESTS || WITH_PERF_AUTOMATION_TESTS)
+#if WITH_AUTOMATION_TESTS
 
 #include "Tests/P14Battery_Tests.h"
 
@@ -9,7 +9,7 @@
 #include "Misc/AutomationTest.h"
 #include "Tests/P14Utils.h"
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14BatteryTests, "Project14.Items.Battery", P14::TestContext
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14BatteryTests, "Project14.Items.Battery", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 

@@ -1,6 +1,6 @@
 // Copyright © 2024, Ivan Kinder
 
-#if (WITH_DEV_AUTOMATION_TESTS || WITH_PERF_AUTOMATION_TESTS)
+#if WITH_AUTOMATION_TESTS
 
 #include "Tests/P14ScienceFuncLib_Tests.h"
 
@@ -9,15 +9,15 @@
 #include "Science/P14ScienceFuncLib.h"
 #include "Tests/P14Utils.h"
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciSimple, "Project14.Science.FibonacciSimple", P14::TestContext
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciSimple, "Project14.Science.FibonacciSimple", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciStress, "Project14.Science.FibonacciStress", P14::TestContext
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciStress, "Project14.Science.FibonacciStress", P14::Test::TestContext
 	| EAutomationTestFlags::StressFilter
 	| EAutomationTestFlags::LowPriority)
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciNegative, "Project14.Science.FibonacciNegative", P14::TestContext
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciNegative, "Project14.Science.FibonacciNegative", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 
@@ -25,7 +25,7 @@ bool FP14FibonacciSimple::RunTest(const FString& Parameters)
 {
 	AddInfo("Fibonacci simple testing");
 
-	TArray<P14::TTestPayload<int32, int32>> TestData = {
+	TArray<P14::Test::TTestPayload<int32, int32>> TestData = {
 		{0, 0},
 		{1, 1},
 		{2, 1},
