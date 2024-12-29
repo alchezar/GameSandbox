@@ -24,18 +24,26 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	_NODISCARD float                                                GetRadius() const { return Radius; }
+	_NODISCARD FP14InventoryData                                    GetInventoryData() const { return InventoryData; };
+	_NODISCARD TMap<EP14InventoryItemType, TObjectPtr<UStaticMesh>> GetMeshesMap() const { return MeshesMap; };
+
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+protected:
+	UFUNCTION(BlueprintCallable)
+	void InitItem(const FLinearColor InColor);
 
 private:
 	void LazyInit();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Components")
 	TObjectPtr<USphereComponent> CollisionComponent = nullptr;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Components")
 	TObjectPtr<UStaticMeshComponent> MeshComponent = nullptr;
-	UPROPERTY(VisibleAnywhere, Category = "C++ | Components")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Components")
 	TObjectPtr<UTextRenderComponent> TextComponent = nullptr;
 	UPROPERTY(EditAnywhere, Category = "C++")
 	TObjectPtr<UNiagaraSystem> Particles = nullptr;

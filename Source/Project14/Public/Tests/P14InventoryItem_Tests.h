@@ -25,7 +25,4 @@ UCLASS(Placeable)
 class PROJECT14_API AP14InventoryItem_Test : public AP14InventoryItem
 {
 	GENERATED_BODY()
-
-public:
-	_NODISCARD float GetRadius() const { return Radius; }
 };

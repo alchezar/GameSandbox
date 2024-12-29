@@ -33,10 +33,7 @@ bool FP14ComponentCouldBeCreated::RunTest(const FString& Parameters)
 {
 	AddInfo("Test if component could be created.");
 	const UP14InventoryComponent* InventoryComponent = NewObject<UP14InventoryComponent>();
-	if (!TestNotNull("Inventory component could be created", InventoryComponent))
-	{
-		return false;
-	}
+	UTEST_NOT_NULL_EXPR(InventoryComponent)
 
 	return true;
 }
@@ -45,6 +42,7 @@ bool FP14ItemScoreShouldBeZeroByDefault::RunTest(const FString& Parameters)
 {
 	AddInfo("Check if item score is zero by default.");
 	const UP14InventoryComponent* InventoryComponent = NewObject<UP14InventoryComponent>();
+	UTEST_NOT_NULL_EXPR(InventoryComponent)
 
 	P14::Test::IterateThroughEnum(EP14InventoryItemType::MAX, [this, InventoryComponent](const EP14InventoryItemType InType) -> void
 	{
@@ -58,6 +56,7 @@ bool FP14NegativeItemShouldNotBeAdded::RunTest(const FString& Parameters)
 {
 	AddInfo("Check if negative item can't be added.");
 	UP14InventoryComponent* InventoryComponent = NewObject<UP14InventoryComponent>();
+	UTEST_NOT_NULL_EXPR(InventoryComponent)
 
 	P14::Test::IterateThroughEnum(EP14InventoryItemType::MAX, [this, InventoryComponent](const EP14InventoryItemType InType) -> void
 	{
@@ -72,6 +71,7 @@ bool FP14PositiveScoreShouldBeAdded::RunTest(const FString& Parameters)
 {
 	AddInfo("Check if positive score can be added.");
 	P14::Test::UP14InventoryComponent_Testable* InventoryComponent = NewObject<P14::Test::UP14InventoryComponent_Testable>();
+	UTEST_NOT_NULL_EXPR(InventoryComponent)
 
 	constexpr int32 Limit = 100;
 	P14::Test::IterateThroughEnum(EP14InventoryItemType::MAX, [this, InventoryComponent](const EP14InventoryItemType InType) -> void
@@ -91,6 +91,7 @@ bool FP14ScoreAboveLimitShouldNotBeAdded::RunTest(const FString& Parameters)
 {
 	AddInfo("Check if score above limit can't be added.");
 	P14::Test::UP14InventoryComponent_Testable* InventoryComponent = NewObject<P14::Test::UP14InventoryComponent_Testable>();
+	UTEST_NOT_NULL_EXPR(InventoryComponent)
 
 	constexpr int32 Limit = 100;
 	P14::Test::IterateThroughEnum(EP14InventoryItemType::MAX, [this, InventoryComponent](const EP14InventoryItemType InType) -> void

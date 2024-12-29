@@ -33,20 +33,9 @@ void AP14InventoryItem::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);
 
-	if (MeshesMap.Contains(InventoryData.Type))
-	{
-		MeshComponent->SetStaticMesh(MeshesMap[InventoryData.Type]);
-	}
-
-	TextComponent->SetText(FText::AsNumber(InventoryData.Score));
-
 	LazyInit();
-	if (DynamicMaterial && MeshComponent)
-	{
-		const FLinearColor RandomColor = Colors[UKismetMathLibrary::RandomInteger(Colors.Num())];
-		DynamicMaterial->SetVectorParameterValue("Color", RandomColor);
-		MeshComponent->SetMaterial(0, DynamicMaterial);
-	}
+	const FLinearColor RandomColor = Colors[UKismetMathLibrary::RandomInteger(Colors.Num())];
+	InitItem(RandomColor);
 }
 
 void AP14InventoryItem::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -83,6 +72,22 @@ void AP14InventoryItem::NotifyActorBeginOverlap(AActor* OtherActor)
 	Destroy();
 }
 
+void AP14InventoryItem::InitItem(const FLinearColor InColor)
+{
+	if (MeshesMap.Contains(InventoryData.Type))
+	{
+		MeshComponent->SetStaticMesh(MeshesMap[InventoryData.Type]);
+	}
+
+	TextComponent->SetText(FText::AsNumber(InventoryData.Score));
+
+	if (DynamicMaterial && MeshComponent)
+	{
+		DynamicMaterial->SetVectorParameterValue("Color", InColor);
+		MeshComponent->SetMaterial(0, DynamicMaterial);
+	}
+}
+
 void AP14InventoryItem::LazyInit()
 {
 	if (Material && !DynamicMaterial && MeshComponent->GetStaticMesh())
@@ -93,7 +98,6 @@ void AP14InventoryItem::LazyInit()
 	if (Colors.IsEmpty())
 	{
 		Colors.Add(FLinearColor::Red);
-		Colors.Add(FLinearColor::Yellow);
 		Colors.Add(FLinearColor::Green);
 		Colors.Add(FLinearColor::Blue);
 	}

@@ -1,6 +1,7 @@
 // Copyright © 2024, Ivan Kinder
 
 #pragma once
+#include "Misc/OutputDeviceNull.h"
 #include "Tests/AutomationCommon.h"
 
 namespace P14::Test
@@ -34,6 +35,23 @@ namespace P14::Test
 		}
 
 		return InWorld->SpawnActor<T>(Blueprint->GeneratedClass, InTransform);
+	}
+
+	FORCEINLINE void CallFuncByNameWithParams(UObject* InObject, const FString& InFuncName, const TArray<FString>& InParams)
+	{
+		if (!InObject)
+		{
+			return;
+		}
+
+		FString Command = InFuncName;
+		for (const FString& Param : InParams)
+		{
+			Command.Append(" ").Append(Param);
+		}
+
+		FOutputDeviceNull OutputDeviceNull{};
+		InObject->CallFunctionByNameWithArguments(*Command, OutputDeviceNull, nullptr, true);
 	}
 
 	class FLevelScope
