@@ -144,7 +144,7 @@ bool FP14InventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 
 	const UStaticMeshComponent* MeshComp = Item->FindComponentByClass<UStaticMeshComponent>();
 	UTEST_NOT_NULL_EXPR(Item)
-	TestTrueExpr(MeshComp->GetStaticMesh() == Item->GetMeshesMap()[EP14InventoryItemType::Sphere]);
+	TestTrueExpr(MeshComp->GetStaticMesh() && MeshComp->GetStaticMesh() == Item->GetMeshesMap()[EP14InventoryItemType::Sphere]);
 
 	const UMaterialInterface* Material = MeshComp->GetMaterial(0);
 	UTEST_NOT_NULL_EXPR(Material)

@@ -35,4 +35,19 @@ struct FP14InventoryData
 	}
 };
 
+USTRUCT(BlueprintType)
+struct FP14HealthData
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "1.0", ClampMax = "100.0"))
+	float MaxHealth = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1"))
+	float HealModifier = 10.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", Units = "seconds"))
+	float HealRate = 0.5f;
+};
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP14OnScoreUpdated, EP14InventoryItemType, Type);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FP14OnHealthChanged);

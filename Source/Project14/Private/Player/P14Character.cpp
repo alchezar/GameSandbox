@@ -46,6 +46,11 @@ void AP14Character::BeginPlay()
 	{
 		Subsystem->AddMappingContext(InputContext, 0);
 	}
+
+	check(HealthData.MaxHealth > 0.f)
+	UpdateHealth(HealthData.MaxHealth);
+
+	OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnAnyDamageReceivedCallback);
 }
 
 void AP14Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -79,4 +84,63 @@ void AP14Character::LookInput(const FInputActionValue& InputValue)
 
 	AddControllerYawInput(InputVector.X);
 	AddControllerPitchInput(InputVector.Y);
+}
+
+void AP14Character::OnAnyDamageReceivedCallback(AActor* DamagedActor, const float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
+{
+	const auto IsDead = [this]() -> bool
+	{
+		return Health <= 0.f;
+	};
+
+	if (Damage <= 0.f || IsDead())
+	{
+		return;
+	}
+
+	UpdateHealth(-Damage);
+
+	if (IsDead())
+	{
+		OnDeath();
+	}
+	else
+	{
+		GetWorld()->GetTimerManager().SetTimer(HealthTimer, this, &ThisClass::OnHealing, HealthData.HealRate, true);
+	}
+}
+
+void AP14Character::UpdateHealth(const float HealthDelta)
+{
+	Health = FMath::Clamp(Health + HealthDelta, 0.f, HealthData.MaxHealth);
+	OnHealthChanged.Broadcast();
+}
+
+void AP14Character::OnHealing()
+{
+	UpdateHealth(HealthData.HealModifier);
+
+	if (Health >= HealthData.MaxHealth)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(HealthTimer);
+		Health = HealthData.MaxHealth;
+	}
+}
+
+void AP14Character::OnDeath()
+{
+	GetWorld()->GetTimerManager().ClearTimer(HealthTimer);
+
+	check(GetCharacterMovement())
+	check(GetCapsuleComponent())
+	check(GetMesh())
+	check(GetController())
+
+	GetCharacterMovement()->DisableMovement();
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetCollisionProfileName("Ragdoll");
+	GetController()->ChangeState(NAME_Spectating);
+	DetachFromControllerPendingDestroy();
+	SetLifeSpan(10.f);
 }

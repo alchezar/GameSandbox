@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "Tests/P14Types.h"
 #include "P14Character.generated.h"
 
 class UInputMappingContext;
@@ -37,7 +38,22 @@ protected:
 	void MoveInput(const FInputActionValue& InputValue);
 	void LookInput(const FInputActionValue& InputValue);
 
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	float GetHealthPercent() const { return Health / HealthData.MaxHealth; }
+
+	UFUNCTION()
+	void OnAnyDamageReceivedCallback(AActor* DamagedActor, const float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+private:
+	void UpdateHealth(const float HealthDelta);
+	void OnHealing();
+	void OnDeath();
+
 	/* ------------------------------ Fields ------------------------------- */
+public:
+	UPROPERTY(EditAnywhere, BlueprintAssignable, Category = "C++")
+	FP14OnHealthChanged OnHealthChanged;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
@@ -57,4 +73,10 @@ protected:
 	TObjectPtr<UInputAction> LookAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UInputAction> JumpAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	FP14HealthData HealthData = {};
+
+private:
+	float        Health      = 0.f;
+	FTimerHandle HealthTimer = {};
 };
