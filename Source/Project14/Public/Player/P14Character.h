@@ -34,12 +34,12 @@ public:
 	_NODISCARD TObjectPtr<USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
 	_NODISCARD TObjectPtr<UCameraComponent>    GetFollowCamera() const { return FollowCamera; }
 
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	float GetHealthPercent() const { return Health / HealthData.MaxHealth; }
+
 protected:
 	void MoveInput(const FInputActionValue& InputValue);
 	void LookInput(const FInputActionValue& InputValue);
-
-	UFUNCTION(BlueprintCallable, Category = "C++")
-	float GetHealthPercent() const { return Health / HealthData.MaxHealth; }
 
 	UFUNCTION()
 	void OnAnyDamageReceivedCallback(AActor* DamagedActor, const float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
@@ -73,7 +73,7 @@ protected:
 	TObjectPtr<UInputAction> LookAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UInputAction> JumpAction = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FP14HealthData HealthData = {};
 
 private:

@@ -42,15 +42,24 @@ void AP14Character::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetController<APlayerController>()->GetLocalPlayer()))
+	check(HealthData.MaxHealth > 0.f)
+	UpdateHealth(HealthData.MaxHealth);
+	OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnAnyDamageReceivedCallback);
+
+	const APlayerController* PlayerController = GetController<APlayerController>();
+	if (!PlayerController)
+	{
+		return;
+	}
+	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	if (!LocalPlayer)
+	{
+		return;
+	}
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
 	{
 		Subsystem->AddMappingContext(InputContext, 0);
 	}
-
-	check(HealthData.MaxHealth > 0.f)
-	UpdateHealth(HealthData.MaxHealth);
-
-	OnTakeAnyDamage.AddDynamic(this, &ThisClass::OnAnyDamageReceivedCallback);
 }
 
 void AP14Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -134,13 +143,15 @@ void AP14Character::OnDeath()
 	check(GetCharacterMovement())
 	check(GetCapsuleComponent())
 	check(GetMesh())
-	check(GetController())
 
 	GetCharacterMovement()->DisableMovement();
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetCollisionProfileName("Ragdoll");
-	GetController()->ChangeState(NAME_Spectating);
+	if (AController* Control = GetController())
+	{
+		Control->ChangeState(NAME_Spectating);
+	}
 	DetachFromControllerPendingDestroy();
-	SetLifeSpan(10.f);
+	SetLifeSpan(HealthData.LifeSpan);
 }

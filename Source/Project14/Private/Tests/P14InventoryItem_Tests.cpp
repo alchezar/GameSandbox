@@ -121,7 +121,7 @@ bool FP14InventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	UWorld* World = AutomationCommon::GetAnyGameWorld();
 	UTEST_NOT_NULL_EXPR(World)
 
-	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/Items/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
+	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
 	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName);
 	UTEST_NOT_NULL_EXPR(Item)
 
@@ -164,7 +164,7 @@ bool FP14InventoryCanBeTaken::RunTest(const FString& Parameters)
 	UTEST_NOT_NULL_EXPR(World)
 
 	const FTransform   InitTransform{FVector{1000.f}};
-	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/Items/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
+	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
 	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)
 

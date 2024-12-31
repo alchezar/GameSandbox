@@ -46,6 +46,13 @@ struct FP14HealthData
 	float HealModifier = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", Units = "seconds"))
 	float HealRate = 0.5f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (ClampMin = "0.1", Units = "seconds"))
+	float LifeSpan = 5.f;
+
+	FString ToString() const
+	{
+		return FString::Printf(TEXT("(MaxHealth=%f,HealModifier=%f,HealRate=%f,LifeSpan=%f)"), MaxHealth, HealModifier, HealRate, LifeSpan);
+	}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP14OnScoreUpdated, EP14InventoryItemType, Type);

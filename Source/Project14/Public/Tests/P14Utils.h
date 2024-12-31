@@ -6,6 +6,9 @@
 
 namespace P14::Test
 {
+#define TestEqualExpr(Actual, Expected) TestEqual(TEXT(#Actual), Actual, Expected)
+#define TestNullExpr(Actual) TestNull(TEXT(#Actual), Actual)
+
 	inline constexpr EAutomationTestFlags TestContext = EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext;
 
 	template <typename T1, typename T2>
@@ -35,6 +38,18 @@ namespace P14::Test
 		}
 
 		return InWorld->SpawnActor<T>(Blueprint->GeneratedClass, InTransform);
+	}
+
+	template <typename T>
+	T* CreateBlueprintDeferred(UWorld* InWorld, const FString& InName, const FTransform& InTransform = FTransform::Identity)
+	{
+		const UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *InName);
+		if (!InWorld || !Blueprint)
+		{
+			return nullptr;
+		}
+
+		return InWorld->SpawnActorDeferred<T>(Blueprint->GeneratedClass, InTransform);
 	}
 
 	FORCEINLINE void CallFuncByNameWithParams(UObject* InObject, const FString& InFuncName, const TArray<FString>& InParams)
