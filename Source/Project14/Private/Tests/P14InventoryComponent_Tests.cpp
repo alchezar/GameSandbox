@@ -1,13 +1,13 @@
 // Copyright © 2024, Ivan Kinder
 
-#if WITH_AUTOMATION_TESTS
-
 #include "Tests/P14InventoryComponent_Tests.h"
 
 #include "CoreMinimal.h"
 #include "Components/P14InventoryComponent.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/P14Utils.h"
+
+#if WITH_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14ComponentCouldBeCreated, "Project14.Components.Inventory.ComponentCouldBeCreated", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter

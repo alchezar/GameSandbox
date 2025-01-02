@@ -1,11 +1,8 @@
 // Copyright © 2024, Ivan Kinder
 
-#if WITH_AUTOMATION_TESTS
-
 #include "Tests/P14InventoryItem_Tests.h"
 
 #include "CoreMinimal.h"
-#include "EngineUtils.h"
 #include "Components/P14InventoryComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/TextRenderComponent.h"
@@ -15,6 +12,8 @@
 #include "Player/P14Character.h"
 #include "Tests/AutomationCommon.h"
 #include "Tests/P14Utils.h"
+
+#if WITH_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14AbstractCppActorCouldNotBeCreated, "Project14.Items.Inventory.AbstractCppActorCouldNotBeCreated", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter
@@ -88,8 +87,9 @@ bool FP14BlueprintShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	UTEST_NOT_NULL_EXPR(World)
 
 	// Load blueprint and spawn inventory item.
+	const FTransform         InitTransform {FVector{0.f, 0.f, 1000.f}};
 	const FString            BPItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Items/BP_InventoryItem.BP_InventoryItem'";
-	const AP14InventoryItem* Item       = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPItemName);
+	const AP14InventoryItem* Item       = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)
 
 	// Collision tests.
@@ -121,8 +121,9 @@ bool FP14InventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	UWorld* World = AutomationCommon::GetAnyGameWorld();
 	UTEST_NOT_NULL_EXPR(World)
 
+	const FTransform   InitTransform{FVector{0.f, 0.f, 1000.f}};
 	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
-	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName);
+	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)
 
 	P14::Test::CallFuncByNameWithParams(Item, "SetTestData", {
@@ -163,7 +164,7 @@ bool FP14InventoryCanBeTaken::RunTest(const FString& Parameters)
 	UWorld* World = AutomationCommon::GetAnyGameWorld();
 	UTEST_NOT_NULL_EXPR(World)
 
-	const FTransform   InitTransform{FVector{1000.f}};
+	const FTransform   InitTransform{FVector{0.f, 0.f, 1000.f}};
 	const FString      BPTestItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Tests/BP_InventoryItemChild_Test.BP_InventoryItemChild_Test'";
 	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)
@@ -172,15 +173,9 @@ bool FP14InventoryCanBeTaken::RunTest(const FString& Parameters)
 	const FLinearColor          TestColor{FLinearColor::Yellow};
 	P14::Test::CallFuncByNameWithParams(Item, "SetInventoryData", {TestData.ToString(), TestColor.ToString()});
 
-	AP14Character* Char = nullptr;
-	for (TActorIterator<AP14Character> Iterator{World}; Iterator; ++Iterator)
-	{
-		if (*Iterator)
-		{
-			Char = *Iterator;
-			break;
-		}
-	}
+	TArray<AP14Character*> Characters = P14::Test::GetAllActors<AP14Character>(World);
+	UTEST_TRUE_EXPR(!Characters.IsEmpty())
+	AP14Character* Char = Characters[0];
 	UTEST_NOT_NULL_EXPR(Char)
 
 	const UP14InventoryComponent* InvComp = Char->FindComponentByClass<UP14InventoryComponent>();

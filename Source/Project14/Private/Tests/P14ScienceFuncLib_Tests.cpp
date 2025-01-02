@@ -1,13 +1,13 @@
 // Copyright © 2024, Ivan Kinder
 
-#if WITH_AUTOMATION_TESTS
-
 #include "Tests/P14ScienceFuncLib_Tests.h"
 
 #include "CoreMinimal.h"
 #include "Misc/AutomationTest.h"
 #include "Science/P14ScienceFuncLib.h"
 #include "Tests/P14Utils.h"
+
+#if WITH_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciSimple, "Project14.Science.FibonacciSimple", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter

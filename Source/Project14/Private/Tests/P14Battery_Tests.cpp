@@ -1,13 +1,13 @@
 // Copyright © 2024, Ivan Kinder
 
-#if WITH_AUTOMATION_TESTS
-
 #include "Tests/P14Battery_Tests.h"
 
 #include "CoreMinimal.h"
 #include "Items/P14Battery.h"
 #include "Misc/AutomationTest.h"
 #include "Tests/P14Utils.h"
+
+#if WITH_AUTOMATION_TESTS
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14BatteryTests, "Project14.Items.Battery", P14::Test::TestContext
 	| EAutomationTestFlags::ProductFilter

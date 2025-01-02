@@ -1,17 +1,17 @@
 // Copyright © 2024, Ivan Kinder
 
-#include "Components/CapsuleComponent.h"
-#include "GameFramework/CharacterMovementComponent.h"
-#if WITH_AUTOMATION_TESTS
-
 #include "Tests/P14Character_Tests.h"
 
 #include "CoreMinimal.h"
+#include "Components/CapsuleComponent.h"
 #include "Engine/DamageEvents.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Misc/AutomationTest.h"
 #include "Player/P14Character.h"
 #include "Tests/AutomationCommon.h"
 #include "Tests/P14Utils.h"
+
+#if WITH_AUTOMATION_TESTS
 
 DEFINE_LOG_CATEGORY_STATIC(LogP14CharacterTest, All, All)
 

@@ -13,14 +13,14 @@ public class Project14 : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"InputCore"
+			"InputCore",
+			"EnhancedInput"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"UMG",
-			"Niagara",
-			"EnhancedInput"
+			"Niagara"
 		});
 	}
 }
