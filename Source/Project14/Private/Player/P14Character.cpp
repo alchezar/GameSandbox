@@ -68,6 +68,10 @@ void AP14Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
+		Input->BindActionValue(MoveAction);
+		Input->BindActionValue(LookAction);
+		Input->BindActionValue(JumpAction);
+
 		Input->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
 		Input->BindAction(LookAction, ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 		Input->BindAction(JumpAction, ETriggerEvent::Started, this, &Super::Jump);

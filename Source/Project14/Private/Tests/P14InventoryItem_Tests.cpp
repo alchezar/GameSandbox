@@ -11,7 +11,7 @@
 #include "Misc/AutomationTest.h"
 #include "Player/P14Character.h"
 #include "Tests/AutomationCommon.h"
-#include "Tests/P14Utils.h"
+#include "Utils/P14Utils.h"
 
 #if WITH_AUTOMATION_TESTS
 
@@ -87,7 +87,7 @@ bool FP14BlueprintShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	UTEST_NOT_NULL_EXPR(World)
 
 	// Load blueprint and spawn inventory item.
-	const FTransform         InitTransform {FVector{0.f, 0.f, 1000.f}};
+	const FTransform         InitTransform{FVector{0.f, 0.f, 1000.f}};
 	const FString            BPItemName = "/Script/Engine.Blueprint'/Game/Project/PP14/Items/BP_InventoryItem.BP_InventoryItem'";
 	const AP14InventoryItem* Item       = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)

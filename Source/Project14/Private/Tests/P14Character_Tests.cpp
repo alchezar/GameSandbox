@@ -9,7 +9,7 @@
 #include "Misc/AutomationTest.h"
 #include "Player/P14Character.h"
 #include "Tests/AutomationCommon.h"
-#include "Tests/P14Utils.h"
+#include "Utils/P14Utils.h"
 
 #if WITH_AUTOMATION_TESTS
 

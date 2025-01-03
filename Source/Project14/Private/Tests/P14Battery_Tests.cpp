@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "Items/P14Battery.h"
 #include "Misc/AutomationTest.h"
-#include "Tests/P14Utils.h"
+#include "Utils/P14Utils.h"
 
 #if WITH_AUTOMATION_TESTS
 

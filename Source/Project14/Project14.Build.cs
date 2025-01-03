@@ -20,7 +20,9 @@ public class Project14 : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"UMG",
-			"Niagara"
+			"Niagara",
+			"Json",
+			"JsonUtilities"
 		});
 	}
 }

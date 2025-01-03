@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Tests/P14Types.h"
+#include "Utils/P14Types.h"
 #include "P14InventoryItem.generated.h"
 
 class UNiagaraSystem;

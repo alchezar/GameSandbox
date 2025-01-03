@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
-#include "Tests/P14Types.h"
+#include "Utils/P14Types.h"
 #include "P14Character.generated.h"
 
 class UInputMappingContext;

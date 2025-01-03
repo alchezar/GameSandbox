@@ -9,7 +9,7 @@
 #include "Items/P14InventoryItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/AutomationTest.h"
-#include "Tests/P14Utils.h"
+#include "Utils/P14Utils.h"
 
 #if WITH_AUTOMATION_TESTS
 
@@ -171,10 +171,10 @@ bool FP14GameplayAllItemsCanBeTakenOnMovement::RunTest(const FString& Parameters
 
 	constexpr float Distance  = 300.f;
 	TArray<FVector> Locations = {
-		{Distance * 1.f, 0.f,            100.f},
-		{Distance * 2.f, 0.f,            100.f},
-		{Distance * 3.f, 0.f,            100.f},
-		{Distance * 3.f, 0.f,            Distance},
+		{Distance * 1.f, 0.f, 100.f},
+		{Distance * 2.f, 0.f, 100.f},
+		{Distance * 3.f, 0.f, 100.f},
+		{Distance * 3.f, 0.f, Distance},
 		{Distance * 3.f, Distance * 1.f, 100.f},
 		{Distance * 3.f, Distance * 2.f, 100.f}
 	};

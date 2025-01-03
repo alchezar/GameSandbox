@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-#include "Tests/P14Types.h"
+#include "Utils/P14Types.h"
 #include "P14InventoryComponent.generated.h"
 
 UCLASS(ClassGroup=(P14), meta=(BlueprintSpawnableComponent))
