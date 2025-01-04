@@ -5,6 +5,9 @@
 #include "EnhancedInputComponent.h"
 #include "Misc/OutputDeviceNull.h"
 #include "Tests/AutomationCommon.h"
+// ReSharper disable CppUnusedIncludeDirective
+#include "Utils/P14JsonUtils.h"
+// ReSharper restore CppUnusedIncludeDirective
 
 class UEnhancedInputLocalPlayerSubsystem;
 
@@ -32,8 +35,13 @@ namespace P14::Test
 		}
 	}
 
+	FORCEINLINE _NODISCARD FString GetTestDataFullPath()
+	{
+		return FPaths::Combine(FPaths::ProjectDir(), "Data", "Project14", "CharacterInputData.json");
+	}
+
 	template <typename T>
-	T* CreateBlueprint(UWorld* InWorld, const FString& InName, const FTransform& InTransform = FTransform::Identity)
+	_NODISCARD T* CreateBlueprint(UWorld* InWorld, const FString& InName, const FTransform& InTransform = FTransform::Identity)
 	{
 		const UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *InName);
 		if (!InWorld || !Blueprint)
@@ -45,7 +53,7 @@ namespace P14::Test
 	}
 
 	template <typename T>
-	T* CreateBlueprintDeferred(UWorld* InWorld, const FString& InName, const FTransform& InTransform = FTransform::Identity)
+	_NODISCARD T* CreateBlueprintDeferred(UWorld* InWorld, const FString& InName, const FTransform& InTransform = FTransform::Identity)
 	{
 		const UBlueprint* Blueprint = LoadObject<UBlueprint>(nullptr, *InName);
 		if (!InWorld || !Blueprint)
@@ -57,7 +65,7 @@ namespace P14::Test
 	}
 
 	template <typename T>
-	TArray<T*> GetAllActors(UWorld* InWorld)
+	_NODISCARD TArray<T*> GetAllActors(UWorld* InWorld)
 	{
 		TArray<T*> Actors = {};
 		for (TActorIterator<T> Iterator{InWorld}; Iterator; ++Iterator)
@@ -72,7 +80,7 @@ namespace P14::Test
 		return Actors;
 	}
 
-	FORCEINLINE int32 GetActionBindingIndex(const UEnhancedInputComponent* InInputComp, const FString InActionName, const ETriggerEvent InTriggerEvent)
+	FORCEINLINE _NODISCARD int32 GetActionBindingIndex(const UEnhancedInputComponent* InInputComp, const FString InActionName, const ETriggerEvent InTriggerEvent)
 	{
 		int32 Result = INDEX_NONE;
 		if (!InInputComp)
@@ -143,5 +151,26 @@ namespace P14::Test
 		FVector2D                           Direction   = {};
 		UEnhancedInputLocalPlayerSubsystem* Subsystem   = nullptr;
 		const UInputAction*                 InputAction = nullptr;
+	};
+
+	class FSimulateMovementLatentCommand : public IAutomationLatentCommand
+	{
+	public:
+		FSimulateMovementLatentCommand(UWorld* InWorld, ACharacter* InChar, TArray<FP14BindingsData> InBindings)
+			: World(InWorld)
+			, Char(InChar)
+			, Bindings(MoveTemp(InBindings))
+		{};
+
+		virtual bool Update() override;
+
+	private:
+		TObjectPtr<UWorld>       World      = nullptr;
+		TObjectPtr<ACharacter>   Char       = nullptr;
+		TArray<FP14BindingsData> Bindings   = {};
+		int32                    FrameIndex = 0;
+
+		UEnhancedInputComponent*            InputComp = nullptr;
+		UEnhancedInputLocalPlayerSubsystem* Subsystem = nullptr;
 	};
 }

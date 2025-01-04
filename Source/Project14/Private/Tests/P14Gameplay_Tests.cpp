@@ -9,6 +9,7 @@
 #include "Items/P14InventoryItem.h"
 #include "Kismet/GameplayStatics.h"
 #include "Misc/AutomationTest.h"
+#include "Utils/P14JsonUtils.h"
 #include "Utils/P14Utils.h"
 
 #if WITH_AUTOMATION_TESTS
@@ -25,11 +26,17 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14GameplayAllItemsCanBeTakenOnMovement, "Proj
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14GameplayAllItemsCanBeTakenOnRecordedMovement, "Project14.Gameplay.AllItemsCanBeTakenOnRecordedMovement", P14::Test::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Custom class of the latent commands by using macro. *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 DEFINE_LATENT_AUTOMATION_COMMAND_ONE_PARAMETER(FP14JumpLatentCommand, ACharacter*, Char);
+
+DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(FP14CheckItemsAmountLatentCommand, UWorld*, World, int32, ItemsAmount);
 
 bool FP14JumpLatentCommand::Update()
 {
@@ -56,8 +63,6 @@ bool FP14JumpLatentCommand::Update()
 
 	return true;
 }
-
-DEFINE_LATENT_AUTOMATION_COMMAND_TWO_PARAMETER(FP14CheckItemsAmountLatentCommand, UWorld*, World, int32, ItemsAmount);
 
 bool FP14CheckItemsAmountLatentCommand::Update()
 {
@@ -87,8 +92,8 @@ bool P14::Test::FP14MoveLatentCommand::Update()
 		InputAction = ActionBinding->GetAction();
 		check(InputAction)
 	}
-
 	if (!Subsystem)
+
 	{
 		const APlayerController* Controller = Char->GetController<APlayerController>();
 		check(Controller)
@@ -108,6 +113,54 @@ bool P14::Test::FP14MoveLatentCommand::Update()
 	return true;
 }
 
+bool P14::Test::FSimulateMovementLatentCommand::Update()
+{
+	if (!World || !Char)
+	{
+		return true;
+	}
+
+	if (!InputComp)
+	{
+		InputComp = Cast<UEnhancedInputComponent>(Char->InputComponent);
+		check(InputComp)
+	}
+	if (!Subsystem)
+	{
+		const APlayerController* Controller = Char->GetController<APlayerController>();
+		check(Controller)
+		const ULocalPlayer* LocalPlayer = Controller->GetLocalPlayer();
+		check(LocalPlayer)
+		Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+		check(Subsystem)
+	}
+
+	const TArray<TUniquePtr<FEnhancedInputActionEventBinding>>& ActionBindings = InputComp->GetActionEventBindings();
+	while (FPlatformTime::Seconds() - StartTime >= Bindings[FrameIndex].WorldTime)
+	{
+		for (int32 Index = 0; Index < ActionBindings.Num(); ++Index)
+		{
+			const FVector Value = {Bindings[FrameIndex].ActionValues[Index].Value};
+			if (Value.IsZero())
+			{
+				continue;
+			}
+			const UInputAction* InputAction = ActionBindings[Index]->GetAction();
+			Subsystem->InjectInputForAction(InputAction, {Value}, InputAction->Modifiers, InputAction->Triggers);
+		}
+		if (++FrameIndex >= Bindings.Num())
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+/* * * * * * * * * * * * * * * * *
+ * Run tests method definitions. *
+ * * * * * * * * * * * * * * * * */
+
 bool FP14GameplayInventoryItemCanBeTakenOnJump::RunTest(const FString& Parameters)
 {
 	AddInfo("Test if item can be taken on jump.");
@@ -123,13 +176,13 @@ bool FP14GameplayInventoryItemCanBeTakenOnJump::RunTest(const FString& Parameter
 	UTEST_NOT_NULL_EXPR(Char)
 
 	// clang-format off
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f));
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
 	ADD_LATENT_AUTOMATION_COMMAND(FP14JumpLatentCommand(Char))
 	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand([this, World]() -> void
 	{
 		const TArray<AP14InventoryItem*> ItemsLeft = P14::Test::GetAllActors<AP14InventoryItem>(World);
 		TestEqualExpr(ItemsLeft.Num(), 0);
-	}, 2.f));
+	}, 2.f))
 	// clang-format on
 
 	return true;
@@ -150,13 +203,13 @@ bool FP14GameplayInventoryItemCanNotBeTakenOnJumpIfTooHigh::RunTest(const FStrin
 	UTEST_NOT_NULL_EXPR(Char)
 
 	// clang-format off
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f));
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
 	ADD_LATENT_AUTOMATION_COMMAND(FP14JumpLatentCommand(Char))
 	ADD_LATENT_AUTOMATION_COMMAND(FDelayedFunctionLatentCommand([this, World]() -> void
 	{
 		const TArray<AP14InventoryItem*> ItemsLeft = P14::Test::GetAllActors<AP14InventoryItem>(World);
 		TestEqualExpr(ItemsLeft.Num(), 1);
-	}, 2.f));
+	}, 2.f))
 	// clang-format on
 
 	return true;
@@ -192,19 +245,52 @@ bool FP14GameplayAllItemsCanBeTakenOnMovement::RunTest(const FString& Parameters
 	UTEST_NOT_NULL_EXPR(Char)
 
 	// Move forward towards first 3 items.
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f));
-	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num()));
-	ADD_LATENT_AUTOMATION_COMMAND(P14::Test::FP14MoveLatentCommand(Char, 1.5f, {0.f, 1.f}));
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(0.5f));
-	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num() - 3));
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
+	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num()))
+	ADD_LATENT_AUTOMATION_COMMAND(P14::Test::FP14MoveLatentCommand(Char, 1.5f, {0.f, 1.f}))
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(0.5f))
+	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num() - 3))
 	// Jump to the upper item.
 	ADD_LATENT_AUTOMATION_COMMAND(FP14JumpLatentCommand(Char))
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f));
-	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num() - 4));
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
+	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, Locations.Num() - 4))
 	// Move right towards the last items.
-	ADD_LATENT_AUTOMATION_COMMAND(P14::Test::FP14MoveLatentCommand(Char, 1.5f, {1.f, 0.f}));
-	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(0.5f));
-	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, 0));
+	ADD_LATENT_AUTOMATION_COMMAND(P14::Test::FP14MoveLatentCommand(Char, 1.5f, {1.f, 0.f}))
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(0.5f))
+	ADD_LATENT_AUTOMATION_COMMAND(FP14CheckItemsAmountLatentCommand(World, 0))
+
+	return true;
+}
+
+bool FP14GameplayAllItemsCanBeTakenOnRecordedMovement::RunTest(const FString& Parameters)
+{
+	AddInfo("Test if all items can be taken on recorded movement.");
+	P14::Test::FLevelScope LevelScope{"/Game/Project/PP14/Level/P14_Root.P14_Root"};
+	UWorld*                World = AutomationCommon::GetAnyGameWorld();
+	UTEST_NOT_NULL_EXPR(World)
+	ACharacter* Char = UGameplayStatics::GetPlayerCharacter(World, 0);
+	UTEST_NOT_NULL_EXPR(Char)
+	APlayerController* Controller = Char->GetController<APlayerController>();
+	UTEST_NOT_NULL_EXPR(Controller)
+	UTEST_TRUE_EXPR(P14::Test::GetAllActors<AP14InventoryItem>(World).Num() == 5);
+
+	const FString Filename = P14::Test::GetTestDataFullPath();
+	FP14InputData InputData;
+	UTEST_TRUE_EXPR(P14::Test::FJsonUtils::ReadInputData(Filename, InputData));
+	UTEST_TRUE_EXPR(!InputData.Bindings.IsEmpty())
+
+	Char->SetActorTransform(InputData.InitialTransform);
+	Controller->SetControlRotation(InputData.InitialTransform.Rotator());
+
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
+	ADD_LATENT_AUTOMATION_COMMAND(P14::Test::FSimulateMovementLatentCommand(World, Char, MoveTemp(InputData.Bindings)))
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand(1.f))
+	TFunction<bool()> Lambda = [this, World]() -> bool
+	{
+		TestTrueExpr(P14::Test::GetAllActors<AP14InventoryItem>(World).IsEmpty());
+		return true;
+	};
+	ADD_LATENT_AUTOMATION_COMMAND(FFunctionLatentCommand(MoveTemp(Lambda)))
 
 	return true;
 }

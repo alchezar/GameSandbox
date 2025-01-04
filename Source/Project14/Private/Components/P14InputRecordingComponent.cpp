@@ -4,6 +4,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "Utils/P14JsonUtils.h"
+#include "Utils/P14Utils.h"
 
 UP14InputRecordingComponent::UP14InputRecordingComponent()
 {
@@ -34,7 +35,7 @@ void UP14InputRecordingComponent::BeginPlay()
 
 void UP14InputRecordingComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	P14::Test::FJsonUtils::WriteInputData(GenerateFileName(), InputData);
+	P14::Test::FJsonUtils::WriteInputData(P14::Test::GetTestDataFullPath(), InputData);
 	Super::EndPlay(EndPlayReason);
 }
 
@@ -56,9 +57,4 @@ void UP14InputRecordingComponent::SaveBindingsData()
 	}
 
 	InputData.Bindings.Add(MoveTemp(BindingsData));
-}
-
-FString UP14InputRecordingComponent::GenerateFileName()
-{
-	return FPaths::Combine(FPaths::ProjectDir(), "Saved", "Data", "Project14", "CharacterInputData.json");
 }

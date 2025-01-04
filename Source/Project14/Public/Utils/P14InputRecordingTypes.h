@@ -11,10 +11,10 @@ struct FP14ActionData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	FName Name;
+	FName Name = "";
 
 	UPROPERTY()
-	FVector Value;
+	FVector Value = {};
 };
 
 USTRUCT()
@@ -23,7 +23,7 @@ struct FP14BindingsData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<FP14ActionData> ActionValues;
+	TArray<FP14ActionData> ActionValues = {};
 
 	UPROPERTY()
 	float WorldTime = 0.f;
@@ -35,7 +35,7 @@ struct FP14InputData
 	GENERATED_BODY()
 
 	UPROPERTY()
-	TArray<FP14BindingsData> Bindings;
+	TArray<FP14BindingsData> Bindings = {};
 
 	UPROPERTY()
 	FTransform InitialTransform = {};

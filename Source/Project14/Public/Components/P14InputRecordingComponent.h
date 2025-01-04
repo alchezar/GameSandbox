@@ -23,8 +23,7 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 private:
-	void    SaveBindingsData();
-	FString GenerateFileName();
+	void SaveBindingsData();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
