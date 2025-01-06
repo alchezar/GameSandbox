@@ -51,11 +51,13 @@ void AP14Character::BeginPlay()
 	{
 		return;
 	}
+
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	if (!LocalPlayer)
 	{
 		return;
 	}
+
 	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
 	{
 		Subsystem->AddMappingContext(InputContext, 0);

@@ -25,8 +25,6 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	/* ------------------------------- This -------------------------------- */
