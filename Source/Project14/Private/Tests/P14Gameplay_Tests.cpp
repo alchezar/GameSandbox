@@ -30,6 +30,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14GameplayAllItemsCanBeTakenOnRecordedMovemen
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 
+IMPLEMENT_COMPLEX_AUTOMATION_TEST(FP14GameplayAllMapsShouldLoads, "Project14.Gameplay.AllMapsShouldLoads", P14::Test::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
+
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Custom class of the latent commands by using macro. *
  * * * * * * * * * * * * * * * * * * * * * * * * * * * */
@@ -92,21 +96,20 @@ bool P14::Test::FP14MoveLatentCommand::Update()
 		InputAction = ActionBinding->GetAction();
 		check(InputAction)
 	}
-	if (!Subsystem)
-
+	if (!EnhancedInput)
 	{
 		const APlayerController* Controller = Char->GetController<APlayerController>();
 		check(Controller)
 		const ULocalPlayer* LocalPlayer = Controller->GetLocalPlayer();
 		check(LocalPlayer)
-		Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-		check(Subsystem)
+		EnhancedInput = Cast<UEnhancedPlayerInput>(Controller->PlayerInput);
+		check(EnhancedInput)
 	}
 
 	const double NewTime = FPlatformTime::Seconds();
 	if (NewTime - StartTime < Time)
 	{
-		Subsystem->InjectInputForAction(InputAction, Direction, InputAction->Modifiers, InputAction->Triggers);
+		EnhancedInput->InjectInputForAction(InputAction, Direction, InputAction->Modifiers, InputAction->Triggers);
 		return false;
 	}
 
@@ -125,14 +128,14 @@ bool P14::Test::FSimulateMovementLatentCommand::Update()
 		InputComp = Cast<UEnhancedInputComponent>(Char->InputComponent);
 		check(InputComp)
 	}
-	if (!Subsystem)
+	if (!EnhancedInput)
 	{
 		const APlayerController* Controller = Char->GetController<APlayerController>();
 		check(Controller)
 		const ULocalPlayer* LocalPlayer = Controller->GetLocalPlayer();
 		check(LocalPlayer)
-		Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-		check(Subsystem)
+		EnhancedInput = Cast<UEnhancedPlayerInput>(Controller->PlayerInput);
+		check(EnhancedInput)
 	}
 
 	const TArray<TUniquePtr<FEnhancedInputActionEventBinding>>& ActionBindings = InputComp->GetActionEventBindings();
@@ -146,7 +149,7 @@ bool P14::Test::FSimulateMovementLatentCommand::Update()
 				continue;
 			}
 			const UInputAction* InputAction = ActionBindings[Index]->GetAction();
-			Subsystem->InjectInputForAction(InputAction, {Value}, InputAction->Modifiers, InputAction->Triggers);
+			EnhancedInput->InjectInputForAction(InputAction, {Value}, InputAction->Modifiers, InputAction->Triggers);
 		}
 		if (++FrameIndex >= Bindings.Num())
 		{
@@ -291,6 +294,30 @@ bool FP14GameplayAllItemsCanBeTakenOnRecordedMovement::RunTest(const FString& Pa
 		return true;
 	};
 	ADD_LATENT_AUTOMATION_COMMAND(FFunctionLatentCommand(MoveTemp(Lambda)))
+
+	return true;
+}
+
+void FP14GameplayAllMapsShouldLoads::GetTests(TArray<FString>& OutBeautifiedNames, TArray<FString>& OutTestCommands) const
+{
+	const TArray<TTuple<FString, FString>> TestData =
+	{
+		{"MainMap", "/Game/Project/PP14/Level/P14_Root"},
+		{"EmptyMap", "/Game/Project/PP14/Level/P14_TestEmpty"},
+		{"TestMap", "/Game/Project/PP14/Level/P14_Test1"}
+	};
+
+	for (const TTuple<FString, FString>& OneTestData : TestData)
+	{
+		OutBeautifiedNames.Add(OneTestData.Key);
+		OutTestCommands.Add(OneTestData.Value);
+	}
+}
+
+bool FP14GameplayAllMapsShouldLoads::RunTest(const FString& Parameters)
+{
+	P14::Test::FLevelScope LevelScope{Parameters};
+	ADD_LATENT_AUTOMATION_COMMAND(FEngineWaitLatentCommand{2.f});
 
 	return true;
 }

@@ -146,11 +146,11 @@ namespace P14::Test
 		virtual bool Update() override;
 
 	private:
-		ACharacter*                         Char        = nullptr;
-		float                               Time        = 0.f;
-		FVector2D                           Direction   = {};
-		UEnhancedInputLocalPlayerSubsystem* Subsystem   = nullptr;
-		const UInputAction*                 InputAction = nullptr;
+		ACharacter*           Char          = nullptr;
+		float                 Time          = 0.f;
+		FVector2D             Direction     = {};
+		UEnhancedPlayerInput* EnhancedInput = nullptr;
+		const UInputAction*   InputAction   = nullptr;
 	};
 
 	class FSimulateMovementLatentCommand : public IAutomationLatentCommand
@@ -170,7 +170,7 @@ namespace P14::Test
 		TArray<FP14BindingsData> Bindings   = {};
 		int32                    FrameIndex = 0;
 
-		UEnhancedInputComponent*            InputComp = nullptr;
-		UEnhancedInputLocalPlayerSubsystem* Subsystem = nullptr;
+		UEnhancedInputComponent* InputComp     = nullptr;
+		UEnhancedPlayerInput*    EnhancedInput = nullptr;
 	};
 }
