@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "P14PauseMenu.generated.h"
+#include "Settings/P14GameSetting.h"
+#include "P14SettingOption.generated.h"
 
-class UButton;
+class UTextBlock;
 
 UCLASS()
-class PROJECT14_API UP14PauseMenu : public UUserWidget
+class PROJECT14_API UP14SettingOption : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -18,12 +19,19 @@ protected:
 	virtual void NativeOnInitialized() override;
 
 	/* ------------------------------- This -------------------------------- */
+public:
+	void Init(UP14GameSetting* InSetting);
+
 protected:
-	UFUNCTION()
-	void OnCloseButtonCallback();
+	void UpdateTexts();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(Transient, meta = (BindWidget))
-	UButton* CloseButton = nullptr;
+	UTextBlock* SettingDisplayName;
+	UPROPERTY(Transient, meta = (BindWidget))
+	UTextBlock* SettingCurrentValue;
+
+private:
+	TWeakObjectPtr<UP14GameSetting> Setting;
 };

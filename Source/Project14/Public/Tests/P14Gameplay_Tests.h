@@ -1,3 +1,3 @@
-// Copyright © 2024, Ivan Kinder
+// Copyright © 2025, Ivan Kinder
 
 #pragma once

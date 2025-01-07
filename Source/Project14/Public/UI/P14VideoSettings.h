@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "P14PauseMenu.generated.h"
+#include "P14VideoSettings.generated.h"
 
-class UButton;
+class UP14SettingOption;
+class UVerticalBox;
 
 UCLASS()
-class PROJECT14_API UP14PauseMenu : public UUserWidget
+class PROJECT14_API UP14VideoSettings : public UUserWidget
 {
 	GENERATED_BODY()
 
@@ -17,13 +18,10 @@ class PROJECT14_API UP14PauseMenu : public UUserWidget
 protected:
 	virtual void NativeOnInitialized() override;
 
-	/* ------------------------------- This -------------------------------- */
-protected:
-	UFUNCTION()
-	void OnCloseButtonCallback();
-
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(Transient, meta = (BindWidget))
-	UButton* CloseButton = nullptr;
+	UVerticalBox* VideoSettingsContainer;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++|UI")
+	TSubclassOf<UP14SettingOption> SettingOptionClass = nullptr;
 };

@@ -1,4 +1,4 @@
-// Copyright © 2024, Ivan Kinder
+// Copyright © 2025, Ivan Kinder
 
 #include "Utils/P14JsonUtils.h"
 
