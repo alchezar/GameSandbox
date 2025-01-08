@@ -2,6 +2,7 @@
 
 #include "UI/P14VideoSettings.h"
 
+#include "Components/Button.h"
 #include "Components/VerticalBox.h"
 #include "Settings/P14GameUserSettings.h"
 #include "UI/P14SettingOption.h"
@@ -12,13 +13,14 @@ void UP14VideoSettings::NativeOnInitialized()
 {
 	Super::NativeOnInitialized();
 
-	const UP14GameUserSettings* UserSettings = UP14GameUserSettings::Get();
+	UP14GameUserSettings* UserSettings = UP14GameUserSettings::Get();
 	if (!UserSettings)
 	{
 		UE_LOG(LogP14VideoSettingsWidget, Error, TEXT("UP14GameUserSettings is nullptr"));
 		return;
 	}
 
+	UserSettings->LoadSettings();
 	const TArray<UP14GameSetting*>& Settings = UserSettings->GetVideoSettings();
 
 	check(VideoSettingsContainer)
@@ -30,5 +32,27 @@ void UP14VideoSettings::NativeOnInitialized()
 		check(SettingWidget)
 		SettingWidget->Init(Setting);
 		VideoSettingsContainer->AddChild(SettingWidget);
+	}
+
+	RunBenchmarkButton->OnReleased.AddDynamic(this, &ThisClass::OnRunBenchmarkButtonCallback);
+	UserSettings->OnSettingsUpdated.AddUObject(this, &ThisClass::OnSettingsUpdatedCallback);
+}
+
+void UP14VideoSettings::OnRunBenchmarkButtonCallback()
+{
+	if (UP14GameUserSettings* UserSettings = UP14GameUserSettings::Get())
+	{
+		UserSettings->RunBenchmark();
+	}
+}
+
+void UP14VideoSettings::OnSettingsUpdatedCallback()
+{
+	for (UWidget* Widget : VideoSettingsContainer->GetAllChildren())
+	{
+		if (UP14SettingOption* Setting = Cast<UP14SettingOption>(Widget))
+		{
+			Setting->UpdateTexts();
+		}
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Utils/P14Types.h"
 #include "P14Controller.generated.h"
 
 class UInputMappingContext;
@@ -27,9 +28,16 @@ public:
 	void TogglePause();
 
 	/* ------------------------------ Fields ------------------------------- */
+public:
+	UPROPERTY(BlueprintAssignable)
+	FP14OnGamePause OnGamePause;
+
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UInputMappingContext> InputContext = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UInputAction> MenuAction = nullptr;
+
+private:
+	bool bInPause = false;
 };

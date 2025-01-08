@@ -10,8 +10,8 @@ struct FP14SettingsOption
 {
 	GENERATED_BODY()
 
-	FString Name;
-	int32   Value;
+	FText Name;
+	int32 Value;
 };
 
 UCLASS()
@@ -21,14 +21,23 @@ class UP14GameSetting : public UObject
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	_NODISCARD FString           GetOptionName() const;
+	_NODISCARD FText              GetOptionName() const;
 	_NODISCARD FP14SettingsOption GetCurrentOption() const;
 
-	void SetName(const FString& InName);
+	void  Init(const FText& InName, const TArray<FP14SettingsOption>& InOptions, TFunction<int32()>&& InGetter, TFunction<void(int32)>&& InSetter);
+	int32 GetCurrentValue() const;
+	void  UpdateCurrentValue(int32 Offset) const;
+
+protected:
+	void SetName(const FText& InName);
 	void SetOptions(const TArray<FP14SettingsOption>& InOptions);
+	void SetGetter(TFunction<int32()>&& InFunc);
+	void SetSetter(TFunction<void(int32)>&& InFunc);
 
 	/* ------------------------------ Fields ------------------------------- */
 private:
-	FString                   Name;
+	FText                      Name;
 	TArray<FP14SettingsOption> Options;
+	TFunction<int32()>         Getter;
+	TFunction<void(int32)>     Setter;
 };

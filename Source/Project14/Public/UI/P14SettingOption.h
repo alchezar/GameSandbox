@@ -7,6 +7,7 @@
 #include "Settings/P14GameSetting.h"
 #include "P14SettingOption.generated.h"
 
+class UButton;
 class UTextBlock;
 
 UCLASS()
@@ -21,9 +22,13 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void Init(UP14GameSetting* InSetting);
+	void UpdateTexts();
 
 protected:
-	void UpdateTexts();
+	UFUNCTION()
+	void OnPrevSettingButtonCallback();
+	UFUNCTION()
+	void OnNextSettingButtonCallback();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
@@ -31,6 +36,10 @@ protected:
 	UTextBlock* SettingDisplayName;
 	UPROPERTY(Transient, meta = (BindWidget))
 	UTextBlock* SettingCurrentValue;
+	UPROPERTY(Transient, meta = (BindWidget))
+	UButton* PrevSettingButton;
+	UPROPERTY(Transient, meta = (BindWidget))
+	UButton* NextSettingButton;
 
 private:
 	TWeakObjectPtr<UP14GameSetting> Setting;

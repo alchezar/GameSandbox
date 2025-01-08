@@ -2,6 +2,7 @@
 
 #include "UI/P14SettingOption.h"
 
+#include "Components/Button.h"
 #include "Components/TextBlock.h"
 
 void UP14SettingOption::NativeOnInitialized()
@@ -10,6 +11,9 @@ void UP14SettingOption::NativeOnInitialized()
 
 	check(SettingDisplayName)
 	check(SettingCurrentValue)
+
+	PrevSettingButton->OnReleased.AddDynamic(this, &ThisClass::OnPrevSettingButtonCallback);
+	NextSettingButton->OnReleased.AddDynamic(this, &ThisClass::OnNextSettingButtonCallback);
 }
 
 void UP14SettingOption::Init(UP14GameSetting* InSetting)
@@ -27,6 +31,18 @@ void UP14SettingOption::UpdateTexts()
 		return;
 	}
 
-	SettingDisplayName->SetText(FText::FromString(Setting->GetOptionName()));
-	SettingCurrentValue->SetText(FText::FromString(Setting->GetCurrentOption().Name));
+	SettingDisplayName->SetText(Setting->GetOptionName());
+	SettingCurrentValue->SetText(Setting->GetCurrentOption().Name);
+}
+
+void UP14SettingOption::OnPrevSettingButtonCallback()
+{
+	Setting->UpdateCurrentValue(-1);
+	UpdateTexts();
+}
+
+void UP14SettingOption::OnNextSettingButtonCallback()
+{
+	Setting->UpdateCurrentValue(1);
+	UpdateTexts();
 }

@@ -36,8 +36,10 @@ void AP14Controller::SetupInputComponent()
 void AP14Controller::TogglePause()
 {
 	// Toggle game pause.
-	const bool bPaused = !IsPaused();
-	SetPause(bPaused);
-	bShowMouseCursor = bPaused;
-	bPaused ? SetInputMode(FInputModeGameAndUI{}.SetHideCursorDuringCapture(false)) : SetInputMode(FInputModeGameOnly{});
+	bInPause = !bInPause;
+	SetPause(bInPause);
+	bShowMouseCursor = bInPause;
+	bInPause ? SetInputMode(FInputModeGameAndUI{}.SetHideCursorDuringCapture(false)) : SetInputMode(FInputModeGameOnly{});
+
+	OnGamePause.Broadcast(bInPause);
 }
