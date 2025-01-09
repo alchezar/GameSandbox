@@ -5,11 +5,8 @@
 #include "CoreMinimal.h"
 #include "P14GameSetting.generated.h"
 
-USTRUCT()
 struct FP14SettingsOption
 {
-	GENERATED_BODY()
-
 	FText Name;
 	int32 Value;
 };

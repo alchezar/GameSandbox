@@ -1,22 +1,28 @@
 // Copyright © 2024, Ivan Kinder
 
 #pragma once
+
 #include "EngineUtils.h"
 #include "EnhancedInputComponent.h"
-#include "Misc/OutputDeviceNull.h"
 #include "Tests/AutomationCommon.h"
-// ReSharper disable CppUnusedIncludeDirective
 #include "Utils/P14JsonUtils.h"
-// ReSharper restore CppUnusedIncludeDirective
 
 class UEnhancedInputLocalPlayerSubsystem;
 
 namespace P14::Test
 {
+	// ReSharper disable CppUE4CodingStandardNamingViolationWarning
 #define TestEqualExpr(Actual, Expected) TestEqual(TEXT(#Actual), Actual, Expected)
 #define TestNullExpr(Actual) TestNull(TEXT(#Actual), Actual)
+	// ReSharper restore CppUE4CodingStandardNamingViolationWarning
 
 	inline constexpr EAutomationTestFlags TestContext = EAutomationTestFlags::EditorContext | EAutomationTestFlags::CommandletContext | EAutomationTestFlags::ProgramContext;
+
+	_NODISCARD FString GetTestDataFullPath();
+	_NODISCARD int32   GetActionBindingIndex(const UEnhancedInputComponent* InInputComp, const FString& InActionName, const ETriggerEvent InTriggerEvent);
+
+	void CallBlueprintFuncByNameWithParams(UObject* InObject, const FString& InFuncName, const TArray<FString>& InParams);
+	void InjectActionInput(const APlayerController* InController, const FString& InActionName, FInputActionValue&& InActionValue);
 
 	template <typename T1, typename T2>
 	struct TTestPayload
@@ -33,11 +39,6 @@ namespace P14::Test
 		{
 			Lambda(StaticCast<T>(Index), Arguments...);
 		}
-	}
-
-	FORCEINLINE _NODISCARD FString GetTestDataFullPath()
-	{
-		return FPaths::Combine(FPaths::ProjectDir(), "Data", "Project14", "CharacterInputData.json");
 	}
 
 	template <typename T>
@@ -78,46 +79,6 @@ namespace P14::Test
 		}
 
 		return Actors;
-	}
-
-	FORCEINLINE _NODISCARD int32 GetActionBindingIndex(const UEnhancedInputComponent* InInputComp, const FString InActionName, const ETriggerEvent InTriggerEvent)
-	{
-		int32 Result = INDEX_NONE;
-		if (!InInputComp)
-		{
-			return Result;
-		}
-
-		for (int32 Index = 0; Index < InInputComp->GetActionEventBindings().Num(); ++Index)
-		{
-			const UInputAction* InputAction  = InInputComp->GetActionEventBindings()[Index]->GetAction();
-			const ETriggerEvent TriggerEvent = InInputComp->GetActionEventBindings()[Index]->GetTriggerEvent();
-
-			if (InputAction->GetName() == InActionName && TriggerEvent == InTriggerEvent)
-			{
-				Result = Index;
-				break;
-			}
-		}
-
-		return Result;
-	}
-
-	FORCEINLINE void CallFuncByNameWithParams(UObject* InObject, const FString& InFuncName, const TArray<FString>& InParams)
-	{
-		if (!InObject)
-		{
-			return;
-		}
-
-		FString Command = InFuncName;
-		for (const FString& Param : InParams)
-		{
-			Command.Append(" ").Append(Param);
-		}
-
-		FOutputDeviceNull OutputDeviceNull{};
-		InObject->CallFunctionByNameWithArguments(*Command, OutputDeviceNull, nullptr, true);
 	}
 
 	class FLevelScope

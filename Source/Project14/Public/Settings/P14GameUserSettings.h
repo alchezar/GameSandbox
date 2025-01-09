@@ -34,6 +34,6 @@ public:
 
 private:
 	UPROPERTY()
-	TArray<UP14GameSetting*>   Settings   = {};
-	TArray<FP14SettingsOption> VfxOptions = {};
+	TArray<UP14GameSetting*>   Settings             = {};
+	TArray<FP14SettingsOption> VideoSettingsOptions = {};
 };

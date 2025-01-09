@@ -8,7 +8,7 @@
 
 UP14GameUserSettings::UP14GameUserSettings()
 {
-	VfxOptions = {
+	VideoSettingsOptions = {
 		{LOCTEXT("FVXQualityLow_Loc", "Low"), 0},
 		{LOCTEXT("FVXQualityMedium_Loc", "Medium"), 1},
 		{LOCTEXT("FVXQualityHigh_Loc", "High"), 2},
@@ -62,7 +62,7 @@ void UP14GameUserSettings::CreateSetting(const FText& InName, TFunction<int32()>
 	UP14GameSetting* Setting = NewObject<UP14GameSetting>();
 	check(Setting)
 
-	Setting->Init(InName, VfxOptions, MoveTemp(InGetter), MoveTemp(InSetter));
+	Setting->Init(InName, VideoSettingsOptions, MoveTemp(InGetter), MoveTemp(InSetter));
 	Settings.Add(Setting);
 }
 

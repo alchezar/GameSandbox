@@ -126,7 +126,7 @@ bool FP14InventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 	AP14InventoryItem* Item           = P14::Test::CreateBlueprint<AP14InventoryItem>(World, BPTestItemName, InitTransform);
 	UTEST_NOT_NULL_EXPR(Item)
 
-	P14::Test::CallFuncByNameWithParams(Item, "SetTestData", {
+	P14::Test::CallBlueprintFuncByNameWithParams(Item, "SetTestData", {
 		FString::FromInt(123),
 		FString::SanitizeFloat(345.67f),
 		FString{"\"Test string\""},
@@ -136,7 +136,7 @@ bool FP14InventoryDataShouldBeSetupCorrectly::RunTest(const FString& Parameters)
 
 	constexpr FP14InventoryData TestData  = {EP14InventoryItemType::Sphere, 13};
 	const FLinearColor          TestColor = {FLinearColor::Yellow};
-	P14::Test::CallFuncByNameWithParams(Item, "SetInventoryData", {TestData.ToString(), TestColor.ToString()});
+	P14::Test::CallBlueprintFuncByNameWithParams(Item, "SetInventoryData", {TestData.ToString(), TestColor.ToString()});
 	TestTrueExpr(Item->GetInventoryData() == TestData);
 
 	const UTextRenderComponent* TextComp = Item->FindComponentByClass<UTextRenderComponent>();
@@ -171,7 +171,7 @@ bool FP14InventoryCanBeTaken::RunTest(const FString& Parameters)
 
 	constexpr FP14InventoryData TestData{EP14InventoryItemType::Sphere, 13};
 	const FLinearColor          TestColor{FLinearColor::Yellow};
-	P14::Test::CallFuncByNameWithParams(Item, "SetInventoryData", {TestData.ToString(), TestColor.ToString()});
+	P14::Test::CallBlueprintFuncByNameWithParams(Item, "SetInventoryData", {TestData.ToString(), TestColor.ToString()});
 
 	TArray<AP14Character*> Characters = P14::Test::GetAllActors<AP14Character>(World);
 	UTEST_TRUE_EXPR(!Characters.IsEmpty())

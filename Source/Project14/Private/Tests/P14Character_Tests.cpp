@@ -55,7 +55,7 @@ bool FP14CharacterHealthMightBeChangedWithDamage::RunTest(const FString& Paramet
 
 	// Set health data.
 	constexpr FP14HealthData HealthData = {1000.f, 10.f, 0.5f, 5.f};
-	P14::Test::CallFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
+	P14::Test::CallBlueprintFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
 	Char->FinishSpawning(InitTransforms);
 
 	// Test if character health might be changed with damage.
@@ -138,7 +138,7 @@ bool FP14CharacterCanBeKilled::RunTest(const FString& Parameters)
 
 	// Set health data.
 	constexpr FP14HealthData HealthData = {1000.f, 10.f, 0.5f, 1.5f};
-	P14::Test::CallFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
+	P14::Test::CallBlueprintFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
 	Char->FinishSpawning(InitTransforms);
 
 	// Test if character can be killed.
@@ -174,7 +174,7 @@ bool FP14CharacterAutoHealWorks::RunTest(const FString& Parameters)
 
 	// Set health data.
 	constexpr FP14HealthData HealthData = {1000.f, 100.f, 0.5f, 2.0f};
-	P14::Test::CallFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
+	P14::Test::CallBlueprintFuncByNameWithParams(Char, "SetHealthData", {HealthData.ToString()});
 	Char->FinishSpawning(InitTransforms);
 
 	TestTrueExpr(FMath::IsNearlyEqual(Char->GetHealthPercent(), 1.f));
