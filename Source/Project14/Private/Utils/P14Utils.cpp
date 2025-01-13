@@ -71,3 +71,15 @@ void P14::Test::InjectActionInput(const APlayerController* InController, const F
 
 	EnhancedInput->InjectInputForAction(InputAction, InActionValue, InputAction->Modifiers, InputAction->Triggers);
 }
+
+UWorld* P14::Test::GetTestGameWorld()
+{
+	for (const FWorldContext& Context : GEngine->GetWorldContexts())
+	{
+		if ((Context.WorldType == EWorldType::PIE || Context.WorldType == EWorldType::Game) && Context.World())
+		{
+			return Context.World();
+		}
+	}
+	return nullptr;
+}

@@ -45,6 +45,11 @@ namespace P14::Test
 	/// @param InActionValue Input value to inject
 	void InjectActionInput(const APlayerController* InController, const FString& InActionName, FInputActionValue&& InActionValue);
 
+	/// Getter for any available world.
+	/// @details Refactored copy of the AutomationCommon::GetAnyGameWorld()
+	/// @return Currently available world.
+	_NODISCARD UWorld* GetTestGameWorld();
+
 	/// Payload struct for automation tests
 	/// @tparam T1 Type of the test value
 	/// @tparam T2 Type of the expected value

@@ -22,7 +22,8 @@ public class Project14 : ModuleRules
 			"UMG",
 			"Niagara",
 			"Json",
-			"JsonUtilities"
+			"JsonUtilities",
+			"FunctionalTesting"
 		});
 	}
 }
