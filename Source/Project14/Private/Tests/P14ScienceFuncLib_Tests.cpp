@@ -21,6 +21,10 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FP14FibonacciNegative, "Project14.Science.Fibon
 	| EAutomationTestFlags::ProductFilter
 	| EAutomationTestFlags::HighPriority)
 
+DEFINE_SPEC(FP14Factorial, "Project14.Science.Factorial", P14::Test::TestContext
+	| EAutomationTestFlags::ProductFilter
+	| EAutomationTestFlags::HighPriority)
+
 bool FP14FibonacciSimple::RunTest(const FString& Parameters)
 {
 	AddInfo("Fibonacci simple testing");
@@ -71,6 +75,49 @@ bool FP14FibonacciNegative::RunTest(const FString& Parameters)
 	UP14ScienceFuncLib::GetFibonacci(-10);
 
 	return true;
+}
+
+void FP14Factorial::Define()
+{
+	Describe("Corner cases", [this]() -> void
+	{
+		It("Factorial of 0 should return 1", [this]() -> void
+		{
+			TestTrueExpr(UP14ScienceFuncLib::GetFactorial(0) == 1);
+		});
+		It("Factorial of 1 should return 1", [this]() -> void
+		{
+			TestTrueExpr(UP14ScienceFuncLib::GetFactorial(1) == 1);
+		});
+		It("Factorial of -1 should return -1", [this]() -> void
+		{
+			TestTrueExpr(UP14ScienceFuncLib::GetFactorial(-1) == -1);
+		});
+	});
+
+	Describe("Normal cases", [this]() -> void
+	{
+		TArray<P14::Test::TTestPayload<int32, int32>> TestData = {
+			{2, 2},
+			{3, 6},
+			{4, 24},
+			{5, 120},
+			{6, 720},
+			{7, 5040},
+			{8, 40320},
+			{9, 362880},
+			{10, 3628800}
+		};
+
+		for (const P14::Test::TTestPayload<int32, int32>& Data : TestData)
+		{
+			const FString WhatString = FString::Format(TEXT("Factorial of {0} should return {1}"), {Data.Test, Data.Expected});
+			It(WhatString, [this, Data]() -> void
+			{
+				TestTrueExpr(UP14ScienceFuncLib::GetFactorial(Data.Test) == Data.Expected);
+			});
+		}
+	});
 }
 
 #endif
