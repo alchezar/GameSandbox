@@ -50,6 +50,10 @@ namespace P14::Test
 	/// @return Currently available world.
 	_NODISCARD UWorld* GetTestGameWorld();
 
+	/// Close a map after automation testing.
+	/// @param World World to close.
+	void AutomationCloseMap(const UWorld* World);
+
 	/// Payload struct for automation tests
 	/// @tparam T1 Type of the test value
 	/// @tparam T2 Type of the expected value
@@ -168,6 +172,35 @@ namespace P14::Test
 		}
 
 		return Actors;
+	}
+
+	/// Get the value of a blueprint property by name
+	/// @tparam ValueType Type of the property
+	/// @tparam ClassType Blueprint class type
+	/// @param Blueprint Pointer to the blueprint
+	/// @param PropertyName Name of the property
+	/// @return Value of the property
+	template <typename ValueType, typename ClassType>
+	ValueType GetPropertyValueByName(ClassType* Blueprint, const FString& PropertyName)
+	{
+		ValueType Result = {};
+		if (!Blueprint)
+		{
+			return Result;
+		}
+
+		for (TFieldIterator<FProperty> It{Blueprint->StaticClass()}; It; ++It)
+		{
+			const FProperty* Property = *It;
+			if (!Property || Property->GetName() != PropertyName)
+			{
+				continue;
+			}
+
+			Result = *Property->ContainerPtrToValuePtr<ValueType>(Blueprint);
+		}
+
+		return Result;
 	}
 
 	/// @class FLevelScope

@@ -38,5 +38,6 @@ protected:
 	float FireFrequency = 1.f;
 
 private:
+	UPROPERTY()
 	FTimerHandle FireTimer;
 };

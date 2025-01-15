@@ -83,3 +83,11 @@ UWorld* P14::Test::GetTestGameWorld()
 	}
 	return nullptr;
 }
+
+void P14::Test::AutomationCloseMap(const UWorld* World)
+{
+	if (APlayerController* TargetPC = World->GetFirstPlayerController())
+	{
+		TargetPC->ConsoleCommand(TEXT("Exit"), true);
+	}
+}
