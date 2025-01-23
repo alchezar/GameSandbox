@@ -24,6 +24,7 @@ public:
 	AP14Character();
 
 protected:
+	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
@@ -49,7 +50,7 @@ private:
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
-	UPROPERTY(EditAnywhere, BlueprintAssignable, Category = "C++")
+	UPROPERTY(VisibleAnywhere, BlueprintAssignable, Category = "C++")
 	FP14OnHealthChanged OnHealthChanged;
 
 protected:
@@ -73,6 +74,8 @@ protected:
 	TObjectPtr<UInputAction> JumpAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FP14HealthData HealthData = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	EP14ClothType ClothType = EP14ClothType::Skeletal;
 
 private:
 	float        Health      = 0.f;

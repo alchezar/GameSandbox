@@ -14,6 +14,14 @@ enum class EP14InventoryItemType : uint8
 	MAX UMETA(Hidden)
 };
 
+UENUM(BlueprintType)
+enum class EP14ClothType : uint8
+{
+	None = 0,
+	Skeletal,
+	Simulated
+};
+
 USTRUCT(BlueprintType)
 struct FP14InventoryData
 {

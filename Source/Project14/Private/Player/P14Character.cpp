@@ -38,6 +38,22 @@ AP14Character::AP14Character()
 	InventoryComponent = CreateDefaultSubobject<UP14InventoryComponent>("InventoryComponent");
 }
 
+void AP14Character::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	for (const TObjectPtr<USceneComponent>& MeshChild : GetMesh()->GetAttachChildren())
+	{
+		if (USkinnedMeshComponent* SkeletalChild = Cast<USkinnedMeshComponent>(MeshChild))
+		{
+			SkeletalChild->SetVisibility(ClothType == EP14ClothType::Skeletal);
+
+			// Use one Anim Blueprint for all skeletal meshes.
+			SkeletalChild->SetLeaderPoseComponent(GetMesh());
+		}
+	}
+}
+
 void AP14Character::BeginPlay()
 {
 	Super::BeginPlay();
