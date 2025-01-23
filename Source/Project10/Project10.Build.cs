@@ -13,11 +13,18 @@ public class Project10 : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"InputCore"
+			"InputCore",
+			"Niagara",
+			"EnhancedInput",
+			"AIModule"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"GameSandbox",
+			"UMG",
+			"NavigationSystem",
+			"PhysicsCore"
 		});
 	}
 }
