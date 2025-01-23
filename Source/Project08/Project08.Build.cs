@@ -13,11 +13,15 @@ public class Project08 : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"InputCore"
+			"InputCore",
+			"EnhancedInput",
+			"OnlineSubsystem",
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"UMG",
+			"OnlineSubsystemUtils"
 		});
 	}
 }
