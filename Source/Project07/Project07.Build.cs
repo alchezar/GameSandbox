@@ -16,7 +16,7 @@ public class Project07 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new string[]
 		{
 		});
 	}

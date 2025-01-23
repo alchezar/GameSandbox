@@ -3,3 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
+
+#define SURFACE_HEAD   SurfaceType3
+#define ECC_PROJECTILE ECC_GameTraceChannel3

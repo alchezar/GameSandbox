@@ -21,7 +21,6 @@ public class Project10 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"GameSandbox",
 			"UMG",
 			"NavigationSystem",
 			"PhysicsCore"
