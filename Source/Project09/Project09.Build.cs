@@ -13,11 +13,15 @@ public class Project09 : ModuleRules
 			"Core",
 			"CoreUObject",
 			"Engine",
-			"InputCore"
+			"InputCore",
+			"GeometryCollectionEngine"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"UMG",
+			"AnimGraphRuntime",
+			"EnhancedInput"
 		});
 	}
 }
