@@ -18,26 +18,23 @@ public class Project12 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"UMG",
 			"AIModule",
-			"Niagara",
-			"GameSandbox",
-			"EnhancedInput",
 			"AnimGraphRuntime",
+			"EnhancedInput",
+			"GameSandbox",
 			"Json",
 			"JsonUtilities",
 			"NavigationSystem",
+			"Niagara",
+			"OnlineSubsystem",
+			"OnlineSubsystemSteam",
+			"OnlineSubsystemUtils",
 			"Slate",
 			"SlateCore",
-			"OnlineSubsystem",
-			"OnlineSubsystemUtils",
-			"OnlineSubsystemSteam",
+			"UMG",
 			"UnrealEd"
 		});
 
-		PublicIncludePaths.AddRange(new[]
-		{
-			"Project12"
-		});
+		PublicIncludePaths.Add("Project12");
 	}
 }

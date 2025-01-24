@@ -20,8 +20,8 @@ public class Project06 : ModuleRules
 		{
 			"AIModule",
 			"EnhancedInput",
-			"UMG",
 			"GameplayTags",
+			"UMG"
 		});
 	}
 }

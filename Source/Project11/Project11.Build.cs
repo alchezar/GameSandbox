@@ -19,9 +19,9 @@ public class Project11 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"UMG",
+			"EnhancedInput",
 			"SlateCore",
-			"EnhancedInput"
+			"UMG"
 		});
 	}
 }

@@ -19,11 +19,11 @@ public class Project14 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"UMG",
-			"Niagara",
+			"FunctionalTesting",
 			"Json",
 			"JsonUtilities",
-			"FunctionalTesting"
+			"Niagara",
+			"UMG"
 		});
 	}
 }

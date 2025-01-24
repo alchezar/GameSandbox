@@ -19,9 +19,9 @@ public class Project05 : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"AnimGraphRuntime",
-			"ProceduralMeshComponent",
 			"EnhancedInput",
 			"Niagara",
+			"ProceduralMeshComponent"
 		});
 	}
 }

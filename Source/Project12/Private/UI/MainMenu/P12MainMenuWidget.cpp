@@ -19,7 +19,7 @@ void UP12MainMenuWidget::NativeConstruct()
 	JoinSessionWidget->OnNetworkWidgetClose.AddUObject(this, &ThisClass::OnNetworkWidgetClosedHandle);
 }
 
-void UP12MainMenuWidget::CacheHUD(const AP12HUD* HUD)
+void UP12MainMenuWidget::CacheHUD(AP12HUD* HUD)
 {
 	CachedHUD = HUD;
 }

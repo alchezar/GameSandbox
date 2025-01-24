@@ -4,12 +4,12 @@
 
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Project10.h"
 #include "HAL/IConsoleManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Net/UnrealNetwork.h"
 #include "PhysicalMaterials/PhysicalMaterial.h"
 #include "Player/P10Character.h"
-#include "Project10/Project10.h"
 #include "Util/P10Library.h"
 
 AP10Weapon::AP10Weapon()

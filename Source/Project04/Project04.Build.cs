@@ -21,7 +21,7 @@ public class Project04 : ModuleRules
 			"AIModule",
 			"EnhancedInput",
 			"NavigationSystem",
-			"UMG",
+			"UMG"
 		});
 	}
 }

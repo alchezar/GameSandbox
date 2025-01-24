@@ -27,7 +27,7 @@ AP10AIGuard::AP10AIGuard()
 void AP10AIGuard::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
+
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
 	PawnSensing->OnHearNoise.AddDynamic(this, &ThisClass::OnHearNoiseHandle);
 }

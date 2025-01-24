@@ -20,8 +20,8 @@ public class Project08 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
-			"UMG",
-			"OnlineSubsystemUtils"
+			"OnlineSubsystemUtils",
+			"UMG"
 		});
 	}
 }

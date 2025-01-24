@@ -18,7 +18,7 @@ class PROJECT12_API UP12MainMenuWidget : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	void CacheHUD(const AP12HUD* HUD);
+	void CacheHUD(AP12HUD* HUD);
 
 protected:
 	virtual void NativeConstruct() override;

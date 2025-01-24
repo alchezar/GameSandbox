@@ -16,8 +16,18 @@ public class Project13 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"AIModule",
+			"EnhancedInput",
+			"Niagara",
+			"OnlineSubsystem",
+			"PhysicsCore",
+			"Slate",
+			"SlateCore",
+			"UMG"
 		});
+
+		PublicIncludePaths.Add("Project13");
 	}
 }

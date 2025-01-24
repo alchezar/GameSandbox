@@ -23,7 +23,7 @@ public class Project02 : ModuleRules
 			"NavigationSystem",
 			"Niagara",
 			"PhysicsCore",
-			"UMG",
+			"UMG"
 		});
 	}
 }
