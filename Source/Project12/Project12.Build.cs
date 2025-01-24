@@ -16,8 +16,28 @@ public class Project12 : ModuleRules
 			"InputCore"
 		});
 
-		PrivateDependencyModuleNames.AddRange(new string[] 
+		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"UMG",
+			"AIModule",
+			"Niagara",
+			"GameSandbox",
+			"EnhancedInput",
+			"AnimGraphRuntime",
+			"Json",
+			"JsonUtilities",
+			"NavigationSystem",
+			"Slate",
+			"SlateCore",
+			"OnlineSubsystem",
+			"OnlineSubsystemUtils",
+			"OnlineSubsystemSteam",
+			"UnrealEd"
+		});
+
+		PublicIncludePaths.AddRange(new[]
+		{
+			"Project12"
 		});
 	}
 }
