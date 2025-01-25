@@ -23,5 +23,6 @@ public class GameSandboxTarget : TargetRules
 		ExtraModuleNames.Add("Project12");
 		ExtraModuleNames.Add("Project13");
 		ExtraModuleNames.Add("Project14");
+		ExtraModuleNames.Add("Project15");
 	}
 }
