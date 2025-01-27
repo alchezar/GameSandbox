@@ -3,18 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Utils/P15Types.h"
 #include "P15Character.generated.h"
 
 class UCameraComponent;
+class UGameplayAbility;
 class UInputAction;
 class UInputMappingContext;
 class USpringArmComponent;
 struct FInputActionValue;
 
 UCLASS()
-class PROJECT15_API AP15Character : public ACharacter
+class PROJECT15_API AP15Character : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -28,19 +30,30 @@ protected:
 	virtual void Tick(const float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
+	/* ----------------------------- Interface ----------------------------- */
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
 	/* ------------------------------- This -------------------------------- */
+public:
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	void AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire);
+
 protected:
 	void MoveInput(const FInputActionValue& InputValue);
 	void LookInput(const FInputActionValue& InputValue);
 	void RunInput(const bool bRun);
 	void CrouchInput();
+	void AttackInput();
 
 private:
+	void AddDefaultMappingContext() const;
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
@@ -58,6 +71,11 @@ protected:
 	TObjectPtr<UInputAction> RunAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> CrouchAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> AttackAction = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
 
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};

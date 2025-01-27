@@ -2,6 +2,7 @@
 
 #include "Player/P15Character.h"
 
+#include "AbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Project15.h"
@@ -14,6 +15,8 @@
 AP15Character::AP15Character()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	AbilitySystemComp = CreateDefaultSubobject<UAbilitySystemComponent>("AbilitySystemComponent");
 
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArmCameraBoomComponent");
 	CameraBoom->SetupAttachment(RootComponent.Get());
@@ -38,10 +41,13 @@ void AP15Character::OnConstruction(const FTransform& Transform)
 	// Use one Anim Blueprint for all skeletal meshes.
 	for (const TObjectPtr<USceneComponent>& MeshChild : GetMesh()->GetAttachChildren())
 	{
-		if (USkinnedMeshComponent* SkeletalChild = Cast<USkinnedMeshComponent>(MeshChild))
+		USkinnedMeshComponent* SkeletalChild = Cast<USkinnedMeshComponent>(MeshChild);
+		if (!SkeletalChild)
 		{
-			SkeletalChild->SetLeaderPoseComponent(GetMesh());
+			continue;
 		}
+
+		SkeletalChild->SetLeaderPoseComponent(GetMesh());
 	}
 }
 
@@ -49,16 +55,8 @@ void AP15Character::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const APlayerController* PlayerController = GetController<APlayerController>())
-	{
-		if (const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer())
-		{
-			if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer))
-			{
-				Subsystem->AddMappingContext(InputContext, 0);
-			}
-		}
-	}
+	AddDefaultMappingContext();
+	AcquireAbility(MeleeAbility);
 }
 
 void AP15Character::Tick(const float DeltaTime)
@@ -82,7 +80,13 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
 		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started, this, &ThisClass::CrouchInput);
+		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput);
 	}
+}
+
+UAbilitySystemComponent* AP15Character::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComp.Get();
 }
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
@@ -139,6 +143,34 @@ void AP15Character::CrouchInput()
 	CameraOffsetChangeData.Alpha     = 0.f;
 }
 
+void AP15Character::AttackInput()
+{
+	AbilitySystemComp->TryActivateAbilityByClass(MeleeAbility);
+}
+
+void AP15Character::AddDefaultMappingContext() const
+{
+	const APlayerController* PlayerController = GetController<APlayerController>();
+	if (!PlayerController)
+	{
+		return;
+	}
+
+	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
+	if (!LocalPlayer)
+	{
+		return;
+	}
+
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
+	if (!Subsystem)
+	{
+		return;
+	}
+
+	Subsystem->AddMappingContext(InputContext, 0);
+}
+
 void AP15Character::ChangeWalkSpeedSmoothly(const float DeltaTime)
 {
 	if (!SpeedChangeData.bActive)
@@ -184,4 +216,18 @@ void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 
 	CurrentOffset = FMath::InterpSinOut(StartOffset, TargetOffset, Alpha);
 	Alpha += DeltaTime / CameraOffsetChangeData.Time;
+}
+
+void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
+{
+	if (!AbilitySystemComp)
+	{
+		return;
+	}
+
+	if (HasAuthority() && AbilityToAcquire)
+	{
+		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
+	}
+	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }

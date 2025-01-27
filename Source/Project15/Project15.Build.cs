@@ -14,7 +14,9 @@ public class Project15 : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"InputCore",
-			"EnhancedInput"
+			"EnhancedInput",
+			"GameplayAbilities",
+			"GameplayTags"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
