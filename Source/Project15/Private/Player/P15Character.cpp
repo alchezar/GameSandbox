@@ -2,6 +2,7 @@
 
 #include "Player/P15Character.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
@@ -11,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Gameplay/Attribute/P15AttributeSet.h"
 
 AP15Character::AP15Character()
 {
@@ -23,6 +25,8 @@ AP15Character::AP15Character()
 
 	PlayerEye = CreateDefaultSubobject<UCameraComponent>("PlayerEyeCameraComponent");
 	PlayerEye->SetupAttachment(CameraBoom.Get());
+
+	AttributeSet = CreateDefaultSubobject<UP15AttributeSet>("AttributeSet");
 
 	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
 	{
@@ -65,6 +69,13 @@ void AP15Character::Tick(const float DeltaTime)
 
 	ChangeWalkSpeedSmoothly(DeltaTime);
 	UpdateCameraBoomOffsetSmoothly(DeltaTime);
+
+	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Format(L"{0} has {1} current and {2} base",
+	{
+		GetName(),
+		FString::SanitizeFloat(AttributeSet->Health.GetCurrentValue()),
+		FString::SanitizeFloat(AttributeSet->Health.GetBaseValue())
+	}));
 }
 
 void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -80,13 +91,36 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
 		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started, this, &ThisClass::CrouchInput);
-		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput);
+		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
+		Input->BindAction(AttackAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
 	}
 }
 
 UAbilitySystemComponent* AP15Character::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComp.Get();
+}
+
+void AP15Character::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
+{
+	if (AbilitySystemComp)
+	{
+		AbilitySystemComp->GetOwnedGameplayTags(TagContainer);
+	}
+}
+
+void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
+{
+	if (!AbilitySystemComp)
+	{
+		return;
+	}
+
+	if (HasAuthority() && AbilityToAcquire)
+	{
+		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
+	}
+	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
@@ -143,9 +177,21 @@ void AP15Character::CrouchInput()
 	CameraOffsetChangeData.Alpha     = 0.f;
 }
 
-void AP15Character::AttackInput()
+void AP15Character::AttackInput(const bool bStart)
 {
-	AbilitySystemComp->TryActivateAbilityByClass(MeleeAbility);
+	if (bStart)
+	{
+		// Activate ability to start playing attack animation.
+		AbilitySystemComp->TryActivateAbilityByClass(MeleeAbility);
+	}
+	else
+	{
+		// Try to deal damage at input completion.
+		FGameplayEventData Payload;
+		Payload.Instigator = this;
+		FGameplayTag Tag   = FGameplayTag::RequestGameplayTag("p15.melee.deal_damage");
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, MoveTemp(Tag), MoveTemp(Payload));
+	}
 }
 
 void AP15Character::AddDefaultMappingContext() const
@@ -216,18 +262,4 @@ void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 
 	CurrentOffset = FMath::InterpSinOut(StartOffset, TargetOffset, Alpha);
 	Alpha += DeltaTime / CameraOffsetChangeData.Time;
-}
-
-void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
-{
-	if (!AbilitySystemComp)
-	{
-		return;
-	}
-
-	if (HasAuthority() && AbilityToAcquire)
-	{
-		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
-	}
-	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Utils/P15Types.h"
 #include "P15Character.generated.h"
@@ -12,11 +13,12 @@ class UCameraComponent;
 class UGameplayAbility;
 class UInputAction;
 class UInputMappingContext;
+class UP15AttributeSet;
 class USpringArmComponent;
 struct FInputActionValue;
 
 UCLASS()
-class PROJECT15_API AP15Character : public ACharacter, public IAbilitySystemInterface
+class PROJECT15_API AP15Character : public ACharacter, public IAbilitySystemInterface, public IGameplayTagAssetInterface
 {
 	GENERATED_BODY()
 
@@ -32,9 +34,12 @@ protected:
 
 	/* ----------------------------- Interface ----------------------------- */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual void                     GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const override;
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	_NODISCARD TObjectPtr<UAbilitySystemComponent> GetAbilitySystemComp() { return AbilitySystemComp; }
+	_NODISCARD TObjectPtr<UCameraComponent>        GetPlayerEye() const { return PlayerEye; }
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire);
 
@@ -43,7 +48,7 @@ protected:
 	void LookInput(const FInputActionValue& InputValue);
 	void RunInput(const bool bRun);
 	void CrouchInput();
-	void AttackInput();
+	void AttackInput(const bool bStart);
 
 private:
 	void AddDefaultMappingContext() const;
@@ -74,6 +79,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> AttackAction = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
+	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
 
