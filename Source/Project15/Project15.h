@@ -12,6 +12,12 @@ namespace P15
 	constexpr float RunSpeed  = 500.f;
 }
 
+#define EARLY_RETURN_IF(Condition)     \
+if (Condition)                         \
+{                                      \
+	return;                            \
+}
+
 ///
 /// This defines a set of helper functions for accessing and initializing attributes,
 /// to avoid having to manually write these functions.

@@ -61,6 +61,8 @@ void AP15Character::BeginPlay()
 
 	AddDefaultMappingContext();
 	AcquireAbility(MeleeAbility);
+	AcquireAbility(DeadAbility);
+	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
 }
 
 void AP15Character::Tick(const float DeltaTime)
@@ -69,13 +71,6 @@ void AP15Character::Tick(const float DeltaTime)
 
 	ChangeWalkSpeedSmoothly(DeltaTime);
 	UpdateCameraBoomOffsetSmoothly(DeltaTime);
-
-	GEngine->AddOnScreenDebugMessage(-1, 0.f, FColor::Cyan, FString::Format(L"{0} has {1} current and {2} base",
-	{
-		GetName(),
-		FString::SanitizeFloat(AttributeSet->Health.GetCurrentValue()),
-		FString::SanitizeFloat(AttributeSet->Health.GetBaseValue())
-	}));
 }
 
 void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -192,6 +187,14 @@ void AP15Character::AttackInput(const bool bStart)
 		FGameplayTag Tag   = FGameplayTag::RequestGameplayTag("p15.melee.deal_damage");
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, MoveTemp(Tag), MoveTemp(Payload));
 	}
+}
+
+void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
+{
+	EARLY_RETURN_IF(bDead || NewHealthPercentage > 0.f)
+
+	bDead = true;
+	AbilitySystemComp->TryActivateAbilityByClass(DeadAbility);
 }
 
 void AP15Character::AddDefaultMappingContext() const

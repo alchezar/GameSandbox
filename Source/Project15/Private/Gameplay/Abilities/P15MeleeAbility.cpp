@@ -4,6 +4,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "Project15.h"
 #include "Camera/CameraComponent.h"
 #include "Gameplay/Effects/P15MeleeEffect.h"
 #include "Player/P15Character.h"
@@ -28,16 +29,12 @@ void UP15MeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	constexpr float TraceDistance = 1000.f;
 	const FVector   Start         = Char->GetPlayerEye()->GetComponentLocation();
 	const FVector   End           = Start + Char->GetPlayerEye()->GetForwardVector() * TraceDistance;
-	if (!GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera))
-	{
-		return;
-	}
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera);
+	DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 5.f);
+	EARLY_RETURN_IF(!HitResult.bBlockingHit)
 
 	Enemy = Cast<AP15Character>(HitResult.GetActor());
-	if (!Enemy)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Enemy || Enemy->GetIsDead())
 
 	// Start the attack animation.
 	Char->PlayAnimMontage(InstigatorMontage, 1.f, StartAttackMontageSectionName);
@@ -59,10 +56,7 @@ void UP15MeleeAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 
 void UP15MeleeAbility::OnAttackEnds(FGameplayTag GameplayTag, const FGameplayEventData* GameplayEventData)
 {
-	if (!Enemy || !DamageGameplayEffectClass)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Enemy || !DamageGameplayEffectClass)
 
 	// Finish attack animation.
 	Char->PlayAnimMontage(InstigatorMontage, 1.f, EndAttackMontageSectionName);

@@ -14,10 +14,10 @@ class PROJECT15_API UP15MeleeAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
+	/* ------------------------------- Super ------------------------------- */
 public:
 	UP15MeleeAbility();
 
-	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled) override;

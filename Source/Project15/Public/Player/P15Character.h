@@ -40,6 +40,8 @@ protected:
 public:
 	_NODISCARD TObjectPtr<UAbilitySystemComponent> GetAbilitySystemComp() { return AbilitySystemComp; }
 	_NODISCARD TObjectPtr<UCameraComponent>        GetPlayerEye() const { return PlayerEye; }
+	_NODISCARD TObjectPtr<UP15AttributeSet>        GetAttributeSet() const { return AttributeSet; }
+	_NODISCARD bool                                GetIsDead() const { return bDead; };
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire);
 
@@ -49,6 +51,7 @@ protected:
 	void RunInput(const bool bRun);
 	void CrouchInput();
 	void AttackInput(const bool bStart);
+	void OnHealthChangedCallback(const float NewHealthPercentage);
 
 private:
 	void AddDefaultMappingContext() const;
@@ -83,9 +86,12 @@ protected:
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UGameplayAbility> DeadAbility = nullptr;
 
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};
 	FP15SmoothChangeData CameraOffsetChangeData = {};
 	double               MaxCrouchOffset        = 0.0;
+	bool                 bDead                  = false;
 };

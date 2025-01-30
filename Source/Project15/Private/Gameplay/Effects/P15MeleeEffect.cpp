@@ -33,14 +33,4 @@ UP15MeleeDamageEffect::UP15MeleeDamageEffect()
 	HealthModifier.ModifierMagnitude = FScalableFloat(-10.f);
 
 	Modifiers.Add(HealthModifier);
-
-	// Add tag for damage.
-	if (UTargetTagsGameplayEffectComponent* GrantedTagsComponent = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>("GrantedTagsComponent"))
-	{
-		FInheritedTagContainer InheritedTagContainer;
-		InheritedTagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag("p15.melee.damage_effect"));
-
-		GrantedTagsComponent->SetAndApplyTargetTagChanges(InheritedTagContainer);
-		GEComponents.Add(GrantedTagsComponent);
-	}
 }

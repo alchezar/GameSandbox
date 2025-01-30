@@ -13,6 +13,14 @@ void UP15AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	const FProperty* ExpectedProp = FindFieldChecked<FProperty>(StaticClass(), GET_MEMBER_NAME_CHECKED(UP15AttributeSet, Health));
 	if (ModifiedProp == ExpectedProp)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, FString::Printf(L"Ohh, I took some damage, now my health is: %f", Health.GetCurrentValue()));
+		Health.SetBaseValue(FMath::Max(0.f, Health.GetBaseValue()));
+		Health.SetCurrentValue(FMath::Max(0.f, Health.GetCurrentValue()));
+
+		OnHealthChanged.Broadcast(GetHealthPercentage());
 	}
+}
+
+float UP15AttributeSet::GetHealthPercentage() const
+{
+	return FMath::Max(0.f, Health.GetCurrentValue() / MaxHealth.GetCurrentValue());
 }
