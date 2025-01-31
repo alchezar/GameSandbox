@@ -23,10 +23,7 @@ void UP15AnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 
-	if (!Owner.Get() || !Movement.Get())
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Owner.Get() || !Movement.Get())
 
 	Velocity  = Movement->Velocity;
 	Speed     = Velocity.Size2D();

@@ -4,48 +4,42 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
-#include "P15MeleeAbility.generated.h"
-
-class AP15Character;
-class UAbilityTask_WaitGameplayEvent;
+#include "P15PushAbility.generated.h"
 
 UCLASS()
-class PROJECT15_API UP15MeleeAbility : public UGameplayAbility
+class PROJECT15_API UP15PushAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/* ------------------------------ Unreal ------------------------------- */
 public:
-	UP15MeleeAbility();
+	UP15PushAbility();
 
 protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled) override;
 
 	/* ------------------------------- This -------------------------------- */
-protected:
-	void OnAttackEnds(FGameplayTag GameplayTag, const FGameplayEventData* GameplayEventData);
+private:
+	void DrawDebug(const FHitResult& InResult) const;
+	///
+	/// @brief Find the name of the animation section.
+	/// @param Target Actor that was hit
+	/// @param Culprit Actor that caused the hit
+	/// @return Name of the animation section
+	///
+	FName FindDirectionName(const AActor* Target, const AActor* Culprit) const;
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayTag DealDamageTag = FGameplayTag::RequestGameplayTag("p15.melee.deal_damage");
+	UAnimMontage* PushMontage = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	UAnimMontage* InstigatorMontage = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	UAnimMontage* TargetMontage = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName StartAttackMontageSectionName = "Start";
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName EndAttackMontageSectionName = "End";
+	UAnimMontage* ReactMontage = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UGameplayEffect> DamageGameplayEffectClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	float PushDistance = 400.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	bool bDebug = true;
-
-private:
-	UPROPERTY()
-	TObjectPtr<AP15Character> Char = nullptr;
-	UPROPERTY()
-	TObjectPtr<AP15Character> Enemy = nullptr;
 };

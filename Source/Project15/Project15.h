@@ -18,6 +18,12 @@ if (Condition)                         \
 	return;                            \
 }
 
+#define CONTINUE_IF(Condition)         \
+if (Condition)                         \
+{                                      \
+	continue;                          \
+}
+
 ///
 /// This defines a set of helper functions for accessing and initializing attributes,
 /// to avoid having to manually write these functions.

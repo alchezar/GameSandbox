@@ -46,10 +46,7 @@ void AP15Character::OnConstruction(const FTransform& Transform)
 	for (const TObjectPtr<USceneComponent>& MeshChild : GetMesh()->GetAttachChildren())
 	{
 		USkinnedMeshComponent* SkeletalChild = Cast<USkinnedMeshComponent>(MeshChild);
-		if (!SkeletalChild)
-		{
-			continue;
-		}
+		CONTINUE_IF(!SkeletalChild)
 
 		SkeletalChild->SetLeaderPoseComponent(GetMesh());
 	}
@@ -60,6 +57,7 @@ void AP15Character::BeginPlay()
 	Super::BeginPlay();
 
 	AddDefaultMappingContext();
+	AcquireAbility(PushAbility);
 	AcquireAbility(MeleeAbility);
 	AcquireAbility(DeadAbility);
 	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
@@ -86,8 +84,9 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
 		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started, this, &ThisClass::CrouchInput);
-		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
-		Input->BindAction(AttackAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
+		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::PushInput);
+		Input->BindAction(AimAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
+		Input->BindAction(AimAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
 	}
 }
 
@@ -98,18 +97,14 @@ UAbilitySystemComponent* AP15Character::GetAbilitySystemComponent() const
 
 void AP15Character::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
-	if (AbilitySystemComp)
-	{
-		AbilitySystemComp->GetOwnedGameplayTags(TagContainer);
-	}
+	EARLY_RETURN_IF(!AbilitySystemComp)
+
+	AbilitySystemComp->GetOwnedGameplayTags(TagContainer);
 }
 
 void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
 {
-	if (!AbilitySystemComp)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!AbilitySystemComp)
 
 	if (HasAuthority() && AbilityToAcquire)
 	{
@@ -120,10 +115,7 @@ void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityT
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
 {
-	if (!Controller)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Controller)
 
 	const FVector ForwardDirection = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::ForwardVector);
 	const FVector RightDirection   = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::RightVector);
@@ -135,10 +127,7 @@ void AP15Character::MoveInput(const FInputActionValue& InputValue)
 
 void AP15Character::LookInput(const FInputActionValue& InputValue)
 {
-	if (!Controller)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Controller)
 
 	const FVector2D InputVector = InputValue.Get<FVector2D>();
 
@@ -172,6 +161,11 @@ void AP15Character::CrouchInput()
 	CameraOffsetChangeData.Alpha     = 0.f;
 }
 
+void AP15Character::PushInput()
+{
+	AbilitySystemComp->TryActivateAbilityByClass(PushAbility);
+}
+
 void AP15Character::AttackInput(const bool bStart)
 {
 	if (bStart)
@@ -200,32 +194,20 @@ void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 void AP15Character::AddDefaultMappingContext() const
 {
 	const APlayerController* PlayerController = GetController<APlayerController>();
-	if (!PlayerController)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!PlayerController)
 
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
-	if (!LocalPlayer)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!LocalPlayer)
 
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
-	if (!Subsystem)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!Subsystem)
 
 	Subsystem->AddMappingContext(InputContext, 0);
 }
 
 void AP15Character::ChangeWalkSpeedSmoothly(const float DeltaTime)
 {
-	if (!SpeedChangeData.bActive)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!SpeedChangeData.bActive)
 
 	float&      CurrentSpeed = GetCharacterMovement()->MaxWalkSpeed;
 	const float StartSpeed   = SpeedChangeData.bPositive ? P15::WalkSpeed : P15::RunSpeed;
@@ -245,10 +227,7 @@ void AP15Character::ChangeWalkSpeedSmoothly(const float DeltaTime)
 
 void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 {
-	if (!CameraOffsetChangeData.bActive)
-	{
-		return;
-	}
+	EARLY_RETURN_IF(!CameraOffsetChangeData.bActive)
 
 	double&          CurrentOffset = CameraBoom->SocketOffset.Z;
 	const double     StartOffset   = CameraOffsetChangeData.bPositive ? MaxCrouchOffset : -MaxCrouchOffset;

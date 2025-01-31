@@ -50,6 +50,8 @@ protected:
 	void LookInput(const FInputActionValue& InputValue);
 	void RunInput(const bool bRun);
 	void CrouchInput();
+	UFUNCTION(BlueprintCallable)
+	void PushInput();
 	void AttackInput(const bool bStart);
 	void OnHealthChangedCallback(const float NewHealthPercentage);
 
@@ -81,9 +83,13 @@ protected:
 	TObjectPtr<UInputAction> CrouchAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> AttackAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> AimAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UGameplayAbility> PushAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
