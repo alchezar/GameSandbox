@@ -57,6 +57,7 @@ void AP15Character::BeginPlay()
 	Super::BeginPlay();
 
 	AddDefaultMappingContext();
+	AutoDetermineTeamID();
 	AcquireAbility(PushAbility);
 	AcquireAbility(MeleeAbility);
 	AcquireAbility(DeadAbility);
@@ -98,14 +99,18 @@ UAbilitySystemComponent* AP15Character::GetAbilitySystemComponent() const
 void AP15Character::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) const
 {
 	EARLY_RETURN_IF(!AbilitySystemComp)
-
 	AbilitySystemComp->GetOwnedGameplayTags(TagContainer);
+}
+
+bool AP15Character::GetIsHostile(const AP15Character* Other) const
+{
+	EARLY_RETURN_VALUE_IF(!Other, false)
+	return TeamID != Other->GetTeamID();
 }
 
 void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
 {
 	EARLY_RETURN_IF(!AbilitySystemComp)
-
 	if (HasAuthority() && AbilityToAcquire)
 	{
 		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
@@ -116,7 +121,6 @@ void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityT
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
 {
 	EARLY_RETURN_IF(!Controller)
-
 	const FVector ForwardDirection = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::ForwardVector);
 	const FVector RightDirection   = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::RightVector);
 
@@ -128,7 +132,6 @@ void AP15Character::MoveInput(const FInputActionValue& InputValue)
 void AP15Character::LookInput(const FInputActionValue& InputValue)
 {
 	EARLY_RETURN_IF(!Controller)
-
 	const FVector2D InputVector = InputValue.Get<FVector2D>();
 
 	AddControllerYawInput(InputVector.X);
@@ -195,10 +198,8 @@ void AP15Character::AddDefaultMappingContext() const
 {
 	const APlayerController* PlayerController = GetController<APlayerController>();
 	EARLY_RETURN_IF(!PlayerController)
-
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	EARLY_RETURN_IF(!LocalPlayer)
-
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
 	EARLY_RETURN_IF(!Subsystem)
 
@@ -244,4 +245,10 @@ void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 
 	CurrentOffset = FMath::InterpSinOut(StartOffset, TargetOffset, Alpha);
 	Alpha += DeltaTime / CameraOffsetChangeData.Time;
+}
+
+void AP15Character::AutoDetermineTeamID()
+{
+	EARLY_RETURN_IF(!GetController() || !GetController()->IsPlayerController())
+	TeamID = 0;
 }

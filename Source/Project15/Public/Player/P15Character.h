@@ -41,7 +41,11 @@ public:
 	_NODISCARD TObjectPtr<UAbilitySystemComponent> GetAbilitySystemComp() { return AbilitySystemComp; }
 	_NODISCARD TObjectPtr<UCameraComponent>        GetPlayerEye() const { return PlayerEye; }
 	_NODISCARD TObjectPtr<UP15AttributeSet>        GetAttributeSet() const { return AttributeSet; }
-	_NODISCARD bool                                GetIsDead() const { return bDead; };
+	_NODISCARD bool                                GetIsDead() const { return bDead; }
+	_NODISCARD uint8                               GetTeamID() const { return TeamID; }
+
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	bool GetIsHostile(const AP15Character* Other) const;
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire);
 
@@ -59,6 +63,7 @@ private:
 	void AddDefaultMappingContext() const;
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
+	void AutoDetermineTeamID();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
@@ -98,6 +103,8 @@ protected:
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};
 	FP15SmoothChangeData CameraOffsetChangeData = {};
-	double               MaxCrouchOffset        = 0.0;
-	bool                 bDead                  = false;
+
+	double MaxCrouchOffset = 0.0;
+	bool   bDead           = false;
+	uint8  TeamID          = 255;
 };

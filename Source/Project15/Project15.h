@@ -12,16 +12,22 @@ namespace P15
 	constexpr float RunSpeed  = 500.f;
 }
 
-#define EARLY_RETURN_IF(Condition)     \
-if (Condition)                         \
-{                                      \
-	return;                            \
+#define EARLY_RETURN_IF(Condition)              \
+if (Condition)                                  \
+{                                               \
+	return;                                     \
 }
 
-#define CONTINUE_IF(Condition)         \
-if (Condition)                         \
-{                                      \
-	continue;                          \
+#define EARLY_RETURN_VALUE_IF(Condition, Value) \
+if (Condition)                                  \
+{                                               \
+	return Value;                               \
+}
+
+#define CONTINUE_IF(Condition)                  \
+if (Condition)                                  \
+{                                               \
+	continue;                                   \
 }
 
 ///

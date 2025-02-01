@@ -4,6 +4,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Project15.h"
+#include "Camera/CameraComponent.h"
 #include "GameFramework/Character.h"
 #include "Gameplay/Effects/P15MeleeEffect.h"
 #include "Player/P15Character.h"
@@ -25,8 +26,8 @@ void UP15PushAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	// Find an enemy.
 	AP15Character*        Char = Cast<AP15Character>(ActorInfo->OwnerActor);
 	FHitResult            HitResult;
-	const FVector         Start = Char->GetActorLocation();
-	const FVector         End   = Start + Char->GetActorForwardVector() * PushDistance;
+	const FVector         Start = Char->GetPlayerEye()->GetComponentLocation();
+	const FVector         End   = Start + Char->GetPlayerEye()->GetForwardVector() * PushDistance;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Char);
 	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera, Params);
@@ -34,6 +35,11 @@ void UP15PushAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	EARLY_RETURN_IF(!HitResult.bBlockingHit)
 	AP15Character* Enemy = Cast<AP15Character>(HitResult.GetActor());
 	EARLY_RETURN_IF(!Enemy || Enemy->GetIsDead())
+
+	// Rotate the character to face the enemy.
+	const FVector EnemyDirection = (Enemy->GetActorLocation() - Char->GetActorLocation()).GetSafeNormal();
+	const float   DeltaYaw       = EnemyDirection.Rotation().Yaw - Char->GetActorForwardVector().Rotation().Yaw;
+	Char->AddActorWorldRotation(FRotator(0.f, DeltaYaw, 0.f));
 
 	// Play an animation.
 	Char->PlayAnimMontage(PushMontage);
