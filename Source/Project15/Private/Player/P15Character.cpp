@@ -43,6 +43,7 @@ void AP15Character::OnConstruction(const FTransform& Transform)
 	Super::OnConstruction(Transform);
 
 	// Use one Anim Blueprint for all skeletal meshes.
+	EARLY_RETURN_IF(!GetMesh())
 	for (const TObjectPtr<USceneComponent>& MeshChild : GetMesh()->GetAttachChildren())
 	{
 		USkinnedMeshComponent* SkeletalChild = Cast<USkinnedMeshComponent>(MeshChild);
@@ -58,10 +59,12 @@ void AP15Character::BeginPlay()
 
 	AddDefaultMappingContext();
 	AutoDetermineTeamID();
-	AcquireAbility(PushAbility);
-	AcquireAbility(MeleeAbility);
-	AcquireAbility(DeadAbility);
+
+	AcquireAllAbilities();
+
 	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
+	AttributeSet->OnManaChanged.AddUObject(this, &ThisClass::OnManaChangedCallback);
+	AttributeSet->OnStrengthChanged.AddUObject(this, &ThisClass::OnStrengthChangedCallback);
 }
 
 void AP15Character::Tick(const float DeltaTime)
@@ -79,6 +82,8 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		Input->BindAction(MoveAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
+		Input->BindAction(MoveAction.Get(), ETriggerEvent::Started, this, &ThisClass::ChangeMovementState, true);
+		Input->BindAction(MoveAction.Get(), ETriggerEvent::Completed, this, &ThisClass::ChangeMovementState, false);
 		Input->BindAction(LookAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::LookInput);
 		Input->BindAction(JumpAction.Get(), ETriggerEvent::Started, this, &Super::Jump);
 		Input->BindAction(JumpAction.Get(), ETriggerEvent::Completed, this, &Super::StopJumping);
@@ -88,6 +93,7 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::PushInput);
 		Input->BindAction(AimAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
 		Input->BindAction(AimAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
+		Input->BindAction(RegenAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RegenInput);
 	}
 }
 
@@ -108,25 +114,51 @@ bool AP15Character::GetIsHostile(const AP15Character* Other) const
 	return TeamID != Other->GetTeamID();
 }
 
-void AP15Character::AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire)
+void AP15Character::AcquireAllAbilities()
 {
 	EARLY_RETURN_IF(!AbilitySystemComp)
-	if (HasAuthority() && AbilityToAcquire)
+
+	// Find all ability classes in this class.
+	for (TFieldIterator<FProperty> It{this->GetClass()}; It; ++It)
 	{
-		AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
+		FProperty*            Property      = *It;
+		const FClassProperty* ClassProperty = CastField<FClassProperty>(Property);
+		CONTINUE_IF(!ClassProperty || !ClassProperty->MetaClass || !ClassProperty->MetaClass->IsChildOf(UGameplayAbility::StaticClass()))
+
+		const TSubclassOf<UGameplayAbility>* AbilityClassPtr = ClassProperty->ContainerPtrToValuePtr<TSubclassOf<UGameplayAbility>>(this);
+		CONTINUE_IF(!AbilityClassPtr)
+		TSubclassOf<UGameplayAbility> AbilityClass = *AbilityClassPtr;
+		CONTINUE_IF(!AbilityClass)
+
+		AllAbilities.Add(AbilityClass);
+	}
+
+	// Acquire all abilities.
+	if (HasAuthority())
+	{
+		for (const TSubclassOf<UGameplayAbility>& AbilityToAcquire : AllAbilities)
+		{
+			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
+		}
 	}
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
 {
-	EARLY_RETURN_IF(!Controller)
+	EARLY_RETURN_IF(!Controller || !bMovingInput)
 	const FVector ForwardDirection = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::ForwardVector);
 	const FVector RightDirection   = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::RightVector);
 
 	const FVector2D InputVector = InputValue.Get<FVector2D>();
 	AddMovementInput(ForwardDirection, InputVector.Y);
 	AddMovementInput(RightDirection, InputVector.X);
+}
+
+void AP15Character::ChangeMovementState(const bool bStart)
+{
+	EARLY_RETURN_IF(!bAllowMoving)
+	bMovingInput = bStart;
 }
 
 void AP15Character::LookInput(const FInputActionValue& InputValue)
@@ -186,6 +218,11 @@ void AP15Character::AttackInput(const bool bStart)
 	}
 }
 
+void AP15Character::RegenInput()
+{
+	bAllowMoving = !AbilitySystemComp->TryActivateAbilityByClass(RegenAbility);
+}
+
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 {
 	EARLY_RETURN_IF(bDead || NewHealthPercentage > 0.f)
@@ -193,6 +230,12 @@ void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 	bDead = true;
 	AbilitySystemComp->TryActivateAbilityByClass(DeadAbility);
 }
+
+void AP15Character::OnManaChangedCallback(const float NewManaPercentage)
+{}
+
+void AP15Character::OnStrengthChangedCallback(const float NewStrengthPercentage)
+{}
 
 void AP15Character::AddDefaultMappingContext() const
 {

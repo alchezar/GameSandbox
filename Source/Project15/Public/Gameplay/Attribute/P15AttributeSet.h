@@ -24,14 +24,33 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	_NODISCARD float GetHealthPercentage() const;
+	_NODISCARD float GetManaPercentage() const;
+	_NODISCARD float GetStrengthPercentage() const;
+
+private:
+	_NODISCARD float GetPercentage(const FGameplayAttributeData& Attribute, const FGameplayAttributeData& MaxAttribute) const;
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
 	FP15OnHealthChangedSignature OnHealthChanged;
+	FP15OnHealthChangedSignature OnManaChanged;
+	FP15OnHealthChangedSignature OnStrengthChanged;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FGameplayAttributeData MaxHealth = {100.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData Health = {100.f};
 	ATTRIBUTE_ACCESSORS(UP15AttributeSet, Health);
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayAttributeData MaxHealth = {100.f};
+	FGameplayAttributeData MaxMana = {100.f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FGameplayAttributeData Mana = {75.f};
+	ATTRIBUTE_ACCESSORS(UP15AttributeSet, Mana);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FGameplayAttributeData MaxStrength = {100.f};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FGameplayAttributeData Strength = {75.f};
+	ATTRIBUTE_ACCESSORS(UP15AttributeSet, Strength);
 };

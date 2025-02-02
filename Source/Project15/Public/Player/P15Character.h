@@ -41,23 +41,29 @@ public:
 	_NODISCARD TObjectPtr<UAbilitySystemComponent> GetAbilitySystemComp() { return AbilitySystemComp; }
 	_NODISCARD TObjectPtr<UCameraComponent>        GetPlayerEye() const { return PlayerEye; }
 	_NODISCARD TObjectPtr<UP15AttributeSet>        GetAttributeSet() const { return AttributeSet; }
+	_NODISCARD bool                                GetIsMoving() const { return bMovingInput && bAllowMoving; }
 	_NODISCARD bool                                GetIsDead() const { return bDead; }
 	_NODISCARD uint8                               GetTeamID() const { return TeamID; }
 
+	void SetAllowMoving(const bool bAllow) { bAllowMoving = bAllow; }
+
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	bool GetIsHostile(const AP15Character* Other) const;
-	UFUNCTION(BlueprintCallable, Category = "C++")
-	void AcquireAbility(const TSubclassOf<UGameplayAbility>& AbilityToAcquire);
+	void AcquireAllAbilities();
 
 protected:
 	void MoveInput(const FInputActionValue& InputValue);
+	void ChangeMovementState(const bool bStart);
 	void LookInput(const FInputActionValue& InputValue);
 	void RunInput(const bool bRun);
 	void CrouchInput();
 	UFUNCTION(BlueprintCallable)
 	void PushInput();
 	void AttackInput(const bool bStart);
+	void RegenInput();
 	void OnHealthChangedCallback(const float NewHealthPercentage);
+	void OnManaChangedCallback(const float NewManaPercentage);
+	void OnStrengthChangedCallback(const float NewStrengthPercentage);
 
 private:
 	void AddDefaultMappingContext() const;
@@ -90,6 +96,8 @@ protected:
 	TObjectPtr<UInputAction> AttackAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> AimAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> RegenAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
@@ -99,12 +107,19 @@ protected:
 	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> DeadAbility = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UGameplayAbility> RegenAbility = nullptr;
 
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};
 	FP15SmoothChangeData CameraOffsetChangeData = {};
 
+	bool bMovingInput = false;
+	bool bAllowMoving = true;
+
 	double MaxCrouchOffset = 0.0;
 	bool   bDead           = false;
 	uint8  TeamID          = 255;
+
+	TArray<TSubclassOf<UGameplayAbility>> AllAbilities = {};
 };

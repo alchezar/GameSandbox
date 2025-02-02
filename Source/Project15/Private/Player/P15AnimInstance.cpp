@@ -29,7 +29,7 @@ void UP15AnimInstance::NativeUpdateAnimation(const float DeltaSeconds)
 	Speed     = Velocity.Size2D();
 	Direction = GetMovementDirectionAngle();
 	bInAir    = Movement->IsFalling();
-	bMoving   = Speed > P15::MinimalSpeed;
+	bMoving   = Owner->GetIsMoving();
 	bCrouch   = Owner->bIsCrouched;
 }
 

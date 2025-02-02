@@ -18,19 +18,16 @@ protected:
 	virtual void NativeOnInitialized() override;
 
 	/* ------------------------------- This -------------------------------- */
-protected:
-	void OnHealthChangedCallback(const float NewHealthPercentage = 1.f);
+public:
+	_NODISCARD TObjectPtr<UImage>                   GetGlassBallImage();
+	_NODISCARD TObjectPtr<UMaterialInstanceDynamic> GetBallDynamicMaterial();
 
-	/* ------------------------------- This -------------------------------- */
-protected:
-
+	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> GlassBallImage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName HealthParameterName = "Health";
 
 private:
 	UPROPERTY()
-	TObjectPtr<UMaterialInstanceDynamic> DynamicHealthMaterial = nullptr;
+	TObjectPtr<UMaterialInstanceDynamic> BallDynamicMaterial = nullptr;
 };
