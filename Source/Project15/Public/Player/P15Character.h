@@ -50,6 +50,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	bool GetIsHostile(const AP15Character* Other) const;
 	void AcquireAllAbilities();
+	void AddGameplayTag(const FGameplayTag TagToAdd) const;
+	void RemoveGameplayTag(const FGameplayTag TagToRemove) const;
+	void ToggleGameplayTag(const FGameplayTag TagToToggle, const bool bAdd) const;
 
 protected:
 	void MoveInput(const FInputActionValue& InputValue);
@@ -109,6 +112,9 @@ protected:
 	TSubclassOf<UGameplayAbility> DeadAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> RegenAbility = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
+	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.health.full");
 
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};

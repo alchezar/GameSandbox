@@ -45,12 +45,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData MaxMana = {100.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayAttributeData Mana = {75.f};
+	FGameplayAttributeData Mana = {100.f};
 	ATTRIBUTE_ACCESSORS(UP15AttributeSet, Mana);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData MaxStrength = {100.f};
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayAttributeData Strength = {75.f};
+	FGameplayAttributeData Strength = {100.f};
 	ATTRIBUTE_ACCESSORS(UP15AttributeSet, Strength);
 };

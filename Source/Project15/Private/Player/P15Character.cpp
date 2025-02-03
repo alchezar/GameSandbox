@@ -65,6 +65,8 @@ void AP15Character::BeginPlay()
 	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
 	AttributeSet->OnManaChanged.AddUObject(this, &ThisClass::OnManaChangedCallback);
 	AttributeSet->OnStrengthChanged.AddUObject(this, &ThisClass::OnStrengthChangedCallback);
+
+	AddGameplayTag(FullHealthTag);
 }
 
 void AP15Character::Tick(const float DeltaTime)
@@ -142,6 +144,21 @@ void AP15Character::AcquireAllAbilities()
 		}
 	}
 	AbilitySystemComp->InitAbilityActorInfo(this, this);
+}
+
+void AP15Character::AddGameplayTag(const FGameplayTag TagToAdd) const
+{
+	AbilitySystemComp->AddLooseGameplayTag(TagToAdd);
+}
+
+void AP15Character::RemoveGameplayTag(const FGameplayTag TagToRemove) const
+{
+	AbilitySystemComp->RemoveLooseGameplayTag(TagToRemove);
+}
+
+void AP15Character::ToggleGameplayTag(const FGameplayTag TagToToggle, const bool bAdd) const
+{
+	AbilitySystemComp->SetTagMapCount(TagToToggle, bAdd ? 1 : 0);
 }
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
@@ -225,6 +242,8 @@ void AP15Character::RegenInput()
 
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 {
+	ToggleGameplayTag(FullHealthTag, FMath::IsNearlyEqual(NewHealthPercentage, 1));
+
 	EARLY_RETURN_IF(bDead || NewHealthPercentage > 0.f)
 
 	bDead = true;

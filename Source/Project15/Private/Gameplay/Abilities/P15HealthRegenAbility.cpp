@@ -7,7 +7,9 @@
 #include "Player/P15Character.h"
 
 UP15HealthRegenAbility::UP15HealthRegenAbility()
-{}
+{
+	ActivationBlockedTags.AddTag(FGameplayTag::RequestGameplayTag("p15.health.full"));
+}
 
 void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -22,13 +24,20 @@ void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	Char->SetAllowMoving(false);
 
 	FTimerHandle         RegenTimer;
-	const FTimerDelegate TimerDelegate = FTimerDelegate::CreateWeakLambda(this, [this, Char]()
+	const FTimerDelegate TimerDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
 	{
-		Char->SetAllowMoving(true);
 		CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, nullptr);
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, true);
 	});
 	GetWorld()->GetTimerManager().SetTimer(RegenTimer, TimerDelegate, RegenMontage->GetSectionLength(RandomSectionIndex), false);
+}
+
+void UP15HealthRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled)
+{
+	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
+	EARLY_RETURN_IF(!Char)
+
+	Char->SetAllowMoving(true);
 
 	// One way to apply the gameplay effect.
 	UAbilitySystemComponent* AbilitySystemComp = Char->GetAbilitySystemComp().Get();
@@ -46,9 +55,6 @@ void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	// 	ActivationInfo,
 	// 	RegenEffectClass->GetDefaultObject<UGameplayEffect>(),
 	// 	1.f);
-}
 
-void UP15HealthRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled)
-{
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
