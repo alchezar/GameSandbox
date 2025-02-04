@@ -46,6 +46,7 @@ public:
 	_NODISCARD uint8                               GetTeamID() const { return TeamID; }
 
 	void SetAllowMoving(const bool bAllow) { bAllowMoving = bAllow; }
+	void SetCollisionResponseToPawn(const ECollisionResponse NewResponse);
 
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	bool GetIsHostile(const AP15Character* Other) const;
@@ -64,9 +65,12 @@ protected:
 	void PushInput();
 	void AttackInput(const bool bStart);
 	void RegenInput();
+	void DashInput();
 	void OnHealthChangedCallback(const float NewHealthPercentage);
 	void OnManaChangedCallback(const float NewManaPercentage);
 	void OnStrengthChangedCallback(const float NewStrengthPercentage);
+	UFUNCTION()
+	void OnCapsuleBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
 	void AddDefaultMappingContext() const;
@@ -101,6 +105,8 @@ protected:
 	TObjectPtr<UInputAction> AimAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> RegenAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> DashAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
@@ -112,6 +118,8 @@ protected:
 	TSubclassOf<UGameplayAbility> DeadAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UGameplayAbility> RegenAbility = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UGameplayAbility> DashAbility = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.health.full");

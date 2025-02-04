@@ -30,7 +30,7 @@ void UP15PushAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	const FVector         End   = Start + Char->GetPlayerEye()->GetForwardVector() * PushDistance;
 	FCollisionQueryParams Params;
 	Params.AddIgnoredActor(Char);
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera, Params);
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Pawn, Params);
 	DrawDebug(HitResult);
 	EARLY_RETURN_IF(!HitResult.bBlockingHit)
 	AP15Character* Enemy = Cast<AP15Character>(HitResult.GetActor());

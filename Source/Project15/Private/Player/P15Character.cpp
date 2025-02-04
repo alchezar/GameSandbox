@@ -61,12 +61,12 @@ void AP15Character::BeginPlay()
 	AutoDetermineTeamID();
 
 	AcquireAllAbilities();
-
 	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
 	AttributeSet->OnManaChanged.AddUObject(this, &ThisClass::OnManaChangedCallback);
 	AttributeSet->OnStrengthChanged.AddUObject(this, &ThisClass::OnStrengthChangedCallback);
-
 	AddGameplayTag(FullHealthTag);
+
+	GetCapsuleComponent()->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnCapsuleBeginOverlapCallback);
 }
 
 void AP15Character::Tick(const float DeltaTime)
@@ -96,6 +96,7 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(AimAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
 		Input->BindAction(AimAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
 		Input->BindAction(RegenAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RegenInput);
+		Input->BindAction(DashAction.Get(), ETriggerEvent::Completed, this, &ThisClass::DashInput);
 	}
 }
 
@@ -108,6 +109,11 @@ void AP15Character::GetOwnedGameplayTags(FGameplayTagContainer& TagContainer) co
 {
 	EARLY_RETURN_IF(!AbilitySystemComp)
 	AbilitySystemComp->GetOwnedGameplayTags(TagContainer);
+}
+
+void AP15Character::SetCollisionResponseToPawn(const ECollisionResponse NewResponse)
+{
+	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, NewResponse);
 }
 
 bool AP15Character::GetIsHostile(const AP15Character* Other) const
@@ -163,7 +169,7 @@ void AP15Character::ToggleGameplayTag(const FGameplayTag TagToToggle, const bool
 
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
 {
-	EARLY_RETURN_IF(!Controller || !bMovingInput)
+	EARLY_RETURN_IF(!Controller || !bMovingInput || !bAllowMoving)
 	const FVector ForwardDirection = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::ForwardVector);
 	const FVector RightDirection   = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::RightVector);
 
@@ -240,6 +246,11 @@ void AP15Character::RegenInput()
 	bAllowMoving = !AbilitySystemComp->TryActivateAbilityByClass(RegenAbility);
 }
 
+void AP15Character::DashInput()
+{
+	AbilitySystemComp->TryActivateAbilityByClass(DashAbility);
+}
+
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 {
 	ToggleGameplayTag(FullHealthTag, FMath::IsNearlyEqual(NewHealthPercentage, 1));
@@ -255,6 +266,17 @@ void AP15Character::OnManaChangedCallback(const float NewManaPercentage)
 
 void AP15Character::OnStrengthChangedCallback(const float NewStrengthPercentage)
 {}
+
+void AP15Character::OnCapsuleBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	EARLY_RETURN_IF(!OtherActor->IsA(AP15Character::StaticClass()))
+
+	FGameplayEventData Payload;
+	Payload.Instigator = this;
+	Payload.Target     = OtherActor;
+	FGameplayTag Tag   = FGameplayTag::RequestGameplayTag("p15.skill.dash.deal_damage");
+	AbilitySystemComp->HandleGameplayEvent(MoveTemp(Tag), &Payload);
+}
 
 void AP15Character::AddDefaultMappingContext() const
 {

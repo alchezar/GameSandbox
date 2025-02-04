@@ -29,7 +29,7 @@ void UP15MeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	constexpr float TraceDistance = 1000.f;
 	const FVector   Start         = Char->GetPlayerEye()->GetComponentLocation();
 	const FVector   End           = Start + Char->GetPlayerEye()->GetForwardVector() * TraceDistance;
-	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Camera);
+	GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Pawn);
 	if (bDebug)
 	{
 		DrawDebugLine(GetWorld(), Start, End, FColor::Green, false, 5.f);
