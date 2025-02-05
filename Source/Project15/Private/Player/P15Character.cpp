@@ -13,6 +13,8 @@
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Gameplay/Attribute/P15AttributeSet.h"
+#include "Runtime/AIModule/Classes/AIController.h"
+#include "Runtime/AIModule/Classes/BrainComponent.h"
 
 AP15Character::AP15Character()
 {
@@ -100,6 +102,13 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 	}
 }
 
+void AP15Character::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	PlayerController = Cast<APlayerController>(NewController);
+}
+
 UAbilitySystemComponent* AP15Character::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComp.Get();
@@ -167,9 +176,48 @@ void AP15Character::ToggleGameplayTag(const FGameplayTag TagToToggle, const bool
 	AbilitySystemComp->SetTagMapCount(TagToToggle, bAdd ? 1 : 0);
 }
 
+void AP15Character::PushCharacter(const FVector& Direction, const float Strength, const float Duration)
+{
+	// Add impulse to character.
+	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
+	EARLY_RETURN_IF(!MovementComp)
+	MovementComp->AddImpulse(Direction * Strength, true);
+
+	// Disable ground friction for a push duration.
+	EARLY_RETURN_IF(Duration <= 0.f)
+	Stun(Duration);
+}
+
+void AP15Character::Stun(const float Duration)
+{
+	if (PlayerController)
+	{
+		PlayerController->DisableInput(PlayerController);
+	}
+	else if (const AAIController* AIController = Cast<AAIController>(Controller))
+	{
+		AIController->GetBrainComponent()->StopLogic("Stun");
+	}
+	GetCharacterMovement()->GroundFriction = 0.f;
+
+	const FTimerDelegate StunDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
+	{
+		if (PlayerController)
+		{
+			PlayerController->EnableInput(PlayerController);
+		}
+		else if (const AAIController* AIController = Cast<AAIController>(Controller))
+		{
+			AIController->GetBrainComponent()->RestartLogic();
+		}
+		GetCharacterMovement()->GroundFriction = P15::GroundFriction;
+	});
+	GetWorld()->GetTimerManager().SetTimer(StunTimer, StunDelegate, Duration, false);
+}
+
 void AP15Character::MoveInput(const FInputActionValue& InputValue)
 {
-	EARLY_RETURN_IF(!Controller || !bMovingInput || !bAllowMoving)
+	EARLY_RETURN_IF(!PlayerController || !PlayerController->InputEnabled())
 	const FVector ForwardDirection = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::ForwardVector);
 	const FVector RightDirection   = FRotator{0.f, Controller->GetControlRotation().Yaw, 0.f}.RotateVector(FVector::RightVector);
 
@@ -180,7 +228,6 @@ void AP15Character::MoveInput(const FInputActionValue& InputValue)
 
 void AP15Character::ChangeMovementState(const bool bStart)
 {
-	EARLY_RETURN_IF(!bAllowMoving)
 	bMovingInput = bStart;
 }
 
@@ -243,7 +290,7 @@ void AP15Character::AttackInput(const bool bStart)
 
 void AP15Character::RegenInput()
 {
-	bAllowMoving = !AbilitySystemComp->TryActivateAbilityByClass(RegenAbility);
+	AbilitySystemComp->TryActivateAbilityByClass(RegenAbility);
 }
 
 void AP15Character::DashInput()
@@ -280,7 +327,6 @@ void AP15Character::OnCapsuleBeginOverlapCallback(UPrimitiveComponent* Overlappe
 
 void AP15Character::AddDefaultMappingContext() const
 {
-	const APlayerController* PlayerController = GetController<APlayerController>();
 	EARLY_RETURN_IF(!PlayerController)
 	const ULocalPlayer* LocalPlayer = PlayerController->GetLocalPlayer();
 	EARLY_RETURN_IF(!LocalPlayer)

@@ -23,7 +23,8 @@ public class Project15 : ModuleRules
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"Niagara",
-			"UMG"
+			"UMG",
+			"AIModule"
 		});
 
 		PublicIncludePaths.Add("Project15");

@@ -6,6 +6,7 @@
 #include "Abilities/GameplayAbility.h"
 #include "P15DashAbility.generated.h"
 
+class UNiagaraSystem;
 class FMontageWaitSimpleDelegate;
 class UAbilityTask_PlayMontageAndWait;
 
@@ -34,12 +35,18 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UGameplayEffect> DamageGameplayEffectClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TObjectPtr<UNiagaraSystem> StunVfx = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	float Impulse = 1500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	float PushStrength = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	float StunDuration = 5.f;
 
 private:
-	float  DefaultGroundFriction = 0.f;
-	float* CurrentGroundFriction = nullptr;
 	UPROPERTY()
 	UAbilityTask_PlayMontageAndWait*    PlayMontageTask  = nullptr;
 	TArray<FMontageWaitSimpleDelegate*> MontageDelegates = {};
+	UPROPERTY()
+	TSet<AActor*> OverlapExclude = {};
 };

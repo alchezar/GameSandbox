@@ -18,10 +18,11 @@ void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	// Play a random montage section.
 	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
 	EARLY_RETURN_IF(!Char || !RegenMontage)
-	const int32 RandomSectionIndex = FMath::Rand32() % RegenMontage->GetNumSections();
-	const FName RandomSectionName  = RegenMontage->GetSectionName(RandomSectionIndex);
+	const int32 RandomSectionIndex  = FMath::Rand32() % RegenMontage->GetNumSections();
+	const FName RandomSectionName   = RegenMontage->GetSectionName(RandomSectionIndex);
+	const float RandomSectionLength = RegenMontage->GetSectionLength(RandomSectionIndex);
 	Char->PlayAnimMontage(RegenMontage.Get(), 1.f, RandomSectionName);
-	Char->SetAllowMoving(false);
+	Char->Stun(RandomSectionLength);
 
 	FTimerHandle         RegenTimer;
 	const FTimerDelegate TimerDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
@@ -36,8 +37,6 @@ void UP15HealthRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
 	EARLY_RETURN_IF(!Char)
-
-	Char->SetAllowMoving(true);
 
 	// One way to apply the gameplay effect.
 	UAbilitySystemComponent* AbilitySystemComp = Char->GetAbilitySystemComp().Get();

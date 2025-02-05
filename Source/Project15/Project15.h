@@ -10,6 +10,8 @@ namespace P15
 
 	constexpr float WalkSpeed = 200.f;
 	constexpr float RunSpeed  = 500.f;
+
+	constexpr float GroundFriction = 8.f;
 }
 
 #define EARLY_RETURN_IF(Condition)              \

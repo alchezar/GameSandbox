@@ -31,6 +31,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+	virtual void PossessedBy(AController* NewController) override;
 
 	/* ----------------------------- Interface ----------------------------- */
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
@@ -41,11 +42,10 @@ public:
 	_NODISCARD TObjectPtr<UAbilitySystemComponent> GetAbilitySystemComp() { return AbilitySystemComp; }
 	_NODISCARD TObjectPtr<UCameraComponent>        GetPlayerEye() const { return PlayerEye; }
 	_NODISCARD TObjectPtr<UP15AttributeSet>        GetAttributeSet() const { return AttributeSet; }
-	_NODISCARD bool                                GetIsMoving() const { return bMovingInput && bAllowMoving; }
+	_NODISCARD bool                                GetIsMoving() const { return bMovingInput; }
 	_NODISCARD bool                                GetIsDead() const { return bDead; }
 	_NODISCARD uint8                               GetTeamID() const { return TeamID; }
 
-	void SetAllowMoving(const bool bAllow) { bAllowMoving = bAllow; }
 	void SetCollisionResponseToPawn(const ECollisionResponse NewResponse);
 
 	UFUNCTION(BlueprintCallable, Category = "C++")
@@ -54,6 +54,8 @@ public:
 	void AddGameplayTag(const FGameplayTag TagToAdd) const;
 	void RemoveGameplayTag(const FGameplayTag TagToRemove) const;
 	void ToggleGameplayTag(const FGameplayTag TagToToggle, const bool bAdd) const;
+	void PushCharacter(const FVector& Direction, const float Strength, const float Duration = 1.f);
+	void Stun(const float Duration);
 
 protected:
 	void MoveInput(const FInputActionValue& InputValue);
@@ -129,11 +131,14 @@ private:
 	FP15SmoothChangeData CameraOffsetChangeData = {};
 
 	bool bMovingInput = false;
-	bool bAllowMoving = true;
 
 	double MaxCrouchOffset = 0.0;
 	bool   bDead           = false;
 	uint8  TeamID          = 255;
 
 	TArray<TSubclassOf<UGameplayAbility>> AllAbilities = {};
+	UPROPERTY()
+	TObjectPtr<APlayerController> PlayerController = nullptr;
+
+	FTimerHandle StunTimer;
 };
