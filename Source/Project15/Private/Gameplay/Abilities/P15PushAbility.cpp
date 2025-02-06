@@ -24,7 +24,6 @@ void UP15PushAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 	}
 
 	// Find an enemy.
-	AP15Character*        Char = Cast<AP15Character>(ActorInfo->OwnerActor);
 	FHitResult            HitResult;
 	const FVector         Start = Char->GetPlayerEye()->GetComponentLocation();
 	const FVector         End   = Start + Char->GetPlayerEye()->GetForwardVector() * PushDistance;

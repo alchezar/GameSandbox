@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "P15BaseAbility.h"
 #include "P15HealthRegenAbility.generated.h"
 
 UCLASS()
-class PROJECT15_API UP15HealthRegenAbility : public UGameplayAbility
+class PROJECT15_API UP15HealthRegenAbility : public UP15BaseAbility
 {
 	GENERATED_BODY()
 

@@ -24,7 +24,6 @@ void UP15MeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 	}
 
 	// Find the enemy ahead.
-	Char = Cast<AP15Character>(ActorInfo->OwnerActor);
 	FHitResult      HitResult;
 	constexpr float TraceDistance = 1000.f;
 	const FVector   Start         = Char->GetPlayerEye()->GetComponentLocation();

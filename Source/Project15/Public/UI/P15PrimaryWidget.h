@@ -6,6 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "P15PrimaryWidget.generated.h"
 
+class UP15AbilitySlotWidget;
 class UP15GlassBallWidget;
 
 UCLASS()
@@ -31,14 +32,10 @@ protected:
 	UP15GlassBallWidget* ManaBallWidget;
 	UPROPERTY(Transient, meta = (BindWidget))
 	UP15GlassBallWidget* StrengthBallWidget;
+	UPROPERTY(Transient, meta = (BindWidget))
+	UP15AbilitySlotWidget* DashAbilitySlotWidget;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName LevelParameterName = "Level";
+	FName BallLevelParameterName = "Level";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FName ColorParameterName = "Color";
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FLinearColor HealthColor = FLinearColor::Red;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FLinearColor ManaColor = FLinearColor::Blue;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FLinearColor StrengthColor = FLinearColor::Green;
+	FName SlotAlphaParameterName = "Alpha";
 };

@@ -12,6 +12,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Gameplay/Abilities/P15BaseAbility.h"
 #include "Gameplay/Attribute/P15AttributeSet.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "Runtime/AIModule/Classes/BrainComponent.h"
@@ -140,11 +141,11 @@ void AP15Character::AcquireAllAbilities()
 	{
 		FProperty*            Property      = *It;
 		const FClassProperty* ClassProperty = CastField<FClassProperty>(Property);
-		CONTINUE_IF(!ClassProperty || !ClassProperty->MetaClass || !ClassProperty->MetaClass->IsChildOf(UGameplayAbility::StaticClass()))
+		CONTINUE_IF(!ClassProperty || !ClassProperty->MetaClass || !ClassProperty->MetaClass->IsChildOf(UP15BaseAbility::StaticClass()))
 
-		const TSubclassOf<UGameplayAbility>* AbilityClassPtr = ClassProperty->ContainerPtrToValuePtr<TSubclassOf<UGameplayAbility>>(this);
+		const TSubclassOf<UP15BaseAbility>* AbilityClassPtr = ClassProperty->ContainerPtrToValuePtr<TSubclassOf<UP15BaseAbility>>(this);
 		CONTINUE_IF(!AbilityClassPtr)
-		TSubclassOf<UGameplayAbility> AbilityClass = *AbilityClassPtr;
+		TSubclassOf<UP15BaseAbility> AbilityClass = *AbilityClassPtr;
 		CONTINUE_IF(!AbilityClass)
 
 		AllAbilities.Add(AbilityClass);
@@ -153,7 +154,7 @@ void AP15Character::AcquireAllAbilities()
 	// Acquire all abilities.
 	if (HasAuthority())
 	{
-		for (const TSubclassOf<UGameplayAbility>& AbilityToAcquire : AllAbilities)
+		for (const TSubclassOf<UP15BaseAbility>& AbilityToAcquire : AllAbilities)
 		{
 			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
 		}

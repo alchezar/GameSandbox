@@ -16,8 +16,7 @@ void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	// Play a random montage section.
-	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
-	EARLY_RETURN_IF(!Char || !RegenMontage)
+	EARLY_RETURN_IF(!RegenMontage)
 	const int32 RandomSectionIndex  = FMath::Rand32() % RegenMontage->GetNumSections();
 	const FName RandomSectionName   = RegenMontage->GetSectionName(RandomSectionIndex);
 	const float RandomSectionLength = RegenMontage->GetSectionLength(RandomSectionIndex);
@@ -35,9 +34,6 @@ void UP15HealthRegenAbility::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 
 void UP15HealthRegenAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled)
 {
-	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
-	EARLY_RETURN_IF(!Char)
-
 	// One way to apply the gameplay effect.
 	UAbilitySystemComponent* AbilitySystemComp = Char->GetAbilitySystemComp().Get();
 	EARLY_RETURN_IF(!AbilitySystemComp || !RegenEffectClass)

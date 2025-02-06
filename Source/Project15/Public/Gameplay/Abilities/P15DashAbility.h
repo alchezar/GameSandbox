@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "P15BaseAbility.h"
 #include "P15DashAbility.generated.h"
 
 class UNiagaraSystem;
@@ -11,7 +11,7 @@ class FMontageWaitSimpleDelegate;
 class UAbilityTask_PlayMontageAndWait;
 
 UCLASS()
-class PROJECT15_API UP15DashAbility : public UGameplayAbility
+class PROJECT15_API UP15DashAbility : public UP15BaseAbility
 {
 	GENERATED_BODY()
 

@@ -18,8 +18,6 @@ void UP15DashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor.Get());
-	EARLY_RETURN_IF(!Char)
 	EARLY_RETURN_IF(!DashMontage)
 
 	CommitAbility(Handle, ActorInfo, ActivationInfo, nullptr);
@@ -64,8 +62,6 @@ void UP15DashAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, c
 void UP15DashAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled)
 {
 	// Allow movement input and stop ignoring other pawns
-	AP15Character* Char = Cast<AP15Character>(ActorInfo->OwnerActor);
-	EARLY_RETURN_IF(!Char)
 	Char->SetCollisionResponseToPawn(ECR_Block);
 
 	// Unsubscribe from montage delegates and clear the task.

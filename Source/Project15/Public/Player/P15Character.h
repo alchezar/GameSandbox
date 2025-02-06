@@ -10,7 +10,6 @@
 #include "P15Character.generated.h"
 
 class UCameraComponent;
-class UGameplayAbility;
 class UInputAction;
 class UInputMappingContext;
 class UP15AttributeSet;
@@ -113,15 +112,15 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UGameplayAbility> PushAbility = nullptr;
+	TSubclassOf<UP15BaseAbility> PushAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UGameplayAbility> MeleeAbility = nullptr;
+	TSubclassOf<UP15BaseAbility> MeleeAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UGameplayAbility> DeadAbility = nullptr;
+	TSubclassOf<UP15BaseAbility> DeadAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UGameplayAbility> RegenAbility = nullptr;
+	TSubclassOf<UP15BaseAbility> RegenAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
-	TSubclassOf<UGameplayAbility> DashAbility = nullptr;
+	TSubclassOf<UP15BaseAbility> DashAbility = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.health.full");
@@ -136,7 +135,7 @@ private:
 	bool   bDead           = false;
 	uint8  TeamID          = 255;
 
-	TArray<TSubclassOf<UGameplayAbility>> AllAbilities = {};
+	TArray<TSubclassOf<UP15BaseAbility>> AllAbilities = {};
 	UPROPERTY()
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 

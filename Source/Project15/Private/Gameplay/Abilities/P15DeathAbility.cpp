@@ -3,7 +3,6 @@
 #include "Gameplay/Abilities/P15DeathAbility.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
-#include "Project15.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Gameplay/Effects/P15DeathEffect.h"
@@ -21,9 +20,8 @@ void UP15DeathAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
 	}
 
-	FTimerHandle         DeathTimer;
-	const FTimerDelegate DeathDelegate = FTimerDelegate::CreateUObject(this, &ThisClass::EnableRagdoll, Cast<ACharacter>(ActorInfo->OwnerActor));
-	GetWorld()->GetTimerManager().SetTimer(DeathTimer, DeathDelegate, 1.f, false);
+	FTimerHandle DeathTimer;
+	GetWorld()->GetTimerManager().SetTimer(DeathTimer, this, &ThisClass::EnableRagdoll, 1.f, false);
 }
 
 void UP15DeathAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const bool bReplicateEndAbility, const bool bWasCancelled)
@@ -31,21 +29,20 @@ void UP15DeathAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-void UP15DeathAbility::EnableRagdoll(ACharacter* InChar) const
+void UP15DeathAbility::EnableRagdoll() const
 {
-	EARLY_RETURN_IF(!InChar)
-	check(InChar->GetCharacterMovement())
-	check(InChar->GetCapsuleComponent())
-	check(InChar->GetMesh())
+	check(Char->GetCharacterMovement())
+	check(Char->GetCapsuleComponent())
+	check(Char->GetMesh())
 
-	InChar->GetCharacterMovement()->DisableMovement();
-	InChar->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	InChar->GetMesh()->SetSimulatePhysics(true);
-	InChar->GetMesh()->SetCollisionProfileName("Ragdoll");
-	if (AController* Control = InChar->GetController())
+	Char->GetCharacterMovement()->DisableMovement();
+	Char->GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Char->GetMesh()->SetSimulatePhysics(true);
+	Char->GetMesh()->SetCollisionProfileName("Ragdoll");
+	if (AController* Control = Char->GetController())
 	{
 		Control->ChangeState(NAME_Spectating);
 	}
-	InChar->DetachFromControllerPendingDestroy();
-	InChar->SetLifeSpan(Lifespan);
+	Char->DetachFromControllerPendingDestroy();
+	Char->SetLifeSpan(Lifespan);
 }

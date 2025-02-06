@@ -16,6 +16,7 @@ class PROJECT15_API UP15GlassBallWidget : public UUserWidget
 	/* ------------------------------ Unreal ------------------------------- */
 protected:
 	virtual void NativeOnInitialized() override;
+	virtual void NativeConstruct() override;
 
 	/* ------------------------------- This -------------------------------- */
 public:
@@ -26,6 +27,10 @@ public:
 protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<UImage> GlassBallImage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FLinearColor BallColor = FLinearColor::Red;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	FName ColorParameterName = "Color";
 
 private:
 	UPROPERTY()

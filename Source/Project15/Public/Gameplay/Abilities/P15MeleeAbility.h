@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "P15BaseAbility.h"
 #include "P15MeleeAbility.generated.h"
 
 class AP15Character;
 class UAbilityTask_WaitGameplayEvent;
 
 UCLASS()
-class PROJECT15_API UP15MeleeAbility : public UGameplayAbility
+class PROJECT15_API UP15MeleeAbility : public UP15BaseAbility
 {
 	GENERATED_BODY()
 
@@ -44,8 +44,6 @@ protected:
 	bool bDebug = true;
 
 private:
-	UPROPERTY()
-	TObjectPtr<AP15Character> Char = nullptr;
 	UPROPERTY()
 	TObjectPtr<AP15Character> Enemy = nullptr;
 };
