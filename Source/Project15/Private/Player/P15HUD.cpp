@@ -14,3 +14,9 @@ void AP15HUD::BeginPlay()
 	EARLY_RETURN_IF(!PrimaryWidget)
 	PrimaryWidget->AddToViewport(0);
 }
+
+void AP15HUD::AddAbilityToUI(const int32 Index, FP15AbilityInfo&& AbilityInfo, FP15OnAbilityStartedSignature* OnAbilityStartedDelegate) const
+{
+	EARLY_RETURN_IF(!PrimaryWidget)
+	PrimaryWidget->AddAbilityToUI(Index, MoveTemp(AbilityInfo), OnAbilityStartedDelegate);
+}

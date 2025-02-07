@@ -19,7 +19,7 @@ void UP15BaseAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }
 
-FP15AbilityInfo UP15BaseAbility::GetAbilityInfo() const
+FP15AbilityInfo UP15BaseAbility::GetAbilityInfo()
 {
 	const UGameplayEffect* CooldownEffect = GetCooldownGameplayEffect();
 	const UGameplayEffect* CostEffect     = GetCostGameplayEffect();
@@ -33,7 +33,7 @@ FP15AbilityInfo UP15BaseAbility::GetAbilityInfo() const
 	{
 		CooldownEffect->DurationMagnitude.GetStaticMagnitudeIfPossible(1.f, Cooldown);
 	}
-	if (CostEffect && !GetIsInstant(CostEffect) && !CostEffect->Modifiers.IsEmpty())
+	if (CostEffect && !CostEffect->Modifiers.IsEmpty())
 	{
 		const FGameplayModifierInfo ModifierInfo = CostEffect->Modifiers[0];
 		ModifierInfo.ModifierMagnitude.GetStaticMagnitudeIfPossible(1.f, Cost);
@@ -44,7 +44,7 @@ FP15AbilityInfo UP15BaseAbility::GetAbilityInfo() const
 		.SetCooldown(Cooldown)
 		.SetCost(Cost)
 		.SetCostType(CostType)
-		.SetMaterial(UIMaterial.Get())
+		.SetTexture(UITexture.Get())
 		.SetAbilityClass(GetClass());
 
 	return Info;
@@ -52,7 +52,7 @@ FP15AbilityInfo UP15BaseAbility::GetAbilityInfo() const
 
 bool UP15BaseAbility::GetIsInstant(const UGameplayEffect* InEffect) const
 {
-	return InEffect->DurationPolicy != EGameplayEffectDurationType::Instant;
+	return InEffect->DurationPolicy == EGameplayEffectDurationType::Instant;
 }
 
 EP15AbilityCostType UP15BaseAbility::GetCostTypeByName(const FString& InName) const

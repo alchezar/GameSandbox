@@ -7,6 +7,7 @@
 #include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Utils/P15Types.h"
+#include "Utils/P15Utils.h"
 #include "P15Character.generated.h"
 
 class UCameraComponent;
@@ -49,7 +50,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	bool GetIsHostile(const AP15Character* Other) const;
-	void AcquireAllAbilities();
 	void AddGameplayTag(const FGameplayTag TagToAdd) const;
 	void RemoveGameplayTag(const FGameplayTag TagToRemove) const;
 	void ToggleGameplayTag(const FGameplayTag TagToToggle, const bool bAdd) const;
@@ -75,11 +75,16 @@ protected:
 
 private:
 	void AddDefaultMappingContext() const;
+	void AutoDetermineTeamID();
+	void AcquireAllAbilities();
+	void AddAbilitiesToUI();
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
-	void AutoDetermineTeamID();
 
 	/* ------------------------------ Fields ------------------------------- */
+public:
+	FP15OnAbilityStartedSignature OnAbilityStarted;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComp = nullptr;

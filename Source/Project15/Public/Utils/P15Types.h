@@ -34,7 +34,7 @@ struct FP15AbilityInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	EP15AbilityCostType CostType = EP15AbilityCostType::Mana;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<UMaterialInterface> Material = nullptr;
+	TObjectPtr<UTexture2D> Texture = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TSubclassOf<UP15BaseAbility> AbilityClass = nullptr;
 
@@ -61,9 +61,9 @@ struct FP15AbilityInfo
 		return *this;
 	}
 
-	FP15AbilityInfo& SetMaterial(UMaterialInterface* NewMaterial)
+	FP15AbilityInfo& SetTexture(UTexture2D* NewTexture)
 	{
-		Material = NewMaterial;
+		Texture = NewTexture;
 		return *this;
 	}
 

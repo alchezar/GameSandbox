@@ -14,6 +14,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Gameplay/Abilities/P15BaseAbility.h"
 #include "Gameplay/Attribute/P15AttributeSet.h"
+#include "Player/P15HUD.h"
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "Runtime/AIModule/Classes/BrainComponent.h"
 
@@ -64,6 +65,8 @@ void AP15Character::BeginPlay()
 	AutoDetermineTeamID();
 
 	AcquireAllAbilities();
+	AddAbilitiesToUI();
+
 	AttributeSet->OnHealthChanged.AddUObject(this, &ThisClass::OnHealthChangedCallback);
 	AttributeSet->OnManaChanged.AddUObject(this, &ThisClass::OnManaChangedCallback);
 	AttributeSet->OnStrengthChanged.AddUObject(this, &ThisClass::OnStrengthChangedCallback);
@@ -130,36 +133,6 @@ bool AP15Character::GetIsHostile(const AP15Character* Other) const
 {
 	EARLY_RETURN_VALUE_IF(!Other, false)
 	return TeamID != Other->GetTeamID();
-}
-
-void AP15Character::AcquireAllAbilities()
-{
-	EARLY_RETURN_IF(!AbilitySystemComp)
-
-	// Find all ability classes in this class.
-	for (TFieldIterator<FProperty> It{this->GetClass()}; It; ++It)
-	{
-		FProperty*            Property      = *It;
-		const FClassProperty* ClassProperty = CastField<FClassProperty>(Property);
-		CONTINUE_IF(!ClassProperty || !ClassProperty->MetaClass || !ClassProperty->MetaClass->IsChildOf(UP15BaseAbility::StaticClass()))
-
-		const TSubclassOf<UP15BaseAbility>* AbilityClassPtr = ClassProperty->ContainerPtrToValuePtr<TSubclassOf<UP15BaseAbility>>(this);
-		CONTINUE_IF(!AbilityClassPtr)
-		TSubclassOf<UP15BaseAbility> AbilityClass = *AbilityClassPtr;
-		CONTINUE_IF(!AbilityClass)
-
-		AllAbilities.Add(AbilityClass);
-	}
-
-	// Acquire all abilities.
-	if (HasAuthority())
-	{
-		for (const TSubclassOf<UP15BaseAbility>& AbilityToAcquire : AllAbilities)
-		{
-			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
-		}
-	}
-	AbilitySystemComp->InitAbilityActorInfo(this, this);
 }
 
 void AP15Character::AddGameplayTag(const FGameplayTag TagToAdd) const
@@ -291,12 +264,18 @@ void AP15Character::AttackInput(const bool bStart)
 
 void AP15Character::RegenInput()
 {
-	AbilitySystemComp->TryActivateAbilityByClass(RegenAbility);
+	if (AbilitySystemComp->TryActivateAbilityByClass(RegenAbility))
+	{
+		OnAbilityStarted.Broadcast(RegenAbility);
+	}
 }
 
 void AP15Character::DashInput()
 {
-	AbilitySystemComp->TryActivateAbilityByClass(DashAbility);
+	if (AbilitySystemComp->TryActivateAbilityByClass(DashAbility))
+	{
+		OnAbilityStarted.Broadcast(DashAbility);
+	}
 }
 
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
@@ -335,6 +314,69 @@ void AP15Character::AddDefaultMappingContext() const
 	EARLY_RETURN_IF(!Subsystem)
 
 	Subsystem->AddMappingContext(InputContext, 0);
+}
+
+void AP15Character::AutoDetermineTeamID()
+{
+	EARLY_RETURN_IF(!GetController() || !GetController()->IsPlayerController())
+	TeamID = 0;
+}
+
+void AP15Character::AcquireAllAbilities()
+{
+	EARLY_RETURN_IF(!AbilitySystemComp)
+
+	// Find all ability classes in this class.
+	for (TFieldIterator<FProperty> It{this->GetClass()}; It; ++It)
+	{
+		FProperty*            Property      = *It;
+		const FClassProperty* ClassProperty = CastField<FClassProperty>(Property);
+		CONTINUE_IF(!ClassProperty || !ClassProperty->MetaClass || !ClassProperty->MetaClass->IsChildOf(UP15BaseAbility::StaticClass()))
+
+		const TSubclassOf<UP15BaseAbility>* AbilityClassPtr = ClassProperty->ContainerPtrToValuePtr<TSubclassOf<UP15BaseAbility>>(this);
+		CONTINUE_IF(!AbilityClassPtr)
+		TSubclassOf<UP15BaseAbility> AbilityClass = *AbilityClassPtr;
+		CONTINUE_IF(!AbilityClass)
+
+		AllAbilities.Add(AbilityClass);
+	}
+
+	// Acquire all abilities.
+	if (HasAuthority())
+	{
+		for (const TSubclassOf<UP15BaseAbility>& AbilityToAcquire : AllAbilities)
+		{
+			AbilitySystemComp->GiveAbility(FGameplayAbilitySpec{AbilityToAcquire});
+		}
+	}
+	AbilitySystemComp->InitAbilityActorInfo(this, this);
+}
+
+void AP15Character::AddAbilitiesToUI()
+{
+	EARLY_RETURN_IF(!PlayerController)
+	const AP15HUD* PlayerHUD = PlayerController->GetHUD<AP15HUD>();
+	EARLY_RETURN_IF(!PlayerHUD)
+
+	// Filter by ability classes that have textures.
+	auto Predicate = [](const TSubclassOf<UP15BaseAbility>& Ability) -> bool
+	{
+		return Ability
+			&& Ability->GetDefaultObject<UP15BaseAbility>()
+			&& Ability->GetDefaultObject<UP15BaseAbility>()->GetHasTexture();
+	};
+	TArray<TSubclassOf<UP15BaseAbility>> FilteredAbilities = AllAbilities.FilterByPredicate(Predicate);
+
+	// Add filtered abilities to the UI.
+	// The order of the ability classes here will correspond to the order of the UI slots.
+	for (int32 Index = 0; Index < FilteredAbilities.Num(); ++Index)
+	{
+		UP15BaseAbility* AbilityInstance = FilteredAbilities[Index].Get()->GetDefaultObject<UP15BaseAbility>();
+		CONTINUE_IF(!AbilityInstance)
+
+		FP15AbilityInfo AbilityInfo = AbilityInstance->GetAbilityInfo();
+		PlayerHUD->AddAbilityToUI(Index, MoveTemp(AbilityInfo), &OnAbilityStarted);
+	}
 }
 
 void AP15Character::ChangeWalkSpeedSmoothly(const float DeltaTime)
@@ -376,10 +418,4 @@ void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 
 	CurrentOffset = FMath::InterpSinOut(StartOffset, TargetOffset, Alpha);
 	Alpha += DeltaTime / CameraOffsetChangeData.Time;
-}
-
-void AP15Character::AutoDetermineTeamID()
-{
-	EARLY_RETURN_IF(!GetController() || !GetController()->IsPlayerController())
-	TeamID = 0;
 }

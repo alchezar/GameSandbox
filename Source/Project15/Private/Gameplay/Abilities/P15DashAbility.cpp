@@ -123,3 +123,13 @@ void UP15DashAbility::OnMontageFinishedCallback()
 {
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
+
+FP15AbilityInfo UP15DashAbility::GetAbilityInfo()
+{
+	FP15AbilityInfo Info = Super::GetAbilityInfo();
+	if (DashMontage)
+	{
+		Info.SetCooldown(DashMontage->GetPlayLength());
+	}
+	return Info;
+}

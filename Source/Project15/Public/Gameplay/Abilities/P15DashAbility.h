@@ -28,6 +28,10 @@ private:
 	UFUNCTION()
 	void OnMontageFinishedCallback();
 
+	/* ------------------------------- Super ------------------------------- */
+public:
+	virtual FP15AbilityInfo GetAbilityInfo() override;
+
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
