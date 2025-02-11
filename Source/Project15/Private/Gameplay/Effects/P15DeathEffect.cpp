@@ -11,7 +11,7 @@ UP15DeathEffect::UP15DeathEffect()
 	if (UTargetTagsGameplayEffectComponent* GrantedTagsComp = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>("GrantedTagsComponent"))
 	{
 		FInheritedTagContainer TagContainer;
-		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag("p15.char.death"));
+		TagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag("p15.char.health.dead"));
 
 		GrantedTagsComp->SetAndApplyTargetTagChanges(TagContainer);
 		GEComponents.Add(GrantedTagsComp);

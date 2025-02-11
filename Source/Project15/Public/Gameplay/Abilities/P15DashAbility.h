@@ -41,9 +41,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TObjectPtr<UNiagaraSystem> StunVfx = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	float Impulse = 1500.f;
+	float Impulse = 1000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	float PushStrength = 500.f;
+	float PushStrength = 1000.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	float StunDuration = 5.f;
 

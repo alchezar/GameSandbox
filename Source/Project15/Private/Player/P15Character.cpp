@@ -93,8 +93,8 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(MoveAction.Get(), ETriggerEvent::Started, this, &ThisClass::ChangeMovementState, true);
 		Input->BindAction(MoveAction.Get(), ETriggerEvent::Completed, this, &ThisClass::ChangeMovementState, false);
 		Input->BindAction(LookAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::LookInput);
-		Input->BindAction(JumpAction.Get(), ETriggerEvent::Started, this, &Super::Jump);
-		Input->BindAction(JumpAction.Get(), ETriggerEvent::Completed, this, &Super::StopJumping);
+		Input->BindAction(JumpAction.Get(), ETriggerEvent::Started, this, &ThisClass::JumpInput, true);
+		Input->BindAction(JumpAction.Get(), ETriggerEvent::Completed, this, &ThisClass::JumpInput, false);
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Started, this, &ThisClass::RunInput, true);
 		Input->BindAction(RunAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
 		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started, this, &ThisClass::CrouchInput);
@@ -103,6 +103,7 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(AimAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
 		Input->BindAction(RegenAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RegenInput);
 		Input->BindAction(DashAction.Get(), ETriggerEvent::Completed, this, &ThisClass::DashInput);
+		Input->BindAction(LaserAction.Get(), ETriggerEvent::Completed, this, &ThisClass::LaserInput);
 	}
 }
 
@@ -200,9 +201,17 @@ void AP15Character::MoveInput(const FInputActionValue& InputValue)
 	AddMovementInput(RightDirection, InputVector.X);
 }
 
+void AP15Character::JumpInput(const bool bInAir)
+{
+	bFalling = bInAir;
+	bFalling ? Jump() : StopJumping();
+}
+
 void AP15Character::ChangeMovementState(const bool bStart)
 {
 	bMovingInput = bStart;
+
+	GetCharacterMovement()->bUseControllerDesiredRotation = bMovingInput && !bFalling;
 }
 
 void AP15Character::LookInput(const FInputActionValue& InputValue)
@@ -212,14 +221,6 @@ void AP15Character::LookInput(const FInputActionValue& InputValue)
 
 	AddControllerYawInput(InputVector.X);
 	AddControllerPitchInput(InputVector.Y);
-
-	if (UCharacterMovementComponent* Movement = GetCharacterMovement())
-	{
-		const bool bMoving = Movement->Velocity.SizeSquared() > P15::MinimalSpeed;
-		const bool bInAir  = Movement->IsFalling();
-
-		Movement->bUseControllerDesiredRotation = bMoving && !bInAir;
-	}
 }
 
 void AP15Character::RunInput(const bool bRun)
@@ -257,25 +258,32 @@ void AP15Character::AttackInput(const bool bStart)
 		// Try to deal damage at input completion.
 		FGameplayEventData Payload;
 		Payload.Instigator = this;
-		FGameplayTag Tag   = FGameplayTag::RequestGameplayTag("p15.melee.deal_damage");
+		FGameplayTag Tag   = FGameplayTag::RequestGameplayTag("p15.skill.melee.deal_damage");
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, MoveTemp(Tag), MoveTemp(Payload));
 	}
 }
 
 void AP15Character::RegenInput()
 {
-	if (AbilitySystemComp->TryActivateAbilityByClass(RegenAbility))
-	{
-		OnAbilityStarted.Broadcast(RegenAbility);
-	}
+	ActivateAbility(RegenAbility);
 }
 
 void AP15Character::DashInput()
 {
-	if (AbilitySystemComp->TryActivateAbilityByClass(DashAbility))
+	ActivateAbility(DashAbility);
+}
+
+void AP15Character::LaserInput()
+{
+	ActivateAbility(LaserAbility);
+
+	// Prevent mana drain.
+	FTimerHandle   LaserTimer;
+	FTimerDelegate LaserDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
 	{
-		OnAbilityStarted.Broadcast(DashAbility);
-	}
+		AbilitySystemComp->CancelAbility(LaserAbility.GetDefaultObject());
+	});
+	GetWorld()->GetTimerManager().SetTimer(LaserTimer, MoveTemp(LaserDelegate), LaserAbility.GetDefaultObject()->GetAbilityInfo().CooldownDuration, false);
 }
 
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
@@ -376,6 +384,14 @@ void AP15Character::AddAbilitiesToUI()
 
 		FP15AbilityInfo AbilityInfo = AbilityInstance->GetAbilityInfo();
 		PlayerHUD->AddAbilityToUI(Index, MoveTemp(AbilityInfo), &OnAbilityStarted);
+	}
+}
+
+void AP15Character::ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass) const
+{
+	if (AbilitySystemComp->TryActivateAbilityByClass(AbilityClass))
+	{
+		OnAbilityStarted.Broadcast(AbilityClass);
 	}
 }
 

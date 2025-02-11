@@ -60,6 +60,7 @@ protected:
 	void MoveInput(const FInputActionValue& InputValue);
 	void ChangeMovementState(const bool bStart);
 	void LookInput(const FInputActionValue& InputValue);
+	void JumpInput(const bool bInAir);
 	void RunInput(const bool bRun);
 	void CrouchInput();
 	UFUNCTION(BlueprintCallable)
@@ -67,6 +68,7 @@ protected:
 	void AttackInput(const bool bStart);
 	void RegenInput();
 	void DashInput();
+	void LaserInput();
 	void OnHealthChangedCallback(const float NewHealthPercentage);
 	void OnManaChangedCallback(const float NewManaPercentage);
 	void OnStrengthChangedCallback(const float NewStrengthPercentage);
@@ -78,6 +80,7 @@ private:
 	void AutoDetermineTeamID();
 	void AcquireAllAbilities();
 	void AddAbilitiesToUI();
+	void ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass) const;
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
 
@@ -113,6 +116,8 @@ protected:
 	TObjectPtr<UInputAction> RegenAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> DashAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> LaserAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
@@ -126,15 +131,18 @@ protected:
 	TSubclassOf<UP15BaseAbility> RegenAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UP15BaseAbility> DashAbility = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UP15BaseAbility> LaserAbility = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
-	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.health.full");
+	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.char.health.full");
 
 private:
 	FP15SmoothChangeData SpeedChangeData        = {};
 	FP15SmoothChangeData CameraOffsetChangeData = {};
 
 	bool bMovingInput = false;
+	bool bFalling     = false;
 
 	double MaxCrouchOffset = 0.0;
 	bool   bDead           = false;

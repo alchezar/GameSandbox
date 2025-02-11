@@ -3,13 +3,19 @@
 ///
 /// @brief Update the attribute and broadcast the change if it name matches.
 ///
-#define APPLY_ATTRIBUTE_CHANGE(AttributeName)                                        \
-if (Data.EvaluatedData.Attribute.GetUProperty()                                      \
-	== FindFieldChecked<FProperty>(StaticClass(), FName(TEXT(#AttributeName))))      \
-{                                                                                    \
-	AttributeName.SetBaseValue(FMath::Max(0.f, AttributeName.GetBaseValue()));       \
-	AttributeName.SetCurrentValue(FMath::Max(0.f, AttributeName.GetCurrentValue())); \
-	On##AttributeName##Changed.Broadcast(Get##AttributeName##Percentage());          \
+#define APPLY_ATTRIBUTE_CHANGE(AttributeName)                                    \
+if (Data.EvaluatedData.Attribute.GetUProperty()                                  \
+	== FindFieldChecked<FProperty>(StaticClass(), FName(TEXT(#AttributeName))))  \
+{                                                                                \
+	AttributeName.SetBaseValue(FMath::Clamp(                                     \
+		AttributeName.GetBaseValue(),                                            \
+		0.f,                                                                     \
+		Max##AttributeName.GetBaseValue()));                                     \
+	AttributeName.SetCurrentValue(FMath::Clamp(                                  \
+		AttributeName.GetCurrentValue(),                                         \
+		0.f,                                                                     \
+		Max##AttributeName.GetCurrentValue()));                                  \
+	On##AttributeName##Changed.Broadcast(Get##AttributeName##Percentage());      \
 }
 
 #include "Gameplay/Attribute/P15AttributeSet.h"

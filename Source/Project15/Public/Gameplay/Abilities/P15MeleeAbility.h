@@ -29,7 +29,7 @@ protected:
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	FGameplayTag DealDamageTag = FGameplayTag::RequestGameplayTag("p15.melee.deal_damage");
+	FGameplayTag DealDamageTag = FGameplayTag::RequestGameplayTag("p15.skill.melee.deal_damage");
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	UAnimMontage* InstigatorMontage = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")

@@ -2,9 +2,15 @@
 
 #include "Gameplay/Abilities/P15BaseAbility.h"
 
+#include "AbilitySystemComponent.h"
+#include "Gameplay/Attribute/P15AttributeSet.h"
 #include "Player/P15Character.h"
 
-UP15BaseAbility::UP15BaseAbility() {}
+UP15BaseAbility::UP15BaseAbility()
+{
+	AbilityTags            = FGameplayTagContainer{FGameplayTag::RequestGameplayTag("p15.skill")};
+	CancelAbilitiesWithTag = FGameplayTagContainer{FGameplayTag::RequestGameplayTag("p15.skill")};
+}
 
 void UP15BaseAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -48,6 +54,27 @@ FP15AbilityInfo UP15BaseAbility::GetAbilityInfo()
 		.SetAbilityClass(GetClass());
 
 	return Info;
+}
+
+bool UP15BaseAbility::GetIsCostStillAvailable()
+{
+	const FP15AbilityInfo   AbilityInfo  = GetAbilityInfo();
+	const UP15AttributeSet* AttributeSet = Char->GetAttributeSet().Get();
+
+	if (AbilityInfo.CostType == EP15AbilityCostType::Health)
+	{
+		return AttributeSet->GetHealth() > FMath::Abs(AbilityInfo.Cost);
+	}
+	if (AbilityInfo.CostType == EP15AbilityCostType::Mana)
+	{
+		return AttributeSet->GetMana() > FMath::Abs(AbilityInfo.Cost);
+	}
+	if (AbilityInfo.CostType == EP15AbilityCostType::Strength)
+	{
+		return AttributeSet->GetStrength() > FMath::Abs(AbilityInfo.Cost);
+	}
+
+	_UNLIKELY return false;
 }
 
 bool UP15BaseAbility::GetIsInstant(const UGameplayEffect* InEffect) const

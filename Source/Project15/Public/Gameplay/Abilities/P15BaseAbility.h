@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "Utils/P15Types.h"
-#include "Utils/P15Utils.h"
 #include "P15BaseAbility.generated.h"
 
 class AP15Character;
@@ -28,6 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	virtual FP15AbilityInfo GetAbilityInfo();
 	_NODISCARD bool         GetHasTexture() const { return UITexture != nullptr; }
+	_NODISCARD bool         GetIsCostStillAvailable();
 
 private:
 	bool                GetIsInstant(const UGameplayEffect* InEffect) const;
@@ -35,7 +35,7 @@ private:
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Base")
 	TObjectPtr<UTexture2D> UITexture = nullptr;
 
 	UPROPERTY()

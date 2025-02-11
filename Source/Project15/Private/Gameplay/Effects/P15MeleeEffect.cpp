@@ -15,7 +15,7 @@ UP15MeleeEffect::UP15MeleeEffect()
 	if (UTargetTagsGameplayEffectComponent* GrantTagsToTargetActor = CreateDefaultSubobject<UTargetTagsGameplayEffectComponent>("GrantTagsToTargetActorComponent"))
 	{
 		FInheritedTagContainer InheritedTagContainer;
-		InheritedTagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag("p15.melee.cooldown"));
+		InheritedTagContainer.Added.AddTag(FGameplayTag::RequestGameplayTag("p15.skill.melee.cooldown"));
 
 		GrantTagsToTargetActor->SetAndApplyTargetTagChanges(InheritedTagContainer);
 		GEComponents.Add(GrantTagsToTargetActor);
