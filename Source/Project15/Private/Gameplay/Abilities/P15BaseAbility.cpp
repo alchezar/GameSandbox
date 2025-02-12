@@ -8,7 +8,7 @@
 
 UP15BaseAbility::UP15BaseAbility()
 {
-	AbilityTags            = FGameplayTagContainer{FGameplayTag::RequestGameplayTag("p15.skill")};
+	SetAssetTags(FGameplayTagContainer{FGameplayTag::RequestGameplayTag("p15.skill")});
 	CancelAbilitiesWithTag = FGameplayTagContainer{FGameplayTag::RequestGameplayTag("p15.skill")};
 }
 

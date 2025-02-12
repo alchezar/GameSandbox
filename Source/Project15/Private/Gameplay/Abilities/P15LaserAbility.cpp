@@ -49,7 +49,7 @@ void UP15LaserAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, const
 
 	// Destroy laser actor and stop using controller yaw rotation.
 	LaserActor->Destroy();
-	Char->bUseControllerRotationYaw = true;
+	Char->bUseControllerRotationYaw = false;
 	Char->StopAnimMontage();
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
