@@ -18,7 +18,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
+	/* ------------------------------- Super ------------------------------- */
 public:
 	virtual void StartTargeting(UGameplayAbility* Ability) override;
 	virtual void ConfirmTargetingAndContinue() override;

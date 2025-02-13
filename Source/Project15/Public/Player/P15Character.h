@@ -47,6 +47,7 @@ public:
 	_NODISCARD uint8                               GetTeamID() const { return TeamID; }
 
 	void SetCollisionResponseToPawn(const ECollisionResponse NewResponse);
+	void SetTargetingState(const bool bNewTargeting);
 
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	bool GetIsHostile(const AP15Character* Other) const;
@@ -148,6 +149,7 @@ private:
 
 	bool bMovingInput = false;
 	bool bFalling     = false;
+	bool bTargeting   = false;
 
 	double MaxCrouchOffset = 0.0;
 	bool   bDead           = false;

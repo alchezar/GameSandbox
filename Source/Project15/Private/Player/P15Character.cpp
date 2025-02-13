@@ -131,6 +131,11 @@ void AP15Character::SetCollisionResponseToPawn(const ECollisionResponse NewRespo
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_Pawn, NewResponse);
 }
 
+void AP15Character::SetTargetingState(const bool bNewTargeting)
+{
+	bTargeting = bNewTargeting;
+}
+
 bool AP15Character::GetIsHostile(const AP15Character* Other) const
 {
 	EARLY_RETURN_VALUE_IF(!Other, false)
@@ -244,11 +249,26 @@ void AP15Character::CrouchInput()
 
 void AP15Character::PushInput()
 {
+	// Confirming the target for the target ability if it's active.
+	if (bTargeting)
+	{
+		AbilitySystemComp->TargetConfirm();
+		return;
+	}
+
+	// Default behavior for the push input.
 	AbilitySystemComp->TryActivateAbilityByClass(PushAbility);
 }
 
 void AP15Character::AttackInput(const bool bStart)
 {
+	// Canceling the target for the target ability if it's active.
+	if (bTargeting)
+	{
+		AbilitySystemComp->TargetCancel();
+		return;
+	}
+
 	if (bStart)
 	{
 		// Activate ability to start playing attack animation.

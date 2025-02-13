@@ -24,6 +24,11 @@ void AP15GroundSelectTarget::Tick(const float DeltaTime)
 #endif
 }
 
+void AP15GroundSelectTarget::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+}
+
 void AP15GroundSelectTarget::StartTargeting(UGameplayAbility* Ability)
 {
 	Super::StartTargeting(Ability);
@@ -51,12 +56,11 @@ FVector AP15GroundSelectTarget::GetPlayerLookingPoint(bool* Result) const
 
 	FHitResult            HitResult;
 	FCollisionQueryParams Params;
-	Params.bTraceComplex = true;
 	Params.AddIgnoredActor(PrimaryPC->GetPawn());
 	constexpr float Distance = 10000.f;
 	const FVector   End      = ViewLocation + ViewRotation.Vector() * Distance;
 
-	const bool bTrace = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, End, ECC_Visibility, Params);
+	const bool bTrace = GetWorld()->LineTraceSingleByChannel(HitResult, ViewLocation, End, ECC_Camera, Params);
 	if (Result)
 	{
 		*Result = bTrace;
