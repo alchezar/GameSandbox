@@ -6,10 +6,7 @@
 #include "P15TargetAbility.h"
 #include "P15GroundBlastAbility.generated.h"
 
-class UAbilityTask_PlayMontageAndWait;
-class AP15GroundSelectTarget;
-class AGameplayAbilityTargetActor;
-class UAbilityTask_WaitTargetData;
+class UNiagaraSystem;
 
 UCLASS()
 class PROJECT15_API UP15GroundBlastAbility : public UP15TargetAbility
@@ -41,4 +38,7 @@ protected:
 	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
 	float PushStrength = 200.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	TObjectPtr<UNiagaraSystem> Niagara = nullptr;
 };

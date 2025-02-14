@@ -32,6 +32,10 @@ public:
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
+	TObjectPtr<USceneComponent> Root = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
+	TObjectPtr<UDecalComponent> Decal = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	float Radius = 200.f;
 };

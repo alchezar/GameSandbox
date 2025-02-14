@@ -82,7 +82,7 @@ private:
 	void AutoDetermineTeamID();
 	void AcquireAllAbilities();
 	void AddAbilitiesToUI();
-	void ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass) const;
+	void ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately = true) const;
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
 

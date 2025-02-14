@@ -87,25 +87,27 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	// clang-format off
 	if (UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		Input->BindAction(MoveAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
-		Input->BindAction(MoveAction.Get(), ETriggerEvent::Started, this, &ThisClass::ChangeMovementState, true);
-		Input->BindAction(MoveAction.Get(), ETriggerEvent::Completed, this, &ThisClass::ChangeMovementState, false);
-		Input->BindAction(LookAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::LookInput);
-		Input->BindAction(JumpAction.Get(), ETriggerEvent::Started, this, &ThisClass::JumpInput, true);
-		Input->BindAction(JumpAction.Get(), ETriggerEvent::Completed, this, &ThisClass::JumpInput, false);
-		Input->BindAction(RunAction.Get(), ETriggerEvent::Started, this, &ThisClass::RunInput, true);
-		Input->BindAction(RunAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
-		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started, this, &ThisClass::CrouchInput);
-		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started, this, &ThisClass::PushInput);
-		Input->BindAction(AimAction.Get(), ETriggerEvent::Started, this, &ThisClass::AttackInput, true);
-		Input->BindAction(AimAction.Get(), ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
-		Input->BindAction(RegenAction.Get(), ETriggerEvent::Completed, this, &ThisClass::RegenInput);
-		Input->BindAction(DashAction.Get(), ETriggerEvent::Completed, this, &ThisClass::DashInput);
-		Input->BindAction(LaserAction.Get(), ETriggerEvent::Completed, this, &ThisClass::LaserInput);
-		Input->BindAction(BlastAction.Get(), ETriggerEvent::Completed, this, &ThisClass::BlastInput);
+		Input->BindAction(MoveAction.Get(),   ETriggerEvent::Triggered, this, &ThisClass::MoveInput);
+		Input->BindAction(MoveAction.Get(),   ETriggerEvent::Started,   this, &ThisClass::ChangeMovementState, true);
+		Input->BindAction(MoveAction.Get(),   ETriggerEvent::Completed, this, &ThisClass::ChangeMovementState, false);
+		Input->BindAction(LookAction.Get(),   ETriggerEvent::Triggered, this, &ThisClass::LookInput);
+		Input->BindAction(JumpAction.Get(),   ETriggerEvent::Started,   this, &ThisClass::JumpInput, true);
+		Input->BindAction(JumpAction.Get(),   ETriggerEvent::Completed, this, &ThisClass::JumpInput, false);
+		Input->BindAction(RunAction.Get(),    ETriggerEvent::Started,   this, &ThisClass::RunInput, true);
+		Input->BindAction(RunAction.Get(),    ETriggerEvent::Completed, this, &ThisClass::RunInput, false);
+		Input->BindAction(CrouchAction.Get(), ETriggerEvent::Started,   this, &ThisClass::CrouchInput);
+		Input->BindAction(AttackAction.Get(), ETriggerEvent::Started,   this, &ThisClass::PushInput);
+		Input->BindAction(AimAction.Get(),    ETriggerEvent::Started,   this, &ThisClass::AttackInput, true);
+		Input->BindAction(AimAction.Get(),    ETriggerEvent::Completed, this, &ThisClass::AttackInput, false);
+		Input->BindAction(RegenAction.Get(),  ETriggerEvent::Completed, this, &ThisClass::RegenInput);
+		Input->BindAction(DashAction.Get(),   ETriggerEvent::Completed, this, &ThisClass::DashInput);
+		Input->BindAction(LaserAction.Get(),  ETriggerEvent::Completed, this, &ThisClass::LaserInput);
+		Input->BindAction(BlastAction.Get(),  ETriggerEvent::Completed, this, &ThisClass::BlastInput);
 	}
+	// clang-format on
 }
 
 void AP15Character::PossessedBy(AController* NewController)
@@ -309,7 +311,7 @@ void AP15Character::LaserInput()
 
 void AP15Character::BlastInput()
 {
-	ActivateAbility(BlastAbility);
+	ActivateAbility(BlastAbility, false);
 }
 
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
@@ -413,9 +415,9 @@ void AP15Character::AddAbilitiesToUI()
 	}
 }
 
-void AP15Character::ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass) const
+void AP15Character::ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately) const
 {
-	if (AbilitySystemComp->TryActivateAbilityByClass(AbilityClass))
+	if (AbilitySystemComp->TryActivateAbilityByClass(AbilityClass) && bImmediately)
 	{
 		OnAbilityStarted.Broadcast(AbilityClass);
 	}

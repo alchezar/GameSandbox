@@ -4,10 +4,20 @@
 
 #include "Project15.h"
 #include "Abilities/GameplayAbility.h"
+#include "Components/DecalComponent.h"
 
 AP15GroundSelectTarget::AP15GroundSelectTarget()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	Root = CreateDefaultSubobject<USceneComponent>("RootSceneComponent");
+	SetRootComponent(Root.Get());
+
+	Decal = CreateDefaultSubobject<UDecalComponent>("DecalComponent");
+	Decal->SetupAttachment(Root.Get());
+	Decal->DecalSize = FVector(Radius);
+	Decal->SetRelativeRotation(FRotator(-90.f, 0.f, 0.f));
+	Decal->SetRelativeScale3D(FVector(0.1f, 1.f, 1.f));
 }
 
 void AP15GroundSelectTarget::BeginPlay()
@@ -19,9 +29,7 @@ void AP15GroundSelectTarget::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-#if 1
-	DrawDebugCapsule(GetWorld(), GetPlayerLookingPoint(), Radius, Radius, FQuat::Identity, FColor::Orange);
-#endif
+	Root->SetWorldLocation(GetPlayerLookingPoint());
 }
 
 void AP15GroundSelectTarget::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -40,10 +48,16 @@ void AP15GroundSelectTarget::ConfirmTargetingAndContinue()
 	const TArray<TWeakObjectPtr<AActor>> OverlappedPawns = GetOverlappedPawns(GetPlayerLookingPoint());
 	FGameplayAbilityTargetDataHandle     TargetData      = {};
 
-	if (!OverlappedPawns.IsEmpty())
-	{
-		TargetData = StartLocation.MakeTargetDataHandleFromActors(OverlappedPawns);
-	}
+	// Add actor array as the first target data (even if there are no overlapped pawns).
+	FGameplayAbilityTargetData_ActorArray* ActorArrayData = new FGameplayAbilityTargetData_ActorArray{};
+	ActorArrayData->TargetActorArray                      = OverlappedPawns;
+	TargetData.Add(ActorArrayData);
+
+	// Add the decal location as the second target data.
+	FGameplayAbilityTargetData_LocationInfo* CenterLocation = new FGameplayAbilityTargetData_LocationInfo{};
+	CenterLocation->TargetLocation.LiteralTransform         = Decal ? Decal->GetComponentTransform() : FTransform::Identity;
+	CenterLocation->TargetLocation.LocationType             = EGameplayAbilityTargetingLocationType::LiteralTransform;
+	TargetData.Add(CenterLocation);
 
 	TargetDataReadyDelegate.Broadcast(MoveTemp(TargetData));
 }

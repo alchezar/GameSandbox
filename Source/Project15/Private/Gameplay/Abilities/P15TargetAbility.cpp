@@ -16,6 +16,12 @@ void UP15TargetAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	// Check if we have enough mana.
+	if (!GetIsCostStillAvailable())
+	{
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false);
+	}
+
 	// For some reason WaitTargetData(...) method doesn't work, so we need to spawn the target actor by ourselves.
 	TargetActor    = GetWorld()->SpawnActor<AP15GroundSelectTarget>(TargetActorClass);
 	WaitTargetData = UAbilityTask_WaitTargetData::WaitTargetDataUsingActor(
@@ -42,6 +48,7 @@ void UP15TargetAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, cons
 		WaitTargetData->ValidData.RemoveAll(this);
 		WaitTargetData = nullptr;
 	}
+	TargetActor->Destroy();
 	TargetActor = nullptr;
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
@@ -50,6 +57,7 @@ void UP15TargetAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, cons
 void UP15TargetAbility::OnValidDataReceivedCallback(const FGameplayAbilityTargetDataHandle& TargetData)
 {
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo);
+	Char->OnAbilityStarted.Broadcast(GetClass());
 	Char->SetTargetingState(false);
 }
 
