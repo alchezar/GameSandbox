@@ -106,6 +106,7 @@ void AP15Character::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 		Input->BindAction(DashAction.Get(),   ETriggerEvent::Completed, this, &ThisClass::DashInput);
 		Input->BindAction(LaserAction.Get(),  ETriggerEvent::Completed, this, &ThisClass::LaserInput);
 		Input->BindAction(BlastAction.Get(),  ETriggerEvent::Completed, this, &ThisClass::BlastInput);
+		Input->BindAction(FireAction.Get(),   ETriggerEvent::Completed, this, &ThisClass::FireInput);
 	}
 	// clang-format on
 }
@@ -312,6 +313,11 @@ void AP15Character::LaserInput()
 void AP15Character::BlastInput()
 {
 	ActivateAbility(BlastAbility, false);
+}
+
+void AP15Character::FireInput()
+{
+	ActivateAbility(FireAbility, false);
 }
 
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)

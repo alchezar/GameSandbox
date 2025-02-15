@@ -25,6 +25,11 @@ protected:
 	virtual void OnValidDataReceivedCallback(const FGameplayAbilityTargetDataHandle& TargetData) override;
 	virtual void OnValidDataCancelledCallback(const FGameplayAbilityTargetDataHandle& TargetData) override;
 
+private:
+	void ListenForAnimNotifies(UAnimMontage* InMontage);
+	void OnGroundBlastBeginCallback(USkeletalMeshComponent* MeshComp);
+	void OnGroundBlastEndCallback(USkeletalMeshComponent* MeshComp);
+
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Montage")
@@ -41,4 +46,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
 	TObjectPtr<UNiagaraSystem> Niagara = nullptr;
+
+private:
+	FGameplayAbilityTargetDataHandle Data;
 };

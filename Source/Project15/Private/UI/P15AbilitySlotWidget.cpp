@@ -103,6 +103,6 @@ void UP15AbilitySlotWidget::UpdateCooldownSmoothly(const float DeltaTime)
 	}
 
 	DynamicMaterial->SetScalarParameterValue(AlphaParameterName, Alpha);
-	CooldownText->SetText(FText::AsNumber(FMath::Floor(MaxCooldown - Cooldown)));
+	CooldownText->SetText(FText::AsNumber(FMath::RoundToInt32(MaxCooldown - Cooldown)));
 	Cooldown += DeltaTime;
 }

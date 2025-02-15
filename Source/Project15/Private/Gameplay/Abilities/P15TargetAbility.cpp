@@ -27,7 +27,7 @@ void UP15TargetAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	WaitTargetData = UAbilityTask_WaitTargetData::WaitTargetDataUsingActor(
 		this,
 		NAME_None,
-		EGameplayTargetingConfirmation::UserConfirmed,
+		EGameplayTargetingConfirmation::CustomMulti,
 		TargetActor);
 
 	check(TargetActor && WaitTargetData);
@@ -48,8 +48,11 @@ void UP15TargetAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, cons
 		WaitTargetData->ValidData.RemoveAll(this);
 		WaitTargetData = nullptr;
 	}
-	TargetActor->Destroy();
-	TargetActor = nullptr;
+	if (TargetActor)
+	{
+		TargetActor->Destroy();
+		TargetActor = nullptr;
+	}
 
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 }

@@ -9,6 +9,7 @@
 AP15GroundSelectTarget::AP15GroundSelectTarget()
 {
 	PrimaryActorTick.bCanEverTick = true;
+	bDestroyOnConfirmation        = false;
 
 	Root = CreateDefaultSubobject<USceneComponent>("RootSceneComponent");
 	SetRootComponent(Root.Get());

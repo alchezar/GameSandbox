@@ -71,6 +71,7 @@ protected:
 	void DashInput();
 	void LaserInput();
 	void BlastInput();
+	void FireInput();
 	void OnHealthChangedCallback(const float NewHealthPercentage);
 	void OnManaChangedCallback(const float NewManaPercentage);
 	void OnStrengthChangedCallback(const float NewStrengthPercentage);
@@ -122,6 +123,8 @@ protected:
 	TObjectPtr<UInputAction> LaserAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> BlastAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> FireAction = nullptr;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Ability")
 	TObjectPtr<UP15AttributeSet> AttributeSet = nullptr;
@@ -139,6 +142,8 @@ protected:
 	TSubclassOf<UP15BaseAbility> LaserAbility = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UP15BaseAbility> BlastAbility = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
+	TSubclassOf<UP15BaseAbility> FireAbility = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.char.health.full");
