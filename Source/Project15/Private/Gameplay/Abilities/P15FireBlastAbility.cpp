@@ -2,7 +2,9 @@
 
 #include "Gameplay/Abilities/P15FireBlastAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Project15.h"
 #include "Abilities/Tasks/AbilityTask_WaitTargetData.h"
 #include "Gameplay/Target/P15AroundTarget.h"
@@ -73,30 +75,55 @@ void UP15FireBlastAbility::OnFireBlastPullCallback(USkeletalMeshComponent* MeshC
 void UP15FireBlastAbility::OnFireBlastPushCallback(USkeletalMeshComponent* MeshComp)
 {
 	EARLY_RETURN_IF(!MeshComp || !Char || MeshComp != Char->GetMesh())
+
+	// Spawn the niagara push particles.
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PushNiagara.Get(), Char->GetActorLocation() + SpawnOffset);
+
+	// Deal damage and push targets.
+	ApplyGameplayEffectToTarget(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		LastTargetData,
+		TargetDamageClass,
+		1.f);
+	PushTargets(PushStrength, 2.f, false);
+
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
 }
 
 void UP15FireBlastAbility::OnDataReceivedCallback(const FGameplayAbilityTargetDataHandle& TargetData)
 {
 	EARLY_RETURN_IF(TargetData.Data.IsEmpty() || !TargetData.Get(0))
 
+	// Spawn the niagara pull particles.
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PullNiagara.Get(), Char->GetActorLocation() - SpawnOffset);
+
 	// Commit ability and start showing cooldown.
 	CommitAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, nullptr);
 	Char->OnAbilityStarted.Broadcast(GetClass());
 
-	for (const TWeakObjectPtr Actor : TargetData.Get(0)->GetActors())
-	{
-		AP15Character* TargetChar = Cast<AP15Character>(Actor.Get());
-		CONTINUE_IF(!TargetChar)
-
-		const FVector Direction = (Char->GetActorLocation() - TargetChar->GetActorLocation()).GetSafeNormal2D();
-		TargetChar->PushCharacter(Direction, PullStrength, GetAbilityInfo().CooldownDuration);
-	}
-
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, false);
+	LastTargetData = TargetData;
+	PushTargets(PullStrength, 1.f, true);
 }
 
 void UP15FireBlastAbility::OnDataCancelledCallback(const FGameplayAbilityTargetDataHandle& TargetData)
 {
 	Char->StopAnimMontage();
 	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, false, true);
+}
+
+void UP15FireBlastAbility::PushTargets(const float Strength, const float Duration, const bool bPull)
+{
+	TArray<TWeakObjectPtr<AActor>> TargetActors = LastTargetData.Get(0)->GetActors();
+	for (const TWeakObjectPtr Actor : TargetActors)
+	{
+		AP15Character* TargetChar = Cast<AP15Character>(Actor.Get());
+		CONTINUE_IF(!TargetChar)
+
+		const FVector From      = bPull ? TargetChar->GetActorLocation() : Char->GetActorLocation();
+		const FVector Towards   = bPull ? Char->GetActorLocation() : TargetChar->GetActorLocation();
+		const FVector Direction = (Towards - From).GetSafeNormal2D();
+		TargetChar->PushCharacter(Direction, Strength, Duration);
+	}
 }

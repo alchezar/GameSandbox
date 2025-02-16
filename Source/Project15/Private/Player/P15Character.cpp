@@ -162,14 +162,17 @@ void AP15Character::ToggleGameplayTag(const FGameplayTag TagToToggle, const bool
 
 void AP15Character::PushCharacter(const FVector& Direction, const float Strength, const float Duration)
 {
-	// Add impulse to character.
-	UCharacterMovementComponent* MovementComp = GetCharacterMovement();
-	EARLY_RETURN_IF(!MovementComp)
-	MovementComp->AddImpulse(Direction * Strength, true);
-
 	// Disable ground friction for a push duration.
-	EARLY_RETURN_IF(Duration <= 0.f)
-	Stun(Duration);
+	if (Duration > 0.f)
+	{
+		Stun(Duration);
+	}
+
+	// Add impulse to character.
+	if (UCharacterMovementComponent* MovementComp = GetCharacterMovement())
+	{
+		MovementComp->AddImpulse(Direction * Strength, true);
+	}
 }
 
 void AP15Character::Stun(const float Duration)

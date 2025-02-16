@@ -52,9 +52,5 @@ TArray<TWeakObjectPtr<AActor>> AP15AroundTarget::GetActorsAround()
 	Algo::Transform(Overlaps, OverlappedActors,
 		[](const FOverlapResult& Result) -> TWeakObjectPtr<AActor> { return Result.GetActor(); });
 
-#if 1
-	DrawDebugCapsule(GetWorld(), Position, Radius, Radius, FQuat::Identity, FColor::Red, false, 6.f);
-#endif
-
 	return OverlappedActors;
 }

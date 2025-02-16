@@ -6,6 +6,7 @@
 #include "Gameplay/Abilities/P15BaseAbility.h"
 #include "P15FireBlastAbility.generated.h"
 
+class UNiagaraSystem;
 class UAbilityTask_WaitTargetData;
 class AP15AroundTarget;
 
@@ -30,6 +31,7 @@ private:
 	void OnDataReceivedCallback(const FGameplayAbilityTargetDataHandle& TargetData);
 	UFUNCTION()
 	void OnDataCancelledCallback(const FGameplayAbilityTargetDataHandle& TargetData);
+	void PushTargets(const float Strength, const float Duration, const bool bPull = false);
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
@@ -40,13 +42,25 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Target")
 	TSubclassOf<AP15AroundTarget> TargetActorClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Target")
+	TSubclassOf<UGameplayEffect> TargetDamageClass = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | PushPull")
-	float PullStrength = 500.f;
+	float PullStrength = 1000.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | PushPull")
+	float PushStrength = 2000.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	TObjectPtr<UNiagaraSystem> PullNiagara = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	TObjectPtr<UNiagaraSystem> PushNiagara = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Effect")
+	FVector SpawnOffset{0.f, 0.f, 50.f};
 
 private:
 	UPROPERTY()
 	AP15AroundTarget* TargetActor = nullptr;
 	UPROPERTY()
-	UAbilityTask_WaitTargetData* WaitTargetData = nullptr;
+	UAbilityTask_WaitTargetData*     WaitTargetData = nullptr;
+	FGameplayAbilityTargetDataHandle LastTargetData;
 };
