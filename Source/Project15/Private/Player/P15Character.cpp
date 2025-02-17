@@ -326,6 +326,7 @@ void AP15Character::FireInput()
 void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 {
 	ToggleGameplayTag(FullHealthTag, FMath::IsNearlyEqual(NewHealthPercentage, 1));
+	StartRegen();
 
 	EARLY_RETURN_IF(bDead || NewHealthPercentage > 0.f)
 
@@ -334,10 +335,14 @@ void AP15Character::OnHealthChangedCallback(const float NewHealthPercentage)
 }
 
 void AP15Character::OnManaChangedCallback(const float NewManaPercentage)
-{}
+{
+	StartRegen();
+}
 
 void AP15Character::OnStrengthChangedCallback(const float NewStrengthPercentage)
-{}
+{
+	StartRegen();
+}
 
 void AP15Character::OnCapsuleBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -424,7 +429,7 @@ void AP15Character::AddAbilitiesToUI()
 	}
 }
 
-void AP15Character::ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately) const
+void AP15Character::ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately)
 {
 	if (AbilitySystemComp->TryActivateAbilityByClass(AbilityClass) && bImmediately)
 	{
@@ -471,4 +476,26 @@ void AP15Character::UpdateCameraBoomOffsetSmoothly(const float DeltaTime)
 
 	CurrentOffset = FMath::InterpSinOut(StartOffset, TargetOffset, Alpha);
 	Alpha += DeltaTime / CameraOffsetChangeData.Time;
+}
+
+void AP15Character::StartRegen()
+{
+	// Positive health delta means the regeneration is already active.
+	const float AllPercentage = AttributeSet->GetAllPercentage();
+	const float Delta         = AllPercentage - LastAllPercentage;
+	LastAllPercentage         = AllPercentage;
+
+	EARLY_RETURN_IF(AllPercentage < 1.f && Delta >= 0.f)
+
+	// Stop any previous regen effect and start timer for the new one.
+	AbilitySystemComp->RemoveActiveGameplayEffect(RegenEffectHandle);
+	FTimerDelegate RegenDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
+	{
+		EARLY_RETURN_IF(!RegenEffectClass)
+		RegenEffectHandle = AbilitySystemComp->ApplyGameplayEffectToSelf(
+			RegenEffectClass->GetDefaultObject<UGameplayEffect>(),
+			1.f,
+			AbilitySystemComp->MakeEffectContext());
+	});
+	GetWorld()->GetTimerManager().SetTimer(RegenTimer, MoveTemp(RegenDelegate), RegenDelay, false);
 }

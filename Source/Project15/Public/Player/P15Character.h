@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "ActiveGameplayEffectHandle.h"
 #include "GameplayTagAssetInterface.h"
 #include "GameFramework/Character.h"
 #include "Utils/P15Types.h"
 #include "Utils/P15Utils.h"
 #include "P15Character.generated.h"
 
+class UGameplayEffect;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
@@ -83,9 +85,10 @@ private:
 	void AutoDetermineTeamID();
 	void AcquireAllAbilities();
 	void AddAbilitiesToUI();
-	void ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately = true) const;
+	void ActivateAbility(const TSubclassOf<UP15BaseAbility>& AbilityClass, const bool bImmediately = true);
 	void ChangeWalkSpeedSmoothly(const float DeltaTime);
 	void UpdateCameraBoomOffsetSmoothly(const float DeltaTime);
+	void StartRegen();
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
@@ -145,6 +148,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Ability")
 	TSubclassOf<UP15BaseAbility> FireAbility = nullptr;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Regen")
+	TSubclassOf<UGameplayEffect> RegenEffectClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Regen")
+	float RegenDelay = 2.f;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Tag")
 	FGameplayTag FullHealthTag = FGameplayTag::RequestGameplayTag("p15.char.health.full");
 
@@ -155,9 +163,9 @@ private:
 	bool bMovingInput = false;
 	bool bFalling     = false;
 	bool bTargeting   = false;
+	bool bDead        = false;
 
 	double MaxCrouchOffset = 0.0;
-	bool   bDead           = false;
 	uint8  TeamID          = 255;
 
 	TArray<TSubclassOf<UP15BaseAbility>> AllAbilities = {};
@@ -165,4 +173,8 @@ private:
 	TObjectPtr<APlayerController> PlayerController = nullptr;
 
 	FTimerHandle StunTimer;
+	FTimerHandle RegenTimer;
+
+	FActiveGameplayEffectHandle RegenEffectHandle = {};
+	float                       LastAllPercentage = 1.f;
 };

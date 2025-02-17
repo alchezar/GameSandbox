@@ -47,6 +47,11 @@ float UP15AttributeSet::GetStrengthPercentage() const
 	return GetPercentage(Strength, MaxStrength);
 }
 
+float UP15AttributeSet::GetAllPercentage() const
+{
+	return GetHealthPercentage() * GetManaPercentage() * GetStrengthPercentage();
+}
+
 float UP15AttributeSet::GetPercentage(const FGameplayAttributeData& Attribute, const FGameplayAttributeData& MaxAttribute) const
 {
 	return FMath::Max(0.f, Attribute.GetCurrentValue() / MaxAttribute.GetCurrentValue());

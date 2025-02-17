@@ -18,11 +18,6 @@ void UP15MeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-	if (!CommitAbility(Handle, ActorInfo, ActivationInfo, nullptr))
-	{
-		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
-	}
-
 	// Find the enemy ahead.
 	FHitResult      HitResult;
 	constexpr float TraceDistance = 1000.f;
@@ -37,6 +32,11 @@ void UP15MeleeAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, 
 
 	Enemy = Cast<AP15Character>(HitResult.GetActor());
 	EARLY_RETURN_IF(!Enemy || Enemy->GetIsDead())
+
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo, nullptr))
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, false, true);
+	}
 
 	// Start the attack animation.
 	Char->PlayAnimMontage(InstigatorMontage, 1.f, StartAttackMontageSectionName);

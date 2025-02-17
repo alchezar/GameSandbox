@@ -26,6 +26,7 @@ public:
 	_NODISCARD float GetHealthPercentage() const;
 	_NODISCARD float GetManaPercentage() const;
 	_NODISCARD float GetStrengthPercentage() const;
+	_NODISCARD float GetAllPercentage() const;
 
 private:
 	_NODISCARD float GetPercentage(const FGameplayAttributeData& Attribute, const FGameplayAttributeData& MaxAttribute) const;
