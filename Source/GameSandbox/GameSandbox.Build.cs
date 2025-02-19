@@ -16,19 +16,9 @@ public class GameSandbox : ModuleRules
 			"InputCore",
 			"UMG",
 			"Niagara",
-			"PhysicsCore",
 			"AIModule",
-			"GameplayTasks",
-			"GameplayTags",
-			"NavigationSystem",
-			"ProceduralMeshComponent",
 			"FieldSystemEngine",
 			"GeometryCollectionEngine",
-			"ChaosSolverEngine",
-			"OnlineSubsystem",
-			"OnlineSubsystemUtils",
-			"OnlineSubsystemSteam",
-			"AnimGraphRuntime"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
@@ -36,11 +26,6 @@ public class GameSandbox : ModuleRules
 			"EnhancedInput",
 			"Slate",
 			"SlateCore",
-			"AnimGraphRuntime",
-			"OnlineSubsystem",
-			"Json",
-			"JsonUtilities",
-			"UnrealEd"
 		});
 
 		PublicIncludePaths.AddRange(new[]
