@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 using UnrealBuildTool;
-using System.Collections.Generic;
 
 public class GameSandboxEditorTarget : TargetRules
 {
@@ -26,7 +25,8 @@ public class GameSandboxEditorTarget : TargetRules
 			"Project12",
 			"Project13",
 			"Project14",
-			"Project15"
+			"Project15",
+			"Project16"
 		});
 	}
 }
