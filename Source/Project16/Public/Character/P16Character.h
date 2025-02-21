@@ -6,6 +6,11 @@
 #include "P16CharacterBase.h"
 #include "P16Character.generated.h"
 
+class UCameraComponent;
+class USpringArmComponent;
+class UInputAction;
+class UInputMappingContext;
+
 UCLASS()
 class PROJECT16_API AP16Character : public AP16CharacterBase
 {
@@ -19,8 +24,11 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
-	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<USpringArmComponent> SpringArm = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UCameraComponent> Camera = nullptr;
 };

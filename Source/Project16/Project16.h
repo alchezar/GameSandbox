@@ -6,7 +6,7 @@
 
 namespace P16
 {
-
+	constexpr int32 CustomDepthRed = 250;
 }
 
 #define EARLY_RETURN_IF(Condition)              \
