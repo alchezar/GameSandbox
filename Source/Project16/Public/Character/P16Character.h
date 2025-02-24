@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "P16CharacterBase.h"
 #include "P16Character.generated.h"
 
@@ -12,7 +13,7 @@ class UInputAction;
 class UInputMappingContext;
 
 UCLASS()
-class PROJECT16_API AP16Character : public AP16CharacterBase
+class PROJECT16_API AP16Character : public AP16CharacterBase, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -20,10 +21,23 @@ class PROJECT16_API AP16Character : public AP16CharacterBase
 public:
 	AP16Character();
 	virtual void OnConstruction(const FTransform& Transform) override;
+	virtual void PossessedBy(AController* NewController) override;
+	virtual void OnRep_PlayerState() override;
 
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
+
+	/* ----------------------------- Interface ----------------------------- */
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	/* ------------------------------- This -------------------------------- */
+public:
+	UAttributeSet* GetAttributeSet() const;
+
+private:
+	void InitAbilityActorInfo();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:

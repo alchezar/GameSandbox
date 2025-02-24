@@ -15,16 +15,16 @@ public class Project16 : ModuleRules
 			"Engine",
 			"InputCore",
 			"EnhancedInput",
-			"GameplayAbilities",
-			"GameplayTags",
-			"GameplayTasks"
+			"GameplayAbilities"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
 			"Niagara",
 			"UMG",
-			"AIModule"
+			"AIModule",
+			"GameplayTags",
+			"GameplayTasks"
 		});
 
 		PublicIncludePaths.Add("Project16");

@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Character/P16PlayerController.h"
+#include "Player/P16PlayerController.h"
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"

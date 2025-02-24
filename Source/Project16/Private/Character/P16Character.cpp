@@ -2,10 +2,12 @@
 
 #include "Character/P16Character.h"
 
+#include "AbilitySystemComponent.h"
 #include "Project16.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/P16PlayerState.h"
 
 AP16Character::AP16Character()
 {
@@ -50,6 +52,22 @@ void AP16Character::OnConstruction(const FTransform& Transform)
 	}
 }
 
+void AP16Character::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	// Server side.
+	InitAbilityActorInfo();
+}
+
+void AP16Character::OnRep_PlayerState()
+{
+	Super::OnRep_PlayerState();
+
+	// Client side.
+	InitAbilityActorInfo();
+}
+
 void AP16Character::BeginPlay()
 {
 	Super::BeginPlay();
@@ -58,4 +76,26 @@ void AP16Character::BeginPlay()
 void AP16Character::Tick(const float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+UAbilitySystemComponent* AP16Character::GetAbilitySystemComponent() const
+{
+	return AbilitySystemComponent.Get();
+}
+
+UAttributeSet* AP16Character::GetAttributeSet() const
+{
+	return AttributeSet.Get();
+}
+
+void AP16Character::InitAbilityActorInfo()
+{
+	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
+	EARLY_RETURN_IF(!State)
+
+	AbilitySystemComponent = State->GetAbilitySystemComponent();
+	AttributeSet           = State->GetAttributeSet();
+
+	AbilitySystemComponent->InitAbilityActorInfo(State, this);
+	AbilitySystemComponent->SetOwnerActor(GetController());
 }
