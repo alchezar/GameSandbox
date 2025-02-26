@@ -7,6 +7,11 @@
 namespace P16
 {
 	constexpr int32 CustomDepthRed = 250;
+
+	namespace ZOrder
+	{
+		constexpr int32 MainOverlay = 0;
+	}
 }
 
 #define EARLY_RETURN_IF(Condition)              \
@@ -26,4 +31,3 @@ if (Condition)                                  \
 {                                               \
 	continue;                                   \
 }
-

@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/P16PlayerState.h"
+#include "UI/HUD/P16HUD.h"
 
 AP16Character::AP16Character()
 {
@@ -98,4 +99,10 @@ void AP16Character::InitAbilityActorInfo()
 
 	AbilitySystemComponent->InitAbilityActorInfo(State, this);
 	AbilitySystemComponent->SetOwnerActor(GetController());
+
+	APlayerController* PlayerController = GetController<APlayerController>();
+	EARLY_RETURN_IF(!PlayerController)
+	AP16HUD* HUD = PlayerController->GetHUD<AP16HUD>();
+	EARLY_RETURN_IF(!HUD)
+	HUD->InitOverlay({PlayerController, State, AbilitySystemComponent, AttributeSet});
 }

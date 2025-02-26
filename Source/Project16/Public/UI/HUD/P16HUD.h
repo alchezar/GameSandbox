@@ -1,0 +1,43 @@
+// Copyright © 2025, Ivan Kinder
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/HUD.h"
+#include "Util/P16Type.h"
+#include "P16HUD.generated.h"
+
+class UP16OverlayWidgetController;
+class UP16Widget;
+
+UCLASS()
+class PROJECT16_API AP16HUD : public AHUD
+{
+	GENERATED_BODY()
+
+	/* ------------------------------ Unreal ------------------------------- */
+public:
+	AP16HUD();
+
+protected:
+	virtual void BeginPlay() override;
+
+	/* ------------------------------- This -------------------------------- */
+public:
+	UP16OverlayWidgetController* GetOverlayWidgetController(const FP16WidgetControllerParams& InParams = {});
+	void                         InitOverlay(const FP16WidgetControllerParams& InParams);
+
+	/* ------------------------------ Fields ------------------------------- */
+public:
+	UPROPERTY()
+	TObjectPtr<UP16Widget> OverlayWidget = nullptr;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TSubclassOf<UP16Widget> OverlayWidgetClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TSubclassOf<UP16OverlayWidgetController> OverlayWidgetControllerClass = nullptr;
+
+private:
+	TObjectPtr<UP16OverlayWidgetController> OverlayWidgetController = nullptr;
+};
