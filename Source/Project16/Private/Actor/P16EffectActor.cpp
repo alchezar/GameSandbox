@@ -36,7 +36,14 @@ void AP16EffectActor::OnBeginOverlapCallback(UPrimitiveComponent* OverlappedComp
 	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(AbilityComponent->GetAttributeSet(UP16AttributeSet::StaticClass()));
 	EARLY_RETURN_IF(!AttributeSet)
 	UP16AttributeSet* MutableAttributeSet = const_cast<UP16AttributeSet*>(AttributeSet);
-	MutableAttributeSet->SetHealth(AttributeSet->GetHealth() + 25.f);
+	if (bHealth)
+	{
+		MutableAttributeSet->SetHealth(AttributeSet->GetHealth() + 25.f);
+	}
+	else
+	{
+		MutableAttributeSet->SetMana(AttributeSet->GetMana() + 25.f);
+	}
 	Destroy();
 }
 

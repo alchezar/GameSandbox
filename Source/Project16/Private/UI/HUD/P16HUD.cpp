@@ -21,7 +21,7 @@ UP16OverlayWidgetController* AP16HUD::GetOverlayWidgetController(const FP16Widge
 	{
 		check(OverlayWidgetControllerClass)
 		OverlayWidgetController = NewObject<UP16OverlayWidgetController>(this, OverlayWidgetControllerClass);
-		OverlayWidgetController->SetWidgetControllerParams(InParams);
+		OverlayWidgetController->InitWidgetController(InParams);
 	}
 
 	return OverlayWidgetController.Get();
@@ -32,6 +32,8 @@ void AP16HUD::InitOverlay(const FP16WidgetControllerParams& InParams)
 	checkf(OverlayWidgetClass, L"Overlay Widget class uninitialized, fill out the Heads-up display!")
 	OverlayWidget = CreateWidget<UP16Widget>(GetWorld(), OverlayWidgetClass);
 
-	OverlayWidget->SetWidgetController(GetOverlayWidgetController(InParams));
+	UP16OverlayWidgetController* WidgetController = GetOverlayWidgetController(InParams);
+	OverlayWidget->SetWidgetController(WidgetController);
+	WidgetController->BroadcastInitialValues();
 	OverlayWidget->AddToViewport(P16::ZOrder::MainOverlay);
 }

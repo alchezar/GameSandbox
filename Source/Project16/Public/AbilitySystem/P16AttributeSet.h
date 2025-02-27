@@ -46,19 +46,19 @@ protected:
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
-	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadOnly, Category = "C++ | Vital")
-	FGameplayAttributeData Health = {50.f};
+	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadWrite, Category = "C++ | Vital")
+	FGameplayAttributeData Health = {75.f};
 	ATTRIBUTE_ACCESSORS(Health)
 
-	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, BlueprintReadOnly, Category = "C++ | Vital")
+	UPROPERTY(ReplicatedUsing = OnRep_MaxHealth, BlueprintReadWrite, Category = "C++ | Vital")
 	FGameplayAttributeData MaxHealth = {100.f};
 	ATTRIBUTE_ACCESSORS(MaxHealth)
 
-	UPROPERTY(ReplicatedUsing = OnRep_Mana, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(ReplicatedUsing = OnRep_Mana, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData Mana = {25.f};
 	ATTRIBUTE_ACCESSORS(Mana)
 
-	UPROPERTY(ReplicatedUsing = OnRep_MaxMana, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(ReplicatedUsing = OnRep_MaxMana, BlueprintReadWrite, Category = "C++")
 	FGameplayAttributeData MaxMana = {50.f};
 	ATTRIBUTE_ACCESSORS(MaxMana)
 };

@@ -17,8 +17,12 @@ class PROJECT16_API UP16WidgetController : public UObject
 
 	/* ------------------------------- This -------------------------------- */
 public:
+	void InitWidgetController(const FP16WidgetControllerParams& InParams);
 	UFUNCTION(BlueprintCallable)
 	void SetWidgetControllerParams(const FP16WidgetControllerParams& InParams);
+
+	virtual void BindCallbacksToDependencies();
+	virtual void BroadcastInitialValues();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:

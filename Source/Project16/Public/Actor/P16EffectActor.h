@@ -33,4 +33,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<USphereComponent> Sphere = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	bool bHealth = true;
 };
