@@ -2,50 +2,99 @@
 
 #include "Actor/P16EffectActor.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemInterface.h"
-#include "AbilitySystemTestAttributeSet.h"
+#include "GameplayEffect.h"
 #include "Project16.h"
-#include "AbilitySystem/P16AttributeSet.h"
-#include "Components/SphereComponent.h"
 
 AP16EffectActor::AP16EffectActor()
 {
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
-	SetRootComponent(Mesh.Get());
+	SetRootComponent(CreateDefaultSubobject<USceneComponent>("SceneRoot"));
 
-	Sphere = CreateDefaultSubobject<USphereComponent>("SphereComponent");
-	Sphere->SetupAttachment(GetRootComponent());
+	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
+	Mesh->SetupAttachment(GetRootComponent());
+	Mesh->SetCollisionProfileName("NoCollision");
+	Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	// Collision object will be setup in Blueprint.
 }
 
 void AP16EffectActor::BeginPlay()
 {
 	Super::BeginPlay();
-
-	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnBeginOverlapCallback);
-	Sphere->OnComponentEndOverlap.AddDynamic(this, &ThisClass::OnEndOverlapCallback);
 }
 
-void AP16EffectActor::OnBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AP16EffectActor::OnBeginOverlap(AActor* TargetActor)
 {
-	// TODO: Change this to apply a Gameplay Effect. For now, using const_cast as a hack!
-	const IAbilitySystemInterface* ActorWithAbilities = Cast<IAbilitySystemInterface>(OtherActor);
-	EARLY_RETURN_IF(!ActorWithAbilities)
-	const UAbilitySystemComponent* AbilityComponent = ActorWithAbilities->GetAbilitySystemComponent();
-	EARLY_RETURN_IF(!AbilityComponent)
-	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(AbilityComponent->GetAttributeSet(UP16AttributeSet::StaticClass()));
-	EARLY_RETURN_IF(!AttributeSet)
-	UP16AttributeSet* MutableAttributeSet = const_cast<UP16AttributeSet*>(AttributeSet);
-	if (bHealth)
+	if (ApplicationPolicy == EP16EffectApplicationPolicy::OnBeginOverlap)
 	{
-		MutableAttributeSet->SetHealth(AttributeSet->GetHealth() + 25.f);
+		ApplyEffectToTarget(TargetActor, GameplayEffectClass);
 	}
-	else
-	{
-		MutableAttributeSet->SetMana(AttributeSet->GetMana() + 25.f);
-	}
-	Destroy();
 }
 
-void AP16EffectActor::OnEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
-{}
+void AP16EffectActor::OnEndOverlap(AActor* TargetActor)
+{
+	if (ApplicationPolicy == EP16EffectApplicationPolicy::OnEndOverlap)
+	{
+		ApplyEffectToTarget(TargetActor, GameplayEffectClass);
+	}
+	else if (RemovalPolicy == EP16EffectRemovalPolicy::OnEndOverlap)
+	{
+		RemoveActiveGameplayEffect(TargetActor);
+	}
+}
+
+void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass)
+{
+	// Ignore actors without ability system component.
+	UAbilitySystemComponent* TargetAbilityComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	EARLY_RETURN_IF(!TargetAbilityComponent)
+	check(InGameplayEffectClass)
+
+	// Apply the effect.
+	const FGameplayEffectContextHandle EffectContext = TargetAbilityComponent->MakeEffectContext();
+	const FGameplayEffectSpecHandle    EffectSpec    = TargetAbilityComponent->MakeOutgoingSpec(InGameplayEffectClass, 1.f, EffectContext);
+	const FActiveGameplayEffectHandle  AppliedEffect = TargetAbilityComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+
+	// Store infinite effects for removal on end overlap.
+	const bool bInfiniteEffect  = EffectSpec.Data->Def->DurationPolicy == EGameplayEffectDurationType::Infinite;
+	const bool bRemovableEffect = RemovalPolicy == EP16EffectRemovalPolicy::OnEndOverlap;
+	if (bInfiniteEffect && bRemovableEffect)
+	{
+		ActiveEffectsMap.Add(AppliedEffect, TargetAbilityComponent);
+	}
+
+	// Destroy not an infinite effect actor on successful apply.
+	if (AppliedEffect.WasSuccessfullyApplied() && !bInfiniteEffect)
+	{
+		Destroy();
+	}
+}
+
+void AP16EffectActor::RemoveActiveGameplayEffect(AActor* TargetActor)
+{
+	// Ignore actors without ability system component.
+	const UAbilitySystemComponent* TargetAbilityComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	EARLY_RETURN_IF(!TargetAbilityComponent)
+
+	// Remove infinite effects from ability system component.
+	TArray<FActiveGameplayEffectHandle> EffectsToRemove = {};
+	for (auto [Effect, AbilityComponent] : ActiveEffectsMap)
+	{
+		CONTINUE_IF(AbilityComponent != TargetAbilityComponent)
+		AbilityComponent->RemoveActiveGameplayEffect(Effect, 1);
+		EffectsToRemove.Add(Effect);
+	}
+
+	// Remove infinite effects from map.
+	for (FActiveGameplayEffectHandle EffectToRemove : EffectsToRemove)
+	{
+		ActiveEffectsMap.FindAndRemoveChecked(EffectToRemove);
+	}
+
+	// Destroy infinite effect actor on successful removal.
+	if (bDestroyOnEffectRemoval)
+	{
+		Destroy();
+	}
+}

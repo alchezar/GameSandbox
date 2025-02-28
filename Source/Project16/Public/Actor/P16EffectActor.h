@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "ActiveGameplayEffectHandle.h"
+#include "Util/P16Type.h"
 #include "P16EffectActor.generated.h"
 
-class USphereComponent;
+class UGameplayEffect;
 
 UCLASS()
 class PROJECT16_API AP16EffectActor : public AActor
@@ -22,18 +23,30 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 protected:
-	UFUNCTION()
-	virtual void OnBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-	void OnEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	void OnBeginOverlap(AActor* TargetActor);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	void OnEndOverlap(AActor* TargetActor);
+
+private:
+	virtual void ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass);
+	virtual void RemoveActiveGameplayEffect(AActor* TargetActor);
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++")
-	TObjectPtr<USphereComponent> Sphere = nullptr;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	bool bHealth = true;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Applied Effect")
+	TSubclassOf<UGameplayEffect> GameplayEffectClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Applied Effect")
+	EP16EffectApplicationPolicy ApplicationPolicy = EP16EffectApplicationPolicy::OnBeginOverlap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect")
+	bool bInfinite = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect", meta = (EditCondition = "bInfinite", EditConditionHides))
+	EP16EffectRemovalPolicy RemovalPolicy = EP16EffectRemovalPolicy::None;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect", meta = (EditCondition = "bInfinite", EditConditionHides))
+	bool bDestroyOnEffectRemoval = false;
+
+	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectsMap;
 };
