@@ -27,6 +27,8 @@ protected:
 	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
 	void OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const;
 
+	void OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags);
+
 	/* ------------------------------ Fields ------------------------------- */
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")

@@ -13,6 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnManaChangeSignature, float, Ne
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMaxManaChangeSignature, float, NewMaxMana);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/)
+
 UCLASS()
 class UP16Library : public UBlueprintFunctionLibrary
 {

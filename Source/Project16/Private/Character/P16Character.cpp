@@ -84,11 +84,6 @@ UAbilitySystemComponent* AP16Character::GetAbilitySystemComponent() const
 	return AbilitySystemComponent.Get();
 }
 
-UAttributeSet* AP16Character::GetAttributeSet() const
-{
-	return AttributeSet.Get();
-}
-
 void AP16Character::InitAbilityActorInfo()
 {
 	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
@@ -105,4 +100,11 @@ void AP16Character::InitAbilityActorInfo()
 	AP16HUD* HUD = PlayerController->GetHUD<AP16HUD>();
 	EARLY_RETURN_IF(!HUD)
 	HUD->InitOverlay({PlayerController, State, AbilitySystemComponent, AttributeSet});
+
+	Super::InitAbilityActorInfo();
+}
+
+UAttributeSet* AP16Character::GetAttributeSet() const
+{
+	return AttributeSet.Get();
 }

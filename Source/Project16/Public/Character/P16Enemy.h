@@ -23,4 +23,8 @@ protected:
 	/* ----------------------------- Interface ----------------------------- */
 public:
 	virtual void ToggleHighlight(const bool bOn) override;
+
+	/* ------------------------------- Super ------------------------------- */
+protected:
+	virtual void InitAbilityActorInfo() override;
 };

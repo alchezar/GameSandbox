@@ -21,6 +21,10 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	/* ------------------------------- This -------------------------------- */
+protected:
+	virtual void InitAbilityActorInfo();
+
 	/* ------------------------------ Fields ------------------------------- */
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")

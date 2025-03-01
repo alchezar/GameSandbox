@@ -32,12 +32,13 @@ protected:
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
+	/* ------------------------------- Super ------------------------------- */
+protected:
+	virtual void InitAbilityActorInfo() override;
+
 	/* ------------------------------- This -------------------------------- */
 public:
 	UAttributeSet* GetAttributeSet() const;
-
-private:
-	void InitAbilityActorInfo();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:

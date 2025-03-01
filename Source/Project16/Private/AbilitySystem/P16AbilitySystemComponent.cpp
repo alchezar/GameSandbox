@@ -12,7 +12,20 @@ void UP16AbilitySystemComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-void UP16AbilitySystemComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void UP16AbilitySystemComponent::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UP16AbilitySystemComponent::OnAbilityActorInfoSet()
+{
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
+}
+
+void UP16AbilitySystemComponent::OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)
+{
+	FGameplayTagContainer TagContainer;
+	GameplayEffectSpec.GetAllAssetTags(TagContainer);
+
+	OnEffectApplied.Broadcast(TagContainer);
 }

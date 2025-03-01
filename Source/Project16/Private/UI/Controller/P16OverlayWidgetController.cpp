@@ -4,6 +4,7 @@
 
 #include "AttributeSet.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
 
 void UP16OverlayWidgetController::BindCallbacksToDependencies()
@@ -19,6 +20,11 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 		.AddUObject(this, &ThisClass::OnManaChangedCallback);
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute())
 		.AddUObject(this, &ThisClass::OnMaxManaChangedCallback);
+
+	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(Params.AbilitySystemComponent))
+	{
+		AbilitySystem->OnEffectApplied.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
+	}
 }
 
 void UP16OverlayWidgetController::BroadcastInitialValues()
@@ -50,4 +56,12 @@ void UP16OverlayWidgetController::OnManaChangedCallback(const FOnAttributeChange
 void UP16OverlayWidgetController::OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const
 {
 	OnMaxManaChanged.Broadcast(Data.NewValue);
+}
+
+void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags)
+{
+	for (const FGameplayTag& Tag : AssetTags)
+	{
+		// TODO: Do something with broadcast tags.
+	}
 }

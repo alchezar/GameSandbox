@@ -24,8 +24,7 @@ AP16Enemy::AP16Enemy()
 void AP16Enemy::BeginPlay()
 {
 	Super::BeginPlay();
-
-	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	InitAbilityActorInfo();
 }
 
 void AP16Enemy::Tick(const float DeltaTime)
@@ -37,4 +36,11 @@ void AP16Enemy::ToggleHighlight(const bool bOn)
 {
 	GetMesh()->SetRenderCustomDepth(bOn);
 	Weapon->SetRenderCustomDepth(bOn);
+}
+
+void AP16Enemy::InitAbilityActorInfo()
+{
+	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+	Super::InitAbilityActorInfo();
 }
