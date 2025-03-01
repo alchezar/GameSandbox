@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P16Type.generated.h"
 
@@ -37,4 +38,29 @@ struct FP16WidgetControllerParams
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+};
+
+USTRUCT()
+struct FP16EffectProperties
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FGameplayEffectContextHandle EffectContext = {};
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystem = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> SourceAvatarActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AController> SourceController = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACharacter> SourceCharacter = nullptr;
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystem = nullptr;
+	UPROPERTY()
+	TObjectPtr<AActor> TargetAvatarActor = nullptr;
+	UPROPERTY()
+	TObjectPtr<AController> TargetController = nullptr;
+	UPROPERTY()
+	TObjectPtr<ACharacter> TargetCharacter = nullptr;
 };

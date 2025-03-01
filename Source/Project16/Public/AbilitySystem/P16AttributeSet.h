@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemComponent.h"
 #include "AttributeSet.h"
+#include "Util/P16Type.h"
 #include "P16AttributeSet.generated.h"
 
 ///
@@ -32,6 +33,8 @@ class PROJECT16_API UP16AttributeSet : public UAttributeSet
 public:
 	UP16AttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
 	/* ------------------------------- This -------------------------------- */
 protected:
@@ -43,6 +46,9 @@ protected:
 	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
 	UFUNCTION()
 	void OnRep_MaxMana(const FGameplayAttributeData& OldMaxMana) const;
+
+private:
+	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
 
 	/* ------------------------------ Fields ------------------------------- */
 public:

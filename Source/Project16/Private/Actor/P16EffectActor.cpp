@@ -53,7 +53,7 @@ void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf
 
 	// Apply the effect.
 	const FGameplayEffectContextHandle EffectContext = TargetAbilityComponent->MakeEffectContext();
-	const FGameplayEffectSpecHandle    EffectSpec    = TargetAbilityComponent->MakeOutgoingSpec(InGameplayEffectClass, 1.f, EffectContext);
+	const FGameplayEffectSpecHandle    EffectSpec    = TargetAbilityComponent->MakeOutgoingSpec(InGameplayEffectClass, EffectLevel, EffectContext);
 	const FActiveGameplayEffectHandle  AppliedEffect = TargetAbilityComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 
 	// Store infinite effects for removal on end overlap.

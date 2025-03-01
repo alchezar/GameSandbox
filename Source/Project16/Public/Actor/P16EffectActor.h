@@ -41,6 +41,8 @@ protected:
 	TSubclassOf<UGameplayEffect> GameplayEffectClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Applied Effect")
 	EP16EffectApplicationPolicy ApplicationPolicy = EP16EffectApplicationPolicy::OnBeginOverlap;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Applied Effect")
+	float EffectLevel = 1.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect")
 	bool bInfinite = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect", meta = (EditCondition = "bInfinite", EditConditionHides))
