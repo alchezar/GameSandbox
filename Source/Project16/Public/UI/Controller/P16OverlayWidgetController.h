@@ -22,21 +22,25 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 protected:
-	void OnHealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnManaChangedCallback(const FOnAttributeChangeData& Data) const;
-	void OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const;
-
-	void OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags);
+	template <typename T>
+	T* GetDataTableRowByTag(UDataTable* InDataTable, const FGameplayTag& InTag);
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
-	FP16OnHealthChangeSignature OnHealthChanged;
+	FP16OnAttributeChangeSignature OnHealthChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
-	FP16OnMaxHealthChangeSignature OnMaxHealthChanged;
+	FP16OnAttributeChangeSignature OnMaxHealthChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
-	FP16OnManaChangeSignature OnManaChanged;
+	FP16OnAttributeChangeSignature OnManaChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
-	FP16OnMaxManaChangeSignature OnMaxManaChanged;
+	FP16OnAttributeChangeSignature OnMaxManaChanged;
+	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
+	FP16OnMessageWidgetRowSignature OnMessageWidgetRow;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")
+	FGameplayTag MessageTag = FGameplayTag::RequestGameplayTag("P16.Message");
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")
+	TObjectPtr<UDataTable> MessageWidgetDataTable = {};
 };

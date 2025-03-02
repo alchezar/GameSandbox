@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
+#include "UI/Widget/P16Widget.h"
 #include "P16Type.generated.h"
 
 class UAttributeSet;
@@ -63,4 +64,19 @@ struct FP16EffectProperties
 	TObjectPtr<AController> TargetController = nullptr;
 	UPROPERTY()
 	TObjectPtr<ACharacter> TargetCharacter = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FP16UIWidgetRow : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FGameplayTag MessageTag = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	FText Message = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TSubclassOf<UP16Widget> MessageWidget;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UTexture2D* Image = nullptr;
 };

@@ -25,15 +25,7 @@ void UP16AttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, f
 {
 	Super::PreAttributeChange(Attribute, NewValue);
 
-	// Clamp values before the changes are actually happens.
-	if (Attribute == GetHealthAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxHealth());
-	}
-	else if (Attribute == GetManaAttribute())
-	{
-		NewValue = FMath::Clamp(NewValue, 0.f, GetMaxMana());
-	}
+	// Clamp values before the changes are actually happens is a bad idea.
 }
 
 void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data)
@@ -41,6 +33,16 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	Super::PostGameplayEffectExecute(Data);
 
 	FP16EffectProperties Properties = GetEffectProperties(Data);
+
+	// Correct place to clamp attribute values.
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), 0.f, GetMaxHealth()));
+	}
+	if (Data.EvaluatedData.Attribute == GetManaAttribute())
+	{
+		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
 }
 
 void UP16AttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth) const

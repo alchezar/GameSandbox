@@ -3,15 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "P16Type.h"
 #include "P16Util.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnHealthChangeSignature, float, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnAttributeChangeSignature, float, NewValue);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMaxHealthChangeSignature, float, NewMaxHealth);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnManaChangeSignature, float, NewMana);
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMaxManaChangeSignature, float, NewMaxMana);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMessageWidgetRowSignature, FP16UIWidgetRow, Row);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/)
 

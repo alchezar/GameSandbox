@@ -13,17 +13,26 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 	EARLY_RETURN_IF(!AttributeSet)
 
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute())
-		.AddUObject(this, &ThisClass::OnHealthChangedCallback);
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnHealthChanged.Broadcast(Data.NewValue); });
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxHealthAttribute())
-		.AddUObject(this, &ThisClass::OnMaxHealthChangedCallback);
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnMaxHealthChanged.Broadcast(Data.NewValue); });
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetManaAttribute())
-		.AddUObject(this, &ThisClass::OnManaChangedCallback);
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnManaChanged.Broadcast(Data.NewValue); });
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute())
-		.AddUObject(this, &ThisClass::OnMaxManaChangedCallback);
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnMaxManaChanged.Broadcast(Data.NewValue); });
 
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(Params.AbilitySystemComponent))
 	{
-		AbilitySystem->OnEffectApplied.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
+		AbilitySystem->OnEffectApplied.AddWeakLambda(this, [this](const FGameplayTagContainer& AssetTags) -> void
+		{
+			EARLY_RETURN_IF(!MessageWidgetDataTable)
+			for (const FGameplayTag& Tag : AssetTags)
+			{
+				const FP16UIWidgetRow* Row = GetDataTableRowByTag<FP16UIWidgetRow>(MessageWidgetDataTable.Get(), Tag);
+				CONTINUE_IF(!Row || !Tag.MatchesTag(MessageTag))
+				OnMessageWidgetRow.Broadcast(*Row);
+			}
+		});
 	}
 }
 
@@ -38,30 +47,19 @@ void UP16OverlayWidgetController::BroadcastInitialValues()
 	OnMaxManaChanged.Broadcast(AttributeSet->GetMaxMana());
 }
 
-void UP16OverlayWidgetController::OnHealthChangedCallback(const FOnAttributeChangeData& Data) const
+template <typename T>
+T* UP16OverlayWidgetController::GetDataTableRowByTag(UDataTable* InDataTable, const FGameplayTag& InTag)
 {
-	OnHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UP16OverlayWidgetController::OnMaxHealthChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnMaxHealthChanged.Broadcast(Data.NewValue);
-}
-
-void UP16OverlayWidgetController::OnManaChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnManaChanged.Broadcast(Data.NewValue);
-}
-
-void UP16OverlayWidgetController::OnMaxManaChangedCallback(const FOnAttributeChangeData& Data) const
-{
-	OnMaxManaChanged.Broadcast(Data.NewValue);
-}
-
-void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags)
-{
-	for (const FGameplayTag& Tag : AssetTags)
+	TArray<FP16UIWidgetRow*> Rows;
+	InDataTable->GetAllRows(nullptr, Rows);
+	for (FP16UIWidgetRow* Row : Rows)
 	{
-		// TODO: Do something with broadcast tags.
+		CONTINUE_IF(!Row || Row->MessageTag != InTag)
+		return Row;
 	}
+
+	_UNLIKELY return InDataTable->FindRow<FP16UIWidgetRow>(InTag.GetTagName(), nullptr);
 }
+
+template
+FP16UIWidgetRow* UP16OverlayWidgetController::GetDataTableRowByTag<FP16UIWidgetRow>(UDataTable* InDataTable, const FGameplayTag& InTag);
