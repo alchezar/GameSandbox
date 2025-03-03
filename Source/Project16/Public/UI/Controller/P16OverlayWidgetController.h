@@ -17,8 +17,8 @@ class PROJECT16_API UP16OverlayWidgetController : public UP16WidgetController
 
 	/* ------------------------------- Super ------------------------------- */
 public:
-	virtual void BroadcastInitialValues() override;
 	virtual void BindCallbacksToDependencies() override;
+	virtual void BroadcastInitialValues() override;
 
 	/* ------------------------------- This -------------------------------- */
 protected:

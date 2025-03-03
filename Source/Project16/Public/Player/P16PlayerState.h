@@ -29,7 +29,7 @@ public:
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
