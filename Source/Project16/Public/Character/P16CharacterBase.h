@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "Interface/P16CombatInterface.h"
 #include "P16CharacterBase.generated.h"
 
 class UGameplayEffect;
@@ -11,7 +12,7 @@ class UAttributeSet;
 class UAbilitySystemComponent;
 
 UCLASS(Abstract)
-class PROJECT16_API AP16CharacterBase : public ACharacter
+class PROJECT16_API AP16CharacterBase : public ACharacter, public IP16CombatInterface
 {
 	GENERATED_BODY()
 
@@ -39,6 +40,8 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
+	TSubclassOf<UGameplayEffect> DefaultVitalAttributes = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;

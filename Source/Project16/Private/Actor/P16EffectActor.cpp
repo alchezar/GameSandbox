@@ -52,9 +52,10 @@ void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf
 	check(InGameplayEffectClass)
 
 	// Apply the effect.
-	const FGameplayEffectContextHandle EffectContext = TargetAbilityComponent->MakeEffectContext();
-	const FGameplayEffectSpecHandle    EffectSpec    = TargetAbilityComponent->MakeOutgoingSpec(InGameplayEffectClass, EffectLevel, EffectContext);
-	const FActiveGameplayEffectHandle  AppliedEffect = TargetAbilityComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+	FGameplayEffectContextHandle EffectContext = TargetAbilityComponent->MakeEffectContext();
+	EffectContext.AddSourceObject(this);
+	const FGameplayEffectSpecHandle   EffectSpec    = TargetAbilityComponent->MakeOutgoingSpec(InGameplayEffectClass, EffectLevel, EffectContext);
+	const FActiveGameplayEffectHandle AppliedEffect = TargetAbilityComponent->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
 
 	// Store infinite effects for removal on end overlap.
 	const bool bInfiniteEffect  = EffectSpec.Data->Def->DurationPolicy == EGameplayEffectDurationType::Infinite;

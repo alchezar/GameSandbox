@@ -30,6 +30,7 @@ void AP16CharacterBase::InitDefaultAttributes() const
 {
 	ApplyEffectToSelf(DefaultPrimaryAttributes);
 	ApplyEffectToSelf(DefaultSecondaryAttributes);
+	ApplyEffectToSelf(DefaultVitalAttributes);
 }
 
 void AP16CharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel) const
@@ -37,7 +38,8 @@ void AP16CharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& In
 	check(AbilitySystemComponent)
 	EARLY_RETURN_IF(!InGameplayEffect)
 
-	const FGameplayEffectContextHandle Context = AbilitySystemComponent->MakeEffectContext();
-	const FGameplayEffectSpecHandle    Spec    = AbilitySystemComponent->MakeOutgoingSpec(InGameplayEffect, InLevel, Context);
+	FGameplayEffectContextHandle Context = AbilitySystemComponent->MakeEffectContext();
+	Context.AddSourceObject(this);
+	const FGameplayEffectSpecHandle Spec = AbilitySystemComponent->MakeOutgoingSpec(InGameplayEffect, InLevel, Context);
 	AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*Spec.Data.Get(), AbilitySystemComponent.Get());
 }

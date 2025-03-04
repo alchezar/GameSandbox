@@ -31,6 +31,7 @@ protected:
 	/* ----------------------------- Interface ----------------------------- */
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	virtual int32                    GetPlayerLevel() override;
 
 	/* ------------------------------- Super ------------------------------- */
 protected:

@@ -159,10 +159,10 @@ public:
 	///
 
 	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadWrite, Category = "C++ | Vital")
-	FGameplayAttributeData Health = {80.f};
+	FGameplayAttributeData Health;
 	ATTRIBUTE_ACCESSORS(Health)
 
 	UPROPERTY(ReplicatedUsing = OnRep_Mana, BlueprintReadWrite, Category = "C++ | Vital")
-	FGameplayAttributeData Mana = {50.f};
+	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(Mana)
 };

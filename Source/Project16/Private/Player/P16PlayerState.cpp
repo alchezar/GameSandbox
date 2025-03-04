@@ -4,6 +4,7 @@
 
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
+#include "Net/UnrealNetwork.h"
 
 AP16PlayerState::AP16PlayerState()
 {
@@ -16,6 +17,13 @@ AP16PlayerState::AP16PlayerState()
 	AttributeSet = CreateDefaultSubobject<UP16AttributeSet>("AttributeSetComponent");
 }
 
+void AP16PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ThisClass, Level)
+}
+
 UAbilitySystemComponent* AP16PlayerState::GetAbilitySystemComponent() const
 {
 	return AbilitySystemComponent.Get();
@@ -25,3 +33,6 @@ UAttributeSet* AP16PlayerState::GetAttributeSet() const
 {
 	return AttributeSet.Get();
 }
+
+void AP16PlayerState::OnRep_Level(const int32 OldLevel)
+{}

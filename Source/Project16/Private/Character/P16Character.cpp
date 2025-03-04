@@ -84,6 +84,14 @@ UAbilitySystemComponent* AP16Character::GetAbilitySystemComponent() const
 	return AbilitySystemComponent.Get();
 }
 
+int32 AP16Character::GetPlayerLevel()
+{
+	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
+	EARLY_RETURN_VALUE_IF(!State, Super::GetPlayerLevel())
+
+	return State->GetPlayerLevel();
+}
+
 void AP16Character::InitAbilityActorInfo()
 {
 	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();

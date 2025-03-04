@@ -18,6 +18,7 @@ class PROJECT16_API AP16PlayerState : public APlayerState, public IAbilitySystem
 	/* ------------------------------ Unreal ------------------------------- */
 public:
 	AP16PlayerState();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	/* ----------------------------- Interface ----------------------------- */
 public:
@@ -25,7 +26,12 @@ public:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	UAttributeSet* GetAttributeSet() const;
+	_NODISCARD UAttributeSet* GetAttributeSet() const;
+	_NODISCARD int32          GetPlayerLevel() const { return Level; }
+
+protected:
+	UFUNCTION()
+	void OnRep_Level(const int32 OldLevel);
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
@@ -33,4 +39,6 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_Level)
+	int32 Level = 1;
 };

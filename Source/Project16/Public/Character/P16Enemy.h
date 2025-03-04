@@ -22,9 +22,15 @@ protected:
 
 	/* ----------------------------- Interface ----------------------------- */
 public:
-	virtual void ToggleHighlight(const bool bOn) override;
+	virtual void  ToggleHighlight(const bool bOn) override;
+	virtual int32 GetPlayerLevel() override { return Level; };
 
 	/* ------------------------------- Super ------------------------------- */
 protected:
 	virtual void InitAbilityActorInfo() override;
+
+	/* ------------------------------ Fields ------------------------------- */
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	int32 Level = 1;
 };
