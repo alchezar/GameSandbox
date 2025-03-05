@@ -20,6 +20,7 @@ public class Project16 : ModuleRules
 
 		PrivateDependencyModuleNames.AddRange(new[]
 		{
+			"GameSandbox",
 			"Niagara",
 			"UMG",
 			"AIModule",
