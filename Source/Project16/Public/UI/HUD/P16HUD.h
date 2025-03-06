@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16HUD.generated.h"
 
+class UP16AttributeMenuWidgetController;
 class UP16OverlayWidgetController;
 class UP16Widget;
 
@@ -24,20 +25,30 @@ protected:
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	UP16OverlayWidgetController* GetOverlayWidgetController(const FP16WidgetControllerParams& InParams = {});
-	void                         InitOverlay(const FP16WidgetControllerParams& InParams);
+	UP16OverlayWidgetController*       GetOverlayWidgetController(const FP16WidgetControllerParams& InParams = {});
+	UP16AttributeMenuWidgetController* GetAttributeMenuWidgetController(const FP16WidgetControllerParams& InParams = {});
+
+	void InitOverlay(const FP16WidgetControllerParams& InParams);
+
+private:
+	template <typename T>
+	T* GetWidgetController(TObjectPtr<T>& InWidgetController, TSubclassOf<T> InWidgetControllerClass, const FP16WidgetControllerParams& InParams = {});
 
 	/* ------------------------------ Fields ------------------------------- */
-public:
-	UPROPERTY()
-	TObjectPtr<UP16Widget> OverlayWidget = nullptr;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UP16Widget> OverlayWidgetClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UP16OverlayWidgetController> OverlayWidgetControllerClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TSubclassOf<UP16AttributeMenuWidgetController> AttributeMenuWidgetControllerClass = nullptr;
 
 private:
+	UPROPERTY()
+	TObjectPtr<UP16Widget> OverlayWidget = nullptr;
+	UPROPERTY()
 	TObjectPtr<UP16OverlayWidgetController> OverlayWidgetController = nullptr;
+	UPROPERTY()
+	TObjectPtr<UP16AttributeMenuWidgetController> AttributeMenuWidgetController = nullptr;
 };

@@ -15,13 +15,13 @@ namespace P16
 }
 
 #define EARLY_RETURN_IF(Condition)              \
-if (Condition)                                  \
+if (Condition) _UNLIKELY                        \
 {                                               \
 	return;                                     \
 }
 
 #define EARLY_RETURN_VALUE_IF(Condition, Value) \
-if (Condition)                                  \
+if (Condition) _UNLIKELY                        \
 {                                               \
 	return Value;                               \
 }

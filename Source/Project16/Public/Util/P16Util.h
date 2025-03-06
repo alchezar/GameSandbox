@@ -10,6 +10,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnAttributeChangeSignature, floa
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMessageWidgetRowSignature, FP16UIWidgetRow, Row);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AttributeInfoSignature, const FP16AttributeInfo&, AttributeInfo);
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/)
 
 UCLASS()

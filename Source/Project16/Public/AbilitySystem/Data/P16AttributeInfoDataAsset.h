@@ -1,0 +1,24 @@
+// Copyright © 2025, Ivan Kinder
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
+#include "Engine/DataAsset.h"
+#include "Util/P16Type.h"
+#include "P16AttributeInfoDataAsset.generated.h"
+
+UCLASS()
+class PROJECT16_API UP16AttributeInfoDataAsset : public UDataAsset
+{
+	GENERATED_BODY()
+
+	/* ------------------------------- This -------------------------------- */
+public:
+	FP16AttributeInfo FindAttributeInfo(const FGameplayTag& InTag, const bool bLogNotFound = false) const;
+
+	/* ------------------------------ Fields ------------------------------- */
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TArray<FP16AttributeInfo> AttributeInfo;
+};

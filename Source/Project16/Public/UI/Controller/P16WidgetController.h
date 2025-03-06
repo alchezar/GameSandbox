@@ -22,10 +22,11 @@ public:
 	void SetWidgetControllerParams(const FP16WidgetControllerParams& InParams);
 
 	virtual void BindCallbacksToDependencies();
+	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Controller")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Widget Controller")
 	FP16WidgetControllerParams Params = {};
 };

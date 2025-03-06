@@ -80,3 +80,18 @@ struct FP16UIWidgetRow : public FTableRowBase
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Image = nullptr;
 };
+
+USTRUCT(BlueprintType)
+struct FP16AttributeInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayTag Tag = FGameplayTag{};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Name = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FText Description = FText::GetEmpty();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float Value = 0.f;
+};
