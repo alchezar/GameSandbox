@@ -15,10 +15,10 @@ class PROJECT16_API UP16AttributeInfoDataAsset : public UDataAsset
 
 	/* ------------------------------- This -------------------------------- */
 public:
-	FP16AttributeInfo FindAttributeInfo(const FGameplayTag& InTag, const bool bLogNotFound = false) const;
+	FP16AttributeInfo FindAttributeInfo(const FGameplayTag& InTag, const UAttributeSet* InAttributeSet, const bool bLogNotFound = false) const;
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TArray<FP16AttributeInfo> AttributeInfo;
+	TArray<FP16AttributeInfo> AttributeInfos;
 };

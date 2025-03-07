@@ -8,8 +8,6 @@
 #include "Util/P16Type.h"
 #include "P16AttributeSet.generated.h"
 
-DECLARE_DELEGATE_RetVal(FGameplayAttribute, FP16AttributeSignature)
-
 ///
 /// This defines a set of helper functions for accessing and initializing attributes,
 /// to avoid having to manually write these functions.
@@ -80,8 +78,6 @@ private:
 
 	/* ------------------------------ Fields ------------------------------- */
 public:
-	TMap<FGameplayTag, FP16AttributeSignature> TagsToAttributesMap = {};
-
 	///
 	/// @section Primary attributes.
 	///

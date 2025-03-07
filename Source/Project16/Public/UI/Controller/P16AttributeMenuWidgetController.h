@@ -26,5 +26,5 @@ public:
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
-	TObjectPtr<UP16AttributeInfoDataAsset> AttributeInfo;
+	TObjectPtr<UP16AttributeInfoDataAsset> AttributeInfoData;
 };

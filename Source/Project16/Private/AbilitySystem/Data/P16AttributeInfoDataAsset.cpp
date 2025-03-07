@@ -2,9 +2,9 @@
 
 #include "AbilitySystem/Data/P16AttributeInfoDataAsset.h"
 
-FP16AttributeInfo UP16AttributeInfoDataAsset::FindAttributeInfo(const FGameplayTag& InTag, const bool bLogNotFound) const
+FP16AttributeInfo UP16AttributeInfoDataAsset::FindAttributeInfo(const FGameplayTag& InTag, const UAttributeSet* InAttributeSet, const bool bLogNotFound) const
 {
-	const FP16AttributeInfo* FoundInfo = AttributeInfo.FindByPredicate([InTag](const FP16AttributeInfo& Info) -> bool
+	const FP16AttributeInfo* FoundInfo = AttributeInfos.FindByPredicate([InTag](const FP16AttributeInfo& Info) -> bool
 	{
 		return Info.Tag.MatchesTagExact(InTag);
 	});
@@ -12,7 +12,8 @@ FP16AttributeInfo UP16AttributeInfoDataAsset::FindAttributeInfo(const FGameplayT
 	FP16AttributeInfo Result = {};
 	if (FoundInfo)
 	{
-		Result = *FoundInfo;
+		Result       = *FoundInfo;
+		Result.Value = Result.Attribute.GetNumericValue(InAttributeSet);
 	}
 	else if (bLogNotFound)
 	{

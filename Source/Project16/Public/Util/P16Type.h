@@ -92,6 +92,8 @@ struct FP16AttributeInfo
 	FText Name = FText::GetEmpty();
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Description = FText::GetEmpty();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FGameplayAttribute Attribute = {};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Value = 0.f;
 };

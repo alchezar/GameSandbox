@@ -7,17 +7,26 @@
 #include "AbilitySystem/Data/P16AttributeInfoDataAsset.h"
 
 void UP16AttributeMenuWidgetController::BindCallbacksToDependencies()
-{}
+{
+	EARLY_RETURN_IF(!Params.AttributeSet)
+
+	for (const FP16AttributeInfo& AttributeInfo : AttributeInfoData->AttributeInfos)
+	{
+		auto Lambda = [this, AttributeInfo](const FOnAttributeChangeData& Data) -> void
+		{
+			AttributeInfoDelegate.Broadcast(AttributeInfoData->FindAttributeInfo(AttributeInfo.Tag, Params.AttributeSet.Get()));
+		};
+		Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeInfo.Attribute).AddWeakLambda(this, MoveTemp(Lambda));
+	}
+}
 
 void UP16AttributeMenuWidgetController::BroadcastInitialValues()
 {
-	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(Params.AttributeSet.Get());
-	EARLY_RETURN_IF(!AttributeSet || !AttributeInfo)
+	EARLY_RETURN_IF(!Params.AttributeSet.Get() || !AttributeInfoData)
 
-	for (auto& [Tag, Delegate] : AttributeSet->TagsToAttributesMap)
+	for (FP16AttributeInfo& AttributeInfo : AttributeInfoData->AttributeInfos)
 	{
-		FP16AttributeInfo Info = AttributeInfo->FindAttributeInfo(Tag);
-		Info.Value             = Delegate.Execute().GetNumericValue(AttributeSet);
+		const FP16AttributeInfo Info = AttributeInfoData->FindAttributeInfo(AttributeInfo.Tag, Params.AttributeSet.Get());
 		AttributeInfoDelegate.Broadcast(Info);
 	}
 }

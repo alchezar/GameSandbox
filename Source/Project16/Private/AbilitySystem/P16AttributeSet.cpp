@@ -7,7 +7,6 @@
 #include "GameplayEffectExtension.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
-#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
 void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##PropertyName) const \
@@ -15,36 +14,8 @@ void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##Property
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ClassName, PropertyName, Old##PropertyName)                 \
 }
 
-#define MAP_GAMEPLAYATTRIBUTE_TO_TAG(PropertyName, Tag)              \
-	FP16AttributeSignature PropertyName##Delegate;                   \
-	PropertyName##Delegate.BindStatic(Get##PropertyName##Attribute); \
-	TagsToAttributesMap.Add(Tag, PropertyName##Delegate);
-
 UP16AttributeSet::UP16AttributeSet()
-{
-	const FP16GameplayTags Tags = FGSGameplayTagsSingleton::Get().P16Tags;
-
-	// clang-format off
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Strength,     Tags.Attribute_Primary_Strength)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Intelligence, Tags.Attribute_Primary_Intelligence)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Resilience,   Tags.Attribute_Primary_Resilience)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Vigor,        Tags.Attribute_Primary_Vigor)
-
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Armor,                 Tags.Attribute_Secondary_Armor)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(ArmorPenetration,      Tags.Attribute_Secondary_ArmorPenetration)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(BlockChance,           Tags.Attribute_Secondary_BlockChance)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(CriticalHitChance,     Tags.Attribute_Secondary_CriticalHitChance)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(CriticalHitDamage,     Tags.Attribute_Secondary_CriticalHitDamage)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(CriticalHitResistance, Tags.Attribute_Secondary_CriticalHitResistance)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(HealthRegeneration,    Tags.Attribute_Secondary_HealthRegeneration)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(ManaRegeneration,      Tags.Attribute_Secondary_ManaRegeneration)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(MaxHealth,             Tags.Attribute_Secondary_MaxHealth)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(MaxMana,               Tags.Attribute_Secondary_MaxMana)
-
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Health, Tags.Attribute_Vital_Health)
-	MAP_GAMEPLAYATTRIBUTE_TO_TAG(Mana,   Tags.Attribute_Vital_Mana)
-	// clang-format on
-}
+{}
 
 void UP16AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
