@@ -8,8 +8,9 @@
 #include "UI/Widget/P16Widget.h"
 #include "P16Type.generated.h"
 
-class UAttributeSet;
 class UAbilitySystemComponent;
+class UAttributeSet;
+class UInputAction;
 
 UENUM()
 enum class EP16EffectApplicationPolicy : uint8
@@ -96,4 +97,15 @@ struct FP16AttributeInfo
 	FGameplayAttribute Attribute = {};
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float Value = 0.f;
+};
+
+USTRUCT(BlueprintType)
+struct FP16InputAction
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	const UInputAction* Action = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag Tag = FGameplayTag{};
 };

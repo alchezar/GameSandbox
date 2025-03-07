@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
+struct FGameplayTag;
+class UP16InputConfig;
 class IP16InterfaceEnemy;
 class AP16Character;
 class UInputAction;
@@ -32,6 +34,10 @@ protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
 	void CursorTrace();
 
+	static void AbilityInputTagPressed(const FGameplayTag InputTag);
+	static void AbilityInputTagReleased(const FGameplayTag InputTag);
+	static void AbilityInputTagHeld(const FGameplayTag InputTag);
+
 private:
 	void AddDefaultMappingContext() const;
 
@@ -40,6 +46,8 @@ protected:
 	TObjectPtr<UInputMappingContext> MappingContext = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> MoveAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	UP16InputConfig* InputConfig = nullptr;
 
 private:
 	TScriptInterface<IP16InterfaceEnemy> LastTickEnemy = {};

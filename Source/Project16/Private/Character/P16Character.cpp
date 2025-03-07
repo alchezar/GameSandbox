@@ -59,6 +59,7 @@ void AP16Character::PossessedBy(AController* NewController)
 
 	// Server side.
 	InitAbilityActorInfo();
+	AddCharacterAbilities();
 }
 
 void AP16Character::OnRep_PlayerState()

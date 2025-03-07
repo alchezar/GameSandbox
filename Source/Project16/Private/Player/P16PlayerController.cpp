@@ -2,9 +2,10 @@
 
 #include "Player/P16PlayerController.h"
 
-#include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "GameplayTagContainer.h"
 #include "Project16.h"
+#include "Component/P16InputComponent.h"
 #include "Interface/P16InterfaceEnemy.h"
 
 AP16PlayerController::AP16PlayerController()
@@ -46,6 +47,15 @@ void AP16PlayerController::SetupInputComponent()
 	check(Input)
 
 	Input->BindAction(MoveAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::MoveInputCallback);
+
+	// Using custom input component for binding all input actions to their tags.
+	if (UP16InputComponent* InputComp = Cast<UP16InputComponent>(InputComponent))
+	{
+		InputComp->BindAbilityActions(InputConfig, this,
+			&ThisClass::AbilityInputTagPressed,
+			&ThisClass::AbilityInputTagReleased,
+			&ThisClass::AbilityInputTagHeld);
+	}
 }
 
 void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue)
@@ -83,6 +93,21 @@ void AP16PlayerController::CursorTrace()
 		}
 	}
 	LastTickEnemy = ThisTickEnemy;
+}
+
+void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Yellow, FString::Printf(L"Pressed: %s", *InputTag.ToString()));
+}
+
+void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Yellow, FString::Printf(L"Released: %s", *InputTag.ToString()));
+}
+
+void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
+{
+	GEngine->AddOnScreenDebugMessage(3, 5.f, FColor::Yellow, FString::Printf(L"Held: %s", *InputTag.ToString()));
 }
 
 void AP16PlayerController::AddDefaultMappingContext() const

@@ -21,7 +21,6 @@ struct FP16GameplayTags
 	FGameplayTag Attribute_Primary_Intelligence;
 	FGameplayTag Attribute_Primary_Resilience;
 	FGameplayTag Attribute_Primary_Vigor;
-
 	FGameplayTag Attribute_Secondary_Armor;
 	FGameplayTag Attribute_Secondary_ArmorPenetration;
 	FGameplayTag Attribute_Secondary_BlockChance;
@@ -32,9 +31,15 @@ struct FP16GameplayTags
 	FGameplayTag Attribute_Secondary_ManaRegeneration;
 	FGameplayTag Attribute_Secondary_MaxHealth;
 	FGameplayTag Attribute_Secondary_MaxMana;
-
 	FGameplayTag Attribute_Vital_Health;
 	FGameplayTag Attribute_Vital_Mana;
+
+	FGameplayTag Input_MouseButtonLeft;
+	FGameplayTag Input_MouseButtonRight;
+	FGameplayTag Input_Number1;
+	FGameplayTag Input_Number2;
+	FGameplayTag Input_Number3;
+	FGameplayTag Input_Number4;
 };
 
 ///

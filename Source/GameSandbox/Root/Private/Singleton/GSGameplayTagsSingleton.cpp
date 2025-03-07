@@ -15,6 +15,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 {
 	UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
 
+	// Attribute tags.
 	Singleton.P16Tags.Attribute_Primary_Strength                = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Strength", "Increases physical damage");
 	Singleton.P16Tags.Attribute_Primary_Intelligence            = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Intelligence", "Increases magical damage");
 	Singleton.P16Tags.Attribute_Primary_Resilience              = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Resilience", "Increases armor and armor penetration");
@@ -31,4 +32,12 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute_Secondary_MaxMana               = Manager.AddNativeGameplayTag("P16.Attribute.Secondary.MaxMana", "Maximum amount of mana obtainable");
 	Singleton.P16Tags.Attribute_Vital_Health                    = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Health", "Current amount of health");
 	Singleton.P16Tags.Attribute_Vital_Mana                      = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Mana", "Current amount of mana");
+
+	// Input tags.
+	Singleton.P16Tags.Input_MouseButtonLeft  = Manager.AddNativeGameplayTag("P16.Input.MouseButtonLeft", "Input tag for the left mouse button");
+	Singleton.P16Tags.Input_MouseButtonRight = Manager.AddNativeGameplayTag("P16.Input.MouseButtonRight", "Input tag for the right mouse button");
+	Singleton.P16Tags.Input_Number1          = Manager.AddNativeGameplayTag("P16.Input.Number1", "Input tag for the number 1 button");
+	Singleton.P16Tags.Input_Number2          = Manager.AddNativeGameplayTag("P16.Input.Number2", "Input tag for the number 2 button");
+	Singleton.P16Tags.Input_Number3          = Manager.AddNativeGameplayTag("P16.Input.Number3", "Input tag for the number 3 button");
+	Singleton.P16Tags.Input_Number4          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
 }

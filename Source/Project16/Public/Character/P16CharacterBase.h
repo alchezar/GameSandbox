@@ -7,6 +7,7 @@
 #include "Interface/P16CombatInterface.h"
 #include "P16CharacterBase.generated.h"
 
+class UP16GameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
 class UAbilitySystemComponent;
@@ -26,8 +27,10 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 protected:
 	virtual void InitAbilityActorInfo();
-	void         InitDefaultAttributes() const;
-	void         ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
+
+	void InitDefaultAttributes() const;
+	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
+	void AddCharacterAbilities() const;
 
 	/* ------------------------------ Fields ------------------------------- */
 protected:
@@ -42,6 +45,9 @@ protected:
 	TSubclassOf<UGameplayEffect> DefaultSecondaryAttributes = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
 	TSubclassOf<UGameplayEffect> DefaultVitalAttributes = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Abilities")
+	TArray<TSubclassOf<UP16GameplayAbility>> StartupAbilities = {};
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;

@@ -7,6 +7,8 @@
 #include "Util/P16Util.h"
 #include "P16AbilitySystemComponent.generated.h"
 
+class UP16GameplayAbility;
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT16_API UP16AbilitySystemComponent : public UAbilitySystemComponent
 {
@@ -23,6 +25,7 @@ protected:
 	/* ------------------------------- This -------------------------------- */
 public:
 	void OnAbilityActorInfoSet();
+	void AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities);
 
 protected:
 	void OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);

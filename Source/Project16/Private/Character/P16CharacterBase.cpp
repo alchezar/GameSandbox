@@ -43,3 +43,13 @@ void AP16CharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& In
 	const FGameplayEffectSpecHandle Spec = AbilitySystemComponent->MakeOutgoingSpec(InGameplayEffect, InLevel, Context);
 	AbilitySystemComponent->ApplyGameplayEffectSpecToTarget(*Spec.Data.Get(), AbilitySystemComponent.Get());
 }
+
+void AP16CharacterBase::AddCharacterAbilities() const
+{
+	EARLY_RETURN_IF(!HasAuthority())
+
+	UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent);
+	EARLY_RETURN_IF(!AbilitySystem)
+
+	AbilitySystem->AddCharacterAbilities(StartupAbilities);
+}
