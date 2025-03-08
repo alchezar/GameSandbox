@@ -10,4 +10,9 @@ UCLASS()
 class PROJECT16_API UP16GameplayAbility : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+	/* ------------------------------ Fields ------------------------------- */
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
+	FGameplayTag StartupInputTag;
 };

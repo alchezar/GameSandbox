@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 
+#include "Project16.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 
 UP16AbilitySystemComponent::UP16AbilitySystemComponent()
@@ -21,24 +22,50 @@ void UP16AbilitySystemComponent::TickComponent(const float DeltaTime, const ELev
 
 void UP16AbilitySystemComponent::OnAbilityActorInfoSet()
 {
-	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
+	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::Client_OnEffectAppliedCallback);
 }
 
 void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities)
 {
 	for (const TSubclassOf<UP16GameplayAbility>& AbilityClass : StartupAbilities)
 	{
-		// // One way to give and activate an ability.
-		// const FGameplayAbilitySpecHandle AbilitySpecHandle = GiveAbility(FGameplayAbilitySpec{AbilityClass});
-		// TryActivateAbility(AbilitySpecHandle);
+		FGameplayAbilitySpec       AbilitySpec = {AbilityClass};
+		const UP16GameplayAbility* Ability     = Cast<UP16GameplayAbility>(AbilitySpec.Ability);
+		CONTINUE_IF(!Ability)
 
-		// Another way to give and activate an ability.
-		FGameplayAbilitySpec AbilitySpec = {AbilityClass};
-		GiveAbilityAndActivateOnce(AbilitySpec);
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(Ability->StartupInputTag);
+		GiveAbility(AbilitySpec);
 	}
 }
 
-void UP16AbilitySystemComponent::OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)
+void UP16AbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
+{
+	EARLY_RETURN_IF(!InputTag.IsValid())
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+
+		AbilitySpecInputPressed(AbilitySpec);
+		CONTINUE_IF(AbilitySpec.IsActive())
+
+		TryActivateAbility(AbilitySpec.Handle);
+	}
+}
+
+void UP16AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& InputTag)
+{
+	EARLY_RETURN_IF(!InputTag.IsValid())
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+
+		AbilitySpecInputReleased(AbilitySpec);
+	}
+}
+
+void UP16AbilitySystemComponent::Client_OnEffectAppliedCallback_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
 	GameplayEffectSpec.GetAllAssetTags(TagContainer);

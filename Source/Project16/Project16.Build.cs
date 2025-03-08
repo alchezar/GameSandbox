@@ -25,7 +25,8 @@ public class Project16 : ModuleRules
 			"UMG",
 			"AIModule",
 			"GameplayTags",
-			"GameplayTasks"
+			"GameplayTasks",
+			"NavigationSystem"
 		});
 
 		PublicIncludePaths.Add("Project16");

@@ -2,20 +2,30 @@
 
 #include "Player/P16PlayerController.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "GameplayTagContainer.h"
+#include "NavigationPath.h"
+#include "NavigationSystem.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "Component/P16InputComponent.h"
+#include "Components/SplineComponent.h"
 #include "Interface/P16InterfaceEnemy.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 AP16PlayerController::AP16PlayerController()
 {
 	SetReplicates(true);
+
+	Spline = CreateDefaultSubobject<USplineComponent>("PathSplineComponent");
 }
 
 void AP16PlayerController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
+
+	ControlledPawn = InPawn;
 }
 
 void AP16PlayerController::BeginPlay()
@@ -36,7 +46,9 @@ void AP16PlayerController::BeginPlay()
 void AP16PlayerController::Tick(const float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
+
 	CursorTrace();
+	AutoRun();
 }
 
 void AP16PlayerController::SetupInputComponent()
@@ -65,7 +77,7 @@ void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue
 	const FVector   ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	const FVector   RightDirection   = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	if (APawn* ControlledPawn = GetPawn())
+	if (ControlledPawn)
 	{
 		ControlledPawn->AddMovementInput(ForwardDirection, InputVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputVector.X);
@@ -74,7 +86,6 @@ void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue
 
 void AP16PlayerController::CursorTrace()
 {
-	FHitResult CursorHit;
 	GetHitResultUnderCursor(ECC_Camera, false, CursorHit);
 	EARLY_RETURN_IF(!CursorHit.bBlockingHit)
 
@@ -95,19 +106,74 @@ void AP16PlayerController::CursorTrace()
 	LastTickEnemy = ThisTickEnemy;
 }
 
+void AP16PlayerController::AutoRun()
+{
+	EARLY_RETURN_IF(!bAutoRunning || !ControlledPawn)
+
+	const float SquaredDistance     = FVector::DistSquared(ControlledPawn->GetActorLocation(), CachedDestination);
+	const float SquaredAcceptRadius = AutoRunAcceptRadius * AutoRunAcceptRadius;
+	if (SquaredDistance < SquaredAcceptRadius)
+	{
+		bAutoRunning = false;
+		return;
+	}
+
+	const FVector Direction = Spline->FindDirectionClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
+	ControlledPawn->AddMovementInput(Direction);
+}
+
 void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(1, 5.f, FColor::Yellow, FString::Printf(L"Pressed: %s", *InputTag.ToString()));
+	if (GetIsLMB(InputTag))
+	{
+		bTargeting   = LastTickEnemy != nullptr;
+		bAutoRunning = false;
+		FollowTime   = 0.f;
+	}
 }
 
 void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(2, 5.f, FColor::Yellow, FString::Printf(L"Released: %s", *InputTag.ToString()));
+	// Activate ability.
+	if (bTargeting || !GetIsLMB(InputTag))
+	{
+		EARLY_RETURN_IF(!GetAbilitySystemComponent())
+		AbilitySystemComponent->AbilityInputTagReleased(InputTag);
+		return;
+	}
+
+	// Move towards click behavior.
+	EARLY_RETURN_IF(FollowTime > ClickThreshold || !ControlledPawn)
+	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination);
+	EARLY_RETURN_IF(!NavPath)
+
+	Spline->ClearSplinePoints();
+	for (const FVector& PathPoint : NavPath->PathPoints)
+	{
+		Spline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World, false);
+		CachedDestination = PathPoint;
+	}
+	bAutoRunning = true;
 }
 
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 {
-	GEngine->AddOnScreenDebugMessage(3, 5.f, FColor::Yellow, FString::Printf(L"Held: %s", *InputTag.ToString()));
+	// Activate ability.
+	if (bTargeting || !GetIsLMB(InputTag))
+	{
+		EARLY_RETURN_IF(!GetAbilitySystemComponent())
+		AbilitySystemComponent->AbilityInputTagHeld(InputTag);
+		return;
+	}
+
+	// Follow mouse behavior.
+	FollowTime += GetWorld()->GetDeltaSeconds();
+	EARLY_RETURN_IF(!CursorHit.bBlockingHit)
+	CachedDestination = CursorHit.ImpactPoint;
+
+	EARLY_RETURN_IF(!ControlledPawn)
+	const FVector WorldDirection = (CachedDestination - ControlledPawn->GetActorLocation()).GetSafeNormal2D();
+	ControlledPawn->AddMovementInput(WorldDirection);
 }
 
 void AP16PlayerController::AddDefaultMappingContext() const
@@ -120,4 +186,19 @@ void AP16PlayerController::AddDefaultMappingContext() const
 	EARLY_RETURN_IF(!Subsystem)
 
 	Subsystem->AddMappingContext(MappingContext.Get(), 0);
+}
+
+UP16AbilitySystemComponent* AP16PlayerController::GetAbilitySystemComponent()
+{
+	if (!AbilitySystemComponent)
+	{
+		AbilitySystemComponent = Cast<UP16AbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetPawn()));
+	}
+
+	return AbilitySystemComponent;
+}
+
+bool AP16PlayerController::GetIsLMB(const FGameplayTag InputTag) const
+{
+	return InputTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Input_MouseButtonLeft);
 }
