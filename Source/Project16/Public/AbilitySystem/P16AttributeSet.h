@@ -24,19 +24,29 @@
  	GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName)               \
  	GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+/// ----------------------------------------------------------------------------
+/// @class   UP16AttributeSet
+/// @brief   Represents an attribute set for a character.
+/// @details Extends the base class with custom attributes, property accessors
+///          and replication logic.
+/// ----------------------------------------------------------------------------
 UCLASS()
 class PROJECT16_API UP16AttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	UP16AttributeSet();
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 protected:
 	UFUNCTION()
 	void OnRep_Strength(const FGameplayAttributeData& OldStrength) const;
@@ -76,11 +86,13 @@ protected:
 private:
 	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 public:
-	///
+	/// ------------------------------------------------------------------------
 	/// @section Primary attributes.
-	///
+	/// ------------------------------------------------------------------------
 
 	/// @brief Increase physical damage.
 	UPROPERTY(ReplicatedUsing = OnRep_Strength, BlueprintReadWrite, Category = "C++ | Primary")
@@ -102,9 +114,9 @@ public:
 	FGameplayAttributeData Vigor;
 	ATTRIBUTE_ACCESSORS(Vigor)
 
-	///
+	/// ------------------------------------------------------------------------
 	/// @section Secondary Attributes.
-	///
+	/// ------------------------------------------------------------------------
 
 	/// @brief Increase health.
 	UPROPERTY(ReplicatedUsing = OnRep_Armor, BlueprintReadWrite, Category = "C++ | Secondary")
@@ -154,9 +166,9 @@ public:
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(MaxMana)
 
-	///
+	/// ------------------------------------------------------------------------
 	/// @section Vital Attributes.
-	///
+	/// ------------------------------------------------------------------------
 
 	UPROPERTY(ReplicatedUsing = OnRep_Health, BlueprintReadWrite, Category = "C++ | Vital")
 	FGameplayAttributeData Health;

@@ -15,17 +15,23 @@ class PROJECT16_API UP16OverlayWidgetController : public UP16WidgetController
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Super
+	/// ------------------------------------------------------------------------
 public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 protected:
 	template <typename T>
 	T* GetDataTableRowByTag(UDataTable* InDataTable, const FGameplayTag& InTag);
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
 	FP16OnAttributeChangeSignature OnHealthChanged;

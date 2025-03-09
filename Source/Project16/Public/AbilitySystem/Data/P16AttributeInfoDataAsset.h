@@ -13,11 +13,15 @@ class PROJECT16_API UP16AttributeInfoDataAsset : public UDataAsset
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	FP16AttributeInfo FindAttributeInfo(const FGameplayTag& InTag, const UAttributeSet* InAttributeSet, const bool bLogNotFound = false) const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TArray<FP16AttributeInfo> AttributeInfos;

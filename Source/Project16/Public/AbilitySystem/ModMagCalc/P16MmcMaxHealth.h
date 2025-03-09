@@ -11,12 +11,16 @@ class PROJECT16_API UP16MmcMaxHealth : public UGameplayModMagnitudeCalculation
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	UP16MmcMaxHealth();
 	virtual float CalculateBaseMagnitude_Implementation(const FGameplayEffectSpec& Spec) const override;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 private:
 	FGameplayEffectAttributeCaptureDefinition VigorDefinition;
 };

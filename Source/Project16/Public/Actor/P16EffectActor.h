@@ -14,14 +14,18 @@ class PROJECT16_API AP16EffectActor : public AActor
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	AP16EffectActor();
 
 protected:
 	virtual void BeginPlay() override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 protected:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void OnBeginOverlap(AActor* TargetActor);
@@ -32,7 +36,9 @@ private:
 	virtual void ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass);
 	virtual void RemoveActiveGameplayEffect(AActor* TargetActor);
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;

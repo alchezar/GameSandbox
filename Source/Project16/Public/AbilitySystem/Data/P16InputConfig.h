@@ -12,11 +12,15 @@ class PROJECT16_API UP16InputConfig : public UDataAsset
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	const UInputAction* FindAbilityInputAction(const FGameplayTag& InTag, const bool bLogNotFound = false) const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Input")
 	TArray<FP16InputAction> AbilityInputActions = {};

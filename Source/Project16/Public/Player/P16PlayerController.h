@@ -7,14 +7,14 @@
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
-class USplineComponent;
-class UP16AbilitySystemComponent;
-struct FGameplayTag;
-class UP16InputConfig;
-class IP16InterfaceEnemy;
 class AP16Character;
+class IP16InterfaceEnemy;
 class UInputAction;
 class UInputMappingContext;
+class UP16AbilitySystemComponent;
+class UP16InputConfig;
+class USplineComponent;
+struct FGameplayTag;
 struct FInputActionValue;
 
 UCLASS()
@@ -22,7 +22,9 @@ class PROJECT16_API AP16PlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	AP16PlayerController();
 
@@ -32,7 +34,9 @@ protected:
 	virtual void Tick(const float DeltaSeconds) override;
 	virtual void SetupInputComponent() override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
 	void CursorTrace();
@@ -48,7 +52,9 @@ private:
 
 	bool GetIsLMB(const FGameplayTag InputTag) const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USplineComponent> Spline = nullptr;

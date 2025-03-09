@@ -15,7 +15,9 @@ class PROJECT16_API UP16WidgetController : public UObject
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	void InitWidgetController(const FP16WidgetControllerParams& InParams);
 	UFUNCTION(BlueprintCallable)
@@ -25,7 +27,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual void BroadcastInitialValues();
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Widget Controller")
 	FP16WidgetControllerParams Params = {};

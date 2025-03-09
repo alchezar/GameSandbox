@@ -14,12 +14,16 @@ class PROJECT16_API UP16AttributeMenuWidgetController : public UP16WidgetControl
 {
 	GENERATED_BODY()
 
-	/* ------------------------------- Super ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++")
 	FP16AttributeInfoSignature AttributeInfoDelegate;
