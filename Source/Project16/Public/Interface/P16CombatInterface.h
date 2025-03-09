@@ -16,5 +16,6 @@ class PROJECT16_API IP16CombatInterface
 	GENERATED_BODY()
 
 public:
-	virtual int32 GetPlayerLevel() { return 0; }
+	virtual int32   GetPlayerLevel() { return 0; }
+	virtual FVector GetCombatSocketLocation() { return FVector::ZeroVector; }
 };

@@ -8,12 +8,19 @@
 #include "AbilitySystem/Data/P16InputConfig.h"
 #include "P16InputComponent.generated.h"
 
+/// ----------------------------------------------------------------------------
+/// @class   UP16InputComponent
+/// @brief   Represents a custom input component.
+/// @details Extends the base class with an ability to bind actions with tags.
+/// ----------------------------------------------------------------------------
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT16_API UP16InputComponent : public UEnhancedInputComponent
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	UP16InputComponent();
 
@@ -21,11 +28,18 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	template <typename UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 	void BindAbilityActions(const UP16InputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc);
 };
+
+/// ----------------------------------------------------------------------------
+/// @class UP16InputComponent
+/// @brief Definition of template functions.
+/// ----------------------------------------------------------------------------
 
 template <typename UserClass, typename PressedFuncType, typename ReleasedFuncType, typename HeldFuncType>
 void UP16InputComponent::BindAbilityActions(const UP16InputConfig* InputConfig, UserClass* Object, PressedFuncType PressedFunc, ReleasedFuncType ReleasedFunc, HeldFuncType HeldFunc)

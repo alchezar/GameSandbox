@@ -12,7 +12,9 @@ class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16InterfaceEn
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	AP16Enemy();
 
@@ -20,16 +22,22 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
 
-	/* ----------------------------- Interface ----------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
 public:
 	virtual void  ToggleHighlight(const bool bOn) override;
 	virtual int32 GetPlayerLevel() override { return Level; };
 
-	/* ------------------------------- Super ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Super
+	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo() override;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	int32 Level = 1;

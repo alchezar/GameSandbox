@@ -17,7 +17,9 @@ class PROJECT16_API AP16Character : public AP16CharacterBase, public IAbilitySys
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	AP16Character();
 	virtual void OnConstruction(const FTransform& Transform) override;
@@ -28,20 +30,28 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
 
-	/* ----------------------------- Interface ----------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
 public:
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual int32                    GetPlayerLevel() override;
 
-	/* ------------------------------- Super ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Super
+	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo() override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	UAttributeSet* GetAttributeSet() const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USpringArmComponent> SpringArm = nullptr;

@@ -17,6 +17,11 @@ void AP16CharacterBase::BeginPlay()
 	Super::BeginPlay();
 }
 
+FVector AP16CharacterBase::GetCombatSocketLocation()
+{
+	return Weapon->GetSocketLocation(CombatSocketName);
+}
+
 void AP16CharacterBase::InitAbilityActorInfo()
 {
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent))

@@ -17,14 +17,24 @@ class PROJECT16_API AP16CharacterBase : public ACharacter, public IP16CombatInte
 {
 	GENERATED_BODY()
 
-	/* ------------------------------ Unreal ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
 public:
 	AP16CharacterBase();
 
 protected:
 	virtual void BeginPlay() override;
 
-	/* ------------------------------- This -------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
+public:
+	virtual FVector GetCombatSocketLocation() override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo();
 
@@ -32,12 +42,16 @@ protected:
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
 	void AddCharacterAbilities() const;
 
-	/* ------------------------------ Fields ------------------------------- */
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USkeletalMeshComponent> Weapon = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	FName HandSocketName = "P16_Hand";
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	FName CombatSocketName = "TipSocket";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes = nullptr;
