@@ -2,6 +2,7 @@
 
 #include "Root/Public/Singleton/GSAssetManager.h"
 
+#include "AbilitySystemGlobals.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 UGSAssetManager& UGSAssetManager::Get()
@@ -19,4 +20,7 @@ void UGSAssetManager::StartInitialLoading()
 
 	// Appropriate place for initialization of all custom gameplay tags.
 	FGSGameplayTagsSingleton::InitializeNativeGameplayTags();
+
+	// This is required to use the target data (initializing the target data cache).
+	UAbilitySystemGlobals::Get().InitGlobalData();
 }

@@ -40,4 +40,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input_Number2          = Manager.AddNativeGameplayTag("P16.Input.Number2", "Input tag for the number 2 button");
 	Singleton.P16Tags.Input_Number3          = Manager.AddNativeGameplayTag("P16.Input.Number3", "Input tag for the number 3 button");
 	Singleton.P16Tags.Input_Number4          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
+
+	// Event tags.
+	Singleton.P16Tags.Event_Montage_Fireball = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
 }

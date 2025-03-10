@@ -3,26 +3,34 @@
 #include "AbilitySystem/Ability/P16ProjectileSpell.h"
 
 #include "Project16.h"
+#include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
 #include "Actor/P16Projectile.h"
 #include "Interface/P16CombatInterface.h"
 
 void UP16ProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+}
 
+void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
+{
 	if (!ProjectileClass)
 	{
-		CancelAbility(Handle, ActorInfo, ActivationInfo, true);
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 	}
 
-	const bool bServer = HasAuthority(&ActivationInfo);
+	const bool bServer = GetAvatarActorFromActorInfo()->HasAuthority();
 	EARLY_RETURN_IF(!bServer)
 
 	FTransform SpawnTransform = FTransform::Identity;
-	// TODO: Set the projectile's rotation.
 	if (const TScriptInterface<IP16CombatInterface> CombatInterface = GetAvatarActorFromActorInfo())
 	{
-		SpawnTransform.SetLocation(CombatInterface->GetCombatSocketLocation());
+		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		FRotator      Rotation       = (InTargetLocation - SocketLocation).Rotation();
+		Rotation.Pitch               = 0.f;
+
+		SpawnTransform.SetLocation(SocketLocation);
+		SpawnTransform.SetRotation(Rotation.Quaternion());
 	}
 
 	AP16Projectile* Projectile = GetWorld()->SpawnActorDeferred<AP16Projectile>(

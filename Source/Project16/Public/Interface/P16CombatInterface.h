@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "P16CombatInterface.generated.h"
 
-UINTERFACE()
+UINTERFACE(BlueprintType)
 class UP16CombatInterface : public UInterface
 {
 	GENERATED_BODY()
@@ -18,4 +18,7 @@ class PROJECT16_API IP16CombatInterface
 public:
 	virtual int32   GetPlayerLevel() { return 0; }
 	virtual FVector GetCombatSocketLocation() { return FVector::ZeroVector; }
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateFacingTo(const FVector& Target);
 };

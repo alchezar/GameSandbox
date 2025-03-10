@@ -59,6 +59,8 @@ void AP16PlayerController::SetupInputComponent()
 	check(Input)
 
 	Input->BindAction(MoveAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::MoveInputCallback);
+	Input->BindAction(ShiftAction.Get(), ETriggerEvent::Started, this, &ThisClass::ShiftInputCallback, true);
+	Input->BindAction(ShiftAction.Get(), ETriggerEvent::Completed, this, &ThisClass::ShiftInputCallback, false);
 
 	// Using custom input component for binding all input actions to their tags.
 	if (UP16InputComponent* InputComp = Cast<UP16InputComponent>(InputComponent))
@@ -82,6 +84,11 @@ void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue
 		ControlledPawn->AddMovementInput(ForwardDirection, InputVector.Y);
 		ControlledPawn->AddMovementInput(RightDirection, InputVector.X);
 	}
+}
+
+void AP16PlayerController::ShiftInputCallback(const FInputActionValue& InputValue, const bool bDown)
+{
+	bShiftKeyDown = bDown;
 }
 
 void AP16PlayerController::CursorTrace()
@@ -159,7 +166,7 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 {
 	// Activate ability.
-	if (bTargeting || !GetIsLMB(InputTag))
+	if (!GetIsLMB(InputTag) || bTargeting || bShiftKeyDown)
 	{
 		EARLY_RETURN_IF(!GetAbilitySystemComponent())
 		AbilitySystemComponent->AbilityInputTagHeld(InputTag);

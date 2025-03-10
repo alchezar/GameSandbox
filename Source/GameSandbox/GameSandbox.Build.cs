@@ -27,6 +27,7 @@ public class GameSandbox : ModuleRules
 			"EnhancedInput",
 			"Slate",
 			"SlateCore",
+			"GameplayAbilities"
 		});
 
 		PublicIncludePaths.AddRange(new[]

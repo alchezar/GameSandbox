@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
@@ -37,8 +38,12 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
+public:
+	_NODISCARD FHitResult GetCursorHit() const { return CursorHit; }
+
 protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
+	void ShiftInputCallback(const FInputActionValue& InputValue, const bool bDown);
 	void CursorTrace();
 	void AutoRun();
 
@@ -64,6 +69,8 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	TObjectPtr<UInputAction> MoveAction = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
+	TObjectPtr<UInputAction> ShiftAction = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Input")
 	UP16InputConfig* InputConfig = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
@@ -82,4 +89,5 @@ private:
 	float      ClickThreshold    = 0.5f;
 	bool       bAutoRunning      = false;
 	bool       bTargeting        = false;
+	bool       bShiftKeyDown     = false;
 };

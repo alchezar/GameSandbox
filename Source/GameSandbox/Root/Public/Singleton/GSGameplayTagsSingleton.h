@@ -40,6 +40,8 @@ struct FP16GameplayTags
 	FGameplayTag Input_Number2;
 	FGameplayTag Input_Number3;
 	FGameplayTag Input_Number4;
+
+	FGameplayTag Event_Montage_Fireball;
 };
 
 ///

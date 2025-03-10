@@ -25,6 +25,13 @@ protected:
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
 
 	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+protected:
+	UFUNCTION(BlueprintCallable, Category = "C++ | Projectile")
+	void SpawnProjectile(const FVector& InTargetLocation);
+
+	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 protected:
