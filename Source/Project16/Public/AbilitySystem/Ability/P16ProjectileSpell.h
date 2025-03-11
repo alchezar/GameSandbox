@@ -37,4 +37,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Class")
 	TSubclassOf<AP16Projectile> ProjectileClass = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Class")
+	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
 };

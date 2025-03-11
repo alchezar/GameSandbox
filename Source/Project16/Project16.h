@@ -12,6 +12,8 @@ namespace P16
 	{
 		constexpr int32 MainOverlay = 0;
 	}
+
+	inline constexpr ECollisionChannel Gecc_Projectile = ECC_GameTraceChannel3;
 }
 
 #define EARLY_RETURN_IF(Condition)              \

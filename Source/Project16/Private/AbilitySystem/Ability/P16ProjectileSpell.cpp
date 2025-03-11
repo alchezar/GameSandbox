@@ -2,8 +2,9 @@
 
 #include "AbilitySystem/Ability/P16ProjectileSpell.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemComponent.h"
 #include "Project16.h"
-#include "Abilities/Async/AbilityAsync_WaitGameplayEvent.h"
 #include "Actor/P16Projectile.h"
 #include "Interface/P16CombatInterface.h"
 
@@ -40,6 +41,10 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
 		Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-	// TODO: Give the projectile a gameplay effect spec for causing damage.
+	if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()))
+	{
+		Projectile->DamageEffectSpecHandle = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), AbilitySystem->MakeEffectContext());
+	}
+
 	Projectile->FinishSpawning(SpawnTransform);
 }

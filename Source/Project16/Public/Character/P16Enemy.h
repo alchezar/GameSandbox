@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "P16CharacterBase.h"
 #include "Interface/P16InterfaceEnemy.h"
+#include "Util/P16Util.h"
 #include "P16Enemy.generated.h"
+
+class UWidgetComponent;
 
 UCLASS()
 class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16InterfaceEnemy
@@ -36,9 +39,23 @@ protected:
 	virtual void InitAbilityActorInfo() override;
 
 	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+private:
+	void InitHealthBar();
+
+	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	UPROPERTY(BlueprintAssignable)
+	FP16OnAttributeChangeSignature OnHealthChanged;
+	UPROPERTY(BlueprintAssignable)
+	FP16OnAttributeChangeSignature OnMaxHealthChanged;
+
 protected:
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UWidgetComponent> HealthBar = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	int32 Level = 1;
 };
