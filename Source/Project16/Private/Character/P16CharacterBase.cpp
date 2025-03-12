@@ -22,6 +22,11 @@ FVector AP16CharacterBase::GetCombatSocketLocation()
 	return Weapon->GetSocketLocation(CombatSocketName);
 }
 
+UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
+{
+	return HitReactMontage.Get();
+}
+
 void AP16CharacterBase::InitAbilityActorInfo()
 {
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent))

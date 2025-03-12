@@ -33,6 +33,10 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute_Vital_Health                    = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Health", "Current amount of health");
 	Singleton.P16Tags.Attribute_Vital_Mana                      = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Mana", "Current amount of mana");
 
+	Singleton.P16Tags.Damage                 = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
+	Singleton.P16Tags.Effect_HitReact        = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
+	Singleton.P16Tags.Event_Montage_Fireball = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
+
 	// Input tags.
 	Singleton.P16Tags.Input_MouseButtonLeft  = Manager.AddNativeGameplayTag("P16.Input.MouseButtonLeft", "Input tag for the left mouse button");
 	Singleton.P16Tags.Input_MouseButtonRight = Manager.AddNativeGameplayTag("P16.Input.MouseButtonRight", "Input tag for the right mouse button");
@@ -40,7 +44,4 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input_Number2          = Manager.AddNativeGameplayTag("P16.Input.Number2", "Input tag for the number 2 button");
 	Singleton.P16Tags.Input_Number3          = Manager.AddNativeGameplayTag("P16.Input.Number3", "Input tag for the number 3 button");
 	Singleton.P16Tags.Input_Number4          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
-
-	// Event tags.
-	Singleton.P16Tags.Event_Montage_Fireball = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
 }

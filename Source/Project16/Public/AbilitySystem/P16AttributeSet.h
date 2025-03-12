@@ -85,6 +85,7 @@ protected:
 
 private:
 	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
+	void                 HandleIncomingDamage(const FP16EffectProperties& Properties);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -177,4 +178,12 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_Mana, BlueprintReadWrite, Category = "C++ | Vital")
 	FGameplayAttributeData Mana;
 	ATTRIBUTE_ACCESSORS(Mana)
+
+	/// ------------------------------------------------------------------------
+	/// @section Meta Attributes.
+	/// ------------------------------------------------------------------------
+
+	UPROPERTY(BlueprintReadOnly, Category = "C++ | Meta")
+	FGameplayAttributeData IncomingDamage;
+	ATTRIBUTE_ACCESSORS(IncomingDamage)
 };

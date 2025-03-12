@@ -22,6 +22,8 @@ public:
 	static UP16AttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent);
 
 private:
 	static FP16WidgetControllerParams GetWidgetControllerParams(const UObject* WorldContextObject);

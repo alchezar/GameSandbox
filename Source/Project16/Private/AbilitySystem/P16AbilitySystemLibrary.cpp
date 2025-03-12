@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Project16.h"
+#include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16CharacterClassInfoDataAsset.h"
 #include "Game/P16GameMode.h"
 #include "Kismet/GameplayStatics.h"
@@ -50,6 +51,19 @@ void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContext
 	ApplyGameplayEffect(AbilitySystemComponent, DefaultInfo.PrimaryAttributes, Level, Avatar);
 	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->SecondaryAttributes, Level, Avatar);
 	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->VitalAttributes, Level, Avatar);
+}
+
+void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent)
+{
+	EARLY_RETURN_IF(!WorldContextObject || !AbilitySystemComponent)
+	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	EARLY_RETURN_IF(!GameMode)
+	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
+	EARLY_RETURN_IF(!ClassInfo)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : ClassInfo->CommonAbilities)
+	{
+		AbilitySystemComponent->GiveAbility({AbilityClass});
+	}
 }
 
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)

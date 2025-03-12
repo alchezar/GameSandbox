@@ -7,6 +7,8 @@
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "AbilitySystem/P16AttributeSet.h"
 #include "Components/WidgetComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 AP16Enemy::AP16Enemy()
 {
@@ -30,7 +32,9 @@ void AP16Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
+	UP16AbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
 	InitHealthBar();
+	InitHitReact();
 }
 
 void AP16Enemy::Tick(const float DeltaTime)
@@ -80,4 +84,19 @@ void AP16Enemy::InitHealthBar()
 	// Broadcast initial values.
 	OnHealthChanged.Broadcast(EnemyAttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(EnemyAttributeSet->GetMaxHealth());
+}
+
+void AP16Enemy::InitHitReact()
+{
+	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+
+	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact)
+		.AddUObject(this, &ThisClass::OnHitReactCallback);
+}
+
+void AP16Enemy::OnHitReactCallback(const FGameplayTag Tag, const int32 Count)
+{
+	bHitReacting = Count > 0;
+
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
 }

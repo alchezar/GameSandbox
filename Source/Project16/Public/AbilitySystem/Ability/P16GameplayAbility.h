@@ -22,4 +22,6 @@ class PROJECT16_API UP16GameplayAbility : public UGameplayAbility
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	FGameplayTag StartupInputTag;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
+	FScalableFloat Damage;
 };

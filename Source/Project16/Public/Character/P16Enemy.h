@@ -44,6 +44,9 @@ protected:
 	/// ------------------------------------------------------------------------
 private:
 	void InitHealthBar();
+	void InitHitReact();
+
+	void OnHitReactCallback(const FGameplayTag Tag, const int32 Count);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -61,4 +64,8 @@ protected:
 	int32 Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
+
+private:
+	bool  bHitReacting  = false;
+	float BaseWalkSpeed = 0.f;
 };

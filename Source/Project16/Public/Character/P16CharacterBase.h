@@ -30,7 +30,8 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
-	virtual FVector GetCombatSocketLocation() override;
+	virtual FVector       GetCombatSocketLocation() override;
+	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -48,10 +49,12 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USkeletalMeshComponent> Weapon = nullptr;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	FName HandSocketName = "P16_Hand";
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	FName CombatSocketName = "TipSocket";
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	TObjectPtr<UAnimMontage> HitReactMontage = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes = nullptr;

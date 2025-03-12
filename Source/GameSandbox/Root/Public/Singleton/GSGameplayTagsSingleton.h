@@ -17,9 +17,9 @@ struct FP16GameplayTags
 {
 	GENERATED_BODY()
 
-	FGameplayTag Attribute_Primary_Strength;
 	FGameplayTag Attribute_Primary_Intelligence;
 	FGameplayTag Attribute_Primary_Resilience;
+	FGameplayTag Attribute_Primary_Strength;
 	FGameplayTag Attribute_Primary_Vigor;
 	FGameplayTag Attribute_Secondary_Armor;
 	FGameplayTag Attribute_Secondary_ArmorPenetration;
@@ -33,15 +33,15 @@ struct FP16GameplayTags
 	FGameplayTag Attribute_Secondary_MaxMana;
 	FGameplayTag Attribute_Vital_Health;
 	FGameplayTag Attribute_Vital_Mana;
-
+	FGameplayTag Damage;
+	FGameplayTag Effect_HitReact;
+	FGameplayTag Event_Montage_Fireball;
 	FGameplayTag Input_MouseButtonLeft;
 	FGameplayTag Input_MouseButtonRight;
 	FGameplayTag Input_Number1;
 	FGameplayTag Input_Number2;
 	FGameplayTag Input_Number3;
 	FGameplayTag Input_Number4;
-
-	FGameplayTag Event_Montage_Fireball;
 };
 
 ///

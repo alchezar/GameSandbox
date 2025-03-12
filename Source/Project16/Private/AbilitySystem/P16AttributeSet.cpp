@@ -5,8 +5,10 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
+#include "Project16.h"
 #include "GameFramework/Character.h"
 #include "Net/UnrealNetwork.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
 void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##PropertyName) const \
@@ -81,7 +83,7 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 {
 	Super::PostGameplayEffectExecute(Data);
 
-	FP16EffectProperties Properties = GetEffectProperties(Data);
+	const FP16EffectProperties Properties = GetEffectProperties(Data);
 
 	// Correct place to clamp attribute values.
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
@@ -91,6 +93,12 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	if (Data.EvaluatedData.Attribute == GetManaAttribute())
 	{
 		SetMana(FMath::Clamp(GetMana(), 0.f, GetMaxMana()));
+	}
+
+	// Using the incoming damage meta attribute to calculate health changes.
+	if (Data.EvaluatedData.Attribute == GetIncomingDamageAttribute())
+	{
+		HandleIncomingDamage(Properties);
 	}
 }
 
@@ -141,4 +149,23 @@ FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffect
 	OutProperties.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OutProperties.TargetAvatarActor.Get());
 
 	return OutProperties;
+}
+
+void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properties)
+{
+	// Remember and reset incoming damage.
+	const float LocalIncomingDamage = GetIncomingDamage();
+	SetIncomingDamage(0.f);
+	EARLY_RETURN_IF(LocalIncomingDamage <= 0.f)
+
+	// Change health attribute.
+	const float NewHealth = GetHealth() - LocalIncomingDamage;
+	SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
+	const bool bFatal = NewHealth <= 0.f;
+	EARLY_RETURN_IF(bFatal)
+
+	// Activate the ability that plays the hit react montage.
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact);
+	Properties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
 }
