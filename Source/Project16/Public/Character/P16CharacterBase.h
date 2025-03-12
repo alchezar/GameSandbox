@@ -37,8 +37,8 @@ public:
 	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo();
+	virtual void InitDefaultAttributes() const;
 
-	void InitDefaultAttributes() const;
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
 	void AddCharacterAbilities() const;
 

@@ -4,6 +4,7 @@
 
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "AbilitySystem/P16AttributeSet.h"
 #include "Components/WidgetComponent.h"
 
@@ -48,6 +49,11 @@ void AP16Enemy::InitAbilityActorInfo()
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 
 	Super::InitAbilityActorInfo();
+}
+
+void AP16Enemy::InitDefaultAttributes() const
+{
+	UP16AbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, AbilitySystemComponent.Get(), Level);
 }
 
 void AP16Enemy::InitHealthBar()

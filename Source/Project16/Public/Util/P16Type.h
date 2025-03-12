@@ -8,6 +8,7 @@
 #include "UI/Widget/P16Widget.h"
 #include "P16Type.generated.h"
 
+class UGameplayEffect;
 class UAbilitySystemComponent;
 class UAttributeSet;
 class UInputAction;
@@ -25,6 +26,14 @@ enum class EP16EffectRemovalPolicy : uint8
 {
 	None = 0 UMETA(DisplayName = "Do not remove"),
 	OnEndOverlap UMETA(DisplayName = "Remove on end overlap"),
+};
+
+UENUM(BlueprintType)
+enum class EP16CharacterClass : uint8
+{
+	Elemental = 0,
+	Warrior,
+	Ranger
 };
 
 USTRUCT(BlueprintType)
@@ -108,4 +117,13 @@ struct FP16InputAction
 	const UInputAction* Action = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag Tag = FGameplayTag{};
+};
+
+USTRUCT(BlueprintType)
+struct FP16CharacterClassDefaultInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayEffect> PrimaryAttributes = nullptr;
 };

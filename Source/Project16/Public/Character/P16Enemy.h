@@ -37,6 +37,7 @@ public:
 	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitDefaultAttributes() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -58,4 +59,6 @@ protected:
 	TObjectPtr<UWidgetComponent> HealthBar = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	int32 Level = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
 };
