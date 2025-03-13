@@ -18,6 +18,7 @@ class PROJECT16_API IP16CombatInterface
 public:
 	virtual int32   GetPlayerLevel() { return 0; }
 	virtual FVector GetCombatSocketLocation() { return FVector::ZeroVector; }
+	virtual void    Die() = 0;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();

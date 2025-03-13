@@ -4,6 +4,7 @@
 
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
+#include "Components/CapsuleComponent.h"
 
 AP16CharacterBase::AP16CharacterBase()
 {
@@ -27,6 +28,12 @@ UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 	return HitReactMontage.Get();
 }
 
+void AP16CharacterBase::Die()
+{
+	Weapon->DetachFromComponent(FDetachmentTransformRules{EDetachmentRule::KeepWorld, true});
+	Multicast_Die();
+}
+
 void AP16CharacterBase::InitAbilityActorInfo()
 {
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent))
@@ -41,6 +48,21 @@ void AP16CharacterBase::InitDefaultAttributes() const
 	ApplyEffectToSelf(DefaultPrimaryAttributes);
 	ApplyEffectToSelf(DefaultSecondaryAttributes);
 	ApplyEffectToSelf(DefaultVitalAttributes);
+}
+
+void AP16CharacterBase::Multicast_Die_Implementation()
+{
+	Weapon->SetSimulatePhysics(true);
+	Weapon->SetEnableGravity(true);
+	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+
+	GetMesh()->SetSimulatePhysics(true);
+	GetMesh()->SetEnableGravity(true);
+	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Dissolve();
 }
 
 void AP16CharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel) const
@@ -62,4 +84,23 @@ void AP16CharacterBase::AddCharacterAbilities() const
 	EARLY_RETURN_IF(!AbilitySystem)
 
 	AbilitySystem->AddCharacterAbilities(StartupAbilities);
+}
+
+void AP16CharacterBase::Dissolve()
+{
+	TArray<UMaterialInstanceDynamic*> DynamicMaterials = {};
+	if (BodyDissolveMaterial)
+	{
+		UMaterialInstanceDynamic* DynamicBodyDissolveMaterial = UMaterialInstanceDynamic::Create(BodyDissolveMaterial.Get(), this);
+		GetMesh()->SetMaterial(0, DynamicBodyDissolveMaterial);
+		DynamicMaterials.Add(DynamicBodyDissolveMaterial);
+	}
+	if (WeaponDissolveMaterial)
+	{
+		UMaterialInstanceDynamic* DynamicWeaponDissolveMaterial = UMaterialInstanceDynamic::Create(WeaponDissolveMaterial.Get(), this);
+		Weapon->SetMaterial(0, DynamicWeaponDissolveMaterial);
+		DynamicMaterials.Add(DynamicWeaponDissolveMaterial);
+	}
+	EARLY_RETURN_IF(DynamicMaterials.IsEmpty());
+	StartDissolveTimeline(DynamicMaterials);
 }

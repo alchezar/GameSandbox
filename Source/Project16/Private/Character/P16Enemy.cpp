@@ -48,6 +48,12 @@ void AP16Enemy::ToggleHighlight(const bool bOn)
 	Weapon->SetRenderCustomDepth(bOn);
 }
 
+void AP16Enemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 void AP16Enemy::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);

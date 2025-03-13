@@ -31,6 +31,7 @@ protected:
 public:
 	virtual void  ToggleHighlight(const bool bOn) override;
 	virtual int32 GetPlayerLevel() override { return Level; };
+	virtual void  Die() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super
@@ -64,6 +65,8 @@ protected:
 	int32 Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	float LifeSpan = 5.f;
 
 private:
 	bool  bHitReacting  = false;

@@ -13,6 +13,7 @@
 #include "Components/SplineComponent.h"
 #include "Interface/P16InterfaceEnemy.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
+#include "UI/Component/P16DamageTextComponent.h"
 
 AP16PlayerController::AP16PlayerController()
 {
@@ -70,6 +71,19 @@ void AP16PlayerController::SetupInputComponent()
 			&ThisClass::AbilityInputTagReleased,
 			&ThisClass::AbilityInputTagHeld);
 	}
+}
+
+void AP16PlayerController::Client_ShowDamageNumber_Implementation(const float InDamage, AActor* Target)
+{
+	EARLY_RETURN_IF(!Target || !DamageTextComponentClass)
+
+	constexpr float MaxOffset    = 50.f;
+	const FVector   RandomOffset = FVector{FMath::RandRange(-MaxOffset, MaxOffset), FMath::RandRange(-MaxOffset, MaxOffset), 0.f};
+
+	UP16DamageTextComponent* DamageText = NewObject<UP16DamageTextComponent>(Target, DamageTextComponentClass);
+	DamageText->RegisterComponent();
+	DamageText->SetWorldLocation(Target->GetActorLocation() + RandomOffset);
+	DamageText->SetDamageText(InDamage);
 }
 
 void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue)

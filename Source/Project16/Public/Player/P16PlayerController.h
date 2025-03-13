@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
+class UP16DamageTextComponent;
 class AP16Character;
 class IP16InterfaceEnemy;
 class UInputAction;
@@ -40,6 +41,9 @@ protected:
 	/// ------------------------------------------------------------------------
 public:
 	_NODISCARD FHitResult GetCursorHit() const { return CursorHit; }
+
+	UFUNCTION(Client, Unreliable)
+	void Client_ShowDamageNumber(const float InDamage, AActor* Target);
 
 protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
@@ -75,6 +79,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	float AutoRunAcceptRadius = 50.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
+	TSubclassOf<UP16DamageTextComponent> DamageTextComponentClass = nullptr;
 
 private:
 	TScriptInterface<IP16InterfaceEnemy> LastTickEnemy = {};

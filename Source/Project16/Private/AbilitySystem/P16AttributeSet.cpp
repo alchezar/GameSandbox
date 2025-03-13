@@ -7,7 +7,9 @@
 #include "GameplayEffectExtension.h"
 #include "Project16.h"
 #include "GameFramework/Character.h"
+#include "Interface/P16CombatInterface.h"
 #include "Net/UnrealNetwork.h"
+#include "Player/P16PlayerController.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
@@ -104,51 +106,35 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 
 FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffectModCallbackData& InData) const
 {
-	FP16EffectProperties OutProperties;
-	OutProperties.EffectContext = InData.EffectSpec.GetContext();
+	FP16EffectProperties Result;
+	Result.EffectContext = InData.EffectSpec.GetContext();
 
 	// Source fields.
-	OutProperties.SourceAbilitySystem = OutProperties.EffectContext.GetOriginalInstigatorAbilitySystemComponent();
-	if (!OutProperties.SourceAbilitySystem || !OutProperties.SourceAbilitySystem->AbilityActorInfo)
+	Result.SourceAbilitySystem = Result.EffectContext.GetOriginalInstigatorAbilitySystemComponent();
+	EARLY_RETURN_VALUE_IF(!Result.SourceAbilitySystem || !Result.SourceAbilitySystem->AbilityActorInfo, Result)
+
+	Result.SourceAvatarActor = Result.SourceAbilitySystem->AbilityActorInfo->AvatarActor.Get();
+	EARLY_RETURN_VALUE_IF(!Result.SourceAvatarActor, Result)
+
+	Result.SourceController = Result.SourceAbilitySystem->AbilityActorInfo->PlayerController.Get();
+	if (!Result.SourceController && Result.SourceAvatarActor; const APawn* SourcePawn = Cast<APawn>(Result.SourceAvatarActor))
 	{
-		return OutProperties;
+		Result.SourceController = SourcePawn->GetController();
 	}
 
-	OutProperties.SourceAvatarActor = OutProperties.SourceAbilitySystem->AbilityActorInfo->AvatarActor.Get();
-	if (!OutProperties.SourceAvatarActor)
-	{
-		return OutProperties;
-	}
+	EARLY_RETURN_VALUE_IF(!Result.SourceController, Result)
 
-	OutProperties.SourceController = OutProperties.SourceAbilitySystem->AbilityActorInfo->PlayerController.Get();
-
-	if (!OutProperties.SourceController && OutProperties.SourceAvatarActor)
-	{
-		if (const APawn* SourcePawn = Cast<APawn>(OutProperties.SourceAvatarActor))
-		{
-			OutProperties.SourceController = SourcePawn->GetController();
-		}
-	}
-
-	if (!OutProperties.SourceController)
-	{
-		return OutProperties;
-	}
-
-	OutProperties.SourceCharacter = Cast<ACharacter>(OutProperties.SourceController->GetPawn());
+	Result.SourceCharacter = Cast<ACharacter>(Result.SourceController->GetPawn());
 
 	// Target fields.
-	if (!InData.Target.AbilityActorInfo || !InData.Target.AbilityActorInfo->AvatarActor.Get())
-	{
-		return OutProperties;
-	}
+	EARLY_RETURN_VALUE_IF(!InData.Target.AbilityActorInfo || !InData.Target.AbilityActorInfo->AvatarActor.Get(), Result)
 
-	OutProperties.TargetAvatarActor   = InData.Target.GetAvatarActor();
-	OutProperties.TargetController    = InData.Target.AbilityActorInfo->PlayerController.Get();
-	OutProperties.TargetCharacter     = Cast<ACharacter>(OutProperties.TargetAvatarActor);
-	OutProperties.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(OutProperties.TargetAvatarActor.Get());
+	Result.TargetAvatarActor   = InData.Target.GetAvatarActor();
+	Result.TargetController    = InData.Target.AbilityActorInfo->PlayerController.Get();
+	Result.TargetCharacter     = Cast<ACharacter>(Result.TargetAvatarActor);
+	Result.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Result.TargetAvatarActor.Get());
 
-	return OutProperties;
+	return Result;
 }
 
 void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properties)
@@ -162,10 +148,32 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 	const float NewHealth = GetHealth() - LocalIncomingDamage;
 	SetHealth(FMath::Clamp(NewHealth, 0.f, GetMaxHealth()));
 	const bool bFatal = NewHealth <= 0.f;
-	EARLY_RETURN_IF(bFatal)
+
+	// Show damage numbers.
+	ShowFloatingText(Properties, LocalIncomingDamage);
 
 	// Activate the ability that plays the hit react montage.
-	FGameplayTagContainer TagContainer;
-	TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact);
-	Properties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
+	if (!bFatal)
+	{
+		FGameplayTagContainer TagContainer;
+		TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact);
+		Properties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
+		return;
+	}
+
+	// Death reaction.
+	const TScriptInterface<IP16CombatInterface> CombatInterface = Properties.TargetAvatarActor.Get();
+	EARLY_RETURN_IF(!CombatInterface)
+	CombatInterface->Die();
+}
+
+void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const
+{
+	const ACharacter* Source = Properties.SourceCharacter;
+	ACharacter*       Target = Properties.TargetCharacter;
+
+	EARLY_RETURN_IF(!Source || !Target || Source == Target)
+	AP16PlayerController* Controller = Source->GetController<AP16PlayerController>();
+	EARLY_RETURN_IF(!Controller)
+	Controller->Client_ShowDamageNumber(InDamage, Target);
 }

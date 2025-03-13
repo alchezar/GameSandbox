@@ -32,6 +32,7 @@ protected:
 public:
 	virtual FVector       GetCombatSocketLocation() override;
 	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
+	virtual void          Die() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -40,8 +41,14 @@ protected:
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultAttributes() const;
 
+	UFUNCTION(NetMulticast, Reliable)
+	virtual void Multicast_Die();
+
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
 	void AddCharacterAbilities() const;
+	void Dissolve();
+	UFUNCTION(BlueprintImplementableEvent)
+	void StartDissolveTimeline(const TArray<UMaterialInstanceDynamic*>& InDynamicMaterials);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -65,6 +72,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Abilities")
 	TArray<TSubclassOf<UP16GameplayAbility>> StartupAbilities = {};
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Dissolve")
+	TObjectPtr<UMaterialInterface> BodyDissolveMaterial = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Dissolve")
+	TObjectPtr<UMaterialInterface> WeaponDissolveMaterial = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
