@@ -39,10 +39,8 @@ UP16AttributeMenuWidgetController* UP16AbilitySystemLibrary::GetAttributeMenuWid
 
 void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level)
 {
-	EARLY_RETURN_IF(!WorldContextObject || !AbilitySystemComponent)
-	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	EARLY_RETURN_IF(!GameMode)
-	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
+	EARLY_RETURN_IF(!WorldContextObject)
+	UP16CharacterClassInfoDataAsset* ClassInfo = GetCharacterClassInfo(WorldContextObject);
 	EARLY_RETURN_IF(!ClassInfo)
 
 	const AActor*                       Avatar      = AbilitySystemComponent->GetAvatarActor();
@@ -55,15 +53,22 @@ void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContext
 
 void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent)
 {
-	EARLY_RETURN_IF(!WorldContextObject || !AbilitySystemComponent)
-	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
-	EARLY_RETURN_IF(!GameMode)
-	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
+	EARLY_RETURN_IF(!AbilitySystemComponent)
+	UP16CharacterClassInfoDataAsset* ClassInfo = GetCharacterClassInfo(WorldContextObject);
 	EARLY_RETURN_IF(!ClassInfo)
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : ClassInfo->CommonAbilities)
 	{
 		AbilitySystemComponent->GiveAbility({AbilityClass});
 	}
+}
+
+UP16CharacterClassInfoDataAsset* UP16AbilitySystemLibrary::GetCharacterClassInfo(const UObject* WorldContextObject)
+{
+	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
+	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	EARLY_RETURN_VALUE_IF(!GameMode, nullptr)
+	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
+	return ClassInfo;
 }
 
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)

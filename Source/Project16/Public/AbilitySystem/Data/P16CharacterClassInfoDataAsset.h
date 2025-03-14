@@ -30,6 +30,8 @@ public:
 	TSubclassOf<UGameplayEffect> VitalAttributes = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Common Class Defaults")
 	TArray<TSubclassOf<UGameplayAbility>> CommonAbilities = {};
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Common Class Defaults | Damage")
+	TObjectPtr<UCurveTable> DamageCalculationCoefficients = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Class Defaults")
 	TMap<EP16CharacterClass, FP16CharacterClassDefaultInfo> CharacterClassInfoMap = {};

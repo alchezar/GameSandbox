@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "AbilitySystem/ModMagCalc/P16MmcMaxMana.h"
+#include "Project16/Public/AbilitySystem/Calculation/P16MmcMaxMana.h"
 
 #include "AbilitySystem/P16AttributeSet.h"
 #include "Interface/P16CombatInterface.h"

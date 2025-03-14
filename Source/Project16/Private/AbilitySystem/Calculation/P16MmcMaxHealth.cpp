@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Public/AbilitySystem/ModMagCalc/P16MmcMaxHealth.h"
+#include "Public/AbilitySystem/Calculation/P16MmcMaxHealth.h"
 
 #include "AbilitySystem/P16AttributeSet.h"
 #include "Interface/P16CombatInterface.h"

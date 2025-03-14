@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16AbilitySystemLibrary.generated.h"
 
+class UP16CharacterClassInfoDataAsset;
 class UP16AttributeMenuWidgetController;
 class UP16OverlayWidgetController;
 
@@ -24,8 +25,10 @@ public:
 	static void InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static UP16CharacterClassInfoDataAsset* GetCharacterClassInfo(const UObject* WorldContextObject);
 
 private:
-	static FP16WidgetControllerParams GetWidgetControllerParams(const UObject* WorldContextObject);
-	static void                       ApplyGameplayEffect(UAbilitySystemComponent* AbilitySystemComponent, const TSubclassOf<UGameplayEffect>& GameplayEffect, const float Level, const AActor* SourceObject);
+	static auto GetWidgetControllerParams(const UObject* WorldContextObject) -> FP16WidgetControllerParams;
+	static void ApplyGameplayEffect(UAbilitySystemComponent* AbilitySystemComponent, const TSubclassOf<UGameplayEffect>& GameplayEffect, const float Level, const AActor* SourceObject);
 };

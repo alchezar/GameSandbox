@@ -11,9 +11,9 @@ class PROJECT16_API UP16DamageTextComponent : public UWidgetComponent
 {
 	GENERATED_BODY()
 
-	/// ┌----------------------------------------------------------------------┐
-	///   @name This
-	/// └----------------------------------------------------------------------┘
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetDamageText(const float Damage);
