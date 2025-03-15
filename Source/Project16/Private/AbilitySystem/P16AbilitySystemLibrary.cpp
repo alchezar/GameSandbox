@@ -4,6 +4,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "Project16.h"
+#include "AbilitySystem/P16GameplayEffectContext.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16CharacterClassInfoDataAsset.h"
 #include "Game/P16GameMode.h"
@@ -69,6 +70,32 @@ UP16CharacterClassInfoDataAsset* UP16AbilitySystemLibrary::GetCharacterClassInfo
 	EARLY_RETURN_VALUE_IF(!GameMode, nullptr)
 	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
 	return ClassInfo;
+}
+
+bool UP16AbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	return Context ? Context->GetIsBlockedHit() : false;
+}
+
+bool UP16AbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	return Context ? Context->GetIsCriticalHit() : false;
+}
+
+void UP16AbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+	Context->SetIsBlockedHit(bNewBlocked);
+}
+
+void UP16AbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+	Context->SetIsCriticalHit(bNewCritical);
 }
 
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)

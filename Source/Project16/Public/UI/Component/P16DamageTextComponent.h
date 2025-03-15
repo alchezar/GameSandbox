@@ -17,4 +17,8 @@ class PROJECT16_API UP16DamageTextComponent : public UWidgetComponent
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetDamageText(const float Damage);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetIsBlockedHit(const bool bBlockedHit);
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetIsCriticalHit(const bool bCriticalHit);
 };

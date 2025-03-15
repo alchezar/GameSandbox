@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectExtension.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interface/P16CombatInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -18,8 +19,7 @@ void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##Property
 	GAMEPLAYATTRIBUTE_REPNOTIFY(ClassName, PropertyName, Old##PropertyName)                 \
 }
 
-UP16AttributeSet::UP16AttributeSet()
-{}
+UP16AttributeSet::UP16AttributeSet() {}
 
 void UP16AttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
@@ -172,8 +172,11 @@ void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, 
 	const ACharacter* Source = Properties.SourceCharacter;
 	ACharacter*       Target = Properties.TargetCharacter;
 
+	const bool bBlockingHit = UP16AbilitySystemLibrary::GetIsBlockedHit(Properties.EffectContext);
+	const bool bCriticalHit = UP16AbilitySystemLibrary::GetIsCriticalHit(Properties.EffectContext);
+
 	EARLY_RETURN_IF(!Source || !Target || Source == Target)
 	AP16PlayerController* Controller = Source->GetController<AP16PlayerController>();
 	EARLY_RETURN_IF(!Controller)
-	Controller->Client_ShowDamageNumber(InDamage, Target);
+	Controller->Client_ShowDamageNumber(InDamage, Target, bBlockingHit, bCriticalHit);
 }

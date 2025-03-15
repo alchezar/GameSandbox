@@ -73,27 +73,30 @@ UP16ExecCalcDamage::UP16ExecCalcDamage()
 void UP16ExecCalcDamage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
 	// Get damage set by Caller magnitude.
-	const FGameplayEffectSpec Spec   = ExecutionParams.GetOwningSpec();
-	float                     Damage = Spec.GetSetByCallerMagnitude(FGSGameplayTagsSingleton::Get().P16Tags.Damage);
+	const FGameplayEffectSpec    Spec          = ExecutionParams.GetOwningSpec();
+	FGameplayEffectContextHandle ContextHandle = Spec.GetContext();
+	float                        Damage        = Spec.GetSetByCallerMagnitude(FGSGameplayTagsSingleton::Get().P16Tags.Damage);
 
 	// Affect damage by modifiers.
 	const FP16ExecutionData ExecutionData{ExecutionParams};
 
-	AffectBlockChance(ExecutionParams, Damage);
+	AffectBlockChance(ExecutionParams, ContextHandle, Damage);
 	AffectArmorAndPenetration(ExecutionParams, ExecutionData, Damage);
-	AffectCriticalHit(ExecutionParams, ExecutionData, Damage);
+	AffectCriticalHit(ExecutionParams, ExecutionData, ContextHandle, Damage);
 
 	// Set incoming damage attribute.
 	const FGameplayModifierEvaluatedData EvaluatedData = {UP16AttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Override, Damage};
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }
 
-void UP16ExecCalcDamage::AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, float& OutDamage) const
+void UP16ExecCalcDamage::AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
 {
 	const float TargetBlockChance = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().BlockChanceDef);
 	EARLY_RETURN_IF(!HasChance(TargetBlockChance))
 
 	OutDamage /= 2.f;
+
+	UP16AbilitySystemLibrary::SetIsBlockedHit(ContextHandle, true);
 }
 
 void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const
@@ -114,7 +117,7 @@ void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomEx
 	OutDamage *= FinalCoefficient;
 }
 
-void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const
+void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
 {
 	const AActor*                               TargetAvatar = ExecutionData.TargetAvatar;
 	const TScriptInterface<IP16CombatInterface> TargetCombat = ExecutionData.TargetCombat;
@@ -129,6 +132,8 @@ void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionP
 
 	OutDamage *= 2.f;
 	OutDamage += CriticalHitDamage;
+
+	UP16AbilitySystemLibrary::SetIsCriticalHit(ContextHandle, true);
 }
 
 FAggregatorEvaluateParameters UP16ExecCalcDamage::GetEvaluateParameters(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const

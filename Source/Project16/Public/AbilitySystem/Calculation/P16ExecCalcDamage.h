@@ -6,6 +6,7 @@
 #include "GameplayEffectExecutionCalculation.h"
 #include "P16ExecCalcDamage.generated.h"
 
+struct FP16GameplayEffectContext;
 class IP16CombatInterface;
 
 /// ----------------------------------------------------------------------------
@@ -50,11 +51,11 @@ public:
 	/// ------------------------------------------------------------------------
 private:
 	/// @brief Capture the block chance on the target and determine if there was a successful block. If so, half the damage.
-	void AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, float& OutDamage) const;
+	void AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Armor penetration ignores a percentage of the target's armor.
 	void AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const;
 	/// @brief Critical hits have a chance to double the damage.
-	void AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const;
+	void AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 
 	auto  GetEvaluateParameters(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const -> FAggregatorEvaluateParameters;
 	bool  HasChance(const float Chance) const;

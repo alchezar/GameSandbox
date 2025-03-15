@@ -27,6 +27,14 @@ public:
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static UP16CharacterClassInfoDataAsset* GetCharacterClassInfo(const UObject* WorldContextObject);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static bool GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static bool GetIsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject) -> FP16WidgetControllerParams;

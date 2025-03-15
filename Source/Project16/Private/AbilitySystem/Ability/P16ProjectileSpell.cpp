@@ -44,7 +44,11 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
 
 	if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()))
 	{
-		const FGameplayEffectSpecHandle SpecHandle   = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), AbilitySystem->MakeEffectContext());
+		FGameplayEffectContextHandle ContextHandle = AbilitySystem->MakeEffectContext();
+		ContextHandle.SetAbility(this);
+		ContextHandle.AddSourceObject(Projectile);
+
+		const FGameplayEffectSpecHandle SpecHandle   = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), ContextHandle);
 		const float                     ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
 		SpecHandle.Data->SetSetByCallerMagnitude(FGSGameplayTagsSingleton::Get().P16Tags.Damage, ScaledDamage);
 

@@ -43,7 +43,7 @@ public:
 	_NODISCARD FHitResult GetCursorHit() const { return CursorHit; }
 
 	UFUNCTION(Client, Unreliable)
-	void Client_ShowDamageNumber(const float InDamage, AActor* Target);
+	void Client_ShowDamageNumber(const float InDamage, AActor* Target, const bool bBlockedHit, const bool bCriticalHit);
 
 protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
