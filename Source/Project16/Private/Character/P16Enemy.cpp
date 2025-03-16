@@ -98,7 +98,7 @@ void AP16Enemy::InitHitReact()
 {
 	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 
-	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact)
+	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Effect.HitReactTag)
 		.AddUObject(this, &ThisClass::OnHitReactCallback);
 }
 

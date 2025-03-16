@@ -221,5 +221,5 @@ UP16AbilitySystemComponent* AP16PlayerController::GetAbilitySystemComponent()
 
 bool AP16PlayerController::GetIsLMB(const FGameplayTag InputTag) const
 {
-	return InputTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Input_MouseButtonLeft);
+	return InputTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Input.MouseButtonLeftTag);
 }

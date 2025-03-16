@@ -107,7 +107,7 @@ void UP16ExecCalcDamage::Execute_Implementation(const FGameplayEffectCustomExecu
 
 	// Search through all damage types.
 	float Damage = 0.f;
-	for (const auto& [DamageTag, ResistanceTag] : FGSGameplayTagsSingleton::Get().P16Tags.DamageTypesToResistances)
+	for (const auto& [DamageTag, ResistanceTag] : FGSGameplayTagsSingleton::Get().P16Tags.Maps.DamageTypesToResistances)
 	{
 		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTag, false);
 		AffectResistance(ExecutionParams, ContextHandle, ResistanceTag, DamageTypeValue);
@@ -133,11 +133,12 @@ void UP16ExecCalcDamage::AffectResistance(const FGameplayEffectCustomExecutionPa
 	// But not with all captured attributes, but only with the ones we really need.
 
 	// clang-format off
+	const auto& ResistanceTags = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Resistance;
 	static TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefinitions = {
-		{FGSGameplayTagsSingleton::Get().P16Tags.Attribute_Resistance_Arcane,    FP16DamageStatics::Get().ArcaneResistanceDef},
-		{FGSGameplayTagsSingleton::Get().P16Tags.Attribute_Resistance_Fire,      FP16DamageStatics::Get().FireResistanceDef},
-		{FGSGameplayTagsSingleton::Get().P16Tags.Attribute_Resistance_Lightning, FP16DamageStatics::Get().LightningResistanceDef},
-		{FGSGameplayTagsSingleton::Get().P16Tags.Attribute_Resistance_Physical,  FP16DamageStatics::Get().PhysicalResistanceDef},
+		{ResistanceTags.ArcaneTag,    FP16DamageStatics::Get().ArcaneResistanceDef},
+		{ResistanceTags.FireTag,      FP16DamageStatics::Get().FireResistanceDef},
+		{ResistanceTags.LightningTag, FP16DamageStatics::Get().LightningResistanceDef},
+		{ResistanceTags.PhysicalTag,  FP16DamageStatics::Get().PhysicalResistanceDef},
 	};
 	// clang-format on
 

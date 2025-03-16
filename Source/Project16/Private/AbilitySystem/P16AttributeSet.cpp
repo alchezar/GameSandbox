@@ -166,7 +166,7 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 	if (!bFatal)
 	{
 		FGameplayTagContainer TagContainer;
-		TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect_HitReact);
+		TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect.HitReactTag);
 		Properties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
 		return;
 	}
