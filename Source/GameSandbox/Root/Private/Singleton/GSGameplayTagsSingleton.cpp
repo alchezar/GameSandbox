@@ -33,7 +33,18 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute_Vital_Health                    = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Health", "Current amount of health");
 	Singleton.P16Tags.Attribute_Vital_Mana                      = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Mana", "Current amount of mana");
 
+	// Resistance tags.
+	Singleton.P16Tags.Attribute_Resistance_Arcane    = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Arcane", "Resistance to Arcane damage");
+	Singleton.P16Tags.Attribute_Resistance_Fire      = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Fire", "Resistance to Fire damage");
+	Singleton.P16Tags.Attribute_Resistance_Lightning = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Lightning", "Resistance to Lightning damage");
+	Singleton.P16Tags.Attribute_Resistance_Physical  = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Physical", "Resistance to Physical damage");
+
+	// Damage tags.
 	Singleton.P16Tags.Damage                 = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
+	Singleton.P16Tags.Damage_Arcane          = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
+	Singleton.P16Tags.Damage_Fire            = Manager.AddNativeGameplayTag("P16.Damage.Fire", "Fire damage type");
+	Singleton.P16Tags.Damage_Lightning       = Manager.AddNativeGameplayTag("P16.Damage.Lightning", "Lightning damage type");
+	Singleton.P16Tags.Damage_Physical        = Manager.AddNativeGameplayTag("P16.Damage.Physical", "Physical damage type");
 	Singleton.P16Tags.Effect_HitReact        = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
 	Singleton.P16Tags.Event_Montage_Fireball = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
 
@@ -44,4 +55,10 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input_Number2          = Manager.AddNativeGameplayTag("P16.Input.Number2", "Input tag for the number 2 button");
 	Singleton.P16Tags.Input_Number3          = Manager.AddNativeGameplayTag("P16.Input.Number3", "Input tag for the number 3 button");
 	Singleton.P16Tags.Input_Number4          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
+
+	// Damage types to resistances map.
+	Singleton.P16Tags.DamageTypesToResistances.Add(Singleton.P16Tags.Damage_Arcane, Singleton.P16Tags.Attribute_Resistance_Arcane);
+	Singleton.P16Tags.DamageTypesToResistances.Add(Singleton.P16Tags.Damage_Fire, Singleton.P16Tags.Attribute_Resistance_Fire);
+	Singleton.P16Tags.DamageTypesToResistances.Add(Singleton.P16Tags.Damage_Lightning, Singleton.P16Tags.Attribute_Resistance_Lightning);
+	Singleton.P16Tags.DamageTypesToResistances.Add(Singleton.P16Tags.Damage_Physical, Singleton.P16Tags.Attribute_Resistance_Physical);
 }

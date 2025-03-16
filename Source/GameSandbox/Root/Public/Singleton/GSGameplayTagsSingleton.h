@@ -33,7 +33,18 @@ struct FP16GameplayTags
 	FGameplayTag Attribute_Secondary_MaxMana;
 	FGameplayTag Attribute_Vital_Health;
 	FGameplayTag Attribute_Vital_Mana;
+
+	FGameplayTag Attribute_Resistance_Arcane;
+	FGameplayTag Attribute_Resistance_Fire;
+	FGameplayTag Attribute_Resistance_Lightning;
+	FGameplayTag Attribute_Resistance_Physical;
+
 	FGameplayTag Damage;
+	FGameplayTag Damage_Arcane;
+	FGameplayTag Damage_Fire;
+	FGameplayTag Damage_Lightning;
+	FGameplayTag Damage_Physical;
+
 	FGameplayTag Effect_HitReact;
 	FGameplayTag Event_Montage_Fireball;
 	FGameplayTag Input_MouseButtonLeft;
@@ -42,6 +53,8 @@ struct FP16GameplayTags
 	FGameplayTag Input_Number2;
 	FGameplayTag Input_Number3;
 	FGameplayTag Input_Number4;
+
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
 };
 
 ///

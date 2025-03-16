@@ -47,7 +47,12 @@ void AP16Projectile::Destroyed()
 
 void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	PlayEffects();
+	EARLY_RETURN_IF(DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data->GetContext().GetEffectCauser() == OtherActor)
+
+	if (!bHit)
+	{
+		PlayEffects();
+	}
 
 	if (HasAuthority())
 	{
@@ -65,7 +70,10 @@ void AP16Projectile::PlayEffects() const
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound.Get(), GetActorLocation());
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect.Get(), GetActorLocation());
 
-	LoopingSoundComp->Stop();
+	if (LoopingSoundComp)
+	{
+		LoopingSoundComp->Stop();
+	}
 }
 
 void AP16Projectile::ApplyDamageTo(AActor* Target) const

@@ -32,7 +32,10 @@ void AP16Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 	InitAbilityActorInfo();
-	UP16AbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	if (HasAuthority())
+	{
+		UP16AbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+	}
 	InitHealthBar();
 	InitHitReact();
 }
@@ -57,6 +60,7 @@ void AP16Enemy::Die()
 void AP16Enemy::InitAbilityActorInfo()
 {
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
+	EARLY_RETURN_IF(!HasAuthority())
 
 	Super::InitAbilityActorInfo();
 }
@@ -77,13 +81,11 @@ void AP16Enemy::InitHealthBar()
 	const UP16AttributeSet* EnemyAttributeSet = Cast<UP16AttributeSet>(AttributeSet);
 	EARLY_RETURN_IF(!EnemyAttributeSet)
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EnemyAttributeSet->GetHealthAttribute())
-		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void
-		{
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void {
 			OnHealthChanged.Broadcast(Data.NewValue);
 		});
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EnemyAttributeSet->GetMaxHealthAttribute())
-		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void
-		{
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void {
 			OnMaxHealthChanged.Broadcast(Data.NewValue);
 		});
 

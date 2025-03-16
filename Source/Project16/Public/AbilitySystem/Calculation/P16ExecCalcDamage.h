@@ -50,6 +50,8 @@ public:
 	/// @name This
 	/// ------------------------------------------------------------------------
 private:
+	/// @brief Apply resistance to each damage type.
+	void AffectResistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, const FGameplayTag& ResistanceTag, float& OutDamage) const;
 	/// @brief Capture the block chance on the target and determine if there was a successful block. If so, half the damage.
 	void AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Armor penetration ignores a percentage of the target's armor.
@@ -57,7 +59,6 @@ private:
 	/// @brief Critical hits have a chance to double the damage.
 	void AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 
-	auto  GetEvaluateParameters(const FGameplayEffectCustomExecutionParameters& ExecutionParams) const -> FAggregatorEvaluateParameters;
 	bool  HasChance(const float Chance) const;
 	float GetAttributeMagnitude(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectAttributeCaptureDefinition& InCaptureDef) const;
 	float GetCoefficient(const UObject* WorldContextObject, const FName RowName, const float Level, const float DefaultValue = 1.f) const;

@@ -7,7 +7,6 @@
 #include "Project16.h"
 #include "Actor/P16Projectile.h"
 #include "Interface/P16CombatInterface.h"
-#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 void UP16ProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -48,9 +47,12 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
 		ContextHandle.SetAbility(this);
 		ContextHandle.AddSourceObject(Projectile);
 
-		const FGameplayEffectSpecHandle SpecHandle   = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), ContextHandle);
-		const float                     ScaledDamage = Damage.GetValueAtLevel(GetAbilityLevel());
-		SpecHandle.Data->SetSetByCallerMagnitude(FGSGameplayTagsSingleton::Get().P16Tags.Damage, ScaledDamage);
+		const FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), ContextHandle);
+		for (const auto& [DamageTag, ScalableFloat] : DamageTypes)
+		{
+			const float Magnitude = ScalableFloat.GetValueAtLevel(GetAbilityLevel());
+			SpecHandle.Data->SetSetByCallerMagnitude(DamageTag, Magnitude);
+		}
 
 		Projectile->DamageEffectSpecHandle = SpecHandle;
 	}

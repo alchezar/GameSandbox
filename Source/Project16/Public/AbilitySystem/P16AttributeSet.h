@@ -83,6 +83,15 @@ protected:
 	UFUNCTION()
 	void OnRep_Mana(const FGameplayAttributeData& OldMana) const;
 
+	UFUNCTION()
+	void OnRep_ArcaneResistance(const FGameplayAttributeData& OldArcaneResistance) const;
+	UFUNCTION()
+	void OnRep_FireResistance(const FGameplayAttributeData& OldFireResistance) const;
+	UFUNCTION()
+	void OnRep_LightningResistance(const FGameplayAttributeData& OldLightningResistance) const;
+	UFUNCTION()
+	void OnRep_PhysicalResistance(const FGameplayAttributeData& OldPhysicalResistance) const;
+
 private:
 	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
 	void                 HandleIncomingDamage(const FP16EffectProperties& Properties);
@@ -167,6 +176,26 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_MaxMana, BlueprintReadWrite, Category = "C++ | Secondary")
 	FGameplayAttributeData MaxMana;
 	ATTRIBUTE_ACCESSORS(MaxMana)
+
+	/// ------------------------------------------------------------------------
+	/// @section Resistance Attributes.
+	/// ------------------------------------------------------------------------
+
+	UPROPERTY(ReplicatedUsing = OnRep_ArcaneResistance, BlueprintReadWrite, Category = "C++ | Resistance")
+	FGameplayAttributeData ArcaneResistance;
+	ATTRIBUTE_ACCESSORS(ArcaneResistance)
+
+	UPROPERTY(ReplicatedUsing = OnRep_FireResistance, BlueprintReadWrite, Category = "C++ | Resistance")
+	FGameplayAttributeData FireResistance;
+	ATTRIBUTE_ACCESSORS(FireResistance)
+
+	UPROPERTY(ReplicatedUsing = OnRep_LightningResistance, BlueprintReadWrite, Category = "C++ | Resistance")
+	FGameplayAttributeData LightningResistance;
+	ATTRIBUTE_ACCESSORS(LightningResistance)
+
+	UPROPERTY(ReplicatedUsing = OnRep_PhysicalResistance, BlueprintReadWrite, Category = "C++ | Resistance")
+	FGameplayAttributeData PhysicalResistance;
+	ATTRIBUTE_ACCESSORS(PhysicalResistance)
 
 	/// ------------------------------------------------------------------------
 	/// @section Vital Attributes.

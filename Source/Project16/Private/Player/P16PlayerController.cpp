@@ -75,7 +75,7 @@ void AP16PlayerController::SetupInputComponent()
 
 void AP16PlayerController::Client_ShowDamageNumber_Implementation(const float InDamage, AActor* Target, const bool bBlockedHit, const bool bCriticalHit)
 {
-	EARLY_RETURN_IF(!Target || !DamageTextComponentClass)
+	EARLY_RETURN_IF(!Target || !DamageTextComponentClass || !IsLocalController())
 
 	constexpr float MaxOffset    = 50.f;
 	const FVector   RandomOffset = FVector{FMath::RandRange(-MaxOffset, MaxOffset), FMath::RandRange(-MaxOffset, MaxOffset), 0.f};
@@ -83,9 +83,7 @@ void AP16PlayerController::Client_ShowDamageNumber_Implementation(const float In
 	UP16DamageTextComponent* DamageText = NewObject<UP16DamageTextComponent>(Target, DamageTextComponentClass);
 	DamageText->RegisterComponent();
 	DamageText->SetWorldLocation(Target->GetActorLocation() + RandomOffset);
-	DamageText->SetDamageText(InDamage);
-	DamageText->SetIsBlockedHit(bBlockedHit);
-	DamageText->SetIsCriticalHit(bCriticalHit);
+	DamageText->SetDamageText(InDamage, bBlockedHit, bCriticalHit);
 }
 
 void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue)
