@@ -14,7 +14,12 @@ namespace P16
 	}
 
 	inline constexpr ECollisionChannel Gecc_Projectile = ECC_GameTraceChannel3;
-}
+
+	namespace Tag
+	{
+		inline const FName Enemy  = "Enemy";
+		inline const FName Player = "Player";
+	}}
 
 #define EARLY_RETURN_IF(Condition)              \
 if (Condition) _UNLIKELY                        \

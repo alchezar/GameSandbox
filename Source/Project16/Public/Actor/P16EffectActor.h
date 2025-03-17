@@ -54,7 +54,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect", meta = (EditCondition = "bInfinite", EditConditionHides))
 	EP16EffectRemovalPolicy RemovalPolicy = EP16EffectRemovalPolicy::None;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect", meta = (EditCondition = "bInfinite", EditConditionHides))
-	bool bDestroyOnEffectRemoval = false;
+	bool bDestroyOnApplication = false;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect")
+	bool bAffectEnemies = false;
 
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectsMap;
 };

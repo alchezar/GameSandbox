@@ -46,6 +46,9 @@ void AP16EffectActor::OnEndOverlap(AActor* TargetActor)
 
 void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass)
 {
+	// Ignore enemies if not allowed.
+	EARLY_RETURN_IF(!TargetActor || (TargetActor->ActorHasTag(P16::Tag::Enemy) && !bAffectEnemies))
+
 	// Ignore actors without ability system component.
 	UAbilitySystemComponent* TargetAbilityComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	EARLY_RETURN_IF(!TargetAbilityComponent)
@@ -94,7 +97,7 @@ void AP16EffectActor::RemoveActiveGameplayEffect(AActor* TargetActor)
 	}
 
 	// Destroy infinite effect actor on successful removal.
-	if (bDestroyOnEffectRemoval)
+	if (bDestroyOnApplication)
 	{
 		Destroy();
 	}

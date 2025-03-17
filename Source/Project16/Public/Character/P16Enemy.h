@@ -8,6 +8,8 @@
 #include "Util/P16Util.h"
 #include "P16Enemy.generated.h"
 
+class AP16AIController;
+class UBehaviorTree;
 class UWidgetComponent;
 
 UCLASS()
@@ -20,6 +22,7 @@ class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16InterfaceEn
 	/// ------------------------------------------------------------------------
 public:
 	AP16Enemy();
+	virtual void PossessedBy(AController* NewController) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -67,8 +70,13 @@ protected:
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	float LifeSpan = 5.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI")
+	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
 
 private:
+	UPROPERTY()
+	TObjectPtr<AP16AIController> AIController = nullptr;
+
 	bool  bHitReacting  = false;
 	float BaseWalkSpeed = 0.f;
 };

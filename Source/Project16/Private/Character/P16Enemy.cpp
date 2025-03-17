@@ -6,6 +6,9 @@
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "AbilitySystem/P16AttributeSet.h"
+#include "AI/P16AIController.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardComponent.h"
 #include "Components/WidgetComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
@@ -13,6 +16,12 @@
 AP16Enemy::AP16Enemy()
 {
 	PrimaryActorTick.bCanEverTick = true;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw   = false;
+	bUseControllerRotationRoll  = false;
+
+	GetCharacterMovement()->bUseControllerDesiredRotation = true;
 
 	// For enemies highlight on hover.
 	GetMesh()->SetCustomDepthStencilValue(P16::CustomDepthRed);
@@ -26,6 +35,20 @@ AP16Enemy::AP16Enemy()
 
 	HealthBar = CreateDefaultSubobject<UWidgetComponent>("HealthBarWidgetComponent");
 	HealthBar->SetupAttachment(GetRootComponent());
+}
+
+void AP16Enemy::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	EARLY_RETURN_IF(!HasAuthority())
+	AIController                              = Cast<AP16AIController>(NewController);
+	UBlackboardComponent* BlackboardComponent = AIController->GetBlackboardComponent();
+	EARLY_RETURN_IF(!BlackboardComponent)
+	BlackboardComponent->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	AIController->RunBehaviorTree(BehaviorTree);
+	BlackboardComponent->SetValueAsBool("HitReacting", false);
+	BlackboardComponent->SetValueAsBool("RangeAttacker", CharacterClass != EP16CharacterClass::Warrior);
 }
 
 void AP16Enemy::BeginPlay()
@@ -107,4 +130,5 @@ void AP16Enemy::OnHitReactCallback(const FGameplayTag Tag, const int32 Count)
 	bHitReacting = Count > 0;
 
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	AIController->GetBlackboardComponent()->SetValueAsBool("HitReacting", bHitReacting);
 }
