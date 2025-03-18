@@ -8,6 +8,7 @@
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16CharacterClassInfoDataAsset.h"
 #include "Game/P16GameMode.h"
+#include "Interface/P16CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/P16PlayerState.h"
 #include "UI/HUD/P16HUD.h"
@@ -52,14 +53,24 @@ void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContext
 	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->VitalAttributes, Level, Avatar);
 }
 
-void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent)
+void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, const EP16CharacterClass CharacterClass)
 {
+	// Add common abilities.
 	EARLY_RETURN_IF(!AbilitySystemComponent)
 	UP16CharacterClassInfoDataAsset* ClassInfo = GetCharacterClassInfo(WorldContextObject);
 	EARLY_RETURN_IF(!ClassInfo)
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : ClassInfo->CommonAbilities)
 	{
 		AbilitySystemComponent->GiveAbility({AbilityClass});
+	}
+
+	// Add character class specific abilities.
+	EARLY_RETURN_IF(!ClassInfo->CharacterClassInfoMap.Contains(CharacterClass))
+	const TScriptInterface<IP16CombatInterface> CombatInterface = AbilitySystemComponent->GetAvatarActor();
+	EARLY_RETURN_IF(!CombatInterface)
+	for (const TSubclassOf<UGameplayAbility>& AbilityClass : ClassInfo->GetClassDefaultInfo(CharacterClass).StartupAbilities)
+	{
+		AbilitySystemComponent->GiveAbility({AbilityClass, CombatInterface->GetPlayerLevel()});
 	}
 }
 

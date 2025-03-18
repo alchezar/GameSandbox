@@ -58,6 +58,14 @@ struct FP16GameplayTags
 */
 
 USTRUCT(BlueprintType)
+struct FP16TagAbility
+{
+	GENERATED_BODY()
+
+	FGameplayTag AttackTag;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagAttributePrimary
 {
 	GENERATED_BODY()
@@ -179,6 +187,7 @@ struct FP16Tags
 {
 	GENERATED_BODY()
 
+	FP16TagAbility         Ability;
 	FP16TagAttribute       Attribute;
 	FP16TagAttributeDamage Damage;
 	FP16TagEffect          Effect;

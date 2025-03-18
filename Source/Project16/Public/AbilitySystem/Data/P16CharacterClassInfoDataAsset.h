@@ -18,7 +18,7 @@ class PROJECT16_API UP16CharacterClassInfoDataAsset : public UDataAsset
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	FP16CharacterClassDefaultInfo GetClassDefaultInfo(EP16CharacterClass CharacterClass);
+	FP16CharacterClassDefaultInfo GetClassDefaultInfo(const EP16CharacterClass CharacterClass);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

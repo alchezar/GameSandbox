@@ -57,7 +57,7 @@ void AP16Enemy::BeginPlay()
 	InitAbilityActorInfo();
 	if (HasAuthority())
 	{
-		UP16AbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent);
+		UP16AbilitySystemLibrary::GiveStartupAbilities(this, AbilitySystemComponent, CharacterClass);
 	}
 	InitHealthBar();
 	InitHitReact();
@@ -68,16 +68,26 @@ void AP16Enemy::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+void AP16Enemy::Die()
+{
+	SetLifeSpan(LifeSpan);
+	Super::Die();
+}
+
 void AP16Enemy::ToggleHighlight(const bool bOn)
 {
 	GetMesh()->SetRenderCustomDepth(bOn);
 	Weapon->SetRenderCustomDepth(bOn);
 }
 
-void AP16Enemy::Die()
+AActor* AP16Enemy::GetCombatTarget_Implementation() const
 {
-	SetLifeSpan(LifeSpan);
-	Super::Die();
+	return CombatTarget;
+}
+
+void AP16Enemy::SetCombatTarget_Implementation(AActor* InCombatTarget)
+{
+	CombatTarget = InCombatTarget;
 }
 
 void AP16Enemy::InitAbilityActorInfo()

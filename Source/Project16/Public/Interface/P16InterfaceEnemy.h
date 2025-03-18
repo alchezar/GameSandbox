@@ -18,4 +18,9 @@ class PROJECT16_API IP16InterfaceEnemy
 
 public:
 	virtual void ToggleHighlight(const bool bOn) = 0;
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	void SetCombatTarget(AActor* InCombatTarget);
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
+	AActor* GetCombatTarget() const;
 };

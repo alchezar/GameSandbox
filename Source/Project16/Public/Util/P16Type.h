@@ -126,4 +126,6 @@ struct FP16CharacterClassDefaultInfo
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TSubclassOf<UGameplayEffect> PrimaryAttributes = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities = {};
 };

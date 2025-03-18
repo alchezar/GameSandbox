@@ -32,9 +32,12 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
-	virtual void  ToggleHighlight(const bool bOn) override;
 	virtual int32 GetPlayerLevel() override { return Level; };
 	virtual void  Die() override;
+
+	virtual void    ToggleHighlight(const bool bOn) override;
+	virtual AActor* GetCombatTarget_Implementation() const override;
+	virtual void    SetCombatTarget_Implementation(AActor* InCombatTarget) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super
@@ -72,6 +75,8 @@ protected:
 	float LifeSpan = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Combat")
+	TObjectPtr<AActor> CombatTarget = nullptr;
 
 private:
 	UPROPERTY()

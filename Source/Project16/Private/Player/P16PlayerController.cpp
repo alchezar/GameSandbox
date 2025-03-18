@@ -174,7 +174,7 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 		Spline->AddSplinePoint(PathPoint, ESplineCoordinateSpace::World, false);
 		CachedDestination = PathPoint;
 	}
-	bAutoRunning = true;
+	bAutoRunning = !NavPath->PathPoints.IsEmpty();
 }
 
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)

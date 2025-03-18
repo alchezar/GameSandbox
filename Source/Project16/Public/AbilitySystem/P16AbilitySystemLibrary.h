@@ -24,7 +24,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level);
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent);
+	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, const EP16CharacterClass CharacterClass);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static UP16CharacterClassInfoDataAsset* GetCharacterClassInfo(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++")
