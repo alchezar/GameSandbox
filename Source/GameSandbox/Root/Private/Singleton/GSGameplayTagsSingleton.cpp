@@ -43,13 +43,22 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute.Resistance.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Physical", "Resistance to Physical damage");
 
 	// Damage tags.
-	Singleton.P16Tags.Damage.Tag                = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
-	Singleton.P16Tags.Damage.ArcaneTag          = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
-	Singleton.P16Tags.Damage.FireTag            = Manager.AddNativeGameplayTag("P16.Damage.Fire", "Fire damage type");
-	Singleton.P16Tags.Damage.LightningTag       = Manager.AddNativeGameplayTag("P16.Damage.Lightning", "Lightning damage type");
-	Singleton.P16Tags.Damage.PhysicalTag        = Manager.AddNativeGameplayTag("P16.Damage.Physical", "Physical damage type");
-	Singleton.P16Tags.Effect.HitReactTag        = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
+	Singleton.P16Tags.Damage.Tag          = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
+	Singleton.P16Tags.Damage.ArcaneTag    = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
+	Singleton.P16Tags.Damage.FireTag      = Manager.AddNativeGameplayTag("P16.Damage.Fire", "Fire damage type");
+	Singleton.P16Tags.Damage.LightningTag = Manager.AddNativeGameplayTag("P16.Damage.Lightning", "Lightning damage type");
+	Singleton.P16Tags.Damage.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Damage.Physical", "Physical damage type");
+
+	// Effect tags.
+	Singleton.P16Tags.Effect.HitReactTag = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
+
+	// Event tags.
 	Singleton.P16Tags.Event.Montage.FireballTag = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
+
+	// Montage tags.
+	Singleton.P16Tags.Montage.Attack.WeaponTag    = Manager.AddNativeGameplayTag("P16.Montage.Attack.Weapon", "Event tag for the weapon attack montage");
+	Singleton.P16Tags.Montage.Attack.LeftHandTag  = Manager.AddNativeGameplayTag("P16.Montage.Attack.LeftHand", "Event tag for the leftHand attack montage");
+	Singleton.P16Tags.Montage.Attack.RightHandTag = Manager.AddNativeGameplayTag("P16.Montage.Attack.RightHand", "Event tag for the rightHand attack montage");
 
 	// Input tags.
 	Singleton.P16Tags.Input.MouseButtonLeftTag  = Manager.AddNativeGameplayTag("P16.Input.MouseButtonLeft", "Input tag for the left mouse button");

@@ -140,5 +140,7 @@ void AP16Enemy::OnHitReactCallback(const FGameplayTag Tag, const int32 Count)
 	bHitReacting = Count > 0;
 
 	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	EARLY_RETURN_IF(!AIController || !AIController->GetBlackboardComponent())
+
 	AIController->GetBlackboardComponent()->SetValueAsBool("HitReacting", bHitReacting);
 }

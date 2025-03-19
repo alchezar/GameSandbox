@@ -109,6 +109,29 @@ void UP16AbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& Ef
 	Context->SetIsCriticalHit(bNewCritical);
 }
 
+TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin)
+{
+	EARLY_RETURN_VALUE_IF(!WorldContextObject, TArray<AActor*>{})
+	const UWorld* World = WorldContextObject->GetWorld();
+	EARLY_RETURN_VALUE_IF(!World, TArray<AActor*>{})
+
+	FCollisionQueryParams SphereParams{};
+	SphereParams.AddIgnoredActors(IgnoredActors);
+
+	TArray<FOverlapResult> OverlapResults{};
+	World->OverlapMultiByObjectType(OverlapResults, SphereOrigin, FQuat::Identity, {{FCollisionObjectQueryParams::InitType::AllDynamicObjects}}, FCollisionShape::MakeSphere(Radius), SphereParams);
+
+	TArray<AActor*> Result = {};
+	for (const FOverlapResult& OverlapResult : OverlapResults)
+	{
+		AActor* Actor = OverlapResult.GetActor();
+		CONTINUE_IF(!Actor->Implements<UP16CombatInterface>() || IP16CombatInterface::Execute_GetIsDead(Actor))
+
+		Result.AddUnique(Actor);
+	}
+	return Result;
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)
 {
 	FP16WidgetControllerParams Result = {};

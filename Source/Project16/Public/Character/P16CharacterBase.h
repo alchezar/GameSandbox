@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Interface/P16CombatInterface.h"
+#include "Util/P16Type.h"
 #include "P16CharacterBase.generated.h"
 
 class UP16GameplayAbility;
@@ -30,9 +31,12 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
-	virtual FVector       GetCombatSocketLocation() override;
-	virtual UAnimMontage* GetHitReactMontage_Implementation() override;
-	virtual void          Die() override;
+	virtual UAnimMontage*             GetHitReactMontage_Implementation() override;
+	virtual void                      Die() override;
+	virtual FVector                   GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
+	virtual bool                      GetIsDead_Implementation() const override;
+	virtual AActor*                   GetAvatar_Implementation() override;
+	virtual TArray<FP16TaggedMontage> GetAttackMontages_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -59,9 +63,11 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	FName HandSocketName = "P16_Hand";
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
-	FName CombatSocketName = "TipSocket";
+	TMap<FGameplayTag, FName> CombatSocketNameMap = {};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	TObjectPtr<UAnimMontage> HitReactMontage = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	TArray<FP16TaggedMontage> AttackMontages = {};
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Attributes")
 	TSubclassOf<UGameplayEffect> DefaultPrimaryAttributes = nullptr;
@@ -82,4 +88,8 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+
+private:
+	bool bDead = false;
+
 };

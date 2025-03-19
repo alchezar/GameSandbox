@@ -186,7 +186,12 @@ void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, 
 	const bool bCriticalHit = UP16AbilitySystemLibrary::GetIsCriticalHit(Properties.EffectContext);
 
 	EARLY_RETURN_IF(!Source || !Target || Source == Target)
-	AP16PlayerController* Controller = Source->GetController<AP16PlayerController>();
-	EARLY_RETURN_IF(!Controller)
-	Controller->Client_ShowDamageNumber(InDamage, Target, bBlockingHit, bCriticalHit);
+	if (AP16PlayerController* SourceController = Source->GetController<AP16PlayerController>())
+	{
+		SourceController->Client_ShowDamageNumber(InDamage, Target, bBlockingHit, bCriticalHit);
+	}
+	if (AP16PlayerController* TargetController = Target->GetController<AP16PlayerController>())
+	{
+		TargetController->Client_ShowDamageNumber(InDamage, Target, bBlockingHit, bCriticalHit);
+	}
 }

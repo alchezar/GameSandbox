@@ -17,6 +17,13 @@ class PROJECT16_API UP16DamageGameplayAbility : public UP16GameplayAbility
 	GENERATED_BODY()
 
 	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
+	UFUNCTION(BlueprintCallable)
+	void CauseDamage(AActor* TargetActor);
+
+	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 protected:

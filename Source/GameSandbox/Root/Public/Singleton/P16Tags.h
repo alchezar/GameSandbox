@@ -162,6 +162,24 @@ struct FP16TagEvent
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagMontageAttack
+{
+	GENERATED_BODY()
+
+	FGameplayTag WeaponTag;
+	FGameplayTag LeftHandTag;
+	FGameplayTag RightHandTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagMontage
+{
+	GENERATED_BODY()
+
+	FP16TagMontageAttack Attack;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagInput
 {
 	GENERATED_BODY()
@@ -192,6 +210,7 @@ struct FP16Tags
 	FP16TagAttributeDamage Damage;
 	FP16TagEffect          Effect;
 	FP16TagEvent           Event;
+	FP16TagMontage         Montage;
 	FP16TagInput           Input;
 
 	FP16TagMaps Maps;

@@ -35,6 +35,8 @@ public:
 	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static TArray<AActor*> GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject) -> FP16WidgetControllerParams;

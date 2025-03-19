@@ -7,6 +7,7 @@
 #include "Project16.h"
 #include "Actor/P16Projectile.h"
 #include "Interface/P16CombatInterface.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 void UP16ProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -24,9 +25,9 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
 	EARLY_RETURN_IF(!bServer)
 
 	FTransform SpawnTransform = FTransform::Identity;
-	if (const TScriptInterface<IP16CombatInterface> CombatInterface = GetAvatarActorFromActorInfo())
+	if (GetAvatarActorFromActorInfo()->Implements<UP16CombatInterface>())
 	{
-		const FVector SocketLocation = CombatInterface->GetCombatSocketLocation();
+		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FGSGameplayTagsSingleton::Get().P16Tags.Montage.Attack.WeaponTag);
 		FRotator      Rotation       = (InTargetLocation - SocketLocation).Rotation();
 		Rotation.Pitch               = 0.f;
 

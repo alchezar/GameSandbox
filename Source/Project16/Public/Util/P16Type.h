@@ -129,3 +129,14 @@ struct FP16CharacterClassDefaultInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities = {};
 };
+
+USTRUCT(BlueprintType)
+struct FP16TaggedMontage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag Tag = {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<UAnimMontage> Montage = nullptr;
+};
