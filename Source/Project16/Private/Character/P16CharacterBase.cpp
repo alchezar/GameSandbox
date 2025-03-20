@@ -65,7 +65,10 @@ UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 
 void AP16CharacterBase::Die()
 {
-	Weapon->DetachFromComponent(FDetachmentTransformRules{EDetachmentRule::KeepWorld, true});
+	if (Weapon)
+	{
+		Weapon->DetachFromComponent(FDetachmentTransformRules{EDetachmentRule::KeepWorld, true});
+	}
 	Multicast_Die();
 }
 
@@ -87,9 +90,12 @@ void AP16CharacterBase::InitDefaultAttributes() const
 
 void AP16CharacterBase::Multicast_Die_Implementation()
 {
-	Weapon->SetSimulatePhysics(true);
-	Weapon->SetEnableGravity(true);
-	Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	if (Weapon)
+	{
+		Weapon->SetSimulatePhysics(true);
+		Weapon->SetEnableGravity(true);
+		Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	}
 
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);

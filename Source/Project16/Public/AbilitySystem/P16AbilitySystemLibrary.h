@@ -37,6 +37,8 @@ public:
 	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static TArray<AActor*> GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static bool GetIsNotFriends(const AActor* First, const AActor* Second);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject) -> FP16WidgetControllerParams;

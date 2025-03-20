@@ -132,6 +132,18 @@ TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObje
 	return Result;
 }
 
+bool UP16AbilitySystemLibrary::GetIsNotFriends(const AActor* First, const AActor* Second)
+{
+	EARLY_RETURN_VALUE_IF(!First || !Second, false)
+
+	const bool bFirstPlayer  = First->ActorHasTag(P16::Tag::Player);
+	const bool bSecondPlayer = Second->ActorHasTag(P16::Tag::Player);
+	const bool bFriends      = bFirstPlayer == bSecondPlayer;
+	const bool bEnemies      = bFirstPlayer != bSecondPlayer;
+
+	return !bFriends || bEnemies;
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)
 {
 	FP16WidgetControllerParams Result = {};
