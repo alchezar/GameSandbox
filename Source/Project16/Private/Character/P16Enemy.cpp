@@ -71,6 +71,10 @@ void AP16Enemy::Tick(const float DeltaTime)
 void AP16Enemy::Die()
 {
 	SetLifeSpan(LifeSpan);
+	if (AIController)
+	{
+		AIController->GetBlackboardComponent()->SetValueAsBool("Dead", true);
+	}
 	Super::Die();
 }
 
