@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "NiagaraFunctionLibrary.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
@@ -48,6 +49,7 @@ void AP16Projectile::Destroyed()
 void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	EARLY_RETURN_IF(DamageEffectSpecHandle.Data.IsValid() && DamageEffectSpecHandle.Data->GetContext().GetEffectCauser() == OtherActor)
+	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(OtherActor, DamageEffectSpecHandle.Data->GetContext().GetEffectCauser()))
 
 	if (!bHit)
 	{

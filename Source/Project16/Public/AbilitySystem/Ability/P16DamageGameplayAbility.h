@@ -6,6 +6,8 @@
 #include "P16GameplayAbility.h"
 #include "P16DamageGameplayAbility.generated.h"
 
+struct FP16TaggedMontage;
+
 /// ----------------------------------------------------------------------------
 /// @class   UP16DamageGameplayAbility
 /// @brief   Represents a damage gameplay ability class.
@@ -22,6 +24,9 @@ class PROJECT16_API UP16DamageGameplayAbility : public UP16GameplayAbility
 public:
 	UFUNCTION(BlueprintCallable)
 	void CauseDamage(AActor* TargetActor);
+
+	UFUNCTION(BlueprintPure)
+	static FP16TaggedMontage GetRandomTaggedMontageFrom(const TArray<FP16TaggedMontage>& Montages);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
