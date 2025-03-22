@@ -8,6 +8,7 @@
 #include "Util/P16Type.h"
 #include "P16CharacterBase.generated.h"
 
+class UNiagaraSystem;
 class UP16GameplayAbility;
 class UGameplayEffect;
 class UAttributeSet;
@@ -37,6 +38,8 @@ public:
 	virtual bool                      GetIsDead_Implementation() const override;
 	virtual AActor*                   GetAvatar_Implementation() override;
 	virtual TArray<FP16TaggedMontage> GetAttackMontages_Implementation() override;
+	virtual FP16TaggedMontage         GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual UNiagaraSystem*           GetBloodEffect_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -83,6 +86,11 @@ protected:
 	TObjectPtr<UMaterialInterface> BodyDissolveMaterial = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Dissolve")
 	TObjectPtr<UMaterialInterface> WeaponDissolveMaterial = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
+	TObjectPtr<UNiagaraSystem> BloodEffect = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
+	TObjectPtr<USoundBase> DeathSound = nullptr;
 
 	UPROPERTY()
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;

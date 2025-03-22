@@ -27,7 +27,7 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation)
 	FTransform SpawnTransform = FTransform::Identity;
 	if (GetAvatarActorFromActorInfo()->Implements<UP16CombatInterface>())
 	{
-		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FGSGameplayTagsSingleton::Get().P16Tags.Montage.Attack.WeaponTag);
+		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket.WeaponTag);
 		FRotator      Rotation       = (InTargetLocation - SocketLocation).Rotation();
 		Rotation.Pitch               = 0.f;
 

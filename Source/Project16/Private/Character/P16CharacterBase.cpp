@@ -5,6 +5,7 @@
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 AP16CharacterBase::AP16CharacterBase()
@@ -15,12 +16,12 @@ AP16CharacterBase::AP16CharacterBase()
 
 	if (CombatSocketNameMap.IsEmpty())
 	{
-		const auto GameplayTags = FGSGameplayTagsSingleton::Get().P16Tags.Montage.Attack;
+		const auto SocketTags = FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket;
 
 		CombatSocketNameMap = {
-			{GameplayTags.WeaponTag, "TipSocket"},
-			{GameplayTags.LeftHandTag, "LeftHand"},
-			{GameplayTags.RightHandTag, "RightHand"}};
+			{SocketTags.WeaponTag, "TipSocket"},
+			{SocketTags.LeftHandTag, "LeftHand"},
+			{SocketTags.RightHandTag, "RightHand"}};
 	}
 }
 
@@ -33,7 +34,7 @@ FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGamepla
 {
 	// Find which mesh has a socket.
 	const USceneComponent* SocketComponent = Weapon;
-	if (!MontageTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Montage.Attack.WeaponTag))
+	if (!MontageTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket.WeaponTag))
 	{
 		SocketComponent = GetMesh();
 	}
@@ -56,6 +57,20 @@ AActor* AP16CharacterBase::GetAvatar_Implementation()
 TArray<FP16TaggedMontage> AP16CharacterBase::GetAttackMontages_Implementation()
 {
 	return AttackMontages;
+}
+
+FP16TaggedMontage AP16CharacterBase::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
+{
+	FP16TaggedMontage* Result = AttackMontages.FindByPredicate([MontageTag](const FP16TaggedMontage& Each) -> bool {
+		return Each.Attack.MatchesTagExact(MontageTag);
+	});
+
+	return Result ? *Result : FP16TaggedMontage{};
+}
+
+UNiagaraSystem* AP16CharacterBase::GetBloodEffect_Implementation()
+{
+	return BloodEffect;
 }
 
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
@@ -90,6 +105,11 @@ void AP16CharacterBase::InitDefaultAttributes() const
 
 void AP16CharacterBase::Multicast_Die_Implementation()
 {
+	if (DeathSound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(this, DeathSound, GetActorLocation());
+	}
+
 	if (Weapon)
 	{
 		Weapon->SetSimulatePhysics(true);

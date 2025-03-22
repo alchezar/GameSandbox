@@ -6,6 +6,8 @@
 #include "Util/P16Type.h"
 #include "P16CombatInterface.generated.h"
 
+class UNiagaraSystem;
+
 UINTERFACE(BlueprintType)
 class UP16CombatInterface : public UInterface
 {
@@ -37,4 +39,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	TArray<FP16TaggedMontage> GetAttackMontages();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	FP16TaggedMontage GetTaggedMontageByTag(const FGameplayTag& MontageTag);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	UNiagaraSystem* GetBloodEffect();
 };

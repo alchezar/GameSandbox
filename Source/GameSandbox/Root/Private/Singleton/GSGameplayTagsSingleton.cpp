@@ -55,10 +55,16 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	// Event tags.
 	Singleton.P16Tags.Event.Montage.FireballTag = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
 
+	// Combat socket tags.
+	Singleton.P16Tags.CombatSocket.WeaponTag    = Manager.AddNativeGameplayTag("P16.CombatSocket.Weapon", "Event tag for the weapon attack montage");
+	Singleton.P16Tags.CombatSocket.LeftHandTag  = Manager.AddNativeGameplayTag("P16.CombatSocket.LeftHand", "Event tag for the leftHand attack montage");
+	Singleton.P16Tags.CombatSocket.RightHandTag = Manager.AddNativeGameplayTag("P16.CombatSocket.RightHand", "Event tag for the rightHand attack montage");
+
 	// Montage tags.
-	Singleton.P16Tags.Montage.Attack.WeaponTag    = Manager.AddNativeGameplayTag("P16.Montage.Attack.Weapon", "Event tag for the weapon attack montage");
-	Singleton.P16Tags.Montage.Attack.LeftHandTag  = Manager.AddNativeGameplayTag("P16.Montage.Attack.LeftHand", "Event tag for the leftHand attack montage");
-	Singleton.P16Tags.Montage.Attack.RightHandTag = Manager.AddNativeGameplayTag("P16.Montage.Attack.RightHand", "Event tag for the rightHand attack montage");
+	Singleton.P16Tags.Montage.Attack.FirstTag  = Manager.AddNativeGameplayTag("P16.Montage.Attack.First", "Event tag for the first attack montage");
+	Singleton.P16Tags.Montage.Attack.SecondTag = Manager.AddNativeGameplayTag("P16.Montage.Attack.Second", "Event tag for the second attack montage");
+	Singleton.P16Tags.Montage.Attack.ThirdTag  = Manager.AddNativeGameplayTag("P16.Montage.Attack.Third", "Event tag for the third attack montage");
+	Singleton.P16Tags.Montage.Attack.FourthTag = Manager.AddNativeGameplayTag("P16.Montage.Attack.Fourth", "Event tag for the fourth attack montage");
 
 	// Input tags.
 	Singleton.P16Tags.Input.MouseButtonLeftTag  = Manager.AddNativeGameplayTag("P16.Input.MouseButtonLeft", "Input tag for the left mouse button");

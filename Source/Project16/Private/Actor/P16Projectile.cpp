@@ -49,21 +49,17 @@ void AP16Projectile::Destroyed()
 void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	EARLY_RETURN_IF(!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data->GetContext().GetEffectCauser() == OtherActor)
-	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(OtherActor, DamageEffectSpecHandle.Data->GetContext().GetEffectCauser()))
 
 	if (!bHit)
 	{
 		PlayEffects();
+		bHit = true;
 	}
 
 	if (HasAuthority())
 	{
 		ApplyDamageTo(OtherActor);
 		Destroy();
-	}
-	else
-	{
-		bHit = true;
 	}
 }
 
@@ -80,6 +76,8 @@ void AP16Projectile::PlayEffects() const
 
 void AP16Projectile::ApplyDamageTo(AActor* Target) const
 {
+	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectSpecHandle.Data->GetContext().GetEffectCauser()))
+
 	UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
 	EARLY_RETURN_IF(!TargetAbilitySystem)
 

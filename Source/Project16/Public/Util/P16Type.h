@@ -136,7 +136,11 @@ struct FP16TaggedMontage
 	GENERATED_BODY()
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FGameplayTag Tag = {};
+	FGameplayTag Attack = {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag Socket = {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<UAnimMontage> Montage = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<USoundBase> Sound = nullptr;
 };
