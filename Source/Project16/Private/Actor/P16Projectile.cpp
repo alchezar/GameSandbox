@@ -14,7 +14,7 @@
 
 AP16Projectile::AP16Projectile()
 {
-	SetReplicates(true);
+	bReplicates = true;
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SetRootComponent(Sphere);

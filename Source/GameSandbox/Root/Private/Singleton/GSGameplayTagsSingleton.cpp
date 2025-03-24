@@ -17,6 +17,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 
 	// Abilities tags.
 	Singleton.P16Tags.Ability.AttackTag = Manager.AddNativeGameplayTag("P16.Ability.Attack", "Attack ability tag");
+	Singleton.P16Tags.Ability.SummonTag = Manager.AddNativeGameplayTag("P16.Ability.Summon", "Summon ability tag");
 
 	// Attribute tags.
 	Singleton.P16Tags.Attribute.Primary.StrengthTag                = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Strength", "Increases physical damage");
@@ -59,6 +60,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.CombatSocket.WeaponTag    = Manager.AddNativeGameplayTag("P16.CombatSocket.Weapon", "Event tag for the weapon attack montage");
 	Singleton.P16Tags.CombatSocket.LeftHandTag  = Manager.AddNativeGameplayTag("P16.CombatSocket.LeftHand", "Event tag for the leftHand attack montage");
 	Singleton.P16Tags.CombatSocket.RightHandTag = Manager.AddNativeGameplayTag("P16.CombatSocket.RightHand", "Event tag for the rightHand attack montage");
+	Singleton.P16Tags.CombatSocket.TailTag      = Manager.AddNativeGameplayTag("P16.CombatSocket.Tail", "Event tag for the tail attack montage");
 
 	// Montage tags.
 	Singleton.P16Tags.Montage.Attack.FirstTag  = Manager.AddNativeGameplayTag("P16.Montage.Attack.First", "Event tag for the first attack montage");

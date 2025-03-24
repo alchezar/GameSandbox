@@ -73,6 +73,16 @@ UNiagaraSystem* AP16CharacterBase::GetBloodEffect_Implementation()
 	return BloodEffect;
 }
 
+int32 AP16CharacterBase::GetMinionCount_Implementation()
+{
+	return MinionCount;
+}
+
+void AP16CharacterBase::IncrementMinionCount_Implementation(const int32 Amount)
+{
+	MinionCount += Amount;
+}
+
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage.Get();

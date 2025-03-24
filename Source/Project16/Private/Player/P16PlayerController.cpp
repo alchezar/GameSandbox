@@ -17,7 +17,7 @@
 
 AP16PlayerController::AP16PlayerController()
 {
-	SetReplicates(true);
+	bReplicates = true;
 
 	Spline = CreateDefaultSubobject<USplineComponent>("PathSplineComponent");
 }

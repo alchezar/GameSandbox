@@ -45,4 +45,10 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UNiagaraSystem* GetBloodEffect();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetMinionCount();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void IncrementMinionCount(const int32 Amount = 1);
 };

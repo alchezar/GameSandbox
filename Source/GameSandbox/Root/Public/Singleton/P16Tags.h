@@ -11,6 +11,7 @@ struct FP16TagAbility
 	GENERATED_BODY()
 
 	FGameplayTag AttackTag;
+	FGameplayTag SummonTag;
 };
 
 USTRUCT(BlueprintType)
@@ -117,6 +118,7 @@ struct FP16TagCombatSocket
 	FGameplayTag WeaponTag;
 	FGameplayTag LeftHandTag;
 	FGameplayTag RightHandTag;
+	FGameplayTag TailTag;
 };
 
 USTRUCT(BlueprintType)

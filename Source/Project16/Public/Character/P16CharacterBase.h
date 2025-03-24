@@ -40,6 +40,8 @@ public:
 	virtual TArray<FP16TaggedMontage> GetAttackMontages_Implementation() override;
 	virtual FP16TaggedMontage         GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
 	virtual UNiagaraSystem*           GetBloodEffect_Implementation() override;
+	virtual int32                     GetMinionCount_Implementation() override;
+	virtual void                      IncrementMinionCount_Implementation(const int32 Amount = 1) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -96,6 +98,8 @@ protected:
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+
+	int32 MinionCount = 0;
 
 private:
 	bool bDead = false;

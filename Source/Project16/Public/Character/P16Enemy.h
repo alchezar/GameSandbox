@@ -75,7 +75,7 @@ protected:
 	float LifeSpan = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Combat")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "C++ | Combat")
 	TObjectPtr<AActor> CombatTarget = nullptr;
 
 private:

@@ -17,9 +17,23 @@ class PROJECT16_API UP16GameplayAbility : public UGameplayAbility
 	GENERATED_BODY()
 
 	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
+protected:
+	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	AActor* OrientToTarget();
+
+	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	FGameplayTag StartupInputTag;
+
 };
