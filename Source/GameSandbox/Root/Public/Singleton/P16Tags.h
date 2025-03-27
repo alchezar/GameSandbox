@@ -6,12 +6,23 @@
 #include "P16Tags.generated.h"
 
 USTRUCT(BlueprintType)
+struct FP16TagAbilityFire
+{
+	GENERATED_BODY()
+
+	FGameplayTag FireballTag;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagAbility
 {
 	GENERATED_BODY()
 
+	FGameplayTag Tag;
 	FGameplayTag AttackTag;
 	FGameplayTag SummonTag;
+
+	FP16TagAbilityFire Fire;
 };
 
 USTRUCT(BlueprintType)

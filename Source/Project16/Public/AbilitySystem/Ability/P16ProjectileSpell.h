@@ -29,7 +29,7 @@ protected:
 	/// ------------------------------------------------------------------------
 protected:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Projectile")
-	void SpawnProjectile(const FVector& InTargetLocation, const FGameplayTag& SocketTag);
+	void SpawnProjectile(const FVector& InTargetLocation, const FGameplayTag& SocketTag, const bool bOrientPitch = false);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

@@ -13,7 +13,7 @@ void UP16ProjectileSpell::ActivateAbility(const FGameplayAbilitySpecHandle Handl
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 }
 
-void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const FGameplayTag& SocketTag)
+void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const FGameplayTag& SocketTag, const bool bOrientPitch)
 {
 	if (!ProjectileClass)
 	{
@@ -28,7 +28,7 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const
 	{
 		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
 		FRotator      Rotation       = (InTargetLocation - SocketLocation).Rotation();
-		Rotation.Pitch               = 0.f;
+		Rotation.Pitch               = bOrientPitch ? Rotation.Pitch : 0.f;
 
 		SpawnTransform.SetLocation(SocketLocation);
 		SpawnTransform.SetRotation(Rotation.Quaternion());

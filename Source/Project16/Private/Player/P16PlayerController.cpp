@@ -57,7 +57,7 @@ void AP16PlayerController::SetupInputComponent()
 	Super::SetupInputComponent();
 
 	UEnhancedInputComponent* Input = Cast<UEnhancedInputComponent>(InputComponent);
-	check(Input)
+	check(Input);
 
 	Input->BindAction(MoveAction.Get(), ETriggerEvent::Triggered, this, &ThisClass::MoveInputCallback);
 	Input->BindAction(ShiftAction.Get(), ETriggerEvent::Started, this, &ThisClass::ShiftInputCallback, true);
@@ -78,7 +78,7 @@ void AP16PlayerController::Client_ShowDamageNumber_Implementation(const float In
 	EARLY_RETURN_IF(!Target || !DamageTextComponentClass || !IsLocalController())
 
 	constexpr float MaxOffset    = 50.f;
-	const FVector   RandomOffset = FVector{FMath::RandRange(-MaxOffset, MaxOffset), FMath::RandRange(-MaxOffset, MaxOffset), 0.f};
+	const FVector   RandomOffset = FVector {FMath::RandRange(-MaxOffset, MaxOffset), FMath::RandRange(-MaxOffset, MaxOffset), 0.f};
 
 	UP16DamageTextComponent* DamageText = NewObject<UP16DamageTextComponent>(Target, DamageTextComponentClass);
 	DamageText->RegisterComponent();
@@ -199,7 +199,7 @@ void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 
 void AP16PlayerController::AddDefaultMappingContext() const
 {
-	check(MappingContext)
+	check(MappingContext);
 
 	const ULocalPlayer* LocalPlayer = GetLocalPlayer();
 	EARLY_RETURN_IF(!LocalPlayer)

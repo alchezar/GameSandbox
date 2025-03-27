@@ -115,16 +115,14 @@ void AP16Enemy::InitHealthBar()
 	HealthBarWidget->SetWidgetController(this);
 
 	// Listen for health changes.
+	// clang-format off
 	const UP16AttributeSet* EnemyAttributeSet = Cast<UP16AttributeSet>(AttributeSet);
 	EARLY_RETURN_IF(!EnemyAttributeSet)
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EnemyAttributeSet->GetHealthAttribute())
-		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void {
-			OnHealthChanged.Broadcast(Data.NewValue);
-		});
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnHealthChanged.Broadcast(Data.NewValue); });
 	AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(EnemyAttributeSet->GetMaxHealthAttribute())
-		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void {
-			OnMaxHealthChanged.Broadcast(Data.NewValue);
-		});
+		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnMaxHealthChanged.Broadcast(Data.NewValue); });
+	// clang-format on
 
 	// Broadcast initial values.
 	OnHealthChanged.Broadcast(EnemyAttributeSet->GetHealth());

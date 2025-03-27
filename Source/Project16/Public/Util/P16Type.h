@@ -18,7 +18,7 @@ enum class EP16EffectApplicationPolicy : uint8
 {
 	None = 0 UMETA(DisplayName = "Do not apply"),
 	OnBeginOverlap UMETA(DisplayName = "Apply on begin overlap"),
-	OnEndOverlap UMETA(DisplayName = "Apply on end overlap"),
+	OnEndOverlap   UMETA(DisplayName = "Apply on end overlap"),
 };
 
 UENUM()
@@ -97,7 +97,7 @@ struct FP16AttributeInfo
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	FGameplayTag Tag = FGameplayTag{};
+	FGameplayTag Tag = FGameplayTag {};
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FText Name = FText::GetEmpty();
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -116,7 +116,7 @@ struct FP16InputAction
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	const UInputAction* Action = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FGameplayTag Tag = FGameplayTag{};
+	FGameplayTag Tag = FGameplayTag {};
 };
 
 USTRUCT(BlueprintType)
@@ -143,4 +143,19 @@ struct FP16TaggedMontage
 	TObjectPtr<UAnimMontage> Montage = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<USoundBase> Sound = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FP16AbilityInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag AbilityTag = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<const UTexture2D> Icon = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TObjectPtr<const UMaterialInterface> Background = nullptr;
+
+	FGameplayTag InputTag = FGameplayTag {};
 };

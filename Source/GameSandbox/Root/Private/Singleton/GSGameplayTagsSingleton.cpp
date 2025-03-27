@@ -16,8 +16,11 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
 
 	// Abilities tags.
+	Singleton.P16Tags.Ability.Tag       = Manager.AddNativeGameplayTag("P16.Ability", "Ability tag");
 	Singleton.P16Tags.Ability.AttackTag = Manager.AddNativeGameplayTag("P16.Ability.Attack", "Attack ability tag");
 	Singleton.P16Tags.Ability.SummonTag = Manager.AddNativeGameplayTag("P16.Ability.Summon", "Summon ability tag");
+
+	Singleton.P16Tags.Ability.Fire.FireballTag = Manager.AddNativeGameplayTag("P16.Ability.Fire.Fireball", "Fireball ability tag");
 
 	// Attribute tags.
 	Singleton.P16Tags.Attribute.Primary.StrengthTag                = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Strength", "Increases physical damage");

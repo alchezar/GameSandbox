@@ -2,6 +2,8 @@
 
 #include "AbilitySystem/Data/P16AttributeInfoDataAsset.h"
 
+#include "Util/P16Log.h"
+
 FP16AttributeInfo UP16AttributeInfoDataAsset::FindAttributeInfo(const FGameplayTag& InTag, const UAttributeSet* InAttributeSet, const bool bLogNotFound) const
 {
 	const FP16AttributeInfo* FoundInfo = AttributeInfos.FindByPredicate([InTag](const FP16AttributeInfo& Info) -> bool
@@ -17,7 +19,7 @@ FP16AttributeInfo UP16AttributeInfoDataAsset::FindAttributeInfo(const FGameplayT
 	}
 	else if (bLogNotFound)
 	{
-		UE_LOG(LogTemp, Error, L"Can't find Info for AttributeTag[%s] on AttributeInfo [%s].", *InTag.ToString(), *GetNameSafe(this));
+		UE_LOG(LogP16, Error, L"Can't find Info for AttributeTag[%s] in AttributeInfo [%s].", *InTag.ToString(), *GetNameSafe(this));
 	}
 
 	return Result;
