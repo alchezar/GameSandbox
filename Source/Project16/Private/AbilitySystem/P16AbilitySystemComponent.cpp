@@ -4,6 +4,8 @@
 
 #include "Project16.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
+#include "Util/P16Log.h"
 
 UP16AbilitySystemComponent::UP16AbilitySystemComponent()
 {
@@ -18,6 +20,46 @@ void UP16AbilitySystemComponent::BeginPlay()
 void UP16AbilitySystemComponent::TickComponent(const float DeltaTime, const ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+}
+
+void UP16AbilitySystemComponent::OnRep_ActivateAbilities()
+{
+	Super::OnRep_ActivateAbilities();
+
+	// Broadcast abilities given event on clients.
+	if (!bStartupAbilitiesGiven)
+	{
+		bStartupAbilitiesGiven = true;
+		OnAbilitiesGiven.Broadcast(this);
+	}
+}
+
+FGameplayTag UP16AbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
+{
+	EARLY_RETURN_VALUE_IF(!InAbilitySpec.Ability, {});
+
+	const FGameplayTag* FoundTag = InAbilitySpec
+		.Ability->AbilityTags
+		.GetGameplayTagArray()
+		.FindByPredicate([](const FGameplayTag Tag) -> bool
+		{
+			return Tag.MatchesTag(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Tag);
+		});
+
+	return FoundTag ? *FoundTag : FGameplayTag {};
+}
+
+FGameplayTag UP16AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
+{
+	const auto* FoundTag = InAbilitySpec
+		.GetDynamicSpecSourceTags()
+		.GetGameplayTagArray()
+		.FindByPredicate([](const FGameplayTag Tag) -> bool
+		{
+			return Tag.MatchesTag(FGSGameplayTagsSingleton::Get().P16Tags.Input.Tag);
+		});
+
+	return FoundTag ? *FoundTag : FGameplayTag {};
 }
 
 void UP16AbilitySystemComponent::OnAbilityActorInfoSet()
@@ -36,6 +78,9 @@ void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<
 		AbilitySpec.GetDynamicSpecSourceTags().AddTag(Ability->StartupInputTag);
 		GiveAbility(AbilitySpec);
 	}
+
+	bStartupAbilitiesGiven = true;
+	OnAbilitiesGiven.Broadcast(this);
 }
 
 void UP16AbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
@@ -62,6 +107,18 @@ void UP16AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
 
 		AbilitySpecInputReleased(AbilitySpec);
+	}
+}
+
+void UP16AbilitySystemComponent::ForEachAbility(const FP16ForEachAbilitySignature& InDelegate)
+{
+	FScopedAbilityListLock ActiveScopeLock {*this};
+	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	{
+		if (!InDelegate.ExecuteIfBound(AbilitySpec))
+		{
+			UE_LOG(LogP16, Warning, L"Failed to execute delegate in %hs.", __FUNCTION__);
+		}
 	}
 }
 

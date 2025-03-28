@@ -72,6 +72,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Montage.Attack.FourthTag = Manager.AddNativeGameplayTag("P16.Montage.Attack.Fourth", "Event tag for the fourth attack montage");
 
 	// Input tags.
+	Singleton.P16Tags.Input.Tag                 = Manager.AddNativeGameplayTag("P16.Input", "Input tag");
 	Singleton.P16Tags.Input.MouseButtonLeftTag  = Manager.AddNativeGameplayTag("P16.Input.MouseButtonLeft", "Input tag for the left mouse button");
 	Singleton.P16Tags.Input.MouseButtonRightTag = Manager.AddNativeGameplayTag("P16.Input.MouseButtonRight", "Input tag for the right mouse button");
 	Singleton.P16Tags.Input.Number1Tag          = Manager.AddNativeGameplayTag("P16.Input.Number1", "Input tag for the number 1 button");

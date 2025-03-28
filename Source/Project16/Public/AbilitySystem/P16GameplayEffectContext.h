@@ -20,20 +20,25 @@ struct FP16GameplayEffectContext : public FGameplayEffectContext
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
 public:
-	_NODISCARD virtual UScriptStruct* GetScriptStruct() const override;
-	_NODISCARD virtual bool           NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
+	_NODISCARD
+	virtual UScriptStruct* GetScriptStruct() const override;
+	_NODISCARD
+	virtual bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess) override;
 
 	/// @brief Creates a copy of this context, used to duplicate for later
 	/// modifications.
 	/// @returns A copy of this context.
-	_NODISCARD virtual FP16GameplayEffectContext* Duplicate() const override;
+	_NODISCARD
+	virtual FP16GameplayEffectContext* Duplicate() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	_NODISCARD bool GetIsCriticalHit() const { return bCriticalHit; }
-	_NODISCARD bool GetIsBlockedHit() const { return bBlockedHit; }
+	_NODISCARD
+	bool GetIsCriticalHit() const { return bCriticalHit; };
+	_NODISCARD
+	bool GetIsBlockedHit() const { return bBlockedHit; };
 
 	void SetIsCriticalHit(const bool bNewCriticalHit) { bCriticalHit = bNewCriticalHit; }
 	void SetIsBlockedHit(const bool bNewBlockedHit) { bBlockedHit = bNewBlockedHit; }

@@ -14,8 +14,8 @@ class PROJECT16_API UP16AbilitySystemGlobals : public UAbilitySystemGlobals
 	/// ------------------------------------------------------------------------
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
-
 public:
 	/// @brief Allocates our custom gameplay effect context.
-	_NODISCARD virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
+	_NODISCARD
+	virtual FGameplayEffectContext* AllocGameplayEffectContext() const override;
 };

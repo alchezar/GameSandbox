@@ -30,7 +30,8 @@ protected:
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	_NODISCARD UProjectileMovementComponent* GetProjectileMovementComponent() const { return ProjectileMovement.Get(); }
+	_NODISCARD
+	UProjectileMovementComponent* GetProjectileMovementComponent() const { return ProjectileMovement.Get(); }
 
 protected:
 	UFUNCTION()

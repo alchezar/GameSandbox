@@ -54,7 +54,7 @@ AllowShortIfStatementsOnASingleLine: Never
 AllowShortLambdasOnASingleLine: All
 AllowShortLoopsOnASingleLine: false
 AlwaysBreakBeforeMultilineStrings: false
-BinPackArguments: true
+BinPackArguments: false
 BinPackParameters: false
 BitFieldColonSpacing: Both
 BracedInitializerIndentWidth: 0
@@ -222,6 +222,6 @@ SpacesInParensOptions:
 SpacesInSquareBrackets: false
 Standard: Auto
 TabWidth: 4
-UseTab: ForContinuationAndIndentation
+UseTab: Always
 VerilogBreakBetweenInstancePorts: true
 

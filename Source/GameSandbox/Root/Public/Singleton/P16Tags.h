@@ -156,6 +156,7 @@ struct FP16TagInput
 {
 	GENERATED_BODY()
 
+	FGameplayTag Tag;
 	FGameplayTag MouseButtonLeftTag;
 	FGameplayTag MouseButtonRightTag;
 	FGameplayTag Number1Tag;

@@ -20,7 +20,6 @@ class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16InterfaceEn
 	/// ------------------------------------------------------------------------
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
-
 public:
 	AP16Enemy();
 	virtual void PossessedBy(AController* NewController) override;
@@ -32,7 +31,6 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name Interface
 	/// ------------------------------------------------------------------------
-
 public:
 	virtual int32 GetPlayerLevel() override { return Level; };
 	virtual void  Die() override;
@@ -44,7 +42,6 @@ public:
 	/// ------------------------------------------------------------------------
 	/// @name Super
 	/// ------------------------------------------------------------------------
-
 protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitDefaultAttributes() const override;
@@ -52,7 +49,6 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
-
 private:
 	void InitHealthBar();
 	void InitHitReact();
@@ -62,7 +58,6 @@ private:
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
-
 public:
 	UPROPERTY(BlueprintAssignable)
 	FP16OnAttributeChangeSignature OnHealthChanged;

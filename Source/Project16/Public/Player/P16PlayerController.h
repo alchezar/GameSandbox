@@ -40,7 +40,8 @@ protected:
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	_NODISCARD FHitResult GetCursorHit() const { return CursorHit; }
+	_NODISCARD
+	FHitResult GetCursorHit() const { return CursorHit; };
 
 	UFUNCTION(Client, Unreliable)
 	void Client_ShowDamageNumber(const float InDamage, AActor* Target, const bool bBlockedHit, const bool bCriticalHit);

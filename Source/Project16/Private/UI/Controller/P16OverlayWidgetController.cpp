@@ -6,6 +6,7 @@
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
+#include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
 
 void UP16OverlayWidgetController::BindCallbacksToDependencies()
 {
@@ -33,6 +34,16 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 				OnMessageWidgetRow.Broadcast(*Row);
 			}
 		});
+
+		// Handle both cases, when abilities are already given and when we need to wait for them.
+		if (AbilitySystem->GetIsStartupAbilitiesGiven())
+		{
+			OnInitStartupAbilities(AbilitySystem);
+		}
+		else
+		{
+			AbilitySystem->OnAbilitiesGiven.AddUObject(this, &ThisClass::OnInitStartupAbilities);
+		}
 	}
 }
 
@@ -45,6 +56,24 @@ void UP16OverlayWidgetController::BroadcastInitialValues()
 	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 	OnManaChanged.Broadcast(AttributeSet->GetMana());
 	OnMaxManaChanged.Broadcast(AttributeSet->GetMaxMana());
+}
+
+void UP16OverlayWidgetController::OnInitStartupAbilities(UP16AbilitySystemComponent* AbilitySystem)
+{
+	EARLY_RETURN_IF(!AbilitySystem || !AbilitySystem->GetIsStartupAbilitiesGiven())
+
+	// Iterate over all activatable abilities within the ability system and broadcast info about them here.
+	FP16ForEachAbilitySignature BroadcastDelegate;
+	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec) -> void
+	{
+		FP16AbilityInfo Info = AbilityInfo->FindAbilityInfo(UP16AbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
+		Info.InputTag        = UP16AbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
+
+		// Broadcast the ability info to the blueprint widgets.
+		AbilityInfoDelegate.Broadcast(Info);
+	});
+
+	AbilitySystem->ForEachAbility(BroadcastDelegate);
 }
 
 template <typename T>
@@ -61,5 +90,4 @@ T* UP16OverlayWidgetController::GetDataTableRowByTag(UDataTable* InDataTable, co
 	_UNLIKELY return InDataTable->FindRow<FP16UIWidgetRow>(InTag.GetTagName(), nullptr);
 }
 
-template
-FP16UIWidgetRow* UP16OverlayWidgetController::GetDataTableRowByTag<FP16UIWidgetRow>(UDataTable* InDataTable, const FGameplayTag& InTag);
+template FP16UIWidgetRow* UP16OverlayWidgetController::GetDataTableRowByTag<FP16UIWidgetRow>(UDataTable* InDataTable, const FGameplayTag& InTag);

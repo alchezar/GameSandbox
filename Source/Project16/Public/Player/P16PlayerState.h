@@ -32,8 +32,10 @@ public:
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	_NODISCARD UAttributeSet* GetAttributeSet() const;
-	_NODISCARD int32          GetPlayerLevel() const { return Level; }
+	_NODISCARD
+	UAttributeSet* GetAttributeSet() const;
+	_NODISCARD
+	int32 GetPlayerLevel() const { return Level; };
 
 protected:
 	UFUNCTION()

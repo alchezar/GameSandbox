@@ -16,16 +16,20 @@ class UInputAction;
 UENUM()
 enum class EP16EffectApplicationPolicy : uint8
 {
-	None = 0 UMETA(DisplayName = "Do not apply"),
+	// clang-format off
+	None = 0       UMETA(DisplayName = "Do not apply"),
 	OnBeginOverlap UMETA(DisplayName = "Apply on begin overlap"),
 	OnEndOverlap   UMETA(DisplayName = "Apply on end overlap"),
+	// clang-format on
 };
 
 UENUM()
 enum class EP16EffectRemovalPolicy : uint8
 {
-	None = 0 UMETA(DisplayName = "Do not remove"),
+	// clang-format off
+	None = 0     UMETA(DisplayName = "Do not remove"),
 	OnEndOverlap UMETA(DisplayName = "Remove on end overlap"),
+	// clang-format on
 };
 
 UENUM(BlueprintType)
@@ -156,6 +160,6 @@ struct FP16AbilityInfo
 	TObjectPtr<const UTexture2D> Icon = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<const UMaterialInterface> Background = nullptr;
-
+	UPROPERTY(BlueprintReadWrite)
 	FGameplayTag InputTag = FGameplayTag {};
 };
