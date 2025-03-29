@@ -21,6 +21,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGamepla
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnAbilitiesGivenSignature, UP16AbilitySystemComponent* /*AbilitySystem*/);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int32 /*StatValue*/);
+
 DECLARE_DELEGATE_OneParam(FP16ForEachAbilitySignature, const FGameplayAbilitySpec&);
 
 UCLASS()

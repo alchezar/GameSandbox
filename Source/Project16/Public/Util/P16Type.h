@@ -165,3 +165,16 @@ struct FP16AbilityInfo
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<const UMaterialInterface> Background = nullptr;
 };
+
+USTRUCT(BlueprintType)
+struct FP16LevelUpInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly)
+	int32 LevelUpRequirement = 0;
+	UPROPERTY(EditDefaultsOnly)
+	int32 AttributePointAward = 1;
+	UPROPERTY(EditDefaultsOnly)
+	int32 SpellPointAward = 1;
+};
