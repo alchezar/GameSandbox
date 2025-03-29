@@ -39,7 +39,7 @@ FGameplayTag UP16AbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAb
 	EARLY_RETURN_VALUE_IF(!InAbilitySpec.Ability, {});
 
 	const FGameplayTag* FoundTag = InAbilitySpec
-		.Ability->AbilityTags
+		.Ability->GetAssetTags()
 		.GetGameplayTagArray()
 		.FindByPredicate([](const FGameplayTag Tag) -> bool
 		{

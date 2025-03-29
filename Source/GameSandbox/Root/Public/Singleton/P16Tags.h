@@ -71,7 +71,6 @@ struct FP16TagAttributeResistance
 	FGameplayTag FireTag;
 	FGameplayTag LightningTag;
 	FGameplayTag PhysicalTag;
-
 };
 
 USTRUCT(BlueprintType)
@@ -83,6 +82,22 @@ struct FP16TagAttribute
 	FP16TagAttributeSecondary  Secondary;
 	FP16TagAttributeVital      Vital;
 	FP16TagAttributeResistance Resistance;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagCooldownFire
+{
+	GENERATED_BODY()
+
+	FGameplayTag FireballTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagCooldown
+{
+	GENERATED_BODY()
+
+	FP16TagCooldownFire Fire;
 };
 
 USTRUCT(BlueprintType)
@@ -185,6 +200,7 @@ struct FP16Tags
 
 	FP16TagAbility         Ability;
 	FP16TagAttribute       Attribute;
+	FP16TagCooldown        Cooldown;
 	FP16TagAttributeDamage Damage;
 	FP16TagEffect          Effect;
 	FP16TagEvent           Event;

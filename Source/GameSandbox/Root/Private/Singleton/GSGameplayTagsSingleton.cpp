@@ -46,6 +46,9 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute.Resistance.LightningTag = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Lightning", "Resistance to Lightning damage");
 	Singleton.P16Tags.Attribute.Resistance.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Physical", "Resistance to Physical damage");
 
+	// Cooldown tags.
+	Singleton.P16Tags.Cooldown.Fire.FireballTag = Manager.AddNativeGameplayTag("P16.Cooldown.Fire.Fireball", "Fireball cooldown tag");
+
 	// Damage tags.
 	Singleton.P16Tags.Damage.Tag          = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
 	Singleton.P16Tags.Damage.ArcaneTag    = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
