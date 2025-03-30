@@ -39,6 +39,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute.Secondary.MaxManaTag               = Manager.AddNativeGameplayTag("P16.Attribute.Secondary.MaxMana", "Maximum amount of mana obtainable");
 	Singleton.P16Tags.Attribute.Vital.HealthTag                    = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Health", "Current amount of health");
 	Singleton.P16Tags.Attribute.Vital.ManaTag                      = Manager.AddNativeGameplayTag("P16.Attribute.Vital.Mana", "Current amount of mana");
+	Singleton.P16Tags.Attribute.Meta.IncomingXPTag                 = Manager.AddNativeGameplayTag("P16.Attribute.Meta.IncomingXP", "Amount of incoming experience");
 
 	// Resistance tags.
 	Singleton.P16Tags.Attribute.Resistance.ArcaneTag    = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Arcane", "Resistance to Arcane damage");

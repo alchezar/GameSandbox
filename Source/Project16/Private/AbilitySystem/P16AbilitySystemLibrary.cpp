@@ -115,10 +115,10 @@ TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObje
 	const UWorld* World = WorldContextObject->GetWorld();
 	EARLY_RETURN_VALUE_IF(!World, TArray<AActor*>{})
 
-	FCollisionQueryParams SphereParams{};
+	FCollisionQueryParams SphereParams {};
 	SphereParams.AddIgnoredActors(IgnoredActors);
 
-	TArray<FOverlapResult> OverlapResults{};
+	TArray<FOverlapResult> OverlapResults {};
 	World->OverlapMultiByObjectType(OverlapResults, SphereOrigin, FQuat::Identity, {{FCollisionObjectQueryParams::InitType::AllDynamicObjects}}, FCollisionShape::MakeSphere(Radius), SphereParams);
 
 	TArray<AActor*> Result = {};
@@ -144,6 +144,16 @@ bool UP16AbilitySystemLibrary::GetIsNotFriends(const AActor* First, const AActor
 	return !bFriends || bEnemies;
 }
 
+int32 UP16AbilitySystemLibrary::GetXPRewardFor(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, const int32 Level)
+{
+	UP16CharacterClassInfoDataAsset* ClassInfo = GetCharacterClassInfo(WorldContextObject);
+	EARLY_RETURN_VALUE_IF(!ClassInfo, 0)
+	const FP16CharacterClassDefaultInfo* FoundInfo = ClassInfo->CharacterClassInfoMap.Find(CharacterClass);
+	EARLY_RETURN_VALUE_IF(!FoundInfo, 0)
+
+	return static_cast<int32>(FoundInfo->XPReward.GetValueAtLevel(Level));
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)
 {
 	FP16WidgetControllerParams Result = {};
@@ -159,7 +169,7 @@ FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(c
 	UAbilitySystemComponent* AbilitySystem = PlayerState->GetAbilitySystemComponent();
 	UAttributeSet*           AttributeSet  = PlayerState->GetAttributeSet();
 
-	Result = FP16WidgetControllerParams{PlayerController, PlayerState, AbilitySystem, AttributeSet};
+	Result = FP16WidgetControllerParams {PlayerController, PlayerState, AbilitySystem, AttributeSet};
 	return Result;
 }
 

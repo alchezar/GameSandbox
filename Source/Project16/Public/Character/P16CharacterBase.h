@@ -42,6 +42,7 @@ public:
 	virtual UNiagaraSystem*           GetBloodEffect_Implementation() override;
 	virtual int32                     GetMinionCount_Implementation() override;
 	virtual void                      IncrementMinionCount_Implementation(const int32 Amount = 1) override;
+	virtual EP16CharacterClass        GetCharacterClass_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -65,6 +66,10 @@ protected:
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USkeletalMeshComponent> Weapon = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
 	FName HandSocketName = "P16_Hand";
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
@@ -83,6 +88,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Abilities")
 	TArray<TSubclassOf<UP16GameplayAbility>> StartupAbilities = {};
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Abilities")
+	TArray<TSubclassOf<UGameplayAbility>> StartupPassiveAbilities = {};
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Dissolve")
 	TObjectPtr<UMaterialInterface> BodyDissolveMaterial = nullptr;
@@ -103,5 +110,4 @@ protected:
 
 private:
 	bool bDead = false;
-
 };

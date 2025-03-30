@@ -95,7 +95,9 @@ protected:
 private:
 	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
 	void                 HandleIncomingDamage(const FP16EffectProperties& Properties);
+	void                 HandleIncomingXP(const FP16EffectProperties& Properties);
 	void                 ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const;
+	void                 SendRewardXPEvent(const FP16EffectProperties& Properties) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -216,4 +218,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "C++ | Meta")
 	FGameplayAttributeData IncomingDamage;
 	ATTRIBUTE_ACCESSORS(IncomingDamage)
+
+	UPROPERTY(BlueprintReadOnly, Category = "C++ | Meta")
+	FGameplayAttributeData IncomingXP;
+	ATTRIBUTE_ACCESSORS(IncomingXP)
 };

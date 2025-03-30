@@ -51,4 +51,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void IncrementMinionCount(const int32 Amount = 1);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	EP16CharacterClass GetCharacterClass();
 };

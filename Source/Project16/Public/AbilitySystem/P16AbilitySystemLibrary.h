@@ -39,6 +39,8 @@ public:
 	static TArray<AActor*> GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	static bool GetIsNotFriends(const AActor* First, const AActor* Second);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static int32 GetXPRewardFor(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, const int32 Level);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject) -> FP16WidgetControllerParams;

@@ -15,7 +15,7 @@ AP16Character::AP16Character()
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate              = FRotator{0.f, 400.f, 0.f};
+	GetCharacterMovement()->RotationRate              = FRotator {0.f, 400.f, 0.f};
 	GetCharacterMovement()->bConstrainToPlane         = true;
 	GetCharacterMovement()->bSnapToPlaneAtStart       = true;
 
@@ -25,7 +25,7 @@ AP16Character::AP16Character()
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("SpringArmComponent");
 	SpringArm->SetupAttachment(GetRootComponent());
-	SpringArm->SetRelativeRotation(FRotator{-45.f, 0.f, 0.f});
+	SpringArm->SetRelativeRotation(FRotator {-45.f, 0.f, 0.f});
 	SpringArm->TargetArmLength         = 750.0f;
 	SpringArm->bUsePawnControlRotation = false;
 	SpringArm->bEnableCameraLag        = true;
@@ -36,6 +36,8 @@ AP16Character::AP16Character()
 	Camera = CreateDefaultSubobject<UCameraComponent>("CameraComponent");
 	Camera->SetupAttachment(SpringArm.Get());
 	Camera->bUsePawnControlRotation = false;
+
+	CharacterClass = EP16CharacterClass::Elemental;
 }
 
 void AP16Character::OnConstruction(const FTransform& Transform)
@@ -91,6 +93,14 @@ int32 AP16Character::GetPlayerLevel()
 	EARLY_RETURN_VALUE_IF(!State, Super::GetPlayerLevel())
 
 	return State->GetPlayerLevel();
+}
+
+void AP16Character::AddToXP_Implementation(const int32 XP)
+{
+	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
+	EARLY_RETURN_IF(!State)
+
+	State->AddXP(XP);
 }
 
 void AP16Character::InitAbilityActorInfo()

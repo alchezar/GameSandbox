@@ -74,6 +74,14 @@ struct FP16TagAttributeResistance
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagAttributeMeta
+{
+	GENERATED_BODY()
+
+	FGameplayTag IncomingXPTag;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagAttribute
 {
 	GENERATED_BODY()
@@ -82,6 +90,7 @@ struct FP16TagAttribute
 	FP16TagAttributeSecondary  Secondary;
 	FP16TagAttributeVital      Vital;
 	FP16TagAttributeResistance Resistance;
+	FP16TagAttributeMeta       Meta;
 };
 
 USTRUCT(BlueprintType)

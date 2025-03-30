@@ -83,6 +83,15 @@ void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<
 	OnAbilitiesGiven.Broadcast(this);
 }
 
+void UP16AbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
+{
+	for (const TSubclassOf<UGameplayAbility>& PassiveAbilityClass : StartupPassiveAbilities)
+	{
+		FGameplayAbilitySpec PassiveAbilitySpec = {PassiveAbilityClass};
+		GiveAbilityAndActivateOnce(PassiveAbilitySpec);
+	}
+}
+
 void UP16AbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	EARLY_RETURN_IF(!InputTag.IsValid())

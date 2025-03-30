@@ -16,7 +16,8 @@ class PROJECT16_API UP16LevelUpInfoDataAsset : public UDataAsset
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	int32 FindLevelForXP(const int32 XP);
+	int32 FindLevelForXP(const int32 XP) const;
+	float GetLevelPercentage(const int32 XP) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

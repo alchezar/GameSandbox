@@ -21,7 +21,8 @@ AP16CharacterBase::AP16CharacterBase()
 		CombatSocketNameMap = {
 			{SocketTags.WeaponTag, "TipSocket"},
 			{SocketTags.LeftHandTag, "LeftHand"},
-			{SocketTags.RightHandTag, "RightHand"}};
+			{SocketTags.RightHandTag, "RightHand"}
+		};
 	}
 }
 
@@ -61,11 +62,12 @@ TArray<FP16TaggedMontage> AP16CharacterBase::GetAttackMontages_Implementation()
 
 FP16TaggedMontage AP16CharacterBase::GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag)
 {
-	FP16TaggedMontage* Result = AttackMontages.FindByPredicate([MontageTag](const FP16TaggedMontage& Each) -> bool {
+	FP16TaggedMontage* Result = AttackMontages.FindByPredicate([MontageTag](const FP16TaggedMontage& Each) -> bool
+	{
 		return Each.Attack.MatchesTagExact(MontageTag);
 	});
 
-	return Result ? *Result : FP16TaggedMontage{};
+	return Result ? *Result : FP16TaggedMontage {};
 }
 
 UNiagaraSystem* AP16CharacterBase::GetBloodEffect_Implementation()
@@ -83,6 +85,11 @@ void AP16CharacterBase::IncrementMinionCount_Implementation(const int32 Amount)
 	MinionCount += Amount;
 }
 
+EP16CharacterClass AP16CharacterBase::GetCharacterClass_Implementation()
+{
+	return CharacterClass;
+}
+
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage.Get();
@@ -92,7 +99,7 @@ void AP16CharacterBase::Die()
 {
 	if (Weapon)
 	{
-		Weapon->DetachFromComponent(FDetachmentTransformRules{EDetachmentRule::KeepWorld, true});
+		Weapon->DetachFromComponent(FDetachmentTransformRules {EDetachmentRule::KeepWorld, true});
 	}
 	Multicast_Die();
 }
@@ -156,6 +163,7 @@ void AP16CharacterBase::AddCharacterAbilities() const
 	EARLY_RETURN_IF(!AbilitySystem)
 
 	AbilitySystem->AddCharacterAbilities(StartupAbilities);
+	AbilitySystem->AddCharacterPassiveAbilities(StartupPassiveAbilities);
 }
 
 void AP16CharacterBase::Dissolve()

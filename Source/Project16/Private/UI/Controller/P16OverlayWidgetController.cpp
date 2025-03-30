@@ -7,11 +7,18 @@
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
 #include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
+#include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
+#include "Player/P16PlayerState.h"
 
 void UP16OverlayWidgetController::BindCallbacksToDependencies()
 {
 	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(Params.AttributeSet.Get());
 	EARLY_RETURN_IF(!AttributeSet)
+
+	if (AP16PlayerState* PlayerState = CastChecked<AP16PlayerState>(Params.PlayerState))
+	{
+		PlayerState->OnXPChanged.AddUObject(this, &ThisClass::OnXPChangedCallback);
+	}
 
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute())
 		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnHealthChanged.Broadcast(Data.NewValue); });
@@ -24,16 +31,7 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(Params.AbilitySystemComponent))
 	{
-		AbilitySystem->OnEffectApplied.AddWeakLambda(this, [this](const FGameplayTagContainer& AssetTags) -> void
-		{
-			EARLY_RETURN_IF(!MessageWidgetDataTable)
-			for (const FGameplayTag& Tag : AssetTags)
-			{
-				const FP16UIWidgetRow* Row = GetDataTableRowByTag<FP16UIWidgetRow>(MessageWidgetDataTable.Get(), Tag);
-				CONTINUE_IF(!Row || !Tag.MatchesTag(MessageTag))
-				OnMessageWidgetRow.Broadcast(*Row);
-			}
-		});
+		AbilitySystem->OnEffectApplied.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
 
 		// Handle both cases, when abilities are already given and when we need to wait for them.
 		if (AbilitySystem->GetIsStartupAbilitiesGiven())
@@ -74,6 +72,28 @@ void UP16OverlayWidgetController::OnInitStartupAbilities(UP16AbilitySystemCompon
 	});
 
 	AbilitySystem->ForEachAbility(BroadcastDelegate);
+}
+
+void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags)
+{
+	EARLY_RETURN_IF(!MessageWidgetDataTable)
+
+	for (const FGameplayTag& Tag : AssetTags)
+	{
+		const FP16UIWidgetRow* Row = GetDataTableRowByTag<FP16UIWidgetRow>(MessageWidgetDataTable.Get(), Tag);
+		CONTINUE_IF(!Row || !Tag.MatchesTag(MessageTag))
+		OnMessageWidgetRow.Broadcast(*Row);
+	}
+}
+
+void UP16OverlayWidgetController::OnXPChangedCallback(const int32 NewXP) const
+{
+	const AP16PlayerState* PlayerState = CastChecked<AP16PlayerState>(Params.PlayerState);
+	EARLY_RETURN_IF(!PlayerState)
+	check(PlayerState->LevelUpInfos)
+
+	const float Percent = PlayerState->LevelUpInfos->GetLevelPercentage(NewXP);
+	OnXPPercentChanged.Broadcast(Percent);
 }
 
 template <typename T>

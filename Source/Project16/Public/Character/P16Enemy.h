@@ -70,8 +70,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	int32 Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
-	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	float LifeSpan = 5.f;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | AI")
 	TObjectPtr<UBehaviorTree> BehaviorTree = nullptr;

@@ -8,6 +8,7 @@
 #include "Util/P16Util.h"
 #include "P16PlayerState.generated.h"
 
+class UP16LevelUpInfoDataAsset;
 class UAttributeSet;
 class UAbilitySystemComponent;
 
@@ -58,6 +59,9 @@ protected:
 public:
 	FP16OnPlayerStatChangedSignature OnXPChanged;
 	FP16OnPlayerStatChangedSignature OnLevelChanged;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++")
+	TObjectPtr<UP16LevelUpInfoDataAsset> LevelUpInfos = nullptr;
 
 protected:
 	UPROPERTY(VisibleAnywhere)

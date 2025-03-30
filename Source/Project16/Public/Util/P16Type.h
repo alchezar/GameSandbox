@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameplayEffectTypes.h"
+#include "ScalableFloat.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "UI/Widget/P16Widget.h"
 #include "P16Type.generated.h"
@@ -132,6 +133,8 @@ struct FP16CharacterClassDefaultInfo
 	TSubclassOf<UGameplayEffect> PrimaryAttributes = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TArray<TSubclassOf<UGameplayAbility>> StartupAbilities = {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FScalableFloat XPReward = {};
 };
 
 USTRUCT(BlueprintType)

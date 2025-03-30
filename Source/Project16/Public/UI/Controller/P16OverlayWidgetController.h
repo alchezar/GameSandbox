@@ -32,6 +32,8 @@ protected:
 	T* GetDataTableRowByTag(UDataTable* InDataTable, const FGameplayTag& InTag);
 
 	void OnInitStartupAbilities(UP16AbilitySystemComponent* AbilitySystem);
+	void OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags);
+	void OnXPChangedCallback(const int32 NewXP) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -49,6 +51,8 @@ public:
 	FP16OnMessageWidgetRowSignature OnMessageWidgetRow;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
 	FP16AbilityInfoSignature AbilityInfoDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
+	FP16OnAttributeChangeSignature OnXPPercentChanged;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")

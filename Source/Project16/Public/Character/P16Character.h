@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "P16CharacterBase.h"
+#include "Interface/P16PlayerInterface.h"
 #include "P16Character.generated.h"
 
 class UCameraComponent;
@@ -13,7 +14,7 @@ class UInputAction;
 class UInputMappingContext;
 
 UCLASS()
-class PROJECT16_API AP16Character : public AP16CharacterBase, public IAbilitySystemInterface
+class PROJECT16_API AP16Character : public AP16CharacterBase, public IAbilitySystemInterface, public IP16PlayerInterface
 {
 	GENERATED_BODY()
 
@@ -34,8 +35,12 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
+	/// @name IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	virtual int32                    GetPlayerLevel() override;
+
+	/// @name IP16PlayerInterface
+	virtual void AddToXP_Implementation(const int32 XP) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super

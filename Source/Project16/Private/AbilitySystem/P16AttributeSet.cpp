@@ -9,9 +9,11 @@
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
 #include "Interface/P16CombatInterface.h"
+#include "Interface/P16PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
 #include "Player/P16PlayerController.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
+#include "Util/P16Log.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
 void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##PropertyName) const \
@@ -112,6 +114,10 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		HandleIncomingDamage(Properties);
 	}
+	if (Data.EvaluatedData.Attribute == GetIncomingXPAttribute())
+	{
+		HandleIncomingXP(Properties);
+	}
 }
 
 FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffectModCallbackData& InData) const
@@ -175,6 +181,18 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 	const TScriptInterface<IP16CombatInterface> CombatInterface = Properties.TargetAvatarActor.Get();
 	EARLY_RETURN_IF(!CombatInterface)
 	CombatInterface->Die();
+	SendRewardXPEvent(Properties);
+}
+
+void UP16AttributeSet::HandleIncomingXP(const FP16EffectProperties& Properties)
+{
+	const float LocalIncomingXP = GetIncomingXP();
+	SetIncomingXP(0.f);
+
+	// TODO: Try to level up.
+
+	EARLY_RETURN_IF(!Properties.SourceCharacter->Implements<UP16PlayerInterface>())
+	IP16PlayerInterface::Execute_AddToXP(Properties.SourceCharacter, LocalIncomingXP);
 }
 
 void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const
@@ -194,4 +212,20 @@ void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, 
 	{
 		TargetController->Client_ShowDamageNumber(InDamage, Target, bBlockingHit, bCriticalHit);
 	}
+}
+
+void UP16AttributeSet::SendRewardXPEvent(const FP16EffectProperties& Properties) const
+{
+	const TScriptInterface<IP16CombatInterface> TargetCombatInterface = Properties.TargetCharacter;
+	EARLY_RETURN_IF(!TargetCombatInterface)
+
+	const EP16CharacterClass TargetClass = IP16CombatInterface::Execute_GetCharacterClass(Properties.TargetCharacter);
+	const int32              TargetLevel = TargetCombatInterface->GetPlayerLevel();
+
+	const FGameplayTag Tag     = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Meta.IncomingXPTag;
+	FGameplayEventData Payload = {};
+	Payload.EventTag           = Tag;
+	Payload.EventMagnitude     = UP16AbilitySystemLibrary::GetXPRewardFor(Properties.TargetCharacter, TargetClass, TargetLevel);
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(Properties.SourceCharacter, Tag, MoveTemp(Payload));
 }
