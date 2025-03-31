@@ -25,12 +25,12 @@ float UP16MmcMaxHealth::CalculateBaseMagnitude_Implementation(const FGameplayEff
 	GetCapturedAttributeMagnitude(VigorDefinition, Spec, EvaluateParameters, Vigor);
 	Vigor = FMath::Max(0.f, Vigor);
 
-	const TScriptInterface<IP16CombatInterface> CombatInterface = Spec.GetContext().GetSourceObject();
+	UObject*    SourceObject = Spec.GetContext().GetSourceObject();
+	const int32 PlayerLevel  = SourceObject && SourceObject->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(SourceObject) : 1;
 
 	constexpr float BaseValue        = 80.f;
 	constexpr float VigorCoefficient = 2.5f;
 	constexpr float LevelCoefficient = 10.f;
-	const int32     PlayerLevel      = CombatInterface ? CombatInterface->GetPlayerLevel() : 0;
 
 	return BaseValue
 		+ VigorCoefficient * Vigor

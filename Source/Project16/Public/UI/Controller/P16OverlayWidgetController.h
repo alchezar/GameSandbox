@@ -47,12 +47,16 @@ public:
 	FP16OnAttributeChangeSignature OnManaChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
 	FP16OnAttributeChangeSignature OnMaxManaChanged;
+
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
 	FP16OnMessageWidgetRowSignature OnMessageWidgetRow;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
 	FP16AbilityInfoSignature AbilityInfoDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "C++ | Attributes")
+
+	UPROPERTY(BlueprintAssignable, Category = "C++ | Stat")
 	FP16OnAttributeChangeSignature OnXPPercentChanged;
+	UPROPERTY(BlueprintAssignable, Category = "C++ | Stat")
+	FP16OnPlayerStatChangeSignature OnLevelChanged;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")

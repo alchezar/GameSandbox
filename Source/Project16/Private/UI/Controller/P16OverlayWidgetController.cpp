@@ -18,6 +18,7 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 	if (AP16PlayerState* PlayerState = CastChecked<AP16PlayerState>(Params.PlayerState))
 	{
 		PlayerState->OnXPChanged.AddUObject(this, &ThisClass::OnXPChangedCallback);
+		PlayerState->OnLevelChanged.AddWeakLambda(this, [this](const int32 NewLevel) -> void { OnLevelChanged.Broadcast(NewLevel); });
 	}
 
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute())

@@ -22,9 +22,6 @@ struct FP16ExecutionData
 	AActor* SourceAvatar = nullptr;
 	AActor* TargetAvatar = nullptr;
 
-	TScriptInterface<IP16CombatInterface> SourceCombat = {};
-	TScriptInterface<IP16CombatInterface> TargetCombat = {};
-
 	explicit FP16ExecutionData(const FGameplayEffectCustomExecutionParameters& ExecutionParams);
 };
 

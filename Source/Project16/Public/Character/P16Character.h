@@ -8,6 +8,7 @@
 #include "Interface/P16PlayerInterface.h"
 #include "P16Character.generated.h"
 
+class UNiagaraComponent;
 class UCameraComponent;
 class USpringArmComponent;
 class UInputAction;
@@ -37,10 +38,20 @@ protected:
 public:
 	/// @name IAbilitySystemInterface
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	virtual int32                    GetPlayerLevel() override;
+
+	/// @name IP16CombatInterface
+	virtual int32 GetPlayerLevel_Implementation() override;
 
 	/// @name IP16PlayerInterface
-	virtual void AddToXP_Implementation(const int32 XP) override;
+	virtual int32 GetXP_Implementation() const override;
+	virtual int32 GetLevelFor_Implementation(const int32 XP) const override;
+	virtual int32 GetAttributePointsReward_Implementation(const int32 Level) const override;
+	virtual int32 GetSpellPointsReward_Implementation(const int32 Level) const override;
+	virtual void  AddToXP_Implementation(const int32 XP) override;
+	virtual void  AddToLevel_Implementation(const int32 Level) override;
+	virtual void  AddAttributePoints_Implementation(const int32 InAttributePoints) override;
+	virtual void  AddSpellPoints_Implementation(const int32 InSpellPoints) override;
+	virtual void  LevelUp_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super
@@ -54,6 +65,10 @@ protected:
 public:
 	UAttributeSet* GetAttributeSet() const;
 
+private:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_LevelUpParticles() const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -62,4 +77,6 @@ protected:
 	TObjectPtr<USpringArmComponent> SpringArm = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UCameraComponent> Camera = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent = nullptr;
 };

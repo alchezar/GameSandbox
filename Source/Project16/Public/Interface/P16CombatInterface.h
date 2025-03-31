@@ -19,17 +19,19 @@ class PROJECT16_API IP16CombatInterface
 	GENERATED_BODY()
 
 public:
-	virtual int32 GetPlayerLevel() { return 0; }
-	virtual void  Die() = 0;
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	int32 GetPlayerLevel();
+
+	virtual void Die() = 0;
+
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void UpdateFacingTo(const FVector& Target);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	FVector GetCombatSocketLocation(const FGameplayTag MontageTag);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	UAnimMontage* GetHitReactMontage();
-
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
-	void UpdateFacingTo(const FVector& Target);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	bool GetIsDead() const;

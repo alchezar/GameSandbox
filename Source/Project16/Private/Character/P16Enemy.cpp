@@ -68,6 +68,11 @@ void AP16Enemy::Tick(const float DeltaTime)
 	Super::Tick(DeltaTime);
 }
 
+int32 AP16Enemy::GetPlayerLevel_Implementation()
+{
+	return Level;
+};
+
 void AP16Enemy::Die()
 {
 	SetLifeSpan(LifeSpan);

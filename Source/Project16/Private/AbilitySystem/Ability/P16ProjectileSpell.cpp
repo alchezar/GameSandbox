@@ -20,13 +20,15 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const
 		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
 	}
 
-	const bool bServer = GetAvatarActorFromActorInfo()->HasAuthority();
+	AActor* Avatar = GetAvatarActorFromActorInfo();
+	EARLY_RETURN_IF(!Avatar)
+	const bool bServer = Avatar->HasAuthority();
 	EARLY_RETURN_IF(!bServer)
 
 	FTransform SpawnTransform = FTransform::Identity;
-	if (GetAvatarActorFromActorInfo()->Implements<UP16CombatInterface>())
+	if (Avatar->Implements<UP16CombatInterface>())
 	{
-		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(GetAvatarActorFromActorInfo(), SocketTag);
+		const FVector SocketLocation = IP16CombatInterface::Execute_GetCombatSocketLocation(Avatar, SocketTag);
 		FRotator      Rotation       = (InTargetLocation - SocketLocation).Rotation();
 		Rotation.Pitch               = bOrientPitch ? Rotation.Pitch : 0.f;
 
@@ -41,7 +43,7 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const
 		Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 
-	if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetAvatarActorFromActorInfo()))
+	if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Avatar))
 	{
 		FGameplayEffectContextHandle ContextHandle = AbilitySystem->MakeEffectContext();
 		ContextHandle.SetAbility(this);

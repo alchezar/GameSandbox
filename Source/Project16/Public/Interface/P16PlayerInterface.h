@@ -18,5 +18,29 @@ class PROJECT16_API IP16PlayerInterface
 
 public:
 	UFUNCTION(BlueprintNativeEvent)
-	void AddToXP(int32 XP);
+	int32 GetXP() const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetLevelFor(const int32 XP) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetAttributePointsReward(const int32 Level) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	int32 GetSpellPointsReward(const int32 Level) const;
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddToXP(const int32 XP);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddToLevel(const int32 Level);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddAttributePoints(const int32 InAttributePoints);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void AddSpellPoints(const int32 InSpellPoints);
+
+	UFUNCTION(BlueprintNativeEvent)
+	void LevelUp();
 };

@@ -66,11 +66,13 @@ void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextO
 
 	// Add character class specific abilities.
 	EARLY_RETURN_IF(!ClassInfo->CharacterClassInfoMap.Contains(CharacterClass))
-	const TScriptInterface<IP16CombatInterface> CombatInterface = AbilitySystemComponent->GetAvatarActor();
-	EARLY_RETURN_IF(!CombatInterface)
+
+	AActor*     AvatarActor = AbilitySystemComponent->GetAvatarActor();
+	const int32 PlayerLevel = AvatarActor && AvatarActor->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(AvatarActor) : 1;
+
 	for (const TSubclassOf<UGameplayAbility>& AbilityClass : ClassInfo->GetClassDefaultInfo(CharacterClass).StartupAbilities)
 	{
-		AbilitySystemComponent->GiveAbility({AbilityClass, CombatInterface->GetPlayerLevel()});
+		AbilitySystemComponent->GiveAbility({AbilityClass, PlayerLevel});
 	}
 }
 
@@ -125,7 +127,7 @@ TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObje
 	for (const FOverlapResult& OverlapResult : OverlapResults)
 	{
 		AActor* Actor = OverlapResult.GetActor();
-		CONTINUE_IF(!Actor->Implements<UP16CombatInterface>() || IP16CombatInterface::Execute_GetIsDead(Actor))
+		CONTINUE_IF(!Actor || !Actor->Implements<UP16CombatInterface>() || IP16CombatInterface::Execute_GetIsDead(Actor))
 
 		Result.AddUnique(Actor);
 	}

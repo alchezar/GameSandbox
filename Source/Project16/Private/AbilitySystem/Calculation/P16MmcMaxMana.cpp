@@ -25,12 +25,12 @@ float UP16MmcMaxMana::CalculateBaseMagnitude_Implementation(const FGameplayEffec
 	GetCapturedAttributeMagnitude(IntelligenceDefinition, Spec, EvaluateParameters, Intelligence);
 	Intelligence = FMath::Max(0.f, Intelligence);
 
-	const TScriptInterface<IP16CombatInterface> CombatInterface = Spec.GetContext().GetSourceObject();
+	UObject*    SourceObject = Spec.GetContext().GetSourceObject();
+	const int32 PlayerLevel  = SourceObject && SourceObject->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(SourceObject) : 1;
 
 	constexpr float BaseValue        = 50.f;
 	constexpr float IntelCoefficient = 2.5f;
 	constexpr float LevelCoefficient = 15.f;
-	const int32     PlayerLevel      = CombatInterface ? CombatInterface->GetPlayerLevel() : 0;
 
 	return BaseValue
 		+ IntelCoefficient * Intelligence

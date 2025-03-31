@@ -13,7 +13,6 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/P16PlayerController.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
-#include "Util/P16Log.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
 void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##PropertyName) const \
@@ -186,13 +185,42 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 
 void UP16AttributeSet::HandleIncomingXP(const FP16EffectProperties& Properties)
 {
+	// Source character is the owner, since GA_ListenForEvents applies GE_EventBasedEffect, adding to IncomingXP.
+	ACharacter* Owner = Properties.SourceCharacter;
+	EARLY_RETURN_IF(!Owner
+		|| !Properties.SourceCharacter->Implements<UP16PlayerInterface>()
+		|| !Properties.TargetCharacter->Implements<UP16CombatInterface>())
+
 	const float LocalIncomingXP = GetIncomingXP();
 	SetIncomingXP(0.f);
 
-	// TODO: Try to level up.
+	// Try to level up.
+	const int32 CurrentLevel = IP16CombatInterface::Execute_GetPlayerLevel(Owner);
+	const int32 CurrentXP    = IP16PlayerInterface::Execute_GetXP(Owner);
+	const int32 NewLevel     = IP16PlayerInterface::Execute_GetLevelFor(Owner, CurrentXP + LocalIncomingXP);
+	const int32 LevelUpsNum  = NewLevel - CurrentLevel;
 
-	EARLY_RETURN_IF(!Properties.SourceCharacter->Implements<UP16PlayerInterface>())
-	IP16PlayerInterface::Execute_AddToXP(Properties.SourceCharacter, LocalIncomingXP);
+	for (int32 Index = 0; Index < LevelUpsNum; ++Index)
+	{
+		const int32 AttributePointsReward = IP16PlayerInterface::Execute_GetAttributePointsReward(Owner, CurrentLevel);
+		const int32 SpellPointsReward     = IP16PlayerInterface::Execute_GetSpellPointsReward(Owner, CurrentLevel);
+
+		// Level up the player and add rewards points
+		IP16PlayerInterface::Execute_AddAttributePoints(Owner, AttributePointsReward);
+		IP16PlayerInterface::Execute_AddSpellPoints(Owner, SpellPointsReward);
+
+		// Fill Health and Mana.
+		SetHealth(GetMaxHealth());
+		SetMana(GetMaxMana());
+	}
+	if (NewLevel > CurrentLevel)
+	{
+		IP16PlayerInterface::Execute_AddToLevel(Owner, NewLevel - CurrentLevel);
+		IP16PlayerInterface::Execute_LevelUp(Owner);
+	}
+
+	// Add the XP to the player.
+	IP16PlayerInterface::Execute_AddToXP(Owner, LocalIncomingXP);
 }
 
 void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const
@@ -216,11 +244,11 @@ void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, 
 
 void UP16AttributeSet::SendRewardXPEvent(const FP16EffectProperties& Properties) const
 {
-	const TScriptInterface<IP16CombatInterface> TargetCombatInterface = Properties.TargetCharacter;
-	EARLY_RETURN_IF(!TargetCombatInterface)
+	ACharacter* TargetCharacter = Properties.TargetCharacter;
+	EARLY_RETURN_IF(!TargetCharacter || !TargetCharacter->Implements<UP16CombatInterface>())
 
-	const EP16CharacterClass TargetClass = IP16CombatInterface::Execute_GetCharacterClass(Properties.TargetCharacter);
-	const int32              TargetLevel = TargetCombatInterface->GetPlayerLevel();
+	const EP16CharacterClass TargetClass = IP16CombatInterface::Execute_GetCharacterClass(TargetCharacter);
+	const int32              TargetLevel = IP16CombatInterface::Execute_GetPlayerLevel(TargetCharacter);
 
 	const FGameplayTag Tag     = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Meta.IncomingXPTag;
 	FGameplayEventData Payload = {};

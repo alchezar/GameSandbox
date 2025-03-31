@@ -76,9 +76,6 @@ FP16ExecutionData::FP16ExecutionData(const FGameplayEffectCustomExecutionParamet
 
 	SourceAvatar = SourceAbilitySystemComponent ? SourceAbilitySystemComponent->GetAvatarActor() : nullptr;
 	TargetAvatar = TargetAbilitySystemComponent ? TargetAbilitySystemComponent->GetAvatarActor() : nullptr;
-
-	SourceCombat = SourceAvatar;
-	TargetCombat = TargetAvatar;
 }
 
 /// ----------------------------------------------------------------------------
@@ -115,7 +112,7 @@ void UP16ExecCalcDamage::Execute_Implementation(const FGameplayEffectCustomExecu
 	}
 
 	// Affect damage by modifiers.
-	const FP16ExecutionData ExecutionData{ExecutionParams};
+	const FP16ExecutionData ExecutionData {ExecutionParams};
 
 	AffectBlockChance(ExecutionParams, ContextHandle, Damage);
 	AffectArmorAndPenetration(ExecutionParams, ExecutionData, Damage);
@@ -161,13 +158,14 @@ void UP16ExecCalcDamage::AffectBlockChance(const FGameplayEffectCustomExecutionP
 
 void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const
 {
-	const AActor*                               SourceAvatar = ExecutionData.SourceAvatar;
-	const AActor*                               TargetAvatar = ExecutionData.TargetAvatar;
-	const TScriptInterface<IP16CombatInterface> SourceCombat = ExecutionData.SourceCombat;
-	const TScriptInterface<IP16CombatInterface> TargetCombat = ExecutionData.TargetCombat;
+	AActor* SourceAvatar = ExecutionData.SourceAvatar;
+	AActor* TargetAvatar = ExecutionData.TargetAvatar;
 
-	const float ArmorPenetrationCoefficient = GetCoefficient(SourceAvatar, "ArmorPenetration", SourceCombat->GetPlayerLevel());
-	const float EffectiveArmorCoefficient   = GetCoefficient(TargetAvatar, "EffectiveArmor", TargetCombat->GetPlayerLevel());
+	const float SourceLevel = SourceAvatar && SourceAvatar->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(SourceAvatar) : 1.f;
+	const float TargetLevel = TargetAvatar && TargetAvatar->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(TargetAvatar) : 1.f;
+
+	const float ArmorPenetrationCoefficient = GetCoefficient(SourceAvatar, "ArmorPenetration", SourceLevel);
+	const float EffectiveArmorCoefficient   = GetCoefficient(TargetAvatar, "EffectiveArmor", TargetLevel);
 
 	const float TargetArmor            = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().ArmorDef);
 	const float SourceArmorPenetration = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().ArmorPenetrationDef);
@@ -179,14 +177,14 @@ void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomEx
 
 void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
 {
-	const AActor*                               TargetAvatar = ExecutionData.TargetAvatar;
-	const TScriptInterface<IP16CombatInterface> TargetCombat = ExecutionData.TargetCombat;
+	AActor*     TargetAvatar = ExecutionData.TargetAvatar;
+	const float TargetLevel  = TargetAvatar && TargetAvatar->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(TargetAvatar) : 1.f;
 
 	const float CriticalHitChance     = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().CriticalHitChanceDef);
 	const float CriticalHitResistance = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().CriticalHitResistanceDef);
 	const float CriticalHitDamage     = GetAttributeMagnitude(ExecutionParams, FP16DamageStatics::Get().CriticalHitDamageDef);
 
-	const float CriticalHitResistanceCoefficient = GetCoefficient(TargetAvatar, "CriticalHitResistance", TargetCombat->GetPlayerLevel());
+	const float CriticalHitResistanceCoefficient = GetCoefficient(TargetAvatar, "CriticalHitResistance", TargetLevel);
 	const float EffectiveCriticalHitChance       = CriticalHitChance * (1.f - CriticalHitResistance * CriticalHitResistanceCoefficient / 100.f);
 	EARLY_RETURN_IF(!HasChance(EffectiveCriticalHitChance))
 
@@ -219,7 +217,7 @@ float UP16ExecCalcDamage::GetCoefficient(const UObject* WorldContextObject, cons
 {
 	const UP16CharacterClassInfoDataAsset* ClassInfo = UP16AbilitySystemLibrary::GetCharacterClassInfo(WorldContextObject);
 	EARLY_RETURN_VALUE_IF(!ClassInfo, DefaultValue);
-	const FRealCurve* Curve = ClassInfo->DamageCalculationCoefficients->FindCurve(RowName, FString{});
+	const FRealCurve* Curve = ClassInfo->DamageCalculationCoefficients->FindCurve(RowName, FString {});
 	EARLY_RETURN_VALUE_IF(!Curve, DefaultValue);
 
 	return Curve->Eval(Level, DefaultValue);

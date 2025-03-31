@@ -32,7 +32,7 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
-	virtual int32 GetPlayerLevel() override { return Level; };
+	virtual int32 GetPlayerLevel_Implementation() override;
 	virtual void  Die() override;
 
 	virtual void    ToggleHighlight(const bool bOn) override;
