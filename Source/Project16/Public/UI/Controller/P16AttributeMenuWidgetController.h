@@ -21,12 +21,19 @@ public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateAttribute(const FGameplayTag& AttributeTag);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(BlueprintAssignable, Category = "C++")
 	FP16AttributeInfoSignature AttributeInfoDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnPlayerStatChangeSignature AttributePointsDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnPlayerStatChangeSignature SpellPointsDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")

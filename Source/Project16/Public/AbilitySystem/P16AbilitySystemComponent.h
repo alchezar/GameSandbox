@@ -44,10 +44,13 @@ public:
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	void ForEachAbility(const FP16ForEachAbilitySignature& InDelegate);
+	void UpdateAttribute(const FGameplayTag& AttributeTag);
 
 protected:
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
+	UFUNCTION(Server, Reliable)
+	void Server_UpdateAttribute(const FGameplayTag& AttributeTag);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

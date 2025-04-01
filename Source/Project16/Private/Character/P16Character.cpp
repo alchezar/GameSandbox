@@ -65,6 +65,10 @@ void AP16Character::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+	// Cache player state right after possessing and before this class logic.
+	OwnPlayerState = GetPlayerState<AP16PlayerState>();
+	check(OwnPlayerState)
+
 	// Server side.
 	InitAbilityActorInfo();
 	AddCharacterAbilities();
@@ -95,58 +99,57 @@ UAbilitySystemComponent* AP16Character::GetAbilitySystemComponent() const
 
 int32 AP16Character::GetPlayerLevel_Implementation()
 {
-	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	return State ? State->GetPlayerLevel() : 1;
+	return OwnPlayerState->GetPlayerLevel();
 }
 
 inline int32 AP16Character::GetXP_Implementation() const
 {
-	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	return State ? State->GetXP() : 0;
+	return OwnPlayerState->GetXP();
 }
 
 int32 AP16Character::GetLevelFor_Implementation(const int32 XP) const
 {
-	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	return State ? State->LevelUpInfos->FindLevelForXP(XP) : 0;
+	return OwnPlayerState->LevelUpInfos->FindLevelForXP(XP);
 }
 
 int32 AP16Character::GetAttributePointsReward_Implementation(const int32 Level) const
 {
-	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	return State ? State->LevelUpInfos->LevelUpInfos[Level].AttributePointAward : 0;
+	return OwnPlayerState->LevelUpInfos->LevelUpInfos[Level].AttributePointAward;
 }
 
 int32 AP16Character::GetSpellPointsReward_Implementation(const int32 Level) const
 {
-	const AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	return State ? State->LevelUpInfos->LevelUpInfos[Level].SpellPointAward : 0;
+	return OwnPlayerState->LevelUpInfos->LevelUpInfos[Level].SpellPointAward;
+}
+
+int32 AP16Character::GetAttributePoints_Implementation() const
+{
+	return OwnPlayerState->GetAttributePoints();
+}
+
+int32 AP16Character::GetSpellPoints_Implementation() const
+{
+	return OwnPlayerState->GetSpellPoints();
 }
 
 void AP16Character::AddToXP_Implementation(const int32 XP)
 {
-	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	EARLY_RETURN_IF(!State)
-
-	State->AddXP(XP);
+	OwnPlayerState->AddXP(XP);
 }
 
 void AP16Character::AddToLevel_Implementation(const int32 Level)
 {
-	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	EARLY_RETURN_IF(!State)
-
-	State->AddLevel(Level);
+	OwnPlayerState->AddLevel(Level);
 }
 
 void AP16Character::AddAttributePoints_Implementation(const int32 InAttributePoints)
 {
-	// TODO: Add attribute points to the player state.
+	OwnPlayerState->AddAttributePoints(InAttributePoints);
 }
 
 void AP16Character::AddSpellPoints_Implementation(const int32 InSpellPoints)
 {
-	// TODO: Add spell points to the player state.
+	OwnPlayerState->AddSpellPoints(InSpellPoints);
 }
 
 void AP16Character::LevelUp_Implementation()
@@ -156,20 +159,17 @@ void AP16Character::LevelUp_Implementation()
 
 void AP16Character::InitAbilityActorInfo()
 {
-	AP16PlayerState* State = GetPlayerState<AP16PlayerState>();
-	EARLY_RETURN_IF(!State)
+	AbilitySystemComponent = OwnPlayerState->GetAbilitySystemComponent();
+	AttributeSet           = OwnPlayerState->GetAttributeSet();
 
-	AbilitySystemComponent = State->GetAbilitySystemComponent();
-	AttributeSet           = State->GetAttributeSet();
-
-	AbilitySystemComponent->InitAbilityActorInfo(State, this);
+	AbilitySystemComponent->InitAbilityActorInfo(OwnPlayerState, this);
 	AbilitySystemComponent->SetOwnerActor(GetController());
 
 	APlayerController* PlayerController = GetController<APlayerController>();
 	EARLY_RETURN_IF(!PlayerController)
 	AP16HUD* HUD = PlayerController->GetHUD<AP16HUD>();
 	EARLY_RETURN_IF(!HUD)
-	HUD->InitOverlay({PlayerController, State, AbilitySystemComponent, AttributeSet});
+	HUD->InitOverlay({PlayerController, OwnPlayerState, AbilitySystemComponent, AttributeSet});
 
 	Super::InitAbilityActorInfo();
 }

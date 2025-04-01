@@ -43,6 +43,7 @@ public:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+	virtual void PostAttributeChange(const FGameplayAttribute& Attribute, const float OldValue, const float NewValue) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -222,4 +223,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "C++ | Meta")
 	FGameplayAttributeData IncomingXP;
 	ATTRIBUTE_ACCESSORS(IncomingXP)
+
+private:
+	bool bTopOfHealth = false;
+	bool bTopOfMana   = false;
 };

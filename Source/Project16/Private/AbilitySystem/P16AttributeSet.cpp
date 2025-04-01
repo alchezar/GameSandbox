@@ -119,6 +119,20 @@ void UP16AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	}
 }
 
+void UP16AttributeSet::PostAttributeChange(const FGameplayAttribute& Attribute, const float OldValue, const float NewValue)
+{
+	if (bTopOfHealth && Attribute == GetMaxHealthAttribute())
+	{
+		SetHealth(GetMaxHealth());
+		bTopOfHealth = false;
+	}
+	if (bTopOfMana && Attribute == GetMaxManaAttribute())
+	{
+		SetMana(GetMaxMana());
+		bTopOfMana = false;
+	}
+}
+
 FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffectModCallbackData& InData) const
 {
 	FP16EffectProperties Result;
@@ -209,9 +223,9 @@ void UP16AttributeSet::HandleIncomingXP(const FP16EffectProperties& Properties)
 		IP16PlayerInterface::Execute_AddAttributePoints(Owner, AttributePointsReward);
 		IP16PlayerInterface::Execute_AddSpellPoints(Owner, SpellPointsReward);
 
-		// Fill Health and Mana.
-		SetHealth(GetMaxHealth());
-		SetMana(GetMaxMana());
+		// Fill Health and Mana in PostAttributeChange(...).
+		bTopOfHealth = true;
+		bTopOfMana   = true;
 	}
 	if (NewLevel > CurrentLevel)
 	{

@@ -2,8 +2,10 @@
 
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "Project16.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
+#include "Interface/P16PlayerInterface.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 #include "Util/P16Log.h"
 
@@ -131,10 +133,29 @@ void UP16AbilitySystemComponent::ForEachAbility(const FP16ForEachAbilitySignatur
 	}
 }
 
+void UP16AbilitySystemComponent::UpdateAttribute(const FGameplayTag& AttributeTag)
+{
+	EARLY_RETURN_IF(GetAvatarActor()->Implements<UP16PlayerInterface>()
+		&& IP16PlayerInterface::Execute_GetAttributePoints(GetAvatarActor()) == 0)
+
+	Server_UpdateAttribute(AttributeTag);
+}
+
 void UP16AbilitySystemComponent::Client_OnEffectAppliedCallback_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)
 {
 	FGameplayTagContainer TagContainer;
 	GameplayEffectSpec.GetAllAssetTags(TagContainer);
 
 	OnEffectApplied.Broadcast(TagContainer);
+}
+
+void UP16AbilitySystemComponent::Server_UpdateAttribute_Implementation(const FGameplayTag& AttributeTag)
+{
+	FGameplayEventData Payload;
+	Payload.EventTag       = AttributeTag;
+	Payload.EventMagnitude = 1.f;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetAvatarActor(), AttributeTag, MoveTemp(Payload));
+
+	IP16PlayerInterface::Execute_AddAttributePoints(GetAvatarActor(), -1);
 }

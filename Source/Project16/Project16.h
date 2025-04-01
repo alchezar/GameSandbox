@@ -19,7 +19,8 @@ namespace P16
 	{
 		inline const FName Enemy  = "Enemy";
 		inline const FName Player = "Player";
-	}}
+	}
+}
 
 #define EARLY_RETURN_IF(Condition)              \
 if (Condition) _UNLIKELY                        \

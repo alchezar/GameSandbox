@@ -8,6 +8,7 @@
 #include "Interface/P16PlayerInterface.h"
 #include "P16Character.generated.h"
 
+class AP16PlayerState;
 class UNiagaraComponent;
 class UCameraComponent;
 class USpringArmComponent;
@@ -47,6 +48,8 @@ public:
 	virtual int32 GetLevelFor_Implementation(const int32 XP) const override;
 	virtual int32 GetAttributePointsReward_Implementation(const int32 Level) const override;
 	virtual int32 GetSpellPointsReward_Implementation(const int32 Level) const override;
+	virtual int32 GetAttributePoints_Implementation() const override;
+	virtual int32 GetSpellPoints_Implementation() const override;
 	virtual void  AddToXP_Implementation(const int32 XP) override;
 	virtual void  AddToLevel_Implementation(const int32 Level) override;
 	virtual void  AddAttributePoints_Implementation(const int32 InAttributePoints) override;
@@ -79,4 +82,8 @@ protected:
 	TObjectPtr<UCameraComponent> Camera = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent = nullptr;
+
+private:
+	UPROPERTY()
+	TObjectPtr<AP16PlayerState> OwnPlayerState = nullptr;
 };

@@ -23,6 +23,8 @@ void AP16PlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
 	DOREPLIFETIME(ThisClass, XP)
 	DOREPLIFETIME(ThisClass, Level)
+	DOREPLIFETIME(ThisClass, AttributePoints)
+	DOREPLIFETIME(ThisClass, SpellPoints)
 }
 
 UAbilitySystemComponent* AP16PlayerState::GetAbilitySystemComponent() const
@@ -59,6 +61,18 @@ void AP16PlayerState::AddLevel(const int32 DeltaLevel)
 	OnLevelChanged.Broadcast(Level);
 }
 
+inline void AP16PlayerState::AddAttributePoints(const int32 DeltaAttributePoints)
+{
+	AttributePoints += DeltaAttributePoints;
+	OnAttributePointsChanged.Broadcast(AttributePoints);
+}
+
+void AP16PlayerState::AddSpellPoints(const int32 DeltaSpellPoints)
+{
+	SpellPoints += DeltaSpellPoints;
+	OnSpellPointsChanged.Broadcast(SpellPoints);
+}
+
 void AP16PlayerState::OnRep_Level(const int32 OldLevel)
 {
 	OnLevelChanged.Broadcast(Level);
@@ -67,4 +81,14 @@ void AP16PlayerState::OnRep_Level(const int32 OldLevel)
 void AP16PlayerState::OnRep_XP(const int32 OldXP)
 {
 	OnXPChanged.Broadcast(XP);
+}
+
+void AP16PlayerState::OnRep_AttributePoints(const int32 OldAttributePoints)
+{
+	OnAttributePointsChanged.Broadcast(AttributePoints);
+}
+
+void AP16PlayerState::OnRep_SpellPoints(const int32 OldSpellPoints)
+{
+	OnSpellPointsChanged.Broadcast(SpellPoints);
 }
