@@ -15,28 +15,29 @@
 
 UP16OverlayWidgetController* UP16AbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
 {
-	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
-
-	const APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	EARLY_RETURN_VALUE_IF(!PlayerController, nullptr)
-
-	AP16HUD* HUD = PlayerController->GetHUD<AP16HUD>();
+	AP16HUD*                   HUD    = nullptr;
+	FP16WidgetControllerParams Params = GetWidgetControllerParams(WorldContextObject, &HUD);
 	EARLY_RETURN_VALUE_IF(!HUD, nullptr)
 
-	return HUD->GetOverlayWidgetController(GetWidgetControllerParams(WorldContextObject));
+	return HUD->GetOverlayWidgetController(MoveTemp(Params));
 }
 
 UP16AttributeMenuWidgetController* UP16AbilitySystemLibrary::GetAttributeMenuWidgetController(const UObject* WorldContextObject)
 {
-	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
-
-	const APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
-	EARLY_RETURN_VALUE_IF(!PlayerController, nullptr)
-
-	AP16HUD* HUD = PlayerController->GetHUD<AP16HUD>();
+	AP16HUD*                   HUD    = nullptr;
+	FP16WidgetControllerParams Params = GetWidgetControllerParams(WorldContextObject, &HUD);
 	EARLY_RETURN_VALUE_IF(!HUD, nullptr)
 
-	return HUD->GetAttributeMenuWidgetController(GetWidgetControllerParams(WorldContextObject));
+	return HUD->GetAttributeMenuWidgetController(MoveTemp(Params));
+}
+
+UP16SpellMenuWidgetController* UP16AbilitySystemLibrary::GetSpellMenuWidgetController(const UObject* WorldContextObject)
+{
+	AP16HUD*                   HUD    = nullptr;
+	FP16WidgetControllerParams Params = GetWidgetControllerParams(WorldContextObject, &HUD);
+	EARLY_RETURN_VALUE_IF(!HUD, nullptr)
+
+	return HUD->GetSpellMenuWidgetController(MoveTemp(Params));
 }
 
 void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level)
@@ -156,7 +157,7 @@ int32 UP16AbilitySystemLibrary::GetXPRewardFor(const UObject* WorldContextObject
 	return static_cast<int32>(FoundInfo->XPReward.GetValueAtLevel(Level));
 }
 
-FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject)
+FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD)
 {
 	FP16WidgetControllerParams Result = {};
 	EARLY_RETURN_VALUE_IF(!WorldContextObject, Result)
@@ -164,9 +165,9 @@ FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(c
 	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(WorldContextObject, 0);
 	EARLY_RETURN_VALUE_IF(!PlayerController, Result)
 
-	const AP16HUD*   HUD         = PlayerController->GetHUD<AP16HUD>();
+	*OutHUD                      = PlayerController->GetHUD<AP16HUD>();
 	AP16PlayerState* PlayerState = PlayerController->GetPlayerState<AP16PlayerState>();
-	EARLY_RETURN_VALUE_IF(!HUD || !PlayerState, Result)
+	EARLY_RETURN_VALUE_IF(!*OutHUD || !PlayerState, Result)
 
 	UAbilitySystemComponent* AbilitySystem = PlayerState->GetAbilitySystemComponent();
 	UAttributeSet*           AttributeSet  = PlayerState->GetAttributeSet();

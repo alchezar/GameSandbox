@@ -21,7 +21,7 @@ void UP16AttributeMenuWidgetController::BindCallbacksToDependencies()
 		Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeInfo.Attribute).AddWeakLambda(this, MoveTemp(Lambda));
 	}
 
-	if (AP16PlayerState* PlayerState = Cast<AP16PlayerState>(Params.PlayerState))
+	if (AP16PlayerState* PlayerState = GetAuraPlayerState())
 	{
 		PlayerState->OnAttributePointsChanged.AddWeakLambda(this,
 			[this](const int32 AttributePoints) -> void { AttributePointsDelegate.Broadcast(AttributePoints); });
@@ -40,7 +40,7 @@ void UP16AttributeMenuWidgetController::BroadcastInitialValues()
 		AttributeInfoDelegate.Broadcast(Info);
 	}
 
-	if (const AP16PlayerState* PlayerState = Cast<AP16PlayerState>(Params.PlayerState))
+	if (const AP16PlayerState* PlayerState = GetAuraPlayerState())
 	{
 		AttributePointsDelegate.Broadcast(PlayerState->GetAttributePoints());
 		SpellPointsDelegate.Broadcast(PlayerState->GetSpellPoints());
@@ -50,7 +50,7 @@ void UP16AttributeMenuWidgetController::BroadcastInitialValues()
 // ReSharper disable once CppUE4BlueprintCallableFunctionMayBeConst
 void UP16AttributeMenuWidgetController::UpdateAttribute(const FGameplayTag& AttributeTag)
 {
-	UP16AbilitySystemComponent* AbilitySystemComponent = Cast<UP16AbilitySystemComponent>(Params.AbilitySystemComponent);
+	UP16AbilitySystemComponent* AbilitySystemComponent = GetAuraAbilitySystemComponent();
 	EARLY_RETURN_IF(!AbilitySystemComponent);
 
 	AbilitySystemComponent->UpdateAttribute(AttributeTag);

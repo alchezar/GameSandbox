@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16HUD.generated.h"
 
+class UP16SpellMenuWidgetController;
 class UP16AttributeMenuWidgetController;
 class UP16OverlayWidgetController;
 class UP16Widget;
@@ -31,6 +32,7 @@ protected:
 public:
 	UP16OverlayWidgetController*       GetOverlayWidgetController(const FP16WidgetControllerParams& InParams = {});
 	UP16AttributeMenuWidgetController* GetAttributeMenuWidgetController(const FP16WidgetControllerParams& InParams = {});
+	UP16SpellMenuWidgetController*     GetSpellMenuWidgetController(const FP16WidgetControllerParams& InParams = {});
 
 	void InitOverlay(const FP16WidgetControllerParams& InParams);
 
@@ -48,6 +50,8 @@ protected:
 	TSubclassOf<UP16OverlayWidgetController> OverlayWidgetControllerClass = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
 	TSubclassOf<UP16AttributeMenuWidgetController> AttributeMenuWidgetControllerClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")
+	TSubclassOf<UP16SpellMenuWidgetController> SpellMenuWidgetControllerClass = nullptr;
 
 private:
 	UPROPERTY()
@@ -56,4 +60,6 @@ private:
 	TObjectPtr<UP16OverlayWidgetController> OverlayWidgetController = nullptr;
 	UPROPERTY()
 	TObjectPtr<UP16AttributeMenuWidgetController> AttributeMenuWidgetController = nullptr;
+	UPROPERTY()
+	TObjectPtr<UP16SpellMenuWidgetController> SpellMenuWidgetController = nullptr;
 };

@@ -9,10 +9,14 @@
 #include "UI/Widget/P16Widget.h"
 #include "P16Type.generated.h"
 
-class UGameplayEffect;
+class AP16PlayerController;
+class AP16PlayerState;
 class UAbilitySystemComponent;
 class UAttributeSet;
+class UGameplayEffect;
 class UInputAction;
+class UP16AbilitySystemComponent;
+class UP16AttributeSet;
 
 UENUM()
 enum class EP16EffectApplicationPolicy : uint8
@@ -54,6 +58,21 @@ struct FP16WidgetControllerParams
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FP16WidgetControllerSpecificParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<AP16PlayerController> PlayerController = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<AP16PlayerState> PlayerState = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UP16AbilitySystemComponent> AbilitySystemComponent = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<UP16AttributeSet> AttributeSet = nullptr;
 };
 
 USTRUCT()

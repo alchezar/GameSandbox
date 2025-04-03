@@ -187,6 +187,8 @@ struct FP16TagInput
 	FGameplayTag Number2Tag;
 	FGameplayTag Number3Tag;
 	FGameplayTag Number4Tag;
+	FGameplayTag Passive1Tag;
+	FGameplayTag Passive2Tag;
 };
 
 USTRUCT(BlueprintType)

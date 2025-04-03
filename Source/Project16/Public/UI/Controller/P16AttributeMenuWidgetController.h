@@ -15,12 +15,16 @@ class PROJECT16_API UP16AttributeMenuWidgetController : public UP16WidgetControl
 	GENERATED_BODY()
 
 	/// ------------------------------------------------------------------------
-	/// @name This
+	/// @name Super
 	/// ------------------------------------------------------------------------
 public:
 	virtual void BindCallbacksToDependencies() override;
 	virtual void BroadcastInitialValues() override;
 
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateAttribute(const FGameplayTag& AttributeTag);
 

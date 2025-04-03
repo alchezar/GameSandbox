@@ -2,20 +2,18 @@
 
 #include "UI/Controller/P16OverlayWidgetController.h"
 
-#include "AttributeSet.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
-#include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
 #include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
 #include "Player/P16PlayerState.h"
 
 void UP16OverlayWidgetController::BindCallbacksToDependencies()
 {
-	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(Params.AttributeSet.Get());
+	const UP16AttributeSet* AttributeSet = GetAuraAttributeSet();
 	EARLY_RETURN_IF(!AttributeSet)
 
-	if (AP16PlayerState* PlayerState = CastChecked<AP16PlayerState>(Params.PlayerState))
+	if (AP16PlayerState* PlayerState = GetAuraPlayerState())
 	{
 		PlayerState->OnXPChanged.AddUObject(this, &ThisClass::OnXPChangedCallback);
 		PlayerState->OnLevelChanged.AddWeakLambda(this, [this](const int32 NewLevel) -> void { OnLevelChanged.Broadcast(NewLevel); });
@@ -30,49 +28,31 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetMaxManaAttribute())
 		.AddWeakLambda(this, [this](const FOnAttributeChangeData& Data) -> void { OnMaxManaChanged.Broadcast(Data.NewValue); });
 
-	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(Params.AbilitySystemComponent))
+	if (UP16AbilitySystemComponent* AbilitySystem = GetAuraAbilitySystemComponent())
 	{
 		AbilitySystem->OnEffectApplied.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
 
 		// Handle both cases, when abilities are already given and when we need to wait for them.
 		if (AbilitySystem->GetIsStartupAbilitiesGiven())
 		{
-			OnInitStartupAbilities(AbilitySystem);
+			BroadcastEachAbilityInfo();
 		}
 		else
 		{
-			AbilitySystem->OnAbilitiesGiven.AddUObject(this, &ThisClass::OnInitStartupAbilities);
+			AbilitySystem->OnAbilitiesGiven.AddUObject(this, &ThisClass::BroadcastEachAbilityInfo);
 		}
 	}
 }
 
 void UP16OverlayWidgetController::BroadcastInitialValues()
 {
-	const UP16AttributeSet* AttributeSet = Cast<UP16AttributeSet>(Params.AttributeSet.Get());
+	const UP16AttributeSet* AttributeSet = GetAuraAttributeSet();
 	EARLY_RETURN_IF(!AttributeSet)
 
 	OnHealthChanged.Broadcast(AttributeSet->GetHealth());
 	OnMaxHealthChanged.Broadcast(AttributeSet->GetMaxHealth());
 	OnManaChanged.Broadcast(AttributeSet->GetMana());
 	OnMaxManaChanged.Broadcast(AttributeSet->GetMaxMana());
-}
-
-void UP16OverlayWidgetController::OnInitStartupAbilities(UP16AbilitySystemComponent* AbilitySystem)
-{
-	EARLY_RETURN_IF(!AbilitySystem || !AbilitySystem->GetIsStartupAbilitiesGiven())
-
-	// Iterate over all activatable abilities within the ability system and broadcast info about them here.
-	FP16ForEachAbilitySignature BroadcastDelegate;
-	BroadcastDelegate.BindLambda([this](const FGameplayAbilitySpec& AbilitySpec) -> void
-	{
-		FP16AbilityInfo Info = AbilityInfo->FindAbilityInfo(UP16AbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
-		Info.InputTag        = UP16AbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
-
-		// Broadcast the ability info to the blueprint widgets.
-		AbilityInfoDelegate.Broadcast(Info);
-	});
-
-	AbilitySystem->ForEachAbility(BroadcastDelegate);
 }
 
 void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags)
@@ -87,9 +67,9 @@ void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagCont
 	}
 }
 
-void UP16OverlayWidgetController::OnXPChangedCallback(const int32 NewXP) const
+void UP16OverlayWidgetController::OnXPChangedCallback(const int32 NewXP)
 {
-	const AP16PlayerState* PlayerState = CastChecked<AP16PlayerState>(Params.PlayerState);
+	const AP16PlayerState* PlayerState = GetAuraPlayerState();
 	EARLY_RETURN_IF(!PlayerState)
 	check(PlayerState->LevelUpInfos)
 

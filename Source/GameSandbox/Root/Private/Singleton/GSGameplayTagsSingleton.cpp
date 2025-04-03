@@ -83,6 +83,8 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input.Number2Tag          = Manager.AddNativeGameplayTag("P16.Input.Number2", "Input tag for the number 2 button");
 	Singleton.P16Tags.Input.Number3Tag          = Manager.AddNativeGameplayTag("P16.Input.Number3", "Input tag for the number 3 button");
 	Singleton.P16Tags.Input.Number4Tag          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
+	Singleton.P16Tags.Input.Passive1Tag         = Manager.AddNativeGameplayTag("P16.Input.Passive1", "Input tag for the passive 1 button");
+	Singleton.P16Tags.Input.Passive2Tag         = Manager.AddNativeGameplayTag("P16.Input.Passive2", "Input tag for the passive 2 button");
 
 	// Damage types to resistances map.
 	// clang-format off

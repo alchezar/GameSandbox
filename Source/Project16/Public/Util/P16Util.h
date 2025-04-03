@@ -21,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AbilityInfoSignature, const FP16
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnAbilitiesGivenSignature, UP16AbilitySystemComponent* /*AbilitySystem*/);
+DECLARE_MULTICAST_DELEGATE(FP16OnAbilitiesGivenSignature);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int32 /*StatValue*/);
 

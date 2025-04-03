@@ -32,7 +32,7 @@ void UP16AbilitySystemComponent::OnRep_ActivateAbilities()
 	if (!bStartupAbilitiesGiven)
 	{
 		bStartupAbilitiesGiven = true;
-		OnAbilitiesGiven.Broadcast(this);
+		OnAbilitiesGiven.Broadcast();
 	}
 }
 
@@ -82,7 +82,7 @@ void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<
 	}
 
 	bStartupAbilitiesGiven = true;
-	OnAbilitiesGiven.Broadcast(this);
+	OnAbilitiesGiven.Broadcast();
 }
 
 void UP16AbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities)
