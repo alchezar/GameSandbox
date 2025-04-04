@@ -13,6 +13,36 @@ struct FP16TagAbilityFire
 	FGameplayTag FireballTag;
 };
 
+USTRUCT()
+struct FP16TagAbilityLightning
+{
+	GENERATED_BODY()
+
+	FGameplayTag ElectrocuteTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagAbilityStatus
+{
+	GENERATED_BODY()
+
+	FGameplayTag Tag;
+	FGameplayTag LockedTag;
+	FGameplayTag EligibleTag;
+	FGameplayTag UnlockedTag;
+	FGameplayTag EquippedTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagAbilityType
+{
+	GENERATED_BODY()
+
+	FGameplayTag OffensiveTag;
+	FGameplayTag PassiveTag;
+	FGameplayTag NoneTag;
+};
+
 USTRUCT(BlueprintType)
 struct FP16TagAbility
 {
@@ -21,8 +51,12 @@ struct FP16TagAbility
 	FGameplayTag Tag;
 	FGameplayTag AttackTag;
 	FGameplayTag SummonTag;
+	FGameplayTag HitReactTag;
 
-	FP16TagAbilityFire Fire;
+	FP16TagAbilityFire      Fire;
+	FP16TagAbilityLightning Lightning;
+	FP16TagAbilityStatus    Status;
+	FP16TagAbilityType      Type;
 };
 
 USTRUCT(BlueprintType)
@@ -102,11 +136,20 @@ struct FP16TagCooldownFire
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagCooldownLightning
+{
+	GENERATED_BODY()
+
+	FGameplayTag ElectrocuteTag;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagCooldown
 {
 	GENERATED_BODY()
 
-	FP16TagCooldownFire Fire;
+	FP16TagCooldownFire      Fire;
+	FP16TagCooldownLightning Lightning;
 };
 
 USTRUCT(BlueprintType)

@@ -36,8 +36,6 @@ public:
 	FP16AttributeInfoSignature AttributeInfoDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "C++")
 	FP16OnPlayerStatChangeSignature AttributePointsDelegate;
-	UPROPERTY(BlueprintAssignable, Category = "C++")
-	FP16OnPlayerStatChangeSignature SpellPointsDelegate;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++")

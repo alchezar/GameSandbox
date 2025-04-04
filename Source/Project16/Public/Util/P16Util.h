@@ -23,6 +23,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGamepla
 
 DECLARE_MULTICAST_DELEGATE(FP16OnAbilitiesGivenSignature);
 
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP16OnAbilityStatusChangedSignature, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*StatusTag*/);
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int32 /*StatValue*/);
 
 DECLARE_DELEGATE_OneParam(FP16ForEachAbilitySignature, const FGameplayAbilitySpec&);

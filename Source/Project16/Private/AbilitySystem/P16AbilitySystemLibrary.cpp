@@ -82,8 +82,17 @@ UP16CharacterClassInfoDataAsset* UP16AbilitySystemLibrary::GetCharacterClassInfo
 	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
 	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
 	EARLY_RETURN_VALUE_IF(!GameMode, nullptr)
-	UP16CharacterClassInfoDataAsset* ClassInfo = GameMode->GetCharacterClassInfo();
-	return ClassInfo;
+
+	return GameMode->GetCharacterClassInfo();
+}
+
+UP16AbilityInfoDataAsset* UP16AbilitySystemLibrary::GetAbilityInfo(const UObject* WorldContextObject)
+{
+	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
+	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	EARLY_RETURN_VALUE_IF(!GameMode, nullptr)
+
+	return GameMode->GetAbilityIfo();
 }
 
 bool UP16AbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)

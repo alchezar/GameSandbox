@@ -40,12 +40,13 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
+	FP16AbilityInfoSignature AbilityInfoDelegate;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Widget Controller")
 	FP16WidgetControllerParams Params = {};
-
-	UPROPERTY(BlueprintAssignable, Category = "C++ | Messages")
-	FP16AbilityInfoSignature AbilityInfoDelegate;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")
 	TObjectPtr<UP16AbilityInfoDataAsset> AbilityInfo = {};

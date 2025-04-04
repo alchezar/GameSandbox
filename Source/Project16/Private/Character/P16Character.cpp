@@ -5,6 +5,7 @@
 #include "AbilitySystemComponent.h"
 #include "NiagaraComponent.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -137,9 +138,14 @@ void AP16Character::AddToXP_Implementation(const int32 XP)
 	OwnPlayerState->AddXP(XP);
 }
 
-void AP16Character::AddToLevel_Implementation(const int32 Level)
+void AP16Character::AddToLevel_Implementation(const int32 DeltaLevel)
 {
-	OwnPlayerState->AddLevel(Level);
+	OwnPlayerState->AddLevel(DeltaLevel);
+
+	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		AbilitySystem->UpdateAbilityStatuses(OwnPlayerState->GetPlayerLevel());
+	}
 }
 
 void AP16Character::AddAttributePoints_Implementation(const int32 InAttributePoints)

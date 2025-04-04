@@ -25,8 +25,6 @@ void UP16AttributeMenuWidgetController::BindCallbacksToDependencies()
 	{
 		PlayerState->OnAttributePointsChanged.AddWeakLambda(this,
 			[this](const int32 AttributePoints) -> void { AttributePointsDelegate.Broadcast(AttributePoints); });
-		PlayerState->OnSpellPointsChanged.AddWeakLambda(this,
-			[this](const int32 SpellPoints) -> void { SpellPointsDelegate.Broadcast(SpellPoints); });
 	}
 }
 
@@ -43,7 +41,6 @@ void UP16AttributeMenuWidgetController::BroadcastInitialValues()
 	if (const AP16PlayerState* PlayerState = GetAuraPlayerState())
 	{
 		AttributePointsDelegate.Broadcast(PlayerState->GetAttributePoints());
-		SpellPointsDelegate.Broadcast(PlayerState->GetSpellPoints());
 	}
 }
 

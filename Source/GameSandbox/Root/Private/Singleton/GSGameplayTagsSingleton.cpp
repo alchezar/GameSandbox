@@ -16,11 +16,21 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	UGameplayTagsManager& Manager = UGameplayTagsManager::Get();
 
 	// Abilities tags.
-	Singleton.P16Tags.Ability.Tag       = Manager.AddNativeGameplayTag("P16.Ability", "Ability tag");
-	Singleton.P16Tags.Ability.AttackTag = Manager.AddNativeGameplayTag("P16.Ability.Attack", "Attack ability tag");
-	Singleton.P16Tags.Ability.SummonTag = Manager.AddNativeGameplayTag("P16.Ability.Summon", "Summon ability tag");
+	Singleton.P16Tags.Ability.Tag         = Manager.AddNativeGameplayTag("P16.Ability", "Ability tag");
+	Singleton.P16Tags.Ability.AttackTag   = Manager.AddNativeGameplayTag("P16.Ability.Attack", "Attack ability tag");
+	Singleton.P16Tags.Ability.SummonTag   = Manager.AddNativeGameplayTag("P16.Ability.Summon", "Summon ability tag");
+	Singleton.P16Tags.Ability.HitReactTag = Manager.AddNativeGameplayTag("P16.Ability.HitReact", "HitReact ability tag");
 
-	Singleton.P16Tags.Ability.Fire.FireballTag = Manager.AddNativeGameplayTag("P16.Ability.Fire.Fireball", "Fireball ability tag");
+	Singleton.P16Tags.Ability.Fire.FireballTag         = Manager.AddNativeGameplayTag("P16.Ability.Fire.Fireball", "Fireball ability tag");
+	Singleton.P16Tags.Ability.Lightning.ElectrocuteTag = Manager.AddNativeGameplayTag("P16.Ability.Lightning.Electrocute", "Electrocute ability tag");
+	Singleton.P16Tags.Ability.Status.Tag               = Manager.AddNativeGameplayTag("P16.Ability.Status", "Ability status tag");
+	Singleton.P16Tags.Ability.Status.LockedTag         = Manager.AddNativeGameplayTag("P16.Ability.Status.Locked", "Locked ability tag");
+	Singleton.P16Tags.Ability.Status.EligibleTag       = Manager.AddNativeGameplayTag("P16.Ability.Status.Eligible", "Eligible ability tag");
+	Singleton.P16Tags.Ability.Status.UnlockedTag       = Manager.AddNativeGameplayTag("P16.Ability.Status.Unlocked", "Unlocked ability tag");
+	Singleton.P16Tags.Ability.Status.EquippedTag       = Manager.AddNativeGameplayTag("P16.Ability.Status.Equipped", "Equipped ability tag");
+	Singleton.P16Tags.Ability.Type.OffensiveTag        = Manager.AddNativeGameplayTag("P16.Ability.Type.Offensive", "Tag for offensive abilities");
+	Singleton.P16Tags.Ability.Type.PassiveTag          = Manager.AddNativeGameplayTag("P16.Ability.Type.Passive", "Tag for passive abilities");
+	Singleton.P16Tags.Ability.Type.NoneTag             = Manager.AddNativeGameplayTag("P16.Ability.Type.None", "Tag for untyped abilities");
 
 	// Attribute tags.
 	Singleton.P16Tags.Attribute.Primary.StrengthTag                = Manager.AddNativeGameplayTag("P16.Attribute.Primary.Strength", "Increases physical damage");
@@ -48,7 +58,8 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Attribute.Resistance.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Attribute.Resistance.Physical", "Resistance to Physical damage");
 
 	// Cooldown tags.
-	Singleton.P16Tags.Cooldown.Fire.FireballTag = Manager.AddNativeGameplayTag("P16.Cooldown.Fire.Fireball", "Fireball cooldown tag");
+	Singleton.P16Tags.Cooldown.Fire.FireballTag         = Manager.AddNativeGameplayTag("P16.Cooldown.Fire.Fireball", "Fireball cooldown tag");
+	Singleton.P16Tags.Cooldown.Lightning.ElectrocuteTag = Manager.AddNativeGameplayTag("P16.Cooldown.Lightning.Electrocute", "Electrocute cooldown tag");
 
 	// Damage tags.
 	Singleton.P16Tags.Damage.Tag          = Manager.AddNativeGameplayTag("P16.Damage", "Damage");

@@ -21,5 +21,7 @@ public:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
-protected:
+public:
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnPlayerStatChangeSignature SpellPointsDelegate;
 };

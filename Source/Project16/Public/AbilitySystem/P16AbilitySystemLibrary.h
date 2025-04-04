@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16AbilitySystemLibrary.generated.h"
 
+class UP16AbilityInfoDataAsset;
 class AP16HUD;
 class UP16SpellMenuWidgetController;
 class UP16CharacterClassInfoDataAsset;
@@ -31,6 +32,8 @@ public:
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, const EP16CharacterClass CharacterClass);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static UP16CharacterClassInfoDataAsset* GetCharacterClassInfo(const UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static UP16AbilityInfoDataAsset* GetAbilityInfo(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	static bool GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
 	UFUNCTION(BlueprintPure, Category = "C++")

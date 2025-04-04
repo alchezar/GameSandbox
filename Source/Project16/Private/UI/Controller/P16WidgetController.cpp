@@ -57,6 +57,7 @@ void UP16WidgetController::BroadcastEachAbilityInfo()
 	{
 		FP16AbilityInfo Info = AbilityInfo->FindAbilityInfo(UP16AbilitySystemComponent::GetAbilityTagFromSpec(AbilitySpec));
 		Info.InputTag        = UP16AbilitySystemComponent::GetInputTagFromSpec(AbilitySpec);
+		Info.StatusTag       = UP16AbilitySystemComponent::GetStatusFromSpec(AbilitySpec);
 
 		// Broadcast each ability info to the blueprint widgets.
 		AbilityInfoDelegate.Broadcast(Info);

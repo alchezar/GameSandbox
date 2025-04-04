@@ -4,7 +4,9 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
+#include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
 #include "Interface/P16PlayerInterface.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 #include "Util/P16Log.h"
@@ -36,6 +38,22 @@ void UP16AbilitySystemComponent::OnRep_ActivateAbilities()
 	}
 }
 
+FGameplayAbilitySpec* UP16AbilitySystemComponent::GetSpecFromAbilityTag(const FGameplayTag& InTag)
+{
+	FScopedAbilityListLock Lock {*this};
+
+	auto AnyOf = [InTag](const FGameplayTag& Tag) -> bool
+	{
+		return InTag.MatchesTag(Tag);
+	};
+	auto FindIf = [AnyOf](const FGameplayAbilitySpec& Spec) -> bool
+	{
+		return Spec.Ability->AbilityTags.GetGameplayTagArray().ContainsByPredicate(AnyOf);
+	};
+
+	return GetActivatableAbilities().FindByPredicate(FindIf);
+}
+
 FGameplayTag UP16AbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
 {
 	EARLY_RETURN_VALUE_IF(!InAbilitySpec.Ability, {});
@@ -64,6 +82,19 @@ FGameplayTag UP16AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbil
 	return FoundTag ? *FoundTag : FGameplayTag {};
 }
 
+FGameplayTag UP16AbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
+{
+	const auto FoundTag = InAbilitySpec
+		.GetDynamicSpecSourceTags()
+		.GetGameplayTagArray()
+		.FindByPredicate([](const FGameplayTag Tag) -> bool
+		{
+			return Tag.MatchesTag(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.Tag);
+		});
+
+	return FoundTag ? *FoundTag : FGameplayTag {};
+}
+
 void UP16AbilitySystemComponent::OnAbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::Client_OnEffectAppliedCallback);
@@ -78,6 +109,7 @@ void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<
 		CONTINUE_IF(!Ability)
 
 		AbilitySpec.GetDynamicSpecSourceTags().AddTag(Ability->StartupInputTag);
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.EquippedTag);
 		GiveAbility(AbilitySpec);
 	}
 
@@ -124,7 +156,7 @@ void UP16AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 void UP16AbilitySystemComponent::ForEachAbility(const FP16ForEachAbilitySignature& InDelegate)
 {
 	FScopedAbilityListLock ActiveScopeLock {*this};
-	for (const FGameplayAbilitySpec& AbilitySpec : ActivatableAbilities.Items)
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		if (!InDelegate.ExecuteIfBound(AbilitySpec))
 		{
@@ -139,6 +171,29 @@ void UP16AbilitySystemComponent::UpdateAttribute(const FGameplayTag& AttributeTa
 		&& IP16PlayerInterface::Execute_GetAttributePoints(GetAvatarActor()) == 0)
 
 	Server_UpdateAttribute(AttributeTag);
+}
+
+void UP16AbilitySystemComponent::UpdateAbilityStatuses(const int32 Level)
+{
+	UP16AbilityInfoDataAsset* AbilityInfo = UP16AbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+	for (const FP16AbilityInfo& Info : AbilityInfo->AbilityInfos)
+	{
+		CONTINUE_IF(!Info.AbilityTag.IsValid()
+			|| Level < Info.LevelRequirement
+			|| GetSpecFromAbilityTag(Info.AbilityTag))
+
+		FGameplayAbilitySpec AbilitySpec = {Info.Ability, 1};
+		FGameplayTag         StatusTag   = FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.EligibleTag;
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(StatusTag);
+		GiveAbility(AbilitySpec);
+		MarkAbilitySpecDirty(AbilitySpec);
+		Client_OnUpdateAbilityStatus(Info.AbilityTag, StatusTag);
+	}
+}
+
+void UP16AbilitySystemComponent::Client_OnUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+{
+	OnAbilityStatusChanged.Broadcast(AbilityTag, StatusTag);
 }
 
 void UP16AbilitySystemComponent::Client_OnEffectAppliedCallback_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)

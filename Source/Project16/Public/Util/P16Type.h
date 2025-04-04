@@ -176,16 +176,22 @@ struct FP16AbilityInfo
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadWrite)
-	FGameplayTag InputTag = FGameplayTag {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag AbilityTag = FGameplayTag {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag CooldownTag = FGameplayTag {};
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag InputTag = FGameplayTag {};
+	UPROPERTY(BlueprintReadOnly)
+	FGameplayTag StatusTag = FGameplayTag {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<const UTexture2D> Icon = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	TObjectPtr<const UMaterialInterface> Background = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSubclassOf<UGameplayAbility> Ability = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	int32 LevelRequirement = 1;
 };
 
 USTRUCT(BlueprintType)
