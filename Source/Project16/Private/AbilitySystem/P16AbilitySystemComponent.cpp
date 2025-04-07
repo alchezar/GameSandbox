@@ -182,18 +182,50 @@ void UP16AbilitySystemComponent::UpdateAbilityStatuses(const int32 Level)
 			|| Level < Info.LevelRequirement
 			|| GetSpecFromAbilityTag(Info.AbilityTag))
 
-		FGameplayAbilitySpec AbilitySpec = {Info.Ability, 1};
-		FGameplayTag         StatusTag   = FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.EligibleTag;
+		constexpr int32      AbilityLevel = 1;
+		FGameplayAbilitySpec AbilitySpec  = {Info.Ability, AbilityLevel};
+		FGameplayTag         StatusTag    = FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.EligibleTag;
 		AbilitySpec.GetDynamicSpecSourceTags().AddTag(StatusTag);
 		GiveAbility(AbilitySpec);
 		MarkAbilitySpecDirty(AbilitySpec);
-		Client_OnUpdateAbilityStatus(Info.AbilityTag, StatusTag);
+		Client_OnUpdateAbilityStatus(Info.AbilityTag, StatusTag, AbilityLevel);
 	}
 }
 
-void UP16AbilitySystemComponent::Client_OnUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag)
+void UP16AbilitySystemComponent::Server_SpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)
 {
-	OnAbilityStatusChanged.Broadcast(AbilityTag, StatusTag);
+	FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag);
+	EARLY_RETURN_IF(!Spec)
+
+	const auto   AbilityTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability;
+	FGameplayTag Status      = GetStatusFromSpec(*Spec);
+	if (Status.MatchesTagExact(AbilityTags.Status.EligibleTag))
+	{
+		// Change status.
+		Spec->GetDynamicSpecSourceTags().RemoveTag(Status);
+		Status = AbilityTags.Status.UnlockedTag;
+		Spec->GetDynamicSpecSourceTags().AddTag(Status);
+	}
+	else if (Status.MatchesTagExact(AbilityTags.Status.EquippedTag)
+		|| Status.MatchesTagExact(AbilityTags.Status.UnlockedTag))
+	{
+		// Just increase ability level.
+		++Spec->Level;
+	}
+
+	// Spend points.
+	if (GetAvatarActor()->Implements<UP16PlayerInterface>())
+	{
+		IP16PlayerInterface::Execute_AddSpellPoints(GetAvatarActor(), -1);
+	}
+
+	Client_OnUpdateAbilityStatus(AbilityTag, Status, Spec->Level);
+	MarkAbilitySpecDirty(*Spec);
+}
+
+void UP16AbilitySystemComponent::Client_OnUpdateAbilityStatus_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const int32 AbilityLevel)
+{
+	OnAbilityStatusChanged.Broadcast(AbilityTag, StatusTag, AbilityLevel);
 }
 
 void UP16AbilitySystemComponent::Client_OnEffectAppliedCallback_Implementation(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle)

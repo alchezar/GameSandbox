@@ -22,6 +22,23 @@ public:
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
+	UFUNCTION(BlueprintCallable)
+	void SpellGlobeSelected(const FGameplayTag& AbilityTag);
+	UFUNCTION(BlueprintCallable)
+	void SpendPointAttempt();
+
+private:
+	void UpdateButtons() const;
+
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
+public:
 	UPROPERTY(BlueprintAssignable, Category = "C++")
 	FP16OnPlayerStatChangeSignature SpellPointsDelegate;
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnSpellGlobeSelectedSignature OnSpellGlobeSelected;
+
+private:
+	FP16SelectedAbility SelectedAbility = {};
 };

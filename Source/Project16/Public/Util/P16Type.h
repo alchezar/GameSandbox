@@ -206,3 +206,10 @@ struct FP16LevelUpInfo
 	UPROPERTY(EditDefaultsOnly)
 	int32 SpellPointAward = 1;
 };
+
+struct FP16SelectedAbility
+{
+	FGameplayTag Ability     = {};
+	FGameplayTag Status      = {};
+	int32        SpellPoints = 0;
+};

@@ -17,6 +17,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 
 	// Abilities tags.
 	Singleton.P16Tags.Ability.Tag         = Manager.AddNativeGameplayTag("P16.Ability", "Ability tag");
+	Singleton.P16Tags.Ability.NoneTag     = Manager.AddNativeGameplayTag("P16.Ability.None", "None ability tag");
 	Singleton.P16Tags.Ability.AttackTag   = Manager.AddNativeGameplayTag("P16.Ability.Attack", "Attack ability tag");
 	Singleton.P16Tags.Ability.SummonTag   = Manager.AddNativeGameplayTag("P16.Ability.Summon", "Summon ability tag");
 	Singleton.P16Tags.Ability.HitReactTag = Manager.AddNativeGameplayTag("P16.Ability.HitReact", "HitReact ability tag");

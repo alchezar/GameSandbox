@@ -51,11 +51,14 @@ public:
 	void UpdateAttribute(const FGameplayTag& AttributeTag);
 	void UpdateAbilityStatuses(const int32 Level);
 
+	UFUNCTION(Server, Reliable)
+	void Server_SpendSpellPoint(const FGameplayTag& AbilityTag);
+
 protected:
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);
 	UFUNCTION(Client, Reliable)
-	void Client_OnUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag);
+	void Client_OnUpdateAbilityStatus(const FGameplayTag& AbilityTag, const FGameplayTag& StatusTag, const int32 AbilityLevel);
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateAttribute(const FGameplayTag& AttributeTag);
 

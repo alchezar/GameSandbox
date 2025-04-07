@@ -49,6 +49,7 @@ struct FP16TagAbility
 	GENERATED_BODY()
 
 	FGameplayTag Tag;
+	FGameplayTag NoneTag;
 	FGameplayTag AttackTag;
 	FGameplayTag SummonTag;
 	FGameplayTag HitReactTag;
