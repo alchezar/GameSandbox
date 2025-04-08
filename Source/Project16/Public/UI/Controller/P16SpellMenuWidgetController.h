@@ -25,10 +25,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpellGlobeSelected(const FGameplayTag& AbilityTag);
 	UFUNCTION(BlueprintCallable)
+	void SpellGlobeDeselected();
+	UFUNCTION(BlueprintCallable)
 	void SpendPointAttempt();
 
 private:
-	void UpdateButtons() const;
+	void UpdateButtons();
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

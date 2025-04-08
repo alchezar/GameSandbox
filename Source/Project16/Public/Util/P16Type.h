@@ -213,3 +213,9 @@ struct FP16SelectedAbility
 	FGameplayTag Status      = {};
 	int32        SpellPoints = 0;
 };
+
+struct FP16AbilityDescription
+{
+	FString CurrentLevel = {};
+	FString NextLevel    = {};
+};

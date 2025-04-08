@@ -54,6 +54,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void Server_SpendSpellPoint(const FGameplayTag& AbilityTag);
 
+	FP16AbilityDescription GetDescription(const FGameplayTag& AbilityTag);
+
 protected:
 	UFUNCTION(Client, Reliable)
 	void Client_OnEffectAppliedCallback(UAbilitySystemComponent* AbilitySystemComponent, const FGameplayEffectSpec& GameplayEffectSpec, FActiveGameplayEffectHandle ActiveGameplayEffectHandle);

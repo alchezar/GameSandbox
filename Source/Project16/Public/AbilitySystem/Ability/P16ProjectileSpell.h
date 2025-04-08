@@ -37,4 +37,6 @@ protected:
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Class")
 	TSubclassOf<AP16Projectile> ProjectileClass = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "C++")
+	int32 NumProjectiles = 5;
 };

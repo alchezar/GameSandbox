@@ -29,11 +29,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	AActor* OrientToTarget();
 
+	virtual FString GetDescription(const int32 CurrentLevel);
+	virtual FString GetDescriptionNextLevel(const int32 CurrentLevel);
+	static FString  GetDescriptionLocked(const int32 CurrentLevel);
+
+protected:
+	_NODISCARD
+	float GetManaCost(const float InLevel = 1.f) const;
+	_NODISCARD
+	float GetCooldownTime(const float InLevel = 1.f) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Input")
 	FGameplayTag StartupInputTag;
-
 };

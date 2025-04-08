@@ -29,3 +29,14 @@ FP16TaggedMontage UP16DamageGameplayAbility::GetRandomTaggedMontageFrom(const TA
 	const int32 RandomIndex = FMath::Rand() % Montages.Num();
 	return Montages[RandomIndex];
 }
+
+float UP16DamageGameplayAbility::GetDamageValue(const int32 InLevel, const FGameplayTag& InDamageTag)
+{
+	float Damage = 0.f;
+
+	const FScalableFloat* FireballScalableDamage = DamageTypes.Find(InDamageTag);
+	EARLY_RETURN_VALUE_IF(!FireballScalableDamage, Damage)
+
+	Damage = FireballScalableDamage->GetValueAtLevel(InLevel);
+	return Damage;
+}

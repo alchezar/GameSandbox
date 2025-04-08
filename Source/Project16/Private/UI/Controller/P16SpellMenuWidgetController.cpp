@@ -69,6 +69,13 @@ void UP16SpellMenuWidgetController::SpellGlobeSelected(const FGameplayTag& Abili
 	UpdateButtons();
 }
 
+void UP16SpellMenuWidgetController::SpellGlobeDeselected()
+{
+	// In order not to display the default description, we set the ability to NoneTag.
+	SelectedAbility = {.Ability = FGSGameplayTagsSingleton::Get().P16Tags.Ability.NoneTag};
+	UpdateButtons();
+}
+
 void UP16SpellMenuWidgetController::SpendPointAttempt()
 {
 	UP16AbilitySystemComponent* AbilitySystem = GetAuraAbilitySystemComponent();
@@ -76,7 +83,7 @@ void UP16SpellMenuWidgetController::SpendPointAttempt()
 	AbilitySystem->Server_SpendSpellPoint(SelectedAbility.Ability);
 }
 
-void UP16SpellMenuWidgetController::UpdateButtons() const
+void UP16SpellMenuWidgetController::UpdateButtons()
 {
 	const auto AbilityTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability;
 
@@ -92,5 +99,7 @@ void UP16SpellMenuWidgetController::UpdateButtons() const
 	{
 		bAllowEquip = false;
 	}
-	OnSpellGlobeSelected.Broadcast(bAllowSpend, bAllowEquip);
+
+	auto [CurrentDescription, NextDescription] = GetAuraAbilitySystemComponent()->GetDescription(SelectedAbility.Ability);
+	OnSpellGlobeSelected.Broadcast(bAllowSpend, bAllowEquip, CurrentDescription, NextDescription);
 }

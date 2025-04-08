@@ -28,6 +28,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	static FP16TaggedMontage GetRandomTaggedMontageFrom(const TArray<FP16TaggedMontage>& Montages);
 
+protected:
+	_NODISCARD
+	float GetDamageValue(const int32 InLevel, const FGameplayTag& InDamageTag);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
+#include "AbilitySystem/Ability/P16DamageGameplayAbility.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
 #include "Interface/P16PlayerInterface.h"
@@ -190,6 +191,29 @@ void UP16AbilitySystemComponent::UpdateAbilityStatuses(const int32 Level)
 		MarkAbilitySpecDirty(AbilitySpec);
 		Client_OnUpdateAbilityStatus(Info.AbilityTag, StatusTag, AbilityLevel);
 	}
+}
+
+FP16AbilityDescription UP16AbilitySystemComponent::GetDescription(const FGameplayTag& AbilityTag)
+{
+	FP16AbilityDescription Result = {};
+
+	// For deselected spell globe.
+	EARLY_RETURN_VALUE_IF(AbilityTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Ability.NoneTag), Result)
+
+	const FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag);
+	if (!Spec)
+	{
+		const UP16AbilityInfoDataAsset* AbilityInfo = UP16AbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+		check(AbilityInfo)
+		Result = {UP16DamageGameplayAbility::GetDescriptionLocked(AbilityInfo->FindAbilityInfo(AbilityTag).LevelRequirement), {}};
+		return Result;
+	}
+
+	UP16GameplayAbility* Ability = Cast<UP16GameplayAbility>(Spec->Ability);
+	EARLY_RETURN_VALUE_IF(!Ability, Result)
+	Result = {Ability->GetDescription(Spec->Level), Ability->GetDescriptionNextLevel(Spec->Level)};
+
+	return Result;
 }
 
 void UP16AbilitySystemComponent::Server_SpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)

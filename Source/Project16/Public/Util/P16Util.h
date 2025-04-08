@@ -19,7 +19,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AttributeInfoSignature, const FP
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AbilityInfoSignature, const FP16AbilityInfo&, AbilityInfo);
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FP16OnSpellGlobeSelectedSignature, bool, bAllowSpend, bool, bAllowEquip);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FP16OnSpellGlobeSelectedSignature, bool, bAllowSpend, bool, bAllowEquip, FString, CurrentDescription, FString, NextDescription);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/);
 
