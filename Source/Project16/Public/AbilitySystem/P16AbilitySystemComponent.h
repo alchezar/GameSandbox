@@ -41,6 +41,12 @@ public:
 	static FGameplayTag GetInputTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec);
 	_NODISCARD
 	static FGameplayTag GetStatusFromSpec(const FGameplayAbilitySpec& InAbilitySpec);
+	_NODISCARD
+	FGameplayTag GetStatusFromAbilityTag(const FGameplayTag& InTag);
+	_NODISCARD
+	FGameplayTag GetInputTagFromAbilityTag(const FGameplayTag& InTag);
+	_NODISCARD
+	FP16AbilityDescription GetDescription(const FGameplayTag& AbilityTag);
 
 	void OnAbilityActorInfoSet();
 	void AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities);
@@ -53,8 +59,10 @@ public:
 
 	UFUNCTION(Server, Reliable)
 	void Server_SpendSpellPoint(const FGameplayTag& AbilityTag);
-
-	FP16AbilityDescription GetDescription(const FGameplayTag& AbilityTag);
+	UFUNCTION(Server, Reliable)
+	void Server_EquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag);
+	UFUNCTION(Client, Reliable)
+	void Client_EquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag);
 
 protected:
 	UFUNCTION(Client, Reliable)
@@ -64,6 +72,9 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateAttribute(const FGameplayTag& AttributeTag);
 
+	void ClearSlot(FGameplayAbilitySpec* InSpec);
+	void ClearAbilitiesOfSlot(const FGameplayTag& InSlotInputTag);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -71,6 +82,7 @@ public:
 	FP16OnEffectAppliedSignature        OnEffectApplied;
 	FP16OnAbilitiesGivenSignature       OnAbilitiesGiven;
 	FP16OnAbilityStatusChangedSignature OnAbilityStatusChanged;
+	FP16OnAbilityEquippedSignature      OnAbilityEquipped;
 
 private:
 	bool bStartupAbilitiesGiven = false;

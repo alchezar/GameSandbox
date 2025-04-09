@@ -180,6 +180,8 @@ struct FP16AbilityInfo
 	FGameplayTag AbilityTag = FGameplayTag {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	FGameplayTag CooldownTag = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FGameplayTag TypeTag = FGameplayTag {};
 	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag InputTag = FGameplayTag {};
 	UPROPERTY(BlueprintReadOnly)

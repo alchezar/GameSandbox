@@ -28,9 +28,17 @@ public:
 	void SpellGlobeDeselected();
 	UFUNCTION(BlueprintCallable)
 	void SpendPointAttempt();
+	UFUNCTION(BlueprintCallable)
+	void EquipButtonPressed();
+	UFUNCTION(BlueprintCallable)
+	void SpellRowGlobePressed(const FGameplayTag& SlotInputTag, const FGameplayTag& TypeTag);
+
+protected:
+	void OnAbilityEquippedCallback(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag);
 
 private:
 	void UpdateButtons();
+	void StopWaitingForEquip();
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -40,7 +48,13 @@ public:
 	FP16OnPlayerStatChangeSignature SpellPointsDelegate;
 	UPROPERTY(BlueprintAssignable, Category = "C++")
 	FP16OnSpellGlobeSelectedSignature OnSpellGlobeSelected;
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnWaitForEquipSelectionSignature OnWaitForEquipSelection;
+	UPROPERTY(BlueprintAssignable, Category = "C++")
+	FP16OnWaitForEquipSelectionSignature StopWaitForEquipSelection;
 
 private:
-	FP16SelectedAbility SelectedAbility = {};
+	FP16SelectedAbility SelectedAbility           = {};
+	bool                bWaitingForEquipSelection = false;
+	FGameplayTag        SelectedSlotTag           = {};
 };
