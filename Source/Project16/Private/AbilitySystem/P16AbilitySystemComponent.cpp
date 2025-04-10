@@ -72,7 +72,7 @@ FGameplayTag UP16AbilitySystemComponent::GetAbilityTagFromSpec(const FGameplayAb
 
 FGameplayTag UP16AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
 {
-	const auto* FoundTag = InAbilitySpec
+	const FGameplayTag* FoundTag = InAbilitySpec
 		.GetDynamicSpecSourceTags()
 		.GetGameplayTagArray()
 		.FindByPredicate([](const FGameplayTag Tag) -> bool
@@ -85,7 +85,7 @@ FGameplayTag UP16AbilitySystemComponent::GetInputTagFromSpec(const FGameplayAbil
 
 FGameplayTag UP16AbilitySystemComponent::GetStatusFromSpec(const FGameplayAbilitySpec& InAbilitySpec)
 {
-	const auto FoundTag = InAbilitySpec
+	const FGameplayTag* FoundTag = InAbilitySpec
 		.GetDynamicSpecSourceTags()
 		.GetGameplayTagArray()
 		.FindByPredicate([](const FGameplayTag Tag) -> bool
@@ -246,13 +246,12 @@ void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGamep
 	ClearAbilitiesOfSlot(SlotInputTag);
 	// Clear this ability's slot, just in case it's a different slot.
 	ClearSlot(Spec);
-	// Now, assign this ability so slot.
+	// Now, assign this ability to slot.
 	Spec->GetDynamicSpecSourceTags().AddTag(SlotInputTag);
-	if (Status.MatchesTagExact(StatusTags.UnlockedTag))
-	{
-		Spec->GetDynamicSpecSourceTags().RemoveTag(StatusTags.UnlockedTag);
-		Spec->GetDynamicSpecSourceTags().AddTag(StatusTags.EquippedTag);
-	}
+	// Add equipped status for this ability.
+	Spec->GetDynamicSpecSourceTags().RemoveTag(StatusTags.UnlockedTag);
+	Spec->GetDynamicSpecSourceTags().AddTag(StatusTags.EquippedTag);
+
 	MarkAbilitySpecDirty(*Spec);
 	Client_EquipAbility(AbilityTag, SlotInputTag, PrevSlotInput, Status);
 }
@@ -317,28 +316,29 @@ void UP16AbilitySystemComponent::Server_UpdateAttribute_Implementation(const FGa
 	IP16PlayerInterface::Execute_AddAttributePoints(GetAvatarActor(), -1);
 }
 
-void UP16AbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* InSpec)
+void UP16AbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* InSpec) const
 {
 	const FGameplayTag Slot = GetInputTagFromSpec(*InSpec);
 	InSpec->GetDynamicSpecSourceTags().RemoveTag(Slot);
+
+	// Remove equipped status for the ability in cleared slot. Maybe this is too much,
+	// but it gives me confidence that all clears and assigns correctly.
+	const FGameplayTag& Status     = GetStatusFromSpec(*InSpec);
+	const auto          StatusTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status;
+	InSpec->GetDynamicSpecSourceTags().RemoveTag(StatusTags.EquippedTag);
+	InSpec->GetDynamicSpecSourceTags().AddTag(StatusTags.UnlockedTag);
 }
 
 void UP16AbilitySystemComponent::ClearAbilitiesOfSlot(const FGameplayTag& InSlotInputTag)
 {
 	FScopedAbilityListLock Lock {*this};
 
-	// Dynamic ability that has this Slot/Input tag.
-	auto AnyOf = [InSlotInputTag](const FGameplayTag& Tag) -> bool
+	// Don't use predicates here, because `FilterByPredicate` returns `TArray<ElementType>` without `&`!
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		return Tag.MatchesTagExact(InSlotInputTag);
-	};
-	// All dynamic abilities with this Slot/InputTag. Perhaps always only one.
-	auto AllOf = [this, AnyOf](const FGameplayAbilitySpec& AbilitySpec) -> bool
-	{
-		return AbilitySpec.GetDynamicSpecSourceTags().GetGameplayTagArray().ContainsByPredicate(AnyOf);
-	};
-	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities().FilterByPredicate(AllOf))
-	{
-		ClearSlot(&AbilitySpec);
+		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InSlotInputTag))
+		{
+			ClearSlot(&AbilitySpec);
+		}
 	}
 }

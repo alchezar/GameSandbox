@@ -5,8 +5,10 @@
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/P16AttributeSet.h"
+#include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
 #include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
 #include "Player/P16PlayerState.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 void UP16OverlayWidgetController::BindCallbacksToDependencies()
 {
@@ -31,6 +33,7 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 	if (UP16AbilitySystemComponent* AbilitySystem = GetAuraAbilitySystemComponent())
 	{
 		AbilitySystem->OnEffectApplied.AddUObject(this, &ThisClass::OnEffectAppliedCallback);
+		AbilitySystem->OnAbilityEquipped.AddUObject(this, &ThisClass::OnAbilityEquippedCallback);
 
 		// Handle both cases, when abilities are already given and when we need to wait for them.
 		if (AbilitySystem->GetIsStartupAbilitiesGiven())
@@ -65,6 +68,24 @@ void UP16OverlayWidgetController::OnEffectAppliedCallback(const FGameplayTagCont
 		CONTINUE_IF(!Row || !Tag.MatchesTag(MessageTag))
 		OnMessageWidgetRow.Broadcast(*Row);
 	}
+}
+
+void UP16OverlayWidgetController::OnAbilityEquippedCallback(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag)
+{
+	const auto AbilityTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability;
+
+	// Broadcast empty info if PreviousSlotTag is valid. Only if equipping an already equipped spell.
+	const FP16AbilityInfo LastSlotInfo {
+		.AbilityTag = AbilityTags.NoneTag,
+		.InputTag = PreviousSlotInputTag,
+		.StatusTag = AbilityTags.Status.UnlockedTag
+	};
+	AbilityInfoDelegate.Broadcast(LastSlotInfo);
+
+	FP16AbilityInfo Info = AbilityInfo->FindAbilityInfo(AbilityTag);
+	Info.StatusTag       = StatusTag;
+	Info.InputTag        = SlotInputTag;
+	AbilityInfoDelegate.Broadcast(Info);
 }
 
 void UP16OverlayWidgetController::OnXPChangedCallback(const int32 NewXP)

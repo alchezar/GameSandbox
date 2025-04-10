@@ -86,6 +86,6 @@ protected:
 	int32 Level = 1;
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_AttributePoints)
 	int32 AttributePoints = 0;
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_SpellPoints)
+	UPROPERTY(EditAnywhere, ReplicatedUsing = OnRep_SpellPoints, Category = "C++")
 	int32 SpellPoints = 0;
 };

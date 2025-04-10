@@ -72,7 +72,7 @@ protected:
 	UFUNCTION(Server, Reliable)
 	void Server_UpdateAttribute(const FGameplayTag& AttributeTag);
 
-	void ClearSlot(FGameplayAbilitySpec* InSpec);
+	void ClearSlot(FGameplayAbilitySpec* InSpec) const;
 	void ClearAbilitiesOfSlot(const FGameplayTag& InSlotInputTag);
 
 	/// ------------------------------------------------------------------------

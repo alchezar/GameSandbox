@@ -27,6 +27,7 @@ protected:
 	T* GetDataTableRowByTag(UDataTable* InDataTable, const FGameplayTag& InTag);
 
 	void OnEffectAppliedCallback(const FGameplayTagContainer& AssetTags);
+	void OnAbilityEquippedCallback(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag);
 	void OnXPChangedCallback(const int32 NewXP);
 
 	/// ------------------------------------------------------------------------
