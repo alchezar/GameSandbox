@@ -40,7 +40,7 @@ void AP16Projectile::Destroyed()
 {
 	if (!bHit && !HasAuthority())
 	{
-		PlayEffects();
+		PlayOnHitEffects();
 	}
 
 	Super::Destroyed();
@@ -48,12 +48,13 @@ void AP16Projectile::Destroyed()
 
 void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	EARLY_RETURN_IF(!DamageEffectSpecHandle.Data.IsValid() || DamageEffectSpecHandle.Data->GetContext().GetEffectCauser() == OtherActor)
+	EARLY_RETURN_IF(!DamageEffectParams.SourceAbilitySystemComponent)
+	const AActor* SourceAvatar = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	EARLY_RETURN_IF(SourceAvatar == OtherActor)
 
 	if (!bHit)
 	{
-		PlayEffects();
-		bHit = true;
+		PlayOnHitEffects();
 	}
 
 	if (HasAuthority())
@@ -63,7 +64,7 @@ void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* Overlappe
 	}
 }
 
-void AP16Projectile::PlayEffects() const
+void AP16Projectile::PlayOnHitEffects()
 {
 	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound.Get(), GetActorLocation());
 	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect.Get(), GetActorLocation());
@@ -72,14 +73,15 @@ void AP16Projectile::PlayEffects() const
 	{
 		LoopingSoundComp->Stop();
 	}
+	bHit = true;
 }
 
-void AP16Projectile::ApplyDamageTo(AActor* Target) const
+void AP16Projectile::ApplyDamageTo(AActor* Target)
 {
-	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectSpecHandle.Data->GetContext().GetEffectCauser()))
+	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor()))
 
-	UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
-	EARLY_RETURN_IF(!TargetAbilitySystem)
+	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Target);
+	EARLY_RETURN_IF(!DamageEffectParams.TargetAbilitySystemComponent)
 
-	TargetAbilitySystem->ApplyGameplayEffectSpecToSelf(*DamageEffectSpecHandle.Data.Get());
+	UP16AbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 }

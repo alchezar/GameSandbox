@@ -48,6 +48,8 @@ public:
 	static bool GetIsNotFriends(const AActor* First, const AActor* Second);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	static int32 GetXPRewardFor(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, const int32 Level);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static FGameplayEffectContextHandle ApplyDamageEffect(const FP16DamageEffectParams& Params);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD = nullptr) -> FP16WidgetControllerParams;

@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
+#include "Util/P16Type.h"
 #include "P16Projectile.generated.h"
 
 class UNiagaraSystem;
@@ -38,15 +38,15 @@ protected:
 	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
-	void PlayEffects() const;
-	void ApplyDamageTo(AActor* Target) const;
+	void PlayOnHitEffects();
+	void ApplyDamageTo(AActor* Target);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Gameplay Effect", meta = (ExposeOnSpawn = "true"))
-	FGameplayEffectSpecHandle DamageEffectSpecHandle;
+	UPROPERTY()
+	FP16DamageEffectParams DamageEffectParams = {};
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")

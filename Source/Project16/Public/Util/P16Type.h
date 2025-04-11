@@ -209,6 +209,55 @@ struct FP16LevelUpInfo
 	int32 SpellPointAward = 1;
 };
 
+USTRUCT(BlueprintType)
+struct FP16DamageInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Tag = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FScalableFloat Damage = {};
+};
+
+USTRUCT(BlueprintType)
+struct FP16DebuffInfo
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Chance = 20.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Damage = 5.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Frequency = 1.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Duration = 5.f;
+};
+
+USTRUCT(BlueprintType)
+struct FP16DamageEffectParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	TObjectPtr<UObject> WorldContext = nullptr;
+	UPROPERTY()
+	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent = nullptr;
+	UPROPERTY()
+	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent = nullptr;
+	UPROPERTY()
+	float BaseDamage = 0.f;
+	UPROPERTY()
+	int32 AbilityLevel = 1;
+	UPROPERTY()
+	FGameplayTag DamageType = {};
+	UPROPERTY()
+	FP16DebuffInfo Debuff = {};
+};
+
 struct FP16SelectedAbility
 {
 	FGameplayTag Ability     = {};

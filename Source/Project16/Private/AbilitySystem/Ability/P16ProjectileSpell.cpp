@@ -42,22 +42,8 @@ void UP16ProjectileSpell::SpawnProjectile(const FVector& InTargetLocation, const
 		GetOwningActorFromActorInfo(),
 		Cast<APawn>(GetOwningActorFromActorInfo()),
 		ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	EARLY_RETURN_IF(!Projectile)
 
-	if (const UAbilitySystemComponent* AbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Avatar))
-	{
-		FGameplayEffectContextHandle ContextHandle = AbilitySystem->MakeEffectContext();
-		ContextHandle.SetAbility(this);
-		ContextHandle.AddSourceObject(Projectile);
-
-		const FGameplayEffectSpecHandle SpecHandle = AbilitySystem->MakeOutgoingSpec(DamageEffectClass, GetAbilityLevel(), ContextHandle);
-		for (const auto& [DamageTag, ScalableFloat] : DamageTypes)
-		{
-			const float Magnitude = ScalableFloat.GetValueAtLevel(GetAbilityLevel());
-			SpecHandle.Data->SetSetByCallerMagnitude(DamageTag, Magnitude);
-		}
-
-		Projectile->DamageEffectSpecHandle = SpecHandle;
-	}
-
+	Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
 	Projectile->FinishSpawning(SpawnTransform);
 }

@@ -166,6 +166,37 @@ struct FP16TagAttributeDamage
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagDebuffType
+{
+	GENERATED_BODY()
+
+	FGameplayTag BurnTag;
+	FGameplayTag StunTag;
+	FGameplayTag HexTag;
+	FGameplayTag BleedTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagDebuffInfo
+{
+	GENERATED_BODY()
+
+	FGameplayTag ChanceTag;
+	FGameplayTag DamageTag;
+	FGameplayTag FrequencyTag;
+	FGameplayTag DurationTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagDebuff
+{
+	GENERATED_BODY()
+
+	FP16TagDebuffType Type;
+	FP16TagDebuffInfo Info;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagEffect
 {
 	GENERATED_BODY()
@@ -241,6 +272,7 @@ struct FP16TagMaps
 	GENERATED_BODY()
 
 	TMap<FGameplayTag, FGameplayTag> DamageTypesToResistances;
+	TMap<FGameplayTag, FGameplayTag> DamageTypesToDebuffs;
 };
 
 ///
@@ -257,6 +289,7 @@ struct FP16Tags
 	FP16TagAttribute       Attribute;
 	FP16TagCooldown        Cooldown;
 	FP16TagAttributeDamage Damage;
+	FP16TagDebuff          Debuff;
 	FP16TagEffect          Effect;
 	FP16TagEvent           Event;
 	FP16TagCombatSocket    CombatSocket;

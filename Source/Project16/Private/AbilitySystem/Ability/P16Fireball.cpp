@@ -3,13 +3,12 @@
 #include "AbilitySystem/Ability/P16Fireball.h"
 
 #include "Project16.h"
-#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 FString UP16Fireball::GetDescription(const int32 CurrentLevel)
 {
 	using namespace P16::Rich;
 
-	const int32 DamageValue  = GetDamageValue(CurrentLevel, FGSGameplayTagsSingleton::Get().P16Tags.Damage.FireTag);
+	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(CurrentLevel);
 	const float ManaCost     = GetManaCost(CurrentLevel);
 	const float CooldownTime = GetCooldownTime(CurrentLevel);
 
@@ -58,7 +57,7 @@ FString UP16Fireball::GetDescriptionNextLevel(const int32 CurrentLevel)
 	using namespace P16::Rich;
 
 	const int32 NextLevel    = CurrentLevel + 1;
-	const int32 DamageValue  = GetDamageValue(NextLevel, FGSGameplayTagsSingleton::Get().P16Tags.Damage.FireTag);
+	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(NextLevel);
 	const float ManaCost     = GetManaCost(NextLevel);
 	const float CooldownCost = GetCooldownTime(NextLevel);
 

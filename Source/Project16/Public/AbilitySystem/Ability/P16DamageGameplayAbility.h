@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "P16GameplayAbility.h"
+#include "Util/P16Type.h"
 #include "P16DamageGameplayAbility.generated.h"
 
 struct FP16TaggedMontage;
@@ -28,9 +29,7 @@ public:
 	UFUNCTION(BlueprintPure)
 	static FP16TaggedMontage GetRandomTaggedMontageFrom(const TArray<FP16TaggedMontage>& Montages);
 
-protected:
-	_NODISCARD
-	float GetDamageValue(const int32 InLevel, const FGameplayTag& InDamageTag);
+	FP16DamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -39,5 +38,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Class")
 	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
-	TMap<FGameplayTag, FScalableFloat> DamageTypes;
+	FP16DamageInfo DamageInfo;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
+	FP16DebuffInfo DebuffInfo = {};
 };

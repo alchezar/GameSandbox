@@ -64,10 +64,20 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 
 	// Damage tags.
 	Singleton.P16Tags.Damage.Tag          = Manager.AddNativeGameplayTag("P16.Damage", "Damage");
-	Singleton.P16Tags.Damage.ArcaneTag    = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
 	Singleton.P16Tags.Damage.FireTag      = Manager.AddNativeGameplayTag("P16.Damage.Fire", "Fire damage type");
 	Singleton.P16Tags.Damage.LightningTag = Manager.AddNativeGameplayTag("P16.Damage.Lightning", "Lightning damage type");
+	Singleton.P16Tags.Damage.ArcaneTag    = Manager.AddNativeGameplayTag("P16.Damage.Arcane", "Arcane damage type");
 	Singleton.P16Tags.Damage.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Damage.Physical", "Physical damage type");
+
+	// Debuff tags.
+	Singleton.P16Tags.Debuff.Type.BurnTag      = Manager.AddNativeGameplayTag("P16.Debuff.Type.Burn", "Burn debuff for fire damage type");
+	Singleton.P16Tags.Debuff.Type.StunTag      = Manager.AddNativeGameplayTag("P16.Debuff.Type.Stun", "Stun debuff for lightning damage type");
+	Singleton.P16Tags.Debuff.Type.HexTag       = Manager.AddNativeGameplayTag("P16.Debuff.Type.Hex", "Hex debuff for arcane damage type");
+	Singleton.P16Tags.Debuff.Type.BleedTag     = Manager.AddNativeGameplayTag("P16.Debuff.Type.Bleed", "Bleed debuff for physical damage type");
+	Singleton.P16Tags.Debuff.Info.ChanceTag    = Manager.AddNativeGameplayTag("P16.Debuff.Info.Chance", "Debuff chance");
+	Singleton.P16Tags.Debuff.Info.DamageTag    = Manager.AddNativeGameplayTag("P16.Debuff.Info.Damage", "Debuff damage");
+	Singleton.P16Tags.Debuff.Info.FrequencyTag = Manager.AddNativeGameplayTag("P16.Debuff.Info.Frequency", "Debuff frequency");
+	Singleton.P16Tags.Debuff.Info.DurationTag  = Manager.AddNativeGameplayTag("P16.Debuff.Info.Duration", "Debuff duration");
 
 	// Effect tags.
 	Singleton.P16Tags.Effect.HitReactTag = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
@@ -99,12 +109,23 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input.Passive2Tag         = Manager.AddNativeGameplayTag("P16.Input.Passive2", "Input tag for the passive 2 button");
 
 	// Damage types to resistances map.
+	const FP16TagAttributeDamage&     Damage                   = Singleton.P16Tags.Damage;
+	const FP16TagAttributeResistance& Resistance               = Singleton.P16Tags.Attribute.Resistance;
+	TMap<FGameplayTag, FGameplayTag>& DamageTypesToResistances = Singleton.P16Tags.Maps.DamageTypesToResistances;
 	// clang-format off
-	const FP16TagAttributeDamage&     Damage     = Singleton.P16Tags.Damage;
-	const FP16TagAttributeResistance& Resistance = Singleton.P16Tags.Attribute.Resistance;
-	Singleton.P16Tags.Maps.DamageTypesToResistances.Add(Damage.ArcaneTag,    Resistance.ArcaneTag);
 	Singleton.P16Tags.Maps.DamageTypesToResistances.Add(Damage.FireTag,      Resistance.FireTag);
 	Singleton.P16Tags.Maps.DamageTypesToResistances.Add(Damage.LightningTag, Resistance.LightningTag);
+	Singleton.P16Tags.Maps.DamageTypesToResistances.Add(Damage.ArcaneTag,    Resistance.ArcaneTag);
 	Singleton.P16Tags.Maps.DamageTypesToResistances.Add(Damage.PhysicalTag,  Resistance.PhysicalTag);
+	// clang-format on
+
+	// Damage types to debuffs map.
+	const FP16TagDebuff&              Debuff               = Singleton.P16Tags.Debuff;
+	TMap<FGameplayTag, FGameplayTag>& DamageTypesToDebuffs = Singleton.P16Tags.Maps.DamageTypesToDebuffs;
+	// clang-format off
+	DamageTypesToDebuffs.Add(Damage.FireTag,      Debuff.Type.BurnTag);
+	DamageTypesToDebuffs.Add(Damage.LightningTag, Debuff.Type.StunTag);
+	DamageTypesToDebuffs.Add(Damage.ArcaneTag,    Debuff.Type.HexTag);
+	DamageTypesToDebuffs.Add(Damage.PhysicalTag,  Debuff.Type.BleedTag);
 	// clang-format on
 }

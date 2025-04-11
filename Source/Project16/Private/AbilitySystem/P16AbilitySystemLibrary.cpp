@@ -11,6 +11,7 @@
 #include "Interface/P16CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/P16PlayerState.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 #include "UI/HUD/P16HUD.h"
 
 UP16OverlayWidgetController* UP16AbilitySystemLibrary::GetOverlayWidgetController(const UObject* WorldContextObject)
@@ -166,6 +167,25 @@ int32 UP16AbilitySystemLibrary::GetXPRewardFor(const UObject* WorldContextObject
 	return static_cast<int32>(FoundInfo->XPReward.GetValueAtLevel(Level));
 }
 
+FGameplayEffectContextHandle UP16AbilitySystemLibrary::ApplyDamageEffect(const FP16DamageEffectParams& Params)
+{
+	EARLY_RETURN_VALUE_IF(!Params.TargetAbilitySystemComponent, {})
+
+	FGameplayEffectContextHandle ContextHandle = Params.TargetAbilitySystemComponent->MakeEffectContext();
+	ContextHandle.AddSourceObject(Params.SourceAbilitySystemComponent->GetAvatarActor());
+	const FGameplayEffectSpecHandle SpecHandle = Params.TargetAbilitySystemComponent->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
+	SpecHandle.Data->SetSetByCallerMagnitude(Params.DamageType, Params.BaseDamage);
+
+	const auto DebuffInfoTags = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Info;
+	SpecHandle.Data->SetSetByCallerMagnitude(DebuffInfoTags.ChanceTag, Params.Debuff.Chance);
+	SpecHandle.Data->SetSetByCallerMagnitude(DebuffInfoTags.DamageTag, Params.Debuff.Damage);
+	SpecHandle.Data->SetSetByCallerMagnitude(DebuffInfoTags.FrequencyTag, Params.Debuff.Frequency);
+	SpecHandle.Data->SetSetByCallerMagnitude(DebuffInfoTags.DurationTag, Params.Debuff.Duration);
+
+	Params.TargetAbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	return ContextHandle;
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD)
 {
 	FP16WidgetControllerParams Result = {};
@@ -191,5 +211,5 @@ void UP16AbilitySystemLibrary::ApplyGameplayEffect(UAbilitySystemComponent* Abil
 	ContextHandle.AddSourceObject(SourceObject);
 
 	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(GameplayEffect, Level, ContextHandle);
-	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
 }

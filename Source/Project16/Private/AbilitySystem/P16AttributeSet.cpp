@@ -155,12 +155,23 @@ FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffect
 
 	Result.SourceCharacter = Cast<ACharacter>(Result.SourceController->GetPawn());
 
+	// After adding debuffs, method `GetOriginalInstigatorAbilitySystemComponent` starts returning ASC of the target, not source.
+	// As a result - always SourceCharacter == Target character, and method `ShowFloatingText` stops showing damage text.
+	// I don't know how to debug that strange method, so the solution is to use previously saved `SourceObject`.
+	if (ACharacter* SourceCharacter = Cast<ACharacter>(Result.EffectContext.GetSourceObject()))
+	{
+		Result.SourceAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceCharacter);
+		Result.SourceAvatarActor   = SourceCharacter;
+		Result.SourceController    = SourceCharacter->GetController();
+		Result.SourceCharacter     = SourceCharacter;
+	}
+
 	// Target fields.
 	EARLY_RETURN_VALUE_IF(!InData.Target.AbilityActorInfo || !InData.Target.AbilityActorInfo->AvatarActor.Get(), Result)
 
 	Result.TargetAvatarActor   = InData.Target.GetAvatarActor();
-	Result.TargetController    = InData.Target.AbilityActorInfo->PlayerController.Get();
 	Result.TargetCharacter     = Cast<ACharacter>(Result.TargetAvatarActor);
+	Result.TargetController    = Result.TargetCharacter ? Result.TargetCharacter->GetController() : InData.Target.AbilityActorInfo->PlayerController.Get();
 	Result.TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(Result.TargetAvatarActor.Get());
 
 	return Result;

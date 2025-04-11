@@ -10,11 +10,9 @@
 void UP16DamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
-	for (auto [Tag, ScalableFloat] : DamageTypes)
-	{
-		const float Magnitude = ScalableFloat.GetValueAtLevel(GetAbilityLevel());
-		DamageSpecHandle.Data->SetSetByCallerMagnitude(Tag, Magnitude);
-	}
+
+	const float Magnitude = DamageInfo.Damage.GetValueAtLevel(GetAbilityLevel());
+	DamageSpecHandle.Data->SetSetByCallerMagnitude(DamageInfo.Tag, Magnitude);
 
 	UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 	EARLY_RETURN_IF(!TargetAbilitySystem)
@@ -30,13 +28,16 @@ FP16TaggedMontage UP16DamageGameplayAbility::GetRandomTaggedMontageFrom(const TA
 	return Montages[RandomIndex];
 }
 
-float UP16DamageGameplayAbility::GetDamageValue(const int32 InLevel, const FGameplayTag& InDamageTag)
+FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
 {
-	float Damage = 0.f;
-
-	const FScalableFloat* FireballScalableDamage = DamageTypes.Find(InDamageTag);
-	EARLY_RETURN_VALUE_IF(!FireballScalableDamage, Damage)
-
-	Damage = FireballScalableDamage->GetValueAtLevel(InLevel);
-	return Damage;
+	return FP16DamageEffectParams {
+		.WorldContext = GetAvatarActorFromActorInfo(),
+		.DamageEffectClass = DamageEffectClass,
+		.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo(),
+		.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor),
+		.BaseDamage = DamageInfo.Damage.GetValueAtLevel(GetAbilityLevel()),
+		.AbilityLevel = GetAbilityLevel(),
+		.DamageType = DamageInfo.Tag,
+		.Debuff = DebuffInfo
+	};
 }
