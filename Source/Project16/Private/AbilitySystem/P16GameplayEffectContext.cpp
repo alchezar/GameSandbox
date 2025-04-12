@@ -23,10 +23,11 @@ bool FP16GameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 		RepBits |= (bHasWorldOrigin)                                  << 6;
 		RepBits |= (bBlockedHit)                                      << 7;
 		RepBits |= (bCriticalHit)                                     << 8;
+		RepBits |= (DebuffSpec.bSuccessful)                           << 9;
 		// clang-format on
 	}
 
-	Ar.SerializeBits(&RepBits, 9);
+	Ar.SerializeBits(&RepBits, 10);
 
 	if (RepBits & (1 << 0))
 	{
@@ -73,6 +74,20 @@ bool FP16GameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 	{
 		Ar << bCriticalHit;
 	}
+	if (RepBits & (1 << 9))
+	{
+		Ar
+			<< DebuffSpec.bSuccessful
+			<< DebuffSpec.Damage
+			<< DebuffSpec.Frequency
+			<< DebuffSpec.Duration;
+
+		if (Ar.IsLoading() && !DebuffSpec.DamageType.IsValid())
+		{
+			DebuffSpec.DamageType = MakeShared<FGameplayTag>();
+		}
+		DebuffSpec.DamageType->NetSerialize(Ar, Map, bOutSuccess);
+	}
 
 	if (Ar.IsLoading())
 	{
@@ -96,4 +111,17 @@ FP16GameplayEffectContext* FP16GameplayEffectContext::Duplicate() const
 	}
 
 	return NewContext;
+}
+
+void FP16GameplayEffectContext::SetDebuffSpec(const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType)
+{
+	// clang-format off
+	DebuffSpec = FP16DebuffSpec {
+		.bSuccessful = bSuccessful,
+		.Damage      = InDebuffInfo.Damage,
+		.Frequency   = InDebuffInfo.Frequency,
+		.Duration    = InDebuffInfo.Duration,
+		.DamageType  = MakeShared<FGameplayTag>(InDamageType)
+	};
+	// clang-format on
 }

@@ -220,6 +220,9 @@ struct FP16DamageInfo
 	FScalableFloat Damage = {};
 };
 
+/// @brief All information about debuff, encapsulated in one struct.
+/// @details This struct designed to store on the source side all the information
+/// about the debuffing we need to use. With the expectation of one debuff per ability.
 USTRUCT(BlueprintType)
 struct FP16DebuffInfo
 {
@@ -233,6 +236,23 @@ struct FP16DebuffInfo
 	float Frequency = 1.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	float Duration = 5.f;
+};
+
+/// @brief All information about debuff, after trying to use it.
+/// @details This is specified version of `FP16DebuffInfo` struct.
+/// Designed to store on the target side all the information about the debuffing
+/// after successful chance to use it.
+USTRUCT(BlueprintType)
+struct FP16DebuffSpec
+{
+	GENERATED_BODY()
+
+	bool  bSuccessful = false;
+	float Damage      = 0.f;
+	float Frequency   = 0.f;
+	float Duration    = 0.f;
+
+	TSharedPtr<FGameplayTag> DamageType = {};
 };
 
 USTRUCT(BlueprintType)

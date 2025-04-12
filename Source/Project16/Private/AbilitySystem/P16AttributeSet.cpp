@@ -155,9 +155,9 @@ FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffect
 
 	Result.SourceCharacter = Cast<ACharacter>(Result.SourceController->GetPawn());
 
-	// After adding debuffs, method `GetOriginalInstigatorAbilitySystemComponent` starts returning ASC of the target, not source.
-	// As a result - always SourceCharacter == Target character, and method `ShowFloatingText` stops showing damage text.
-	// I don't know how to debug that strange method, so the solution is to use previously saved `SourceObject`.
+	//! After adding debuffs, method `GetOriginalInstigatorAbilitySystemComponent` starts returning ASC of the target, not source.
+	//! As a result - always SourceCharacter == Target character, and method `ShowFloatingText` stops showing damage text.
+	//! I don't know how to debug that strange method, so the solution is to use previously saved `SourceObject`.
 	if (ACharacter* SourceCharacter = Cast<ACharacter>(Result.EffectContext.GetSourceObject()))
 	{
 		Result.SourceAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceCharacter);
@@ -191,6 +191,8 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 
 	// Show damage numbers.
 	ShowFloatingText(Properties, LocalIncomingDamage);
+
+	HandleDebuff(Properties);
 
 	// Activate the ability that plays the hit react montage.
 	if (!bFatal)
@@ -246,6 +248,20 @@ void UP16AttributeSet::HandleIncomingXP(const FP16EffectProperties& Properties)
 
 	// Add the XP to the player.
 	IP16PlayerInterface::Execute_AddToXP(Owner, LocalIncomingXP);
+}
+
+void UP16AttributeSet::HandleDebuff(const FP16EffectProperties& Properties)
+{
+	const FP16DebuffSpec DebuffSpec = UP16AbilitySystemLibrary::GetDebuffSpec(Properties.EffectContext);
+	EARLY_RETURN_IF(!DebuffSpec.bSuccessful)
+
+	// TODO: Handle Debuff.
+	FString Debug = "";
+	Debug         = FString::Format(L"{0}Debuff:    {1}\n", {Debug, DebuffSpec.DamageType->GetTagName().ToString()});
+	Debug         = FString::Format(L"{0}Damage:    {1}\n", {Debug, DebuffSpec.Damage});
+	Debug         = FString::Format(L"{0}Frequency: {1}\n", {Debug, DebuffSpec.Frequency});
+	Debug         = FString::Format(L"{0}Duration:  {1}\n", {Debug, DebuffSpec.Duration});
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, Debug);
 }
 
 void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const

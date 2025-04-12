@@ -98,40 +98,37 @@ UP16ExecCalcDamage::UP16ExecCalcDamage()
 
 void UP16ExecCalcDamage::Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	// Get damage set by Caller magnitude.
 	const FGameplayEffectSpec    Spec          = ExecutionParams.GetOwningSpec();
 	FGameplayEffectContextHandle ContextHandle = Spec.GetContext();
 
-	// Search through all damage types.
 	float Damage = 0.f;
-	for (const auto& [DamageTag, ResistanceTag] : FGSGameplayTagsSingleton::Get().P16Tags.Maps.DamageTypesToResistances)
-	{
-		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTag, false);
-		AffectResistance(ExecutionParams, ContextHandle, ResistanceTag, DamageTypeValue);
-		Damage += DamageTypeValue;
-	}
 
-	// Affect damage by modifiers.
-	const FP16ExecutionData ExecutionData {ExecutionParams};
-
+	AffectDamage(ExecutionParams, Spec, ContextHandle, Damage);
 	AffectBlockChance(ExecutionParams, ContextHandle, Damage);
-	AffectArmorAndPenetration(ExecutionParams, ExecutionData, Damage);
-	AffectCriticalHit(ExecutionParams, ExecutionData, ContextHandle, Damage);
+	AffectArmorAndPenetration(ExecutionParams, Damage);
+	AffectCriticalHit(ExecutionParams, ContextHandle, Damage);
+	AffectDebuffs(ExecutionParams, Spec, ContextHandle);
 
 	// Set incoming damage attribute.
 	const FGameplayModifierEvaluatedData EvaluatedData = {UP16AttributeSet::GetIncomingDamageAttribute(), EGameplayModOp::Override, Damage};
 	OutExecutionOutput.AddOutputModifier(EvaluatedData);
 }
 
-void UP16ExecCalcDamage::AffectResistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, const FGameplayTag& ResistanceTag, float& OutDamage) const
+FGameplayEffectAttributeCaptureDefinition& UP16ExecCalcDamage::GetCaptureDefinitionBy(const FGameplayTag& InTag) const
 {
-	// For some reason FGSGameplayTagsSingleton::Get() is not initialized when FP16DamageStatics constructor is called.
-	// So, instead of creating a map there, we're using static variable instead.
-	// But not with all captured attributes, but only with the ones we really need.
+	//! For some reason FGSGameplayTagsSingleton::Get() is not initialized when FP16DamageStatics constructor is called.
+	//! So, instead of creating a map there, we're using static variable instead.
 
-	// clang-format off
+	const auto& SecondaryTags  = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Secondary;
 	const auto& ResistanceTags = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Resistance;
+	// clang-format off
 	static TMap<FGameplayTag, FGameplayEffectAttributeCaptureDefinition> TagsToCaptureDefinitions = {
+		{SecondaryTags.ArmorTag,                 FP16DamageStatics::Get().ArmorDef},
+		{SecondaryTags.ArmorPenetrationTag,      FP16DamageStatics::Get().ArmorPenetrationDef},
+		{SecondaryTags.BlockChanceTag,           FP16DamageStatics::Get().BlockChanceDef},
+		{SecondaryTags.CriticalHitChanceTag,     FP16DamageStatics::Get().CriticalHitChanceDef},
+		{SecondaryTags.CriticalHitDamageTag,     FP16DamageStatics::Get().CriticalHitDamageDef},
+		{SecondaryTags.CriticalHitResistanceTag, FP16DamageStatics::Get().CriticalHitResistanceDef},
 		{ResistanceTags.ArcaneTag,    FP16DamageStatics::Get().ArcaneResistanceDef},
 		{ResistanceTags.FireTag,      FP16DamageStatics::Get().FireResistanceDef},
 		{ResistanceTags.LightningTag, FP16DamageStatics::Get().LightningResistanceDef},
@@ -139,8 +136,23 @@ void UP16ExecCalcDamage::AffectResistance(const FGameplayEffectCustomExecutionPa
 	};
 	// clang-format on
 
-	EARLY_RETURN_IF(!TagsToCaptureDefinitions.Contains(ResistanceTag))
-	const auto  CaptureDef = TagsToCaptureDefinitions[ResistanceTag];
+	return TagsToCaptureDefinitions[InTag];
+}
+
+void UP16ExecCalcDamage::AffectDamage(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
+{
+	// Search through all damage types.
+	for (const auto& [DamageTag, ResistanceTag] : FGSGameplayTagsSingleton::Get().P16Tags.Maps.DamageTypesToResistances)
+	{
+		float DamageTypeValue = Spec.GetSetByCallerMagnitude(DamageTag, false);
+		AffectResistance(ExecutionParams, ContextHandle, ResistanceTag, DamageTypeValue);
+		OutDamage += DamageTypeValue;
+	}
+}
+
+void UP16ExecCalcDamage::AffectResistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, const FGameplayTag& ResistanceTag, float& OutDamage) const
+{
+	const auto& CaptureDef = GetCaptureDefinitionBy(ResistanceTag);
 	const float Resistance = GetAttributeMagnitude(ExecutionParameters, CaptureDef);
 
 	OutDamage -= OutDamage * Resistance / 100.f;
@@ -156,8 +168,10 @@ void UP16ExecCalcDamage::AffectBlockChance(const FGameplayEffectCustomExecutionP
 	UP16AbilitySystemLibrary::SetIsBlockedHit(ContextHandle, true);
 }
 
-void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const
+void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, float& OutDamage) const
 {
+	const FP16ExecutionData ExecutionData {ExecutionParams};
+
 	AActor* SourceAvatar = ExecutionData.SourceAvatar;
 	AActor* TargetAvatar = ExecutionData.TargetAvatar;
 
@@ -175,8 +189,10 @@ void UP16ExecCalcDamage::AffectArmorAndPenetration(const FGameplayEffectCustomEx
 	OutDamage *= FinalCoefficient;
 }
 
-void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
+void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const
 {
+	const FP16ExecutionData ExecutionData {ExecutionParams};
+
 	AActor*     TargetAvatar = ExecutionData.TargetAvatar;
 	const float TargetLevel  = TargetAvatar && TargetAvatar->Implements<UP16CombatInterface>() ? IP16CombatInterface::Execute_GetPlayerLevel(TargetAvatar) : 1.f;
 
@@ -192,6 +208,34 @@ void UP16ExecCalcDamage::AffectCriticalHit(const FGameplayEffectCustomExecutionP
 	OutDamage += CriticalHitDamage;
 
 	UP16AbilitySystemLibrary::SetIsCriticalHit(ContextHandle, true);
+}
+
+void UP16ExecCalcDamage::AffectDebuffs(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FGameplayEffectContextHandle& ContextHandle) const
+{
+	FP16Tags Tags = FGSGameplayTagsSingleton::Get().P16Tags;
+	for (const auto& [DamageType, DebuffType] : Tags.Maps.DamageTypesToDebuffs)
+	{
+		const float TypeDamage = Spec.GetSetByCallerMagnitude(DamageType, false, -1.f);
+		CONTINUE_IF(TypeDamage < 0.f)
+
+		// Determine if there was a successful debuff.
+		const FGameplayTag& ResistanceTag = Tags.Maps.DamageTypesToResistances[DamageType];
+		const auto&         CaptureDef    = GetCaptureDefinitionBy(ResistanceTag);
+
+		const float SourceDebuffChance     = Spec.GetSetByCallerMagnitude(Tags.Debuff.Info.ChanceTag, false, -1.f);
+		const float TargetDebuffResistance = GetAttributeMagnitude(ExecutionParams, CaptureDef);
+		const float EffectiveDebuffChance  = SourceDebuffChance * (100.f - TargetDebuffResistance) / 100.f;
+		CONTINUE_IF(!HasChance(EffectiveDebuffChance))
+
+		// Carrying debuff information through, from activation gameplay effect to the target's attribute set.
+		FP16DebuffInfo DebuffInfo = {
+			.Chance = 100.f,
+			.Damage = Spec.GetSetByCallerMagnitude(Tags.Debuff.Info.DamageTag, false, -1.f),
+			.Frequency = Spec.GetSetByCallerMagnitude(Tags.Debuff.Info.FrequencyTag, false, -1.f),
+			.Duration = Spec.GetSetByCallerMagnitude(Tags.Debuff.Info.DurationTag, false, -1.f)
+		};
+		UP16AbilitySystemLibrary::SetDebuffSpec(ContextHandle, true, DebuffInfo, DamageType);
+	}
 }
 
 bool UP16ExecCalcDamage::HasChance(const float Chance) const

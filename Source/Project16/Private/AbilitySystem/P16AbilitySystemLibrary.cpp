@@ -108,6 +108,20 @@ bool UP16AbilitySystemLibrary::GetIsCriticalHit(const FGameplayEffectContextHand
 	return Context ? Context->GetIsCriticalHit() : false;
 }
 
+FP16DebuffSpec UP16AbilitySystemLibrary::GetDebuffSpec(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	return Context ? Context->GetDebuffSpec() : FP16DebuffSpec {};
+}
+
+FGameplayTag UP16AbilitySystemLibrary::GetDebuffDamageType(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_VALUE_IF(!Context || !Context->GetDebuffSpec().DamageType.IsValid(), FGameplayTag {})
+
+	return *Context->GetDebuffSpec().DamageType;
+}
+
 void UP16AbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked)
 {
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
@@ -120,6 +134,13 @@ void UP16AbilitySystemLibrary::SetIsCriticalHit(FGameplayEffectContextHandle& Ef
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
 	EARLY_RETURN_IF(!Context)
 	Context->SetIsCriticalHit(bNewCritical);
+}
+
+void UP16AbilitySystemLibrary::SetDebuffSpec(FGameplayEffectContextHandle& EffectContextHandle, const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+	Context->SetDebuffSpec(bSuccessful, InDebuffInfo, InDamageType);
 }
 
 TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin)

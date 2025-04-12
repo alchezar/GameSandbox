@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameplayEffectTypes.h"
+#include "Util/P16Type.h"
 #include "P16GameplayEffectContext.generated.h"
 
 /// ----------------------------------------------------------------------------
@@ -39,9 +40,12 @@ public:
 	bool GetIsCriticalHit() const { return bCriticalHit; };
 	_NODISCARD
 	bool GetIsBlockedHit() const { return bBlockedHit; };
+	_NODISCARD
+	FP16DebuffSpec GetDebuffSpec() const { return DebuffSpec; };
 
 	void SetIsCriticalHit(const bool bNewCriticalHit) { bCriticalHit = bNewCriticalHit; }
 	void SetIsBlockedHit(const bool bNewBlockedHit) { bBlockedHit = bNewBlockedHit; }
+	void SetDebuffSpec(const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -51,6 +55,10 @@ protected:
 	bool bBlockedHit = false;
 	UPROPERTY()
 	bool bCriticalHit = false;
+
+	TSharedPtr<FGameplayTag> DamageType = {};
+
+	FP16DebuffSpec DebuffSpec = {};
 };
 
 /// ----------------------------------------------------------------------------

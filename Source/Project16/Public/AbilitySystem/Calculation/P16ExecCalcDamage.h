@@ -47,14 +47,19 @@ public:
 	/// @name This
 	/// ------------------------------------------------------------------------
 private:
+	FGameplayEffectAttributeCaptureDefinition& GetCaptureDefinitionBy(const FGameplayTag& InTag) const;
+
+	void AffectDamage(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Apply resistance to each damage type.
 	void AffectResistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, const FGameplayTag& ResistanceTag, float& OutDamage) const;
 	/// @brief Capture the block chance on the target and determine if there was a successful block. If so, half the damage.
 	void AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Armor penetration ignores a percentage of the target's armor.
-	void AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, float& OutDamage) const;
+	void AffectArmorAndPenetration(const FGameplayEffectCustomExecutionParameters& ExecutionParams, float& OutDamage) const;
 	/// @brief Critical hits have a chance to double the damage.
-	void AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FP16ExecutionData& ExecutionData, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
+	void AffectCriticalHit(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
+	/// @brief Apply debuffs to the target.
+	void AffectDebuffs(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FGameplayEffectContextHandle& ContextHandle) const;
 
 	bool  HasChance(const float Chance) const;
 	float GetAttributeMagnitude(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectAttributeCaptureDefinition& InCaptureDef) const;
