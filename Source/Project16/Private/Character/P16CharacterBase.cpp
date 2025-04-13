@@ -4,6 +4,7 @@
 
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
+#include "AbilitySystem/Debuff/P16DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
@@ -13,6 +14,10 @@ AP16CharacterBase::AP16CharacterBase()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>("WeaponSkeletalMeshComponent");
 	Weapon->SetupAttachment(GetMesh(), HandSocketName);
 	Weapon->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	BurnDebuff = CreateDefaultSubobject<UP16DebuffNiagaraComponent>("DebuffNiagaraComponent");
+	BurnDebuff->SetupAttachment(GetRootComponent());
+	BurnDebuff->DebuffTag = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.BurnTag;
 
 	if (CombatSocketNameMap.IsEmpty())
 	{
@@ -90,6 +95,16 @@ EP16CharacterClass AP16CharacterBase::GetCharacterClass_Implementation()
 	return CharacterClass;
 }
 
+FP16OnAbilitySystemRegisteredSignature& AP16CharacterBase::GetOnAbilitySystemRegisteredDelegate()
+{
+	return OnAbilitySystemRegistered;
+}
+
+FP16OnDeathSignature& AP16CharacterBase::GetOnDeathDelegate()
+{
+	return OnDeath;
+}
+
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage.Get();
@@ -106,6 +121,8 @@ void AP16CharacterBase::Die()
 
 void AP16CharacterBase::InitAbilityActorInfo()
 {
+	OnAbilitySystemRegistered.Broadcast(AbilitySystemComponent);
+
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent))
 	{
 		AbilitySystem->OnAbilityActorInfoSet();
@@ -142,6 +159,7 @@ void AP16CharacterBase::Multicast_Die_Implementation()
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();
 	bDead = true;
+	OnDeath.Broadcast(this);
 }
 
 void AP16CharacterBase::ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel) const

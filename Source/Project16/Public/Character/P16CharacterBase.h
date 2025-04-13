@@ -8,6 +8,7 @@
 #include "Util/P16Type.h"
 #include "P16CharacterBase.generated.h"
 
+class UP16DebuffNiagaraComponent;
 class UNiagaraSystem;
 class UP16GameplayAbility;
 class UGameplayEffect;
@@ -32,22 +33,26 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
-	virtual UAnimMontage*             GetHitReactMontage_Implementation() override;
-	virtual void                      Die() override;
-	virtual FVector                   GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
-	virtual bool                      GetIsDead_Implementation() const override;
-	virtual AActor*                   GetAvatar_Implementation() override;
-	virtual TArray<FP16TaggedMontage> GetAttackMontages_Implementation() override;
-	virtual FP16TaggedMontage         GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
-	virtual UNiagaraSystem*           GetBloodEffect_Implementation() override;
-	virtual int32                     GetMinionCount_Implementation() override;
-	virtual void                      IncrementMinionCount_Implementation(const int32 Amount = 1) override;
-	virtual EP16CharacterClass        GetCharacterClass_Implementation() override;
+	virtual UAnimMontage*                           GetHitReactMontage_Implementation() override;
+	virtual void                                    Die() override;
+	virtual FVector                                 GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
+	virtual bool                                    GetIsDead_Implementation() const override;
+	virtual AActor*                                 GetAvatar_Implementation() override;
+	virtual TArray<FP16TaggedMontage>               GetAttackMontages_Implementation() override;
+	virtual FP16TaggedMontage                       GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
+	virtual UNiagaraSystem*                         GetBloodEffect_Implementation() override;
+	virtual int32                                   GetMinionCount_Implementation() override;
+	virtual void                                    IncrementMinionCount_Implementation(const int32 Amount = 1) override;
+	virtual EP16CharacterClass                      GetCharacterClass_Implementation() override;
+	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() override;
+	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
 protected:
+	/// @brief Initialize ability actor info.
+	/// @attention Super method should be called at the end of the overriden method.
 	virtual void InitAbilityActorInfo();
 	virtual void InitDefaultAttributes() const;
 
@@ -63,9 +68,15 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	FP16OnAbilitySystemRegisteredSignature OnAbilitySystemRegistered;
+	FP16OnDeathSignature                   OnDeath;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USkeletalMeshComponent> Weapon = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP16DebuffNiagaraComponent> BurnDebuff = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;

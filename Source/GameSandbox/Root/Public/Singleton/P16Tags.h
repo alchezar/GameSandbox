@@ -170,6 +170,7 @@ struct FP16TagDebuffType
 {
 	GENERATED_BODY()
 
+	FGameplayTag Tag;
 	FGameplayTag BurnTag;
 	FGameplayTag StunTag;
 	FGameplayTag HexTag;

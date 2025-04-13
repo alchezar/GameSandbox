@@ -95,11 +95,13 @@ protected:
 
 private:
 	FP16EffectProperties GetEffectProperties(const FGameplayEffectModCallbackData& InData) const;
-	void                 HandleIncomingDamage(const FP16EffectProperties& Properties);
-	void                 HandleIncomingXP(const FP16EffectProperties& Properties);
-	void                 HandleDebuff(const FP16EffectProperties& Properties);
-	void                 ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const;
-	void                 SendRewardXPEvent(const FP16EffectProperties& Properties) const;
+	bool                 GetIsAvatarDead() const;
+
+	void HandleIncomingDamage(const FP16EffectProperties& Properties);
+	void HandleIncomingXP(const FP16EffectProperties& Properties);
+	void HandleDebuff(const FP16EffectProperties& Properties);
+	void ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const;
+	void SendRewardXPEvent(const FP16EffectProperties& Properties) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

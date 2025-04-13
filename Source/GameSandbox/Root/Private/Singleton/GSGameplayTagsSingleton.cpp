@@ -70,6 +70,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Damage.PhysicalTag  = Manager.AddNativeGameplayTag("P16.Damage.Physical", "Physical damage type");
 
 	// Debuff tags.
+	Singleton.P16Tags.Debuff.Type.Tag          = Manager.AddNativeGameplayTag("P16.Debuff.Type", "Parent tag for debuff types.");
 	Singleton.P16Tags.Debuff.Type.BurnTag      = Manager.AddNativeGameplayTag("P16.Debuff.Type.Burn", "Burn debuff for fire damage type");
 	Singleton.P16Tags.Debuff.Type.StunTag      = Manager.AddNativeGameplayTag("P16.Debuff.Type.Stun", "Stun debuff for lightning damage type");
 	Singleton.P16Tags.Debuff.Type.HexTag       = Manager.AddNativeGameplayTag("P16.Debuff.Type.Hex", "Hex debuff for arcane damage type");

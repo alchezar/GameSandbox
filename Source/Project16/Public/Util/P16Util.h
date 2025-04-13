@@ -9,6 +9,8 @@
 struct FGameplayAbilitySpec;
 class UP16AbilitySystemComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnDeathSignature, AActor*, DeadActor);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnAttributeChangeSignature, float, NewValue);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangeSignature, int32, NewValue);
@@ -23,11 +25,13 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnWaitForEquipSelectionSignature
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FP16OnSpellGlobeSelectedSignature, bool, bAllowSpend, bool, bAllowEquip, FString, CurrentDescription, FString, NextDescription);
 
-DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/);
-
 DECLARE_MULTICAST_DELEGATE(FP16OnAbilitiesGivenSignature);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/);
+
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int32 /*StatValue*/);
+
+DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnAbilitySystemRegisteredSignature, UAbilitySystemComponent*);
 
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP16OnAbilityStatusChangedSignature, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*StatusTag*/, const int32 /*Level*/);
 

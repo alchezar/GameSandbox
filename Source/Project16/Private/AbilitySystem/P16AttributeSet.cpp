@@ -7,7 +7,9 @@
 #include "GameplayEffectExtension.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
+#include "AbilitySystem/P16GameplayEffectContext.h"
 #include "GameFramework/Character.h"
+#include "GameplayEffectComponents/TargetTagsGameplayEffectComponent.h"
 #include "Interface/P16CombatInterface.h"
 #include "Interface/P16PlayerInterface.h"
 #include "Net/UnrealNetwork.h"
@@ -177,8 +179,21 @@ FP16EffectProperties UP16AttributeSet::GetEffectProperties(const FGameplayEffect
 	return Result;
 }
 
+bool UP16AttributeSet::GetIsAvatarDead() const
+{
+	const UAbilitySystemComponent* OwningAbilitySystemComponent = GetOwningAbilitySystemComponent();
+	EARLY_RETURN_VALUE_IF(!OwningAbilitySystemComponent, false)
+	const AActor* AvatarActor = OwningAbilitySystemComponent->GetAvatarActor();
+	EARLY_RETURN_VALUE_IF(!AvatarActor || !AvatarActor->Implements<UP16CombatInterface>(), false)
+
+	return IP16CombatInterface::Execute_GetIsDead(AvatarActor);
+}
+
 void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properties)
 {
+	// Don't kill twice.
+	EARLY_RETURN_IF(GetIsAvatarDead())
+
 	// Remember and reset incoming damage.
 	const float LocalIncomingDamage = GetIncomingDamage();
 	SetIncomingDamage(0.f);
@@ -255,13 +270,43 @@ void UP16AttributeSet::HandleDebuff(const FP16EffectProperties& Properties)
 	const FP16DebuffSpec DebuffSpec = UP16AbilitySystemLibrary::GetDebuffSpec(Properties.EffectContext);
 	EARLY_RETURN_IF(!DebuffSpec.bSuccessful)
 
-	// TODO: Handle Debuff.
-	FString Debug = "";
-	Debug         = FString::Format(L"{0}Debuff:    {1}\n", {Debug, DebuffSpec.DamageType->GetTagName().ToString()});
-	Debug         = FString::Format(L"{0}Damage:    {1}\n", {Debug, DebuffSpec.Damage});
-	Debug         = FString::Format(L"{0}Frequency: {1}\n", {Debug, DebuffSpec.Frequency});
-	Debug         = FString::Format(L"{0}Duration:  {1}\n", {Debug, DebuffSpec.Duration});
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, Debug);
+	// Crete and setup new debuff gameplay effect.
+	const FString    DebuffName = FString::Printf(L"DynamicDebuff_%s", *DebuffSpec.DamageType->ToString());
+	UGameplayEffect* Effect     = NewObject<UGameplayEffect>(GetTransientPackage(), *DebuffName);
+	// Setup duration
+	Effect->DurationPolicy    = EGameplayEffectDurationType::HasDuration;
+	Effect->Period            = DebuffSpec.Frequency;
+	Effect->DurationMagnitude = FScalableFloat {DebuffSpec.Duration};
+
+	// Add debuff tag
+	// Effect->InheritableOwnedTagsContainer.AddTag(DebuffTag); // - 5.3 deprecated, so we need different approach:
+	const FGameplayTag                  DebuffTag           = FGSGameplayTagsSingleton::Get().P16Tags.Maps.DamageTypesToDebuffs[*DebuffSpec.DamageType];
+	UTargetTagsGameplayEffectComponent& TargetTagsComponent = Effect->FindOrAddComponent<UTargetTagsGameplayEffectComponent>();
+	FInheritedTagContainer              InheritableOwnedTagsContainer {};
+	InheritableOwnedTagsContainer.AddTag(DebuffTag);
+	TargetTagsComponent.SetAndApplyTargetTagChanges(InheritableOwnedTagsContainer);
+	// Stacking
+	Effect->StackingType    = EGameplayEffectStackingType::AggregateBySource;
+	Effect->StackLimitCount = 1;
+	// Modifiers
+	const int32 Index = Effect->Modifiers.Num();
+	Effect->Modifiers.Add(FGameplayModifierInfo {});
+	FGameplayModifierInfo& ModifierInfo = Effect->Modifiers[Index];
+	ModifierInfo.ModifierMagnitude      = FScalableFloat {DebuffSpec.Damage};
+	ModifierInfo.ModifierOp             = EGameplayModOp::Additive;
+	ModifierInfo.Attribute              = GetIncomingDamageAttribute();
+
+	// Apply the effect
+	// New context for debuff GE, not the same as the context of the damage GE.
+	FGameplayEffectContextHandle NewContextHandle = Properties.SourceAbilitySystem->MakeEffectContext();
+	NewContextHandle.AddSourceObject(Properties.SourceAvatarActor);
+
+	const FGameplayEffectSpec* MutableSpec = new FGameplayEffectSpec {Effect, NewContextHandle, 1.f};
+	EARLY_RETURN_IF(!MutableSpec)
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(MutableSpec->GetContext().Get());
+	Context->SetDamageType(DebuffSpec.DamageType);
+
+	Properties.TargetAbilitySystem->ApplyGameplayEffectSpecToSelf(*MutableSpec);
 }
 
 void UP16AttributeSet::ShowFloatingText(const FP16EffectProperties& Properties, const float InDamage) const

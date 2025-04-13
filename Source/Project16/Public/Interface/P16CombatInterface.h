@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Util/P16Type.h"
+#include "Util/P16Util.h"
 #include "P16CombatInterface.generated.h"
 
 class UNiagaraSystem;
@@ -56,4 +57,7 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EP16CharacterClass GetCharacterClass();
+
+	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() = 0;
+	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() = 0;
 };

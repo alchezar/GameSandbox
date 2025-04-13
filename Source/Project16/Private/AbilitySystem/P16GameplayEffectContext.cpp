@@ -125,3 +125,8 @@ void FP16GameplayEffectContext::SetDebuffSpec(const bool bSuccessful, const FP16
 	};
 	// clang-format on
 }
+
+void FP16GameplayEffectContext::SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType)
+{
+	DebuffSpec.DamageType = InDamageType;
+}

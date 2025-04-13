@@ -46,6 +46,7 @@ public:
 	void SetIsCriticalHit(const bool bNewCriticalHit) { bCriticalHit = bNewCriticalHit; }
 	void SetIsBlockedHit(const bool bNewBlockedHit) { bBlockedHit = bNewBlockedHit; }
 	void SetDebuffSpec(const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType);
+	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
