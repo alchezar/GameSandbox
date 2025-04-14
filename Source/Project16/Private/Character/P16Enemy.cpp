@@ -73,14 +73,14 @@ int32 AP16Enemy::GetPlayerLevel_Implementation()
 	return Level;
 };
 
-void AP16Enemy::Die()
+void AP16Enemy::Die(const FVector& DeathImpulse)
 {
 	SetLifeSpan(LifeSpan);
 	if (AIController)
 	{
 		AIController->GetBlackboardComponent()->SetValueAsBool("Dead", true);
 	}
-	Super::Die();
+	Super::Die(DeathImpulse);
 }
 
 void AP16Enemy::ToggleHighlight(const bool bOn)

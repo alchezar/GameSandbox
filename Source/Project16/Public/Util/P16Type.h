@@ -256,26 +256,43 @@ struct FP16DebuffSpec
 };
 
 USTRUCT(BlueprintType)
+struct FP16TrickImpulse
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float Magnitude = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (UIMin = 0.f, ClampMin = 0.f, UIMax = 100.f, ClampMax = 100.f))
+	float Chance = 100.f;
+	UPROPERTY(BlueprintReadWrite)
+	FVector Velocity = FVector::ZeroVector;
+};
+
+USTRUCT(BlueprintType)
 struct FP16DamageEffectParams
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UObject> WorldContext = nullptr;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TSubclassOf<UGameplayEffect> DamageEffectClass = nullptr;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> SourceAbilitySystemComponent = nullptr;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> TargetAbilitySystemComponent = nullptr;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	float BaseDamage = 0.f;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	int32 AbilityLevel = 1;
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FGameplayTag DamageType = {};
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	FP16DebuffInfo Debuff = {};
+	UPROPERTY(BlueprintReadWrite)
+	FP16TrickImpulse DeathImpulse = {};
+	UPROPERTY(BlueprintReadWrite)
+	FP16TrickImpulse Knockback = {};
 };
 
 struct FP16SelectedAbility

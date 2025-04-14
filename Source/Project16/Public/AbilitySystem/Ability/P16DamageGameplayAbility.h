@@ -29,7 +29,10 @@ public:
 	UFUNCTION(BlueprintPure)
 	static FP16TaggedMontage GetRandomTaggedMontageFrom(const TArray<FP16TaggedMontage>& Montages);
 
+	UFUNCTION(BlueprintPure)
 	FP16DamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
+
+	static void UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -41,4 +44,9 @@ protected:
 	FP16DamageInfo DamageInfo;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
 	FP16DebuffInfo DebuffInfo = {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Trick")
+	FP16TrickImpulse DeathImpulse = {.Magnitude = 5000.f};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Trick")
+	FP16TrickImpulse KnockbackForce = {.Magnitude = 500.f, .Chance = 0.f};
 };

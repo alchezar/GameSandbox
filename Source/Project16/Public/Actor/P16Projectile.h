@@ -24,6 +24,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(const float DeltaSeconds) override;
 	virtual void Destroyed() override;
 
 	/// ------------------------------------------------------------------------
@@ -38,8 +39,9 @@ protected:
 	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 private:
-	void PlayOnHitEffects();
+	void PlayOnHitEffects() const;
 	void ApplyDamageTo(AActor* Target);
+	void CustomMove(const float DeltaSeconds);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -66,10 +68,14 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Projectile")
 	float LifeSpan = 15.f;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	float DistanceToGround = 0.f;
+
 private:
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> LoopingSoundComp = nullptr;
 
-	bool         bHit = false;
 	FTimerHandle DestroyTimer;
+	FVector      LastTickLocation = FVector::ZeroVector;
+	FVector      ForwardDirection = FVector::ZeroVector;
 };

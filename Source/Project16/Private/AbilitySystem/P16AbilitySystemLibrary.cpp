@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/P16AbilitySystemLibrary.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Project16.h"
 #include "AbilitySystem/P16GameplayEffectContext.h"
@@ -122,6 +123,22 @@ FGameplayTag UP16AbilitySystemLibrary::GetDebuffDamageType(const FGameplayEffect
 	return *Context->GetDebuffSpec().DamageType;
 }
 
+FVector UP16AbilitySystemLibrary::GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_VALUE_IF(!Context, FVector::ZeroVector)
+
+	return Context->GetDeadImpulse();
+}
+
+FVector UP16AbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_VALUE_IF(!Context, FVector::ZeroVector)
+
+	return Context->GetKnockbackForce();
+}
+
 void UP16AbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked)
 {
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
@@ -141,6 +158,22 @@ void UP16AbilitySystemLibrary::SetDebuffSpec(FGameplayEffectContextHandle& Effec
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
 	EARLY_RETURN_IF(!Context)
 	Context->SetDebuffSpec(bSuccessful, InDebuffInfo, InDamageType);
+}
+
+void UP16AbilitySystemLibrary::SetDeathImpulse(FGameplayEffectContextHandle& EffectContextHandle, const FVector& InImpulse)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+
+	Context->SetDeathImpulse(InImpulse);
+}
+
+void UP16AbilitySystemLibrary::SetKnockbackForce(FGameplayEffectContextHandle& EffectContextHandle, const FVector& InForce)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+
+	Context->SetKnockbackForce(InForce);
 }
 
 TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin)
@@ -194,6 +227,9 @@ FGameplayEffectContextHandle UP16AbilitySystemLibrary::ApplyDamageEffect(const F
 
 	FGameplayEffectContextHandle ContextHandle = Params.TargetAbilitySystemComponent->MakeEffectContext();
 	ContextHandle.AddSourceObject(Params.SourceAbilitySystemComponent->GetAvatarActor());
+	SetDeathImpulse(ContextHandle, Params.DeathImpulse.Velocity);
+	SetKnockbackForce(ContextHandle, Params.Knockback.Velocity);
+
 	const FGameplayEffectSpecHandle SpecHandle = Params.TargetAbilitySystemComponent->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
 	SpecHandle.Data->SetSetByCallerMagnitude(Params.DamageType, Params.BaseDamage);
 

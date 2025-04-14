@@ -30,7 +30,7 @@ protected:
 	void OnDebuffTagChanged(FGameplayTag CallbackTag, const int32 NewCount);
 	void ListenToDebuffTagChanges(UAbilitySystemComponent* AbilitySystemComponent);
 	UFUNCTION()
-	void OnDeathCallback(AActor* DeadActor);
+	void OnDeathCallback(AActor* DeadActor = nullptr);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

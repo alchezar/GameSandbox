@@ -210,18 +210,25 @@ void UP16AttributeSet::HandleIncomingDamage(const FP16EffectProperties& Properti
 	HandleDebuff(Properties);
 
 	// Activate the ability that plays the hit react montage.
+	EARLY_RETURN_IF(!Properties.TargetAvatarActor)
 	if (!bFatal)
 	{
 		FGameplayTagContainer TagContainer;
 		TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect.HitReactTag);
 		Properties.TargetAbilitySystem->TryActivateAbilitiesByTag(TagContainer);
+
+		const FVector KnockbackForce = UP16AbilitySystemLibrary::GetKnockbackForce(Properties.EffectContext);
+		if (KnockbackForce.SizeSquared() > 100.0 && Properties.TargetCharacter)
+		{
+			Properties.TargetCharacter->LaunchCharacter(KnockbackForce, true, true);
+		}
 		return;
 	}
 
 	// Death reaction.
 	const TScriptInterface<IP16CombatInterface> CombatInterface = Properties.TargetAvatarActor.Get();
 	EARLY_RETURN_IF(!CombatInterface)
-	CombatInterface->Die();
+	CombatInterface->Die(UP16AbilitySystemLibrary::GetDeathImpulse(Properties.EffectContext));
 	SendRewardXPEvent(Properties);
 }
 

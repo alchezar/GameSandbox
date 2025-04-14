@@ -110,13 +110,13 @@ UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 	return HitReactMontage.Get();
 }
 
-void AP16CharacterBase::Die()
+void AP16CharacterBase::Die(const FVector& DeathImpulse)
 {
 	if (Weapon)
 	{
 		Weapon->DetachFromComponent(FDetachmentTransformRules {EDetachmentRule::KeepWorld, true});
 	}
-	Multicast_Die();
+	Multicast_Die(DeathImpulse);
 }
 
 void AP16CharacterBase::InitAbilityActorInfo()
@@ -137,7 +137,7 @@ void AP16CharacterBase::InitDefaultAttributes() const
 	ApplyEffectToSelf(DefaultVitalAttributes);
 }
 
-void AP16CharacterBase::Multicast_Die_Implementation()
+void AP16CharacterBase::Multicast_Die_Implementation(const FVector& DeathImpulse)
 {
 	if (DeathSound)
 	{
@@ -149,12 +149,14 @@ void AP16CharacterBase::Multicast_Die_Implementation()
 		Weapon->SetSimulatePhysics(true);
 		Weapon->SetEnableGravity(true);
 		Weapon->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+		Weapon->AddImpulse(DeathImpulse / 8.f, NAME_None, true);
 	}
 
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	GetMesh()->SetCollisionResponseToChannel(ECC_WorldStatic, ECR_Block);
+	GetMesh()->AddImpulse(DeathImpulse, NAME_None, true);
 
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Dissolve();

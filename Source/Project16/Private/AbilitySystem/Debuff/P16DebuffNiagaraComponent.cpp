@@ -37,7 +37,15 @@ void UP16DebuffNiagaraComponent::BeginPlay()
 
 void UP16DebuffNiagaraComponent::OnDebuffTagChanged(FGameplayTag CallbackTag, const int32 NewCount)
 {
-	NewCount > 0 ? Activate() : Deactivate();
+	const TScriptInterface<IP16CombatInterface> CombatInterface = GetOwner();
+
+	if (NewCount > 0 && CombatInterface && !IP16CombatInterface::Execute_GetIsDead(GetOwner()))
+	{
+		Activate();
+		return;
+	}
+
+	Deactivate();
 }
 
 void UP16DebuffNiagaraComponent::ListenToDebuffTagChanges(UAbilitySystemComponent* AbilitySystemComponent)

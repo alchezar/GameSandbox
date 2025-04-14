@@ -34,7 +34,7 @@ protected:
 	/// ------------------------------------------------------------------------
 public:
 	virtual UAnimMontage*                           GetHitReactMontage_Implementation() override;
-	virtual void                                    Die() override;
+	virtual void                                    Die(const FVector& DeathImpulse) override;
 	virtual FVector                                 GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
 	virtual bool                                    GetIsDead_Implementation() const override;
 	virtual AActor*                                 GetAvatar_Implementation() override;
@@ -57,7 +57,7 @@ protected:
 	virtual void InitDefaultAttributes() const;
 
 	UFUNCTION(NetMulticast, Reliable)
-	virtual void Multicast_Die();
+	virtual void Multicast_Die(const FVector& DeathImpulse);
 
 	void ApplyEffectToSelf(const TSubclassOf<UGameplayEffect>& InGameplayEffect, const float InLevel = 1.f) const;
 	void AddCharacterAbilities() const;

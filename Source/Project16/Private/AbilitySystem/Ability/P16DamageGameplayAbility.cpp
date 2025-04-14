@@ -30,7 +30,7 @@ FP16TaggedMontage UP16DamageGameplayAbility::GetRandomTaggedMontageFrom(const TA
 
 FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor) const
 {
-	return FP16DamageEffectParams {
+	FP16DamageEffectParams DamageEffectParams {
 		.WorldContext = GetAvatarActorFromActorInfo(),
 		.DamageEffectClass = DamageEffectClass,
 		.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo(),
@@ -38,6 +38,35 @@ FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClas
 		.BaseDamage = DamageInfo.Damage.GetValueAtLevel(GetAbilityLevel()),
 		.AbilityLevel = GetAbilityLevel(),
 		.DamageType = DamageInfo.Tag,
-		.Debuff = DebuffInfo
+		.Debuff = DebuffInfo,
+		.DeathImpulse = DeathImpulse,
+		.Knockback = KnockbackForce
 	};
+
+	UpdateDamageEffectParams(TargetActor, DamageEffectParams);
+
+	return DamageEffectParams;
+}
+
+void UP16DamageGameplayAbility::UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams)
+{
+	EARLY_RETURN_IF(!TargetActor)
+
+	const AActor* Avatar   = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
+	const FVector ToTarget = (TargetActor->GetActorLocation() - Avatar->GetActorLocation()).GetSafeNormal();
+
+	constexpr float Angle              = -25.f;
+	const FVector   KnockbackDirection = ToTarget.RotateAngleAxis(Angle, Avatar->GetActorRightVector());
+
+	// Ability system.
+	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+
+	// Death impulse.
+	DamageEffectParams.DeathImpulse.Velocity = KnockbackDirection * DamageEffectParams.DeathImpulse.Magnitude;
+
+	// Knockback force.
+	if (DamageEffectParams.Knockback.Chance > FMath::RandRange(0.f, 100.f))
+	{
+		DamageEffectParams.Knockback.Velocity = KnockbackDirection * DamageEffectParams.Knockback.Magnitude;
+	}
 }

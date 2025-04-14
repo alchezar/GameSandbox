@@ -42,11 +42,17 @@ public:
 	bool GetIsBlockedHit() const { return bBlockedHit; };
 	_NODISCARD
 	FP16DebuffSpec GetDebuffSpec() const { return DebuffSpec; };
+	_NODISCARD
+	FVector GetDeadImpulse() const { return DeathImpulse; };
+	_NODISCARD
+	FVector GetKnockbackForce() const { return KnockbackForce; };
 
 	void SetIsCriticalHit(const bool bNewCriticalHit) { bCriticalHit = bNewCriticalHit; }
 	void SetIsBlockedHit(const bool bNewBlockedHit) { bBlockedHit = bNewBlockedHit; }
 	void SetDebuffSpec(const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType);
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType);
+	void SetDeathImpulse(const FVector& NewImpulse) { DeathImpulse = NewImpulse; };
+	void SetKnockbackForce(const FVector& NewForce) { KnockbackForce = NewForce; };
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -58,8 +64,12 @@ protected:
 	bool bCriticalHit = false;
 
 	TSharedPtr<FGameplayTag> DamageType = {};
-
+	UPROPERTY()
 	FP16DebuffSpec DebuffSpec = {};
+	UPROPERTY()
+	FVector DeathImpulse = FVector::ZeroVector;
+	UPROPERTY()
+	FVector KnockbackForce = FVector::ZeroVector;
 };
 
 /// ----------------------------------------------------------------------------
