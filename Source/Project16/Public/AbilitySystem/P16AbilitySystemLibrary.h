@@ -64,6 +64,10 @@ public:
 	static int32 GetXPRewardFor(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, const int32 Level);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static FGameplayEffectContextHandle ApplyDamageEffect(const FP16DamageEffectParams& Params);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static TArray<FVector> EvenlySpacedVectors(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count);
 
 private:
 	static auto GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD = nullptr) -> FP16WidgetControllerParams;

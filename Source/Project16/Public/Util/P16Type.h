@@ -307,3 +307,17 @@ struct FP16AbilityDescription
 	FString CurrentLevel = {};
 	FString NextLevel    = {};
 };
+
+template <typename T>
+concept RangeComparable = requires(T Min, T Max)
+{
+	{ Min <= Max } -> std::convertible_to<bool>;
+	{ Min > Max } -> std::convertible_to<bool>;
+};
+
+template <RangeComparable T>
+struct TP16Range
+{
+	T Min;
+	T Max;
+};

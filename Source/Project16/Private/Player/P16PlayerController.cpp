@@ -7,6 +7,7 @@
 #include "GameplayTagContainer.h"
 #include "NavigationPath.h"
 #include "NavigationSystem.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "Component/P16InputComponent.h"
@@ -175,6 +176,8 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 		CachedDestination = PathPoint;
 	}
 	bAutoRunning = !NavPath->PathPoints.IsEmpty();
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagara, CachedDestination);
 }
 
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)

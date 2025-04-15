@@ -3,6 +3,9 @@
 #include "AbilitySystem/Ability/P16Fireball.h"
 
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
+#include "Actor/P16Projectile.h"
+#include "Interface/P16CombatInterface.h"
 
 FString UP16Fireball::GetDescription(const int32 CurrentLevel)
 {
@@ -39,7 +42,7 @@ FString UP16Fireball::GetDescription(const int32 CurrentLevel)
 	else
 	{
 		Description += FRichString {}
-			.Num(Default, FMath::Min(CurrentLevel, NumProjectiles))
+			.Num(Default, FMath::Min(CurrentLevel, MaxNumProjectiles))
 			.Add(Default, " balls of fire, exploding on impact and dealing: ")
 			.Get();
 	}
@@ -77,9 +80,51 @@ FString UP16Fireball::GetDescriptionNextLevel(const int32 CurrentLevel)
 		.Gap(Double)
 		// Description.
 		.Add(Default, "Launches ")
-		.Num(Default, FMath::Min(NextLevel, NumProjectiles))
+		.Num(Default, FMath::Min(NextLevel, MaxNumProjectiles))
 		.Add(Default, " balls of fire, exploding on impact and dealing: ")
 		.Num(Damage, DamageValue)
 		.Add(Default, " fire damage with a chance to burn.")
 		.Get();
+}
+
+void UP16Fireball::SpawnProjectiles(const FVector& InTargetLocation, const FGameplayTag& SocketTag, AActor* HomingTarget, const float AdditionalPitch)
+{
+	if (!ProjectileClass)
+	{
+		CancelAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true);
+	}
+
+	AActor* Avatar = GetAvatarActorFromActorInfo();
+	EARLY_RETURN_IF(!Avatar)
+	const bool bServer = Avatar->HasAuthority();
+	EARLY_RETURN_IF(!bServer)
+
+	FTransform SpawnTransform = FTransform::Identity;
+	EARLY_RETURN_IF(!Avatar->Implements<UP16CombatInterface>())
+
+	const FVector SocketLocation  = IP16CombatInterface::Execute_GetCombatSocketLocation(Avatar, SocketTag);
+	FRotator      ForwardRotation = (InTargetLocation - SocketLocation).Rotation();
+	ForwardRotation.Pitch += AdditionalPitch;
+
+	const FVector          Forward        = ForwardRotation.Vector();
+	const int32            NumProjectiles = FMath::Min(MaxNumProjectiles, GetAbilityLevel());
+	const TArray<FRotator> Rotations      = UP16AbilitySystemLibrary::EvenlySpacedRotators(Forward, FVector::UpVector, ProjectileSpreadAngle, NumProjectiles);
+
+	for (const FRotator& Rotation : Rotations)
+	{
+		SpawnTransform.SetRotation(Rotation.Quaternion());
+		SpawnTransform.SetLocation(SocketLocation);
+
+		AP16Projectile* Projectile = GetWorld()->SpawnActorDeferred<AP16Projectile>(
+			ProjectileClass,
+			SpawnTransform,
+			GetOwningActorFromActorInfo(),
+			Cast<APawn>(GetOwningActorFromActorInfo()),
+			ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		CONTINUE_IF(!Projectile)
+
+		Projectile->DamageEffectParams = MakeDamageEffectParamsFromClassDefaults();
+		Projectile->UpdateHomingTarget(HomingTarget, InTargetLocation);
+		Projectile->FinishSpawning(SpawnTransform);
+	}
 }

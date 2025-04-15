@@ -243,6 +243,48 @@ FGameplayEffectContextHandle UP16AbilitySystemLibrary::ApplyDamageEffect(const F
 	return ContextHandle;
 }
 
+TArray<FRotator> UP16AbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count)
+{
+	TArray<FRotator> Result;
+	Result.Reserve(Count);
+
+	if (Count <= 1)
+	{
+		Result.Add(Forward.Rotation());
+		return Result;
+	}
+
+	const FVector SpreadLeftBound  = Forward.RotateAngleAxis(SpreadAngle / -2.f, FVector::UpVector);
+	const float   SpreadDeltaAngle = SpreadAngle / (Count - 1);
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(SpreadLeftBound.RotateAngleAxis(SpreadDeltaAngle * Index, Axis).Rotation());
+	}
+	return Result;
+}
+
+TArray<FVector> UP16AbilitySystemLibrary::EvenlySpacedVectors(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count)
+{
+	TArray<FVector> Result;
+	Result.Reserve(Count);
+
+	if (Count <= 1)
+	{
+		Result.Add(Forward);
+		return Result;
+	}
+
+	const FVector SpreadLeftBound  = Forward.RotateAngleAxis(SpreadAngle / -2.f, FVector::UpVector);
+	const float   SpreadDeltaAngle = SpreadAngle / (Count - 1);
+
+	for (int32 Index = 0; Index < Count; ++Index)
+	{
+		Result.Add(SpreadLeftBound.RotateAngleAxis(SpreadDeltaAngle * Index, Axis));
+	}
+	return Result;
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD)
 {
 	FP16WidgetControllerParams Result = {};

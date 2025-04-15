@@ -34,6 +34,8 @@ public:
 	_NODISCARD
 	UProjectileMovementComponent* GetProjectileMovementComponent() const { return ProjectileMovement.Get(); }
 
+	void UpdateHomingTarget(const AActor* HomingTarget, const FVector& MouseLocation);
+
 protected:
 	UFUNCTION()
 	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
@@ -49,6 +51,8 @@ private:
 public:
 	UPROPERTY()
 	FP16DamageEffectParams DamageEffectParams = {};
+	UPROPERTY()
+	TObjectPtr<USceneComponent> HomingTargetSceneComponent = nullptr;
 
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
@@ -68,8 +72,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Projectile")
 	float LifeSpan = 15.f;
 
+	/// @brief Ability to hover projectile above ground.
+	/// @details If > 0, projectile movement component features will be disabled.
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	float DistanceToGround = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	bool bHoming = true;
 
 private:
 	UPROPERTY()

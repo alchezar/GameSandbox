@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
+class UNiagaraSystem;
 class UP16DamageTextComponent;
 class AP16Character;
 class IP16InterfaceEnemy;
@@ -80,6 +81,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	float AutoRunAcceptRadius = 50.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
+	TObjectPtr<UNiagaraSystem> ClickNiagara = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
 	TSubclassOf<UP16DamageTextComponent> DamageTextComponentClass = nullptr;

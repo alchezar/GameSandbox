@@ -10,6 +10,7 @@
 #include "Components/AudioComponent.h"
 #include "Components/SphereComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Interface/P16CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 
 AP16Projectile::AP16Projectile()
@@ -25,14 +26,16 @@ AP16Projectile::AP16Projectile()
 	Sphere->SetCollisionObjectType(P16::Gecc_Projectile);
 
 	ProjectileMovement                         = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
-	ProjectileMovement->InitialSpeed           = Speed;
-	ProjectileMovement->MaxSpeed               = Speed;
 	ProjectileMovement->ProjectileGravityScale = 0.f;
+	ProjectileMovement->bIsHomingProjectile    = bHoming;
 }
 
 void AP16Projectile::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ProjectileMovement->InitialSpeed = Speed;
+	ProjectileMovement->MaxSpeed     = Speed;
 
 	Sphere->OnComponentBeginOverlap.AddDynamic(this, &ThisClass::OnSphereBeginOverlapCallback);
 
@@ -43,6 +46,7 @@ void AP16Projectile::BeginPlay()
 	ForwardDirection = GetActorForwardVector();
 	if (DistanceToGround > 0.f)
 	{
+		bHoming                                = false;
 		ProjectileMovement->bSimulationEnabled = false;
 		ProjectileMovement->InitialSpeed       = 0.f;
 	}
@@ -60,6 +64,26 @@ void AP16Projectile::Destroyed()
 	PlayOnHitEffects();
 
 	Super::Destroyed();
+}
+
+void AP16Projectile::UpdateHomingTarget(const AActor* HomingTarget, const FVector& MouseLocation)
+{
+	EARLY_RETURN_IF(DistanceToGround > 0 || !bHoming)
+
+	if (HomingTarget && HomingTarget->Implements<UP16CombatInterface>())
+	{
+		ProjectileMovement->HomingTargetComponent = HomingTarget->GetRootComponent();
+	}
+	else
+	{
+		HomingTargetSceneComponent = NewObject<USceneComponent>(this);
+		HomingTargetSceneComponent->SetWorldLocation(MouseLocation);
+		ProjectileMovement->HomingTargetComponent = HomingTargetSceneComponent;
+	}
+
+	constexpr TP16Range AccelerationRange           = {1800.f, 3600.f};
+	ProjectileMovement->HomingAccelerationMagnitude = FMath::RandRange(AccelerationRange.Min, AccelerationRange.Max);
+	ProjectileMovement->bIsHomingProjectile         = true;
 }
 
 void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
