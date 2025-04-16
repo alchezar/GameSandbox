@@ -211,6 +211,7 @@ struct FP16TagEventMontage
 	GENERATED_BODY()
 
 	FGameplayTag FireballTag;
+	FGameplayTag ElectrocuteTag;
 };
 
 USTRUCT(BlueprintType)
@@ -268,6 +269,25 @@ struct FP16TagInput
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagPlayerBlocked
+{
+	GENERATED_BODY()
+
+	FGameplayTag InputPressedTag;
+	FGameplayTag InputHeldTag;
+	FGameplayTag InputReleasedTag;
+	FGameplayTag CursorTraceTag;
+};
+
+USTRUCT(BlueprintType)
+struct FP16TagPlayer
+{
+	GENERATED_BODY()
+
+	FP16TagPlayerBlocked Blocked;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagMaps
 {
 	GENERATED_BODY()
@@ -296,6 +316,7 @@ struct FP16Tags
 	FP16TagCombatSocket    CombatSocket;
 	FP16TagMontage         Montage;
 	FP16TagInput           Input;
+	FP16TagPlayer          Player;
 
 	FP16TagMaps Maps;
 };

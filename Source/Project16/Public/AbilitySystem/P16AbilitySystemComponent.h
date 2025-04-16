@@ -34,7 +34,8 @@ public:
 	FGameplayAbilitySpec* GetSpecFromAbilityTag(const FGameplayTag& InTag);
 
 	_NODISCARD
-	bool GetIsStartupAbilitiesGiven() const { return bStartupAbilitiesGiven; };
+	bool GetIsStartupAbilitiesGiven() const { return bStartupAbilitiesGiven; }
+
 	_NODISCARD
 	static FGameplayTag GetAbilityTagFromSpec(const FGameplayAbilitySpec& InAbilitySpec);
 	_NODISCARD
@@ -51,6 +52,7 @@ public:
 	void OnAbilityActorInfoSet();
 	void AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities);
+	void AbilityInputTagPressed(const FGameplayTag& InputTag);
 	void AbilityInputTagHeld(const FGameplayTag& InputTag);
 	void AbilityInputTagReleased(const FGameplayTag& InputTag);
 	void ForEachAbility(const FP16ForEachAbilitySignature& InDelegate);

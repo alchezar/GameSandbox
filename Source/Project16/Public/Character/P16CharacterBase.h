@@ -46,6 +46,7 @@ public:
 	virtual EP16CharacterClass                      GetCharacterClass_Implementation() override;
 	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() override;
 	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() override;
+	virtual USkeletalMeshComponent*                 GetWeapon_Implementation() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

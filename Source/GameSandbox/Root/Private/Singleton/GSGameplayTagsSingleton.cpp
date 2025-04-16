@@ -84,7 +84,8 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Effect.HitReactTag = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
 
 	// Event tags.
-	Singleton.P16Tags.Event.Montage.FireballTag = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
+	Singleton.P16Tags.Event.Montage.FireballTag    = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
+	Singleton.P16Tags.Event.Montage.ElectrocuteTag = Manager.AddNativeGameplayTag("P16.Event.Montage.Electrocute", "Event tag for the electrocute montage");
 
 	// Combat socket tags.
 	Singleton.P16Tags.CombatSocket.WeaponTag    = Manager.AddNativeGameplayTag("P16.CombatSocket.Weapon", "Event tag for the weapon attack montage");
@@ -108,6 +109,12 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Input.Number4Tag          = Manager.AddNativeGameplayTag("P16.Input.Number4", "Input tag for the number 4 button");
 	Singleton.P16Tags.Input.Passive1Tag         = Manager.AddNativeGameplayTag("P16.Input.Passive1", "Input tag for the passive 1 button");
 	Singleton.P16Tags.Input.Passive2Tag         = Manager.AddNativeGameplayTag("P16.Input.Passive2", "Input tag for the passive 2 button");
+
+	// Player block tags.
+	Singleton.P16Tags.Player.Blocked.InputPressedTag  = Manager.AddNativeGameplayTag("P16.Player.Blocked.InputPressed", "Block input pressed callback");
+	Singleton.P16Tags.Player.Blocked.InputHeldTag     = Manager.AddNativeGameplayTag("P16.Player.Blocked.InputHeld", "Block input held callback");
+	Singleton.P16Tags.Player.Blocked.InputReleasedTag = Manager.AddNativeGameplayTag("P16.Player.Blocked.InputReleased", "Block input released callback");
+	Singleton.P16Tags.Player.Blocked.CursorTraceTag   = Manager.AddNativeGameplayTag("P16.Player.Blocked.CursorTrace", "Block tracing under the cursor");
 
 	// Damage types to resistances map.
 	const FP16TagAttributeDamage&     Damage                   = Singleton.P16Tags.Damage;

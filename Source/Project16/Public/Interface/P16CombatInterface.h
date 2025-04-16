@@ -58,6 +58,12 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	EP16CharacterClass GetCharacterClass();
 
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SetInShockLoop(const bool bInLoop);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	USkeletalMeshComponent* GetWeapon();
+
 	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() = 0;
 	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() = 0;
 };

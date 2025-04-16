@@ -108,6 +108,17 @@ void AP16PlayerController::ShiftInputCallback(const FInputActionValue& InputValu
 
 void AP16PlayerController::CursorTrace()
 {
+	EARLY_RETURN_IF(!GetAbilitySystemComponent())
+	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.CursorTraceTag))
+	{
+		if (LastTickEnemy)
+		{
+			LastTickEnemy->ToggleHighlight(false);
+			LastTickEnemy = nullptr;
+		}
+		return;
+	}
+
 	GetHitResultUnderCursor(ECC_Camera, false, CursorHit);
 	EARLY_RETURN_IF(!CursorHit.bBlockingHit)
 
@@ -146,16 +157,25 @@ void AP16PlayerController::AutoRun()
 
 void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)
 {
+	EARLY_RETURN_IF(!GetAbilitySystemComponent()
+		|| GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputPressedTag))
+
 	if (GetIsLMB(InputTag))
 	{
 		bTargeting   = LastTickEnemy != nullptr;
 		bAutoRunning = false;
 		FollowTime   = 0.f;
 	}
+
+	EARLY_RETURN_IF(!GetAbilitySystemComponent())
+	AbilitySystemComponent->AbilityInputTagPressed(InputTag);
 }
 
 void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 {
+	EARLY_RETURN_IF(!GetAbilitySystemComponent()
+		|| GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputReleasedTag))
+
 	// Activate ability.
 	if (bTargeting || !GetIsLMB(InputTag))
 	{
@@ -177,11 +197,17 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 	}
 	bAutoRunning = !NavPath->PathPoints.IsEmpty();
 
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagara, CachedDestination);
+	if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputPressedTag))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagara, CachedDestination);
+	}
 }
 
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 {
+	EARLY_RETURN_IF(!GetAbilitySystemComponent()
+		|| GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputHeldTag))
+
 	// Activate ability.
 	if (!GetIsLMB(InputTag) || bTargeting || bShiftKeyDown)
 	{

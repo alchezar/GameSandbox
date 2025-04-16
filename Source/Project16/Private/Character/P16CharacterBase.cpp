@@ -105,6 +105,11 @@ FP16OnDeathSignature& AP16CharacterBase::GetOnDeathDelegate()
 	return OnDeath;
 }
 
+USkeletalMeshComponent* AP16CharacterBase::GetWeapon_Implementation()
+{
+	return Weapon.Get();
+}
+
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage.Get();

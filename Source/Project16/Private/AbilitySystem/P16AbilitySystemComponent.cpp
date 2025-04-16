@@ -164,6 +164,28 @@ void UP16AbilitySystemComponent::AddCharacterPassiveAbilities(const TArray<TSubc
 	}
 }
 
+void UP16AbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& InputTag)
+{
+	EARLY_RETURN_IF(!InputTag.IsValid())
+
+	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		AbilitySpecInputPressed(AbilitySpec);
+
+		CONTINUE_IF(!AbilitySpec.IsActive())
+		// More comprehensive approach to handle `InstancedPerExecution` policy,
+		// because `GetPrimaryInstance()` is only valid on `InstancePerActor` policy.
+		for (const UGameplayAbility* AbilityInstance : AbilitySpec.GetAbilityInstances())
+		{
+			InvokeReplicatedEvent(
+				EAbilityGenericReplicatedEvent::InputPressed,
+				AbilitySpec.Handle,
+				AbilityInstance->GetCurrentActivationInfo().GetActivationPredictionKey());
+		}
+	}
+}
+
 void UP16AbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTag)
 {
 	EARLY_RETURN_IF(!InputTag.IsValid())
@@ -185,9 +207,19 @@ void UP16AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)
+			|| !AbilitySpec.IsActive())
 
 		AbilitySpecInputReleased(AbilitySpec);
+		// More comprehensive approach to handle `InstancedPerExecution` policy,
+		// because `GetPrimaryInstance()` is only valid on `InstancePerActor` policy.
+		for (const UGameplayAbility* AbilityInstance : AbilitySpec.GetAbilityInstances())
+		{
+			InvokeReplicatedEvent(
+				EAbilityGenericReplicatedEvent::InputReleased,
+				AbilitySpec.Handle,
+				AbilityInstance->GetCurrentActivationInfo().GetActivationPredictionKey());
+		}
 	}
 }
 
