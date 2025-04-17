@@ -23,7 +23,7 @@ AP16Projectile::AP16Projectile()
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("SphereCollisionComponent");
 	SetRootComponent(Sphere);
-	Sphere->SetCollisionObjectType(P16::Gecc_Projectile);
+	Sphere->SetCollisionObjectType(P16::CollisionChannel::Projectile);
 
 	ProjectileMovement                         = CreateDefaultSubobject<UProjectileMovementComponent>("ProjectileMovementComponent");
 	ProjectileMovement->ProjectileGravityScale = 0.f;

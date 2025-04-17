@@ -285,6 +285,25 @@ TArray<FVector> UP16AbilitySystemLibrary::EvenlySpacedVectors(const FVector& For
 	return Result;
 }
 
+TArray<AActor*> UP16AbilitySystemLibrary::GetClosestTargets(const int32 MaxTargets, TArray<AActor*> Actors, const FVector& Origin)
+{
+	EARLY_RETURN_VALUE_IF(Actors.Num() <= MaxTargets, Actors)
+
+	auto ClosestFirst = [Origin](const AActor* ActorA, const AActor* ActorB) -> bool
+	{
+		const float DistanceA = FVector::DistSquared(Origin, ActorA->GetActorLocation());
+		const float DistanceB = FVector::DistSquared(Origin, ActorB->GetActorLocation());
+
+		return DistanceA < DistanceB;
+	};
+	Algo::Sort(Actors, ClosestFirst);
+
+	const int32 Length = FMath::Min(Actors.Num(), MaxTargets);
+	Actors.SetNum(Length);
+
+	return Actors;
+}
+
 FP16WidgetControllerParams UP16AbilitySystemLibrary::GetWidgetControllerParams(const UObject* WorldContextObject, AP16HUD** OutHUD)
 {
 	FP16WidgetControllerParams Result = {};

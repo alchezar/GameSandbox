@@ -24,9 +24,9 @@ AP16CharacterBase::AP16CharacterBase()
 		const auto SocketTags = FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket;
 
 		CombatSocketNameMap = {
-			{SocketTags.WeaponTag, "TipSocket"},
-			{SocketTags.LeftHandTag, "LeftHand"},
-			{SocketTags.RightHandTag, "RightHand"}
+			{SocketTags.WeaponTag, P16::Socket::Weapon},
+			{SocketTags.LeftHandTag, P16::Socket::LeftHand},
+			{SocketTags.RightHandTag, P16::Socket::RightHand}
 		};
 	}
 }

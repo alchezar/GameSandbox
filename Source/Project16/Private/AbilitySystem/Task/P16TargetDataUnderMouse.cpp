@@ -50,16 +50,17 @@ void UP16TargetDataUnderMouse::SendMouseCursorData() const
 	EARLY_RETURN_IF(!ActorInfo)
 	const AP16PlayerController* PlayerController = Cast<AP16PlayerController>(ActorInfo->PlayerController.Get());
 	EARLY_RETURN_IF(!PlayerController)
-	const FHitResult LastHitResult = PlayerController->GetCursorHit();
+	FHitResult LastHitResult;
+	PlayerController->GetHitResultUnderCursor(P16::CollisionChannel::Weapon, false, LastHitResult);
 
-	FGameplayAbilityTargetData_SingleTargetHit* DataPtr    = new FGameplayAbilityTargetData_SingleTargetHit{LastHitResult};
+	FGameplayAbilityTargetData_SingleTargetHit* DataPtr    = new FGameplayAbilityTargetData_SingleTargetHit {LastHitResult};
 	const FGameplayAbilityTargetDataHandle      DataHandle = {DataPtr};
 
 	AbilitySystemComponent->ServerSetReplicatedTargetData(
 		GetAbilitySpecHandle(),
 		GetActivationPredictionKey(),
 		DataHandle,
-		FGameplayTag{},
+		FGameplayTag {},
 		AbilitySystemComponent->ScopedPredictionKey);
 
 	EARLY_RETURN_IF(!ShouldBroadcastAbilityTaskDelegates())

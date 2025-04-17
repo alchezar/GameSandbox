@@ -2,7 +2,9 @@
 
 #include "AbilitySystem/Ability/P16BeamSpell.h"
 #include "Project16.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "GameFramework/Character.h"
+#include "Interface/P16CombatInterface.h"
 
 FString UP16BeamSpell::GetDescription(const int32 CurrentLevel)
 {
@@ -45,4 +47,51 @@ void UP16BeamSpell::StoreOwnerVariables()
 
 	OwnerController = CurrentActorInfo->PlayerController.Get();
 	OwnerCharacter  = Cast<ACharacter>(CurrentActorInfo->AvatarActor);
+}
+
+void UP16BeamSpell::TraceFirstTarget(const FVector& BeamTargetLocation)
+{
+	FHitResult HitResult;
+
+	FVector Start = GetAvatarActorFromActorInfo()->GetActorLocation();
+	if (const USkeletalMeshComponent* Weapon = IP16CombatInterface::Execute_GetWeapon(GetAvatarActorFromActorInfo()))
+	{
+		Start = Weapon->GetSocketLocation(P16::Socket::Weapon);
+	}
+	const FQuat     Rotation = (BeamTargetLocation - Start).Rotation().Quaternion();
+	constexpr float Radius   = 30.f;
+
+	FCollisionQueryParams Params {};
+	Params.AddIgnoredActor(GetAvatarActorFromActorInfo());
+
+	GetWorld()->SweepSingleByChannel(
+		HitResult,
+		Start,
+		BeamTargetLocation,
+		Rotation,
+		P16::CollisionChannel::Weapon,
+		FCollisionShape::MakeSphere(Radius),
+		Params);
+
+	if (HitResult.bBlockingHit)
+	{
+		MouseHitLocation = HitResult.ImpactPoint;
+		MouseHitActor    = HitResult.GetActor();
+	}
+}
+
+TArray<AActor*> UP16BeamSpell::StoreAdditionalTargets() const
+{
+	const UObject*        WorldContext  = GetAvatarActorFromActorInfo();
+	const TArray<AActor*> IgnoredActors = {GetAvatarActorFromActorInfo(), MouseHitActor};
+	constexpr float       Radius        = 850.f;
+
+	TArray<AActor*> OverlappingActors = UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(
+		WorldContext,
+		IgnoredActors,
+		Radius,
+		MouseHitLocation);
+	const int32 NumTargets = FMath::Min(GetAbilityLevel(), MaxNumTargets);
+
+	return UP16AbilitySystemLibrary::GetClosestTargets(NumTargets, MoveTemp(OverlappingActors), MouseHitLocation);
 }

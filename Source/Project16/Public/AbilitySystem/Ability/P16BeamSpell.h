@@ -26,6 +26,10 @@ public:
 	void StoreMouseDataInfo(const FHitResult& HitResult);
 	UFUNCTION(BlueprintCallable)
 	void StoreOwnerVariables();
+	UFUNCTION(BlueprintCallable)
+	void TraceFirstTarget(const FVector& BeamTargetLocation);
+	UFUNCTION(BlueprintCallable)
+	TArray<AActor*> StoreAdditionalTargets() const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -39,4 +43,6 @@ protected:
 	TObjectPtr<APlayerController> OwnerController = nullptr;
 	UPROPERTY(BlueprintReadWrite, Category = "C++")
 	TObjectPtr<ACharacter> OwnerCharacter = nullptr;
+	UPROPERTY(BlueprintReadWrite, Category = "C++")
+	int32 MaxNumTargets = 5;
 };
