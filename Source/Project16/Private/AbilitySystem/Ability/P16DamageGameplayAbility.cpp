@@ -11,7 +11,7 @@ void UP16DamageGameplayAbility::CauseDamage(AActor* TargetActor)
 {
 	const FGameplayEffectSpecHandle DamageSpecHandle = MakeOutgoingGameplayEffectSpec(DamageEffectClass);
 
-	const float Magnitude = DamageInfo.Damage.GetValueAtLevel(GetAbilityLevel());
+	const float Magnitude = GetDamageAtLevel(GetAbilityLevel());
 	DamageSpecHandle.Data->SetSetByCallerMagnitude(DamageInfo.Tag, Magnitude);
 
 	UAbilitySystemComponent* TargetAbilitySystem = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
@@ -35,7 +35,7 @@ FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClas
 		.DamageEffectClass = DamageEffectClass,
 		.SourceAbilitySystemComponent = GetAbilitySystemComponentFromActorInfo(),
 		.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor),
-		.BaseDamage = DamageInfo.Damage.GetValueAtLevel(GetAbilityLevel()),
+		.BaseDamage = GetDamageAtLevel(GetAbilityLevel()),
 		.AbilityLevel = GetAbilityLevel(),
 		.DamageType = DamageInfo.Tag,
 		.Debuff = DebuffInfo,
@@ -46,6 +46,11 @@ FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClas
 	UpdateDamageEffectParams(TargetActor, DamageEffectParams);
 
 	return DamageEffectParams;
+}
+
+float UP16DamageGameplayAbility::GetDamageAtLevel(const int32 InLevel) const
+{
+	return DamageInfo.Damage.GetValueAtLevel(InLevel);
 }
 
 void UP16DamageGameplayAbility::UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams)

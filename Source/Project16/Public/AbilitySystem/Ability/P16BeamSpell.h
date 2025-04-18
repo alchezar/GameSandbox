@@ -31,6 +31,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<AActor*> StoreAdditionalTargets() const;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPrimaryTargetDied(AActor* DeadTarget);
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnAdditionalTargetDied(AActor* DeadTarget);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

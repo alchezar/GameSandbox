@@ -32,6 +32,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	FP16DamageEffectParams MakeDamageEffectParamsFromClassDefaults(AActor* TargetActor = nullptr) const;
 
+	UFUNCTION(BlueprintPure)
+	float GetDamageAtLevel(const int32 InLevel) const;
+
 	static void UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams);
 
 	/// ------------------------------------------------------------------------

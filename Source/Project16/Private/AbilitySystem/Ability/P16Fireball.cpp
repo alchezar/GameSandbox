@@ -11,7 +11,7 @@ FString UP16Fireball::GetDescription(const int32 CurrentLevel)
 {
 	using namespace P16::Rich;
 
-	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(CurrentLevel);
+	const int32 DamageValue  = GetDamageAtLevel(CurrentLevel);
 	const float ManaCost     = GetManaCost(CurrentLevel);
 	const float CooldownTime = GetCooldownTime(CurrentLevel);
 
@@ -60,7 +60,7 @@ FString UP16Fireball::GetDescriptionNextLevel(const int32 CurrentLevel)
 	using namespace P16::Rich;
 
 	const int32 NextLevel    = CurrentLevel + 1;
-	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(NextLevel);
+	const int32 DamageValue  = GetDamageAtLevel(NextLevel);
 	const float ManaCost     = GetManaCost(NextLevel);
 	const float CooldownCost = GetCooldownTime(NextLevel);
 

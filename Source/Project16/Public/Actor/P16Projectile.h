@@ -44,6 +44,7 @@ private:
 	void PlayOnHitEffects() const;
 	void ApplyDamageTo(AActor* Target);
 	void CustomMove(const float DeltaSeconds);
+	void CheckTarget();
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

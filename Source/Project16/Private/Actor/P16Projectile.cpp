@@ -50,6 +50,9 @@ void AP16Projectile::BeginPlay()
 		ProjectileMovement->bSimulationEnabled = false;
 		ProjectileMovement->InitialSpeed       = 0.f;
 	}
+
+	FTimerHandle TargetCheckTimer;
+	GetWorld()->GetTimerManager().SetTimer(TargetCheckTimer, this, &ThisClass::CheckTarget, 1.f, true, 1.f);
 }
 
 void AP16Projectile::Tick(const float DeltaSeconds)
@@ -145,4 +148,10 @@ void AP16Projectile::CustomMove(const float DeltaSeconds)
 	SetActorLocation(ResultLocation);
 	SetActorRotation((ResultLocation - LastTickLocation).Rotation());
 	LastTickLocation = ResultLocation;
+}
+
+void AP16Projectile::CheckTarget()
+{
+	EARLY_RETURN_IF(ProjectileMovement->HomingTargetComponent.IsValid())
+	Destroy();
 }

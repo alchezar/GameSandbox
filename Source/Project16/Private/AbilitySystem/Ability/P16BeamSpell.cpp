@@ -6,11 +6,21 @@
 #include "GameFramework/Character.h"
 #include "Interface/P16CombatInterface.h"
 
+#define LISTEN_TO_TARGET_DEATH(Target, Callback)                                   \
+if (const TScriptInterface<IP16CombatInterface> CombatInterface = Target)          \
+{                                                                                  \
+	FP16OnDeathSignature& OnDeathDelegate = CombatInterface->GetOnDeathDelegate(); \
+	if (!OnDeathDelegate.IsAlreadyBound(this, &ThisClass::##Callback))    \
+	{                                                                              \
+		OnDeathDelegate.AddDynamic(this, &ThisClass::##Callback);                  \
+	}                                                                              \
+}
+
 FString UP16BeamSpell::GetDescription(const int32 CurrentLevel)
 {
 	using namespace P16::Rich;
 
-	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(CurrentLevel);
+	const int32 DamageValue  = GetDamageAtLevel(CurrentLevel);
 	const float ManaCost     = GetManaCost(CurrentLevel);
 	const float CooldownTime = GetCooldownTime(CurrentLevel);
 
@@ -22,7 +32,7 @@ FString UP16BeamSpell::GetDescriptionNextLevel(const int32 CurrentLevel)
 	using namespace P16::Rich;
 
 	const int32 NextLevel    = CurrentLevel + 1;
-	const int32 DamageValue  = DamageInfo.Damage.GetValueAtLevel(NextLevel);
+	const int32 DamageValue  = GetDamageAtLevel(NextLevel);
 	const float ManaCost     = GetManaCost(NextLevel);
 	const float CooldownCost = GetCooldownTime(NextLevel);
 
@@ -78,6 +88,8 @@ void UP16BeamSpell::TraceFirstTarget(const FVector& BeamTargetLocation)
 		MouseHitLocation = HitResult.ImpactPoint;
 		MouseHitActor    = HitResult.GetActor();
 	}
+
+	LISTEN_TO_TARGET_DEATH(MouseHitActor, OnPrimaryTargetDied);
 }
 
 TArray<AActor*> UP16BeamSpell::StoreAdditionalTargets() const
@@ -93,5 +105,11 @@ TArray<AActor*> UP16BeamSpell::StoreAdditionalTargets() const
 		MouseHitLocation);
 	const int32 NumTargets = FMath::Min(GetAbilityLevel(), MaxNumTargets);
 
-	return UP16AbilitySystemLibrary::GetClosestTargets(NumTargets, MoveTemp(OverlappingActors), MouseHitLocation);
+	TArray<AActor*> Result = UP16AbilitySystemLibrary::GetClosestTargets(NumTargets, MoveTemp(OverlappingActors), MouseHitLocation);
+	for (AActor* Target : Result)
+	{
+		LISTEN_TO_TARGET_DEATH(Target, OnAdditionalTargetDied)
+	}
+
+	return Result;
 }
