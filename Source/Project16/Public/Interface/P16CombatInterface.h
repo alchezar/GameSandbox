@@ -38,6 +38,9 @@ public:
 	bool GetIsDead() const;
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	bool GetBeingShocked() const;
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	AActor* GetAvatar();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
@@ -60,6 +63,9 @@ public:
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void SetInShockLoop(const bool bInLoop);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
+	void SetBeingShocked(const bool bIsShocked);
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	USkeletalMeshComponent* GetWeapon();

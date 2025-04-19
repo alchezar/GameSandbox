@@ -25,6 +25,7 @@ class PROJECT16_API AP16CharacterBase : public ACharacter, public IP16CombatInte
 	/// ------------------------------------------------------------------------
 public:
 	AP16CharacterBase();
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -37,6 +38,7 @@ public:
 	virtual void                                    Die(const FVector& DeathImpulse) override;
 	virtual FVector                                 GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
 	virtual bool                                    GetIsDead_Implementation() const override;
+	virtual bool                                    GetBeingShocked_Implementation() const override;
 	virtual AActor*                                 GetAvatar_Implementation() override;
 	virtual TArray<FP16TaggedMontage>               GetAttackMontages_Implementation() override;
 	virtual FP16TaggedMontage                       GetTaggedMontageByTag_Implementation(const FGameplayTag& MontageTag) override;
@@ -47,6 +49,7 @@ public:
 	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() override;
 	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() override;
 	virtual USkeletalMeshComponent*                 GetWeapon_Implementation() override;
+	virtual void                                    SetBeingShocked_Implementation(const bool bIsShocked) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -66,6 +69,15 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent)
 	void StartDissolveTimeline(const TArray<UMaterialInstanceDynamic*>& InDynamicMaterials);
 
+	virtual void OnBurnTagChanged(const FGameplayTag CallbackTag, const int32 NewCount);
+	virtual void OnStunTagChanged(const FGameplayTag CallbackTag, const int32 NewCount);
+
+private:
+	UFUNCTION()
+	void OnRep_Burned(const bool bOldBurned = false) const;
+	UFUNCTION()
+	void OnRep_Stunned(const bool bOldStunned = false) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -73,11 +85,20 @@ public:
 	FP16OnAbilitySystemRegisteredSignature OnAbilitySystemRegistered;
 	FP16OnDeathSignature                   OnDeath;
 
+	UPROPERTY(ReplicatedUsing = "OnRep_Burned", BlueprintReadOnly, Category = "C++")
+	bool bBurned = false;
+	UPROPERTY(ReplicatedUsing = "OnRep_Stunned", BlueprintReadOnly, Category = "C++")
+	bool bStunned = false;
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "C++")
+	bool bBeingShocked = false;
+
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<USkeletalMeshComponent> Weapon = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP16DebuffNiagaraComponent> BurnDebuff = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP16DebuffNiagaraComponent> StunDebuff = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;
@@ -118,7 +139,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UAttributeSet> AttributeSet = nullptr;
 
-	int32 MinionCount = 0;
+	int32 MinionCount   = 0;
+	float BaseWalkSpeed = 0.f;
 
 private:
 	bool bDead = false;

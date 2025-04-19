@@ -35,6 +35,11 @@ void UP16DebuffNiagaraComponent::BeginPlay()
 	}
 }
 
+void UP16DebuffNiagaraComponent::ToggleDebuff(const bool bOn)
+{
+	OnDebuffTagChanged(DebuffTag, bOn ? 1 : -1);
+}
+
 void UP16DebuffNiagaraComponent::OnDebuffTagChanged(FGameplayTag CallbackTag, const int32 NewCount)
 {
 	const TScriptInterface<IP16CombatInterface> CombatInterface = GetOwner();

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "NiagaraComponent.h"
+#include "Character/P16CharacterBase.h"
 #include "P16DebuffNiagaraComponent.generated.h"
 
 class UAbilitySystemComponent;
@@ -26,6 +27,9 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
+public:
+	void ToggleDebuff(const bool bOn);
+
 protected:
 	void OnDebuffTagChanged(FGameplayTag CallbackTag, const int32 NewCount);
 	void ListenToDebuffTagChanges(UAbilitySystemComponent* AbilitySystemComponent);

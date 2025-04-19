@@ -58,6 +58,7 @@ public:
 	void ForEachAbility(const FP16ForEachAbilitySignature& InDelegate);
 	void UpdateAttribute(const FGameplayTag& AttributeTag);
 	void UpdateAbilityStatuses(const int32 Level);
+	void UpdateStunStatus(const bool bStun);
 
 	UFUNCTION(Server, Reliable)
 	void Server_SpendSpellPoint(const FGameplayTag& AbilityTag);

@@ -203,6 +203,7 @@ struct FP16TagEffect
 	GENERATED_BODY()
 
 	FGameplayTag HitReactTag;
+	FGameplayTag BeingShockedTag;
 };
 
 USTRUCT(BlueprintType)

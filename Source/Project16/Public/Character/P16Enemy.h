@@ -45,6 +45,7 @@ public:
 protected:
 	virtual void InitAbilityActorInfo() override;
 	virtual void InitDefaultAttributes() const override;
+	virtual void OnStunTagChanged(const FGameplayTag Tag, const int32 Count) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This
@@ -79,7 +80,4 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<AP16AIController> AIController = nullptr;
-
-	bool  bHitReacting  = false;
-	float BaseWalkSpeed = 0.f;
 };

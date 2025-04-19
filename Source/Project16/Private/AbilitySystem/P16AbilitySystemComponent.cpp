@@ -262,6 +262,18 @@ void UP16AbilitySystemComponent::UpdateAbilityStatuses(const int32 Level)
 	}
 }
 
+void UP16AbilitySystemComponent::UpdateStunStatus(const bool bStun)
+{
+	FGameplayTagContainer BlockedTagsContainer;
+	const auto            BlockedTags = FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked;
+	BlockedTagsContainer.AddTag(BlockedTags.InputPressedTag);
+	BlockedTagsContainer.AddTag(BlockedTags.InputHeldTag);
+	BlockedTagsContainer.AddTag(BlockedTags.InputReleasedTag);
+	BlockedTagsContainer.AddTag(BlockedTags.CursorTraceTag);
+
+	AddLooseGameplayTags(BlockedTagsContainer, bStun ? 1 : -1);
+}
+
 void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag)
 {
 	FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag);

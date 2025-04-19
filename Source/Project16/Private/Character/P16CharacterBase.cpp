@@ -6,7 +6,9 @@
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/Debuff/P16DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Net/UnrealNetwork.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 AP16CharacterBase::AP16CharacterBase()
@@ -18,6 +20,10 @@ AP16CharacterBase::AP16CharacterBase()
 	BurnDebuff = CreateDefaultSubobject<UP16DebuffNiagaraComponent>("DebuffNiagaraComponent");
 	BurnDebuff->SetupAttachment(GetRootComponent());
 	BurnDebuff->DebuffTag = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.BurnTag;
+
+	StunDebuff = CreateDefaultSubobject<UP16DebuffNiagaraComponent>("StunDebuffNiagaraComponent");
+	StunDebuff->SetupAttachment(GetRootComponent());
+	StunDebuff->DebuffTag = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.StunTag;
 
 	if (CombatSocketNameMap.IsEmpty())
 	{
@@ -31,9 +37,20 @@ AP16CharacterBase::AP16CharacterBase()
 	}
 }
 
+void AP16CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AP16CharacterBase, bBurned);
+	DOREPLIFETIME(AP16CharacterBase, bStunned);
+	DOREPLIFETIME(AP16CharacterBase, bBeingShocked);
+}
+
 void AP16CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
 }
 
 FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag)
@@ -53,6 +70,11 @@ FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGamepla
 bool AP16CharacterBase::GetIsDead_Implementation() const
 {
 	return bDead;
+}
+
+bool AP16CharacterBase::GetBeingShocked_Implementation() const
+{
+	return bBeingShocked;
 }
 
 AActor* AP16CharacterBase::GetAvatar_Implementation()
@@ -110,6 +132,25 @@ USkeletalMeshComponent* AP16CharacterBase::GetWeapon_Implementation()
 	return Weapon.Get();
 }
 
+void AP16CharacterBase::SetBeingShocked_Implementation(const bool bIsShocked)
+{
+	bBeingShocked = bIsShocked;
+
+	EARLY_RETURN_IF(!AbilitySystemComponent)
+
+	FGameplayTagContainer TagContainer;
+	TagContainer.AddTag(FGSGameplayTagsSingleton::Get().P16Tags.Effect.BeingShockedTag);
+
+	if (bBeingShocked)
+	{
+		AbilitySystemComponent->TryActivateAbilitiesByTag(TagContainer);
+	}
+	else
+	{
+		AbilitySystemComponent->CancelAbilities(&TagContainer);
+	}
+}
+
 UAnimMontage* AP16CharacterBase::GetHitReactMontage_Implementation()
 {
 	return HitReactMontage.Get();
@@ -127,6 +168,12 @@ void AP16CharacterBase::Die(const FVector& DeathImpulse)
 void AP16CharacterBase::InitAbilityActorInfo()
 {
 	OnAbilitySystemRegistered.Broadcast(AbilitySystemComponent);
+
+	// Listen to debuff applications.
+	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.BurnTag)
+		.AddUObject(this, &ThisClass::OnBurnTagChanged);
+	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.StunTag)
+		.AddUObject(this, &ThisClass::OnStunTagChanged);
 
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent))
 	{
@@ -208,4 +255,41 @@ void AP16CharacterBase::Dissolve()
 	}
 	EARLY_RETURN_IF(DynamicMaterials.IsEmpty());
 	StartDissolveTimeline(DynamicMaterials);
+}
+
+void AP16CharacterBase::OnBurnTagChanged(const FGameplayTag CallbackTag, const int32 NewCount)
+{
+	bBurned = NewCount > 0;
+
+	if (HasAuthority())
+	{
+		OnRep_Burned();
+	}
+}
+
+void AP16CharacterBase::OnStunTagChanged(const FGameplayTag CallbackTag, const int32 NewCount)
+{
+	bStunned = NewCount > 0;
+
+	GetCharacterMovement()->MaxWalkSpeed = bStunned ? 0.f : BaseWalkSpeed;
+
+	// Don't allow to move while stunned. As it is called on Server, `OnRep_Stunned()` will be called on Clients.
+	if (HasAuthority())
+	{
+		OnRep_Stunned();
+	}
+}
+
+void AP16CharacterBase::OnRep_Burned(const bool bOldBurned) const
+{
+	BurnDebuff->ToggleDebuff(bBurned);
+}
+
+void AP16CharacterBase::OnRep_Stunned(const bool bOldStunned) const
+{
+	UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(AbilitySystemComponent);
+	EARLY_RETURN_IF(!AbilitySystem)
+	AbilitySystem->UpdateStunStatus(bStunned);
+
+	StunDebuff->ToggleDebuff(bStunned);
 }

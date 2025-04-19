@@ -112,6 +112,14 @@ void AP16Enemy::InitDefaultAttributes() const
 	UP16AbilitySystemLibrary::InitDefaultAttributes(this, CharacterClass, AbilitySystemComponent.Get(), Level);
 }
 
+void AP16Enemy::OnStunTagChanged(const FGameplayTag Tag, const int32 Count)
+{
+	Super::OnStunTagChanged(Tag, Count);
+
+	EARLY_RETURN_IF(!AIController || !AIController->GetBlackboardComponent())
+	AIController->GetBlackboardComponent()->SetValueAsBool("Stunned", bStunned);
+}
+
 void AP16Enemy::InitHealthBar()
 {
 	// Set the enemy as the widget controller for the health bar.
@@ -136,17 +144,15 @@ void AP16Enemy::InitHealthBar()
 
 void AP16Enemy::InitHitReact()
 {
-	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
-
 	AbilitySystemComponent->RegisterGameplayTagEvent(FGSGameplayTagsSingleton::Get().P16Tags.Effect.HitReactTag)
 		.AddUObject(this, &ThisClass::OnHitReactCallback);
 }
 
 void AP16Enemy::OnHitReactCallback(const FGameplayTag Tag, const int32 Count)
 {
-	bHitReacting = Count > 0;
+	const bool bHitReacting = Count > 0;
 
-	GetCharacterMovement()->MaxWalkSpeed = bHitReacting ? 0.f : BaseWalkSpeed;
+	GetCharacterMovement()->MaxWalkSpeed = bHitReacting || bStunned ? 0.f : BaseWalkSpeed;
 	EARLY_RETURN_IF(!AIController || !AIController->GetBlackboardComponent())
 
 	AIController->GetBlackboardComponent()->SetValueAsBool("HitReacting", bHitReacting);

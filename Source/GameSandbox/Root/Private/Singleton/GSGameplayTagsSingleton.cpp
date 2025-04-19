@@ -81,7 +81,8 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Debuff.Info.DurationTag  = Manager.AddNativeGameplayTag("P16.Debuff.Info.Duration", "Debuff duration");
 
 	// Effect tags.
-	Singleton.P16Tags.Effect.HitReactTag = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
+	Singleton.P16Tags.Effect.HitReactTag     = Manager.AddNativeGameplayTag("P16.Effect.HitReact", "Effect tag granted when Hit Reacting");
+	Singleton.P16Tags.Effect.BeingShockedTag = Manager.AddNativeGameplayTag("P16.Effect.BeingShocked", "Effect tag granted when Being Shocked");
 
 	// Event tags.
 	Singleton.P16Tags.Event.Montage.FireballTag    = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");

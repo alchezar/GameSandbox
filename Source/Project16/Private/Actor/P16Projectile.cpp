@@ -33,6 +33,7 @@ AP16Projectile::AP16Projectile()
 void AP16Projectile::BeginPlay()
 {
 	Super::BeginPlay();
+	SetReplicateMovement(true);
 
 	ProjectileMovement->InitialSpeed = Speed;
 	ProjectileMovement->MaxSpeed     = Speed;
