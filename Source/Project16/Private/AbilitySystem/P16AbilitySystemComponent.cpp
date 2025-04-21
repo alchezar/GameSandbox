@@ -168,9 +168,10 @@ void UP16AbilitySystemComponent::AbilityInputTagPressed(const FGameplayTag& Inpu
 {
 	EARLY_RETURN_IF(!InputTag.IsValid())
 
+	FScopedAbilityListLock Lock {*this};
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		CONTINUE_IF(!GetAbilityHasSlot(AbilitySpec, InputTag))
 		AbilitySpecInputPressed(AbilitySpec);
 
 		CONTINUE_IF(!AbilitySpec.IsActive())
@@ -190,9 +191,10 @@ void UP16AbilitySystemComponent::AbilityInputTagHeld(const FGameplayTag& InputTa
 {
 	EARLY_RETURN_IF(!InputTag.IsValid())
 
+	FScopedAbilityListLock Lock {*this};
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag))
+		CONTINUE_IF(!GetAbilityHasSlot(AbilitySpec, InputTag))
 
 		AbilitySpecInputPressed(AbilitySpec);
 		CONTINUE_IF(AbilitySpec.IsActive())
@@ -205,9 +207,10 @@ void UP16AbilitySystemComponent::AbilityInputTagReleased(const FGameplayTag& Inp
 {
 	EARLY_RETURN_IF(!InputTag.IsValid())
 
+	FScopedAbilityListLock Lock {*this};
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InputTag)
+		CONTINUE_IF(!GetAbilityHasSlot(AbilitySpec, InputTag)
 			|| !AbilitySpec.IsActive())
 
 		AbilitySpecInputReleased(AbilitySpec);
@@ -274,9 +277,9 @@ void UP16AbilitySystemComponent::UpdateStunStatus(const bool bStun)
 	AddLooseGameplayTags(BlockedTagsContainer, bStun ? 1 : -1);
 }
 
-void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag)
+void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGameplayTag& InAbilityTag, const FGameplayTag& SlotInputTag)
 {
-	FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(AbilityTag);
+	FGameplayAbilitySpec* Spec = GetSpecFromAbilityTag(InAbilityTag);
 	EARLY_RETURN_IF(!Spec)
 
 	const FGameplayTag& PrevSlotInput = GetInputTagFromSpec(*Spec);
@@ -286,18 +289,35 @@ void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGamep
 	const bool bStatusValid = Status.MatchesTagExact(StatusTags.EquippedTag) || Status.MatchesTagExact(StatusTags.UnlockedTag);
 	EARLY_RETURN_IF(!bStatusValid)
 
-	// Remove this Slot/Input tag from any Ability that has it.
-	ClearAbilitiesOfSlot(SlotInputTag);
-	// Clear this ability's slot, just in case it's a different slot.
-	ClearSlot(Spec);
-	// Now, assign this ability to slot.
-	Spec->GetDynamicSpecSourceTags().AddTag(SlotInputTag);
-	// Add equipped status for this ability.
-	Spec->GetDynamicSpecSourceTags().RemoveTag(StatusTags.UnlockedTag);
-	Spec->GetDynamicSpecSourceTags().AddTag(StatusTags.EquippedTag);
+	// There is an ability in this slot already. Deactivate and clear that slot.
+	if (!GetSlotIsEmpty(SlotInputTag))
+	{
+		if (FGameplayAbilitySpec* SpecWithSlot = GetSpecWithSlot(SlotInputTag))
+		{
+			const FGameplayTag AbilityTag = GetAbilityTagFromSpec(*SpecWithSlot);
+			// If that ability is the same as this ability, we can return early.
+			if (InAbilityTag.MatchesTagExact(AbilityTag))
+			{
+				Client_EquipAbility(InAbilityTag, SlotInputTag, PrevSlotInput, Status);
+				return;
+			}
+			if (GetIsPassiveAbility(*SpecWithSlot))
+			{
+				OnDeactivatePassiveAbility.Broadcast(AbilityTag);
+			}
+			ClearSlot(SpecWithSlot);
+		}
+	}
 
+	// Ability doesn't yet have a slot, it's not active.
+	if (!GetAbilityHasAnySlot(*Spec) && GetIsPassiveAbility(*Spec))
+	{
+		TryActivateAbility(Spec->Handle);
+	}
+
+	AssignSlotToAbility(*Spec, SlotInputTag);
 	MarkAbilitySpecDirty(*Spec);
-	Client_EquipAbility(AbilityTag, SlotInputTag, PrevSlotInput, Status);
+	Client_EquipAbility(InAbilityTag, SlotInputTag, PrevSlotInput, Status);
 }
 
 void UP16AbilitySystemComponent::Client_EquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag)
@@ -360,7 +380,7 @@ void UP16AbilitySystemComponent::Server_UpdateAttribute_Implementation(const FGa
 	IP16PlayerInterface::Execute_AddAttributePoints(GetAvatarActor(), -1);
 }
 
-void UP16AbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* InSpec) const
+void UP16AbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* InSpec)
 {
 	const FGameplayTag Slot = GetInputTagFromSpec(*InSpec);
 	InSpec->GetDynamicSpecSourceTags().RemoveTag(Slot);
@@ -375,14 +395,73 @@ void UP16AbilitySystemComponent::ClearSlot(FGameplayAbilitySpec* InSpec) const
 
 void UP16AbilitySystemComponent::ClearAbilitiesOfSlot(const FGameplayTag& InSlotInputTag)
 {
-	FScopedAbilityListLock Lock {*this};
-
 	// Don't use predicates here, because `FilterByPredicate` returns `TArray<ElementType>` without `&`!
+	FScopedAbilityListLock Lock {*this};
 	for (FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
-		if (AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InSlotInputTag))
+		if (GetAbilityHasSlot(AbilitySpec, InSlotInputTag))
 		{
 			ClearSlot(&AbilitySpec);
 		}
 	}
+}
+
+bool UP16AbilitySystemComponent::GetSlotIsEmpty(const FGameplayTag& InSlotInputTag)
+{
+	FScopedAbilityListLock Lock {*this};
+
+	auto AnyOf = [this, InSlotInputTag](const FGameplayAbilitySpec& AbilitySpec) -> bool
+	{
+		return GetAbilityHasSlot(AbilitySpec, InSlotInputTag);
+	};
+	return !GetActivatableAbilities().ContainsByPredicate(AnyOf);
+}
+
+bool UP16AbilitySystemComponent::GetAbilityHasSlot(const FGameplayAbilitySpec& Spec, const FGameplayTag& Slot)
+{
+	return Spec.GetDynamicSpecSourceTags().HasTagExact(Slot);
+}
+
+bool UP16AbilitySystemComponent::GetAbilityHasAnySlot(const FGameplayAbilitySpec& Spec)
+{
+	return Spec.GetDynamicSpecSourceTags().HasTag(FGSGameplayTagsSingleton::Get().P16Tags.Input.Tag);
+}
+
+FGameplayAbilitySpec* UP16AbilitySystemComponent::GetSpecWithSlot(const FGameplayTag& InSlotInputTag)
+{
+	FScopedAbilityListLock Lock {*this};
+
+	auto AnyOf = [InSlotInputTag](const FGameplayTag& Tag) -> bool
+	{
+		return InSlotInputTag.MatchesTag(Tag);
+	};
+	auto FindIf = [AnyOf](const FGameplayAbilitySpec& Spec) -> bool
+	{
+		return Spec.GetDynamicSpecSourceTags().GetGameplayTagArray().ContainsByPredicate(AnyOf);
+	};
+
+	return GetActivatableAbilities().FindByPredicate(FindIf);
+}
+
+bool UP16AbilitySystemComponent::GetIsPassiveAbility(const FGameplayAbilitySpec& Spec) const
+{
+	const UP16AbilityInfoDataAsset* AbilityInfoData = UP16AbilitySystemLibrary::GetAbilityInfo(GetAvatarActor());
+	EARLY_RETURN_VALUE_IF(!AbilityInfoData, false)
+
+	const FP16AbilityInfo AbilityInfo = AbilityInfoData->FindAbilityInfo(GetAbilityTagFromSpec(Spec));
+	const FGameplayTag    AbilityType = AbilityInfo.TypeTag;
+
+	return AbilityType.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Type.PassiveTag);
+}
+
+void UP16AbilitySystemComponent::AssignSlotToAbility(FGameplayAbilitySpec& Spec, const FGameplayTag& SlotInputTag)
+{
+	// Clear this ability's slot, just in case it's a different slot.
+	ClearSlot(&Spec);
+	// Now, assign this ability to slot.
+	Spec.GetDynamicSpecSourceTags().AddTag(SlotInputTag);
+	// Add equipped status for this ability.
+	const auto StatusTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status;
+	Spec.GetDynamicSpecSourceTags().RemoveTag(StatusTags.UnlockedTag);
+	Spec.GetDynamicSpecSourceTags().AddTag(StatusTags.EquippedTag);
 }

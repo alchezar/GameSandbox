@@ -21,6 +21,17 @@ struct FP16TagAbilityLightning
 	FGameplayTag ElectrocuteTag;
 };
 
+USTRUCT()
+struct FP16TagAbilityPassive
+{
+	GENERATED_BODY()
+
+	FGameplayTag Tag;
+	FGameplayTag HaloOfProtectionTag;
+	FGameplayTag LifeSiphonTag;
+	FGameplayTag ManaSiphonTag;
+};
+
 USTRUCT(BlueprintType)
 struct FP16TagAbilityStatus
 {
@@ -56,6 +67,7 @@ struct FP16TagAbility
 
 	FP16TagAbilityFire      Fire;
 	FP16TagAbilityLightning Lightning;
+	FP16TagAbilityPassive   Passive;
 	FP16TagAbilityStatus    Status;
 	FP16TagAbilityType      Type;
 };

@@ -33,6 +33,8 @@ DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int3
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnAbilitySystemRegisteredSignature, UAbilitySystemComponent*);
 
+DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnDeactivatePassiveAbilitySignature, const FGameplayTag& /*AbilityTag*/);
+
 DECLARE_MULTICAST_DELEGATE_ThreeParams(FP16OnAbilityStatusChangedSignature, const FGameplayTag& /*AbilityTag*/, const FGameplayTag& /*StatusTag*/, const int32 /*Level*/);
 
 DECLARE_MULTICAST_DELEGATE_FourParams(FP16OnAbilityEquippedSignature, const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag)
