@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
-#include "NiagaraComponent.h"
-#include "Character/P16CharacterBase.h"
-#include "P16DebuffNiagaraComponent.generated.h"
+#include "P16NiagaraComponent.h"
+#include "P16PassiveNiagaraComponent.generated.h"
 
 class UAbilitySystemComponent;
 
 UCLASS()
-class PROJECT16_API UP16DebuffNiagaraComponent : public UNiagaraComponent
+class PROJECT16_API UP16PassiveNiagaraComponent : public UP16NiagaraComponent
 {
 	GENERATED_BODY()
 
@@ -19,27 +18,21 @@ class PROJECT16_API UP16DebuffNiagaraComponent : public UNiagaraComponent
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
 public:
-	UP16DebuffNiagaraComponent();
+	UP16PassiveNiagaraComponent();
 
 protected:
 	virtual void BeginPlay() override;
 
 	/// ------------------------------------------------------------------------
+	/// @name Super
+	/// ------------------------------------------------------------------------
+protected:
+	virtual void ListenToChanges(UAbilitySystemComponent* InAbilitySystem) override;
+
+	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
-public:
-	void ToggleDebuff(const bool bOn);
-
 protected:
-	void OnDebuffTagChanged(FGameplayTag CallbackTag, const int32 NewCount);
-	void ListenToDebuffTagChanges(UAbilitySystemComponent* AbilitySystemComponent);
 	UFUNCTION()
-	void OnDeathCallback(AActor* DeadActor = nullptr);
-
-	/// ------------------------------------------------------------------------
-	/// @name Fields
-	/// ------------------------------------------------------------------------
-public:
-	UPROPERTY(VisibleAnywhere, Category = "C++")
-	FGameplayTag DebuffTag = {};
+	void OnPassiveActivate(const FGameplayTag& AbilityTag, const bool bActivate);
 };

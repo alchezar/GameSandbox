@@ -66,6 +66,8 @@ public:
 	void Server_EquipAbility(const FGameplayTag& InAbilityTag, const FGameplayTag& SlotInputTag);
 	UFUNCTION(Client, Reliable)
 	void Client_EquipAbility(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag);
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_ActivatePassiveEffect(const FGameplayTag& AbilityTag, const bool bActivate);
 
 protected:
 	UFUNCTION(Client, Reliable)
@@ -95,6 +97,7 @@ public:
 	FP16OnAbilityStatusChangedSignature     OnAbilityStatusChanged;
 	FP16OnAbilityEquippedSignature          OnAbilityEquipped;
 	FP16OnDeactivatePassiveAbilitySignature OnDeactivatePassiveAbility;
+	FP16OnActivatePassiveEffectSignature    OnActivatePassiveEffect;
 
 private:
 	bool bStartupAbilitiesGiven = false;

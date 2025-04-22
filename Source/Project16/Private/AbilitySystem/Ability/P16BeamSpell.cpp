@@ -10,9 +10,9 @@
 if (const TScriptInterface<IP16CombatInterface> CombatInterface = Target)          \
 {                                                                                  \
 	FP16OnDeathSignature& OnDeathDelegate = CombatInterface->GetOnDeathDelegate(); \
-	if (!OnDeathDelegate.IsAlreadyBound(this, &ThisClass::##Callback))    \
+	if (!OnDeathDelegate.IsAlreadyBound(this, &ThisClass::Callback))               \
 	{                                                                              \
-		OnDeathDelegate.AddDynamic(this, &ThisClass::##Callback);                  \
+		OnDeathDelegate.AddDynamic(this, &ThisClass::Callback);                    \
 	}                                                                              \
 }
 

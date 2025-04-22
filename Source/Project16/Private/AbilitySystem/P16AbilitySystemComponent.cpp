@@ -303,6 +303,7 @@ void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGamep
 			}
 			if (GetIsPassiveAbility(*SpecWithSlot))
 			{
+				Multicast_ActivatePassiveEffect(AbilityTag, false);
 				OnDeactivatePassiveAbility.Broadcast(AbilityTag);
 			}
 			ClearSlot(SpecWithSlot);
@@ -313,6 +314,7 @@ void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGamep
 	if (!GetAbilityHasAnySlot(*Spec) && GetIsPassiveAbility(*Spec))
 	{
 		TryActivateAbility(Spec->Handle);
+		Multicast_ActivatePassiveEffect(InAbilityTag, true);
 	}
 
 	AssignSlotToAbility(*Spec, SlotInputTag);
@@ -323,6 +325,11 @@ void UP16AbilitySystemComponent::Server_EquipAbility_Implementation(const FGamep
 void UP16AbilitySystemComponent::Client_EquipAbility_Implementation(const FGameplayTag& AbilityTag, const FGameplayTag& SlotInputTag, const FGameplayTag& PreviousSlotInputTag, const FGameplayTag& StatusTag)
 {
 	OnAbilityEquipped.Broadcast(AbilityTag, SlotInputTag, PreviousSlotInputTag, StatusTag);
+}
+
+void UP16AbilitySystemComponent::Multicast_ActivatePassiveEffect_Implementation(const FGameplayTag& AbilityTag, const bool bActivate)
+{
+	OnActivatePassiveEffect.Broadcast(AbilityTag, bActivate);
 }
 
 void UP16AbilitySystemComponent::Server_SpendSpellPoint_Implementation(const FGameplayTag& AbilityTag)

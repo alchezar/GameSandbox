@@ -23,6 +23,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AbilityInfoSignature, const FP16
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnWaitForEquipSelectionSignature, const FGameplayTag&, TypeTag);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FP16OnActivatePassiveEffectSignature, const FGameplayTag&, AbilityTag, const bool, bActivate);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_FourParams(FP16OnSpellGlobeSelectedSignature, bool, bAllowSpend, bool, bAllowEquip, FString, CurrentDescription, FString, NextDescription);
 
 DECLARE_MULTICAST_DELEGATE(FP16OnAbilitiesGivenSignature);

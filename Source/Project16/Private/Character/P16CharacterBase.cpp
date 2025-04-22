@@ -4,7 +4,8 @@
 
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
-#include "AbilitySystem/Debuff/P16DebuffNiagaraComponent.h"
+#include "AbilitySystem/Niagara/P16PassiveNiagaraComponent.h"
+#include "Project16/Public/AbilitySystem/Niagara/P16DebuffNiagaraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -19,11 +20,26 @@ AP16CharacterBase::AP16CharacterBase()
 
 	BurnDebuff = CreateDefaultSubobject<UP16DebuffNiagaraComponent>("DebuffNiagaraComponent");
 	BurnDebuff->SetupAttachment(GetRootComponent());
-	BurnDebuff->DebuffTag = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.BurnTag;
+	BurnDebuff->Init(FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.BurnTag);
 
 	StunDebuff = CreateDefaultSubobject<UP16DebuffNiagaraComponent>("StunDebuffNiagaraComponent");
 	StunDebuff->SetupAttachment(GetRootComponent());
-	StunDebuff->DebuffTag = FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.StunTag;
+	StunDebuff->Init(FGSGameplayTagsSingleton::Get().P16Tags.Debuff.Type.StunTag);
+
+	EffectAttachComponent = CreateDefaultSubobject<USceneComponent>("EffectAttachSceneComponent");
+	EffectAttachComponent->SetupAttachment(GetRootComponent());
+
+	HaloPassive = CreateDefaultSubobject<UP16PassiveNiagaraComponent>("HaloOfProtectionNiagaraComponent");
+	HaloPassive->SetupAttachment(EffectAttachComponent);
+	HaloPassive->Init(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Passive.HaloOfProtectionTag);
+
+	LifePassive = CreateDefaultSubobject<UP16PassiveNiagaraComponent>("LifeSiphonNiagaraComponent");
+	LifePassive->SetupAttachment(EffectAttachComponent);
+	LifePassive->Init(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Passive.LifeSiphonTag);
+
+	ManaPassive = CreateDefaultSubobject<UP16PassiveNiagaraComponent>("ManaSiphonNiagaraComponent");
+	ManaPassive->SetupAttachment(EffectAttachComponent);
+	ManaPassive->Init(FGSGameplayTagsSingleton::Get().P16Tags.Ability.Passive.ManaSiphonTag);
 
 	if (CombatSocketNameMap.IsEmpty())
 	{
@@ -51,6 +67,13 @@ void AP16CharacterBase::BeginPlay()
 	Super::BeginPlay();
 
 	BaseWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+}
+
+void AP16CharacterBase::Tick(const float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	OrientPassiveSpells();
 }
 
 FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag)
@@ -282,7 +305,7 @@ void AP16CharacterBase::OnStunTagChanged(const FGameplayTag CallbackTag, const i
 
 void AP16CharacterBase::OnRep_Burned(const bool bOldBurned) const
 {
-	BurnDebuff->ToggleDebuff(bBurned);
+	BurnDebuff->ToggleEffect(bBurned);
 }
 
 void AP16CharacterBase::OnRep_Stunned(const bool bOldStunned) const
@@ -291,5 +314,14 @@ void AP16CharacterBase::OnRep_Stunned(const bool bOldStunned) const
 	EARLY_RETURN_IF(!AbilitySystem)
 	AbilitySystem->UpdateStunStatus(bStunned);
 
-	StunDebuff->ToggleDebuff(bStunned);
+	StunDebuff->ToggleEffect(bStunned);
+}
+
+void AP16CharacterBase::OrientPassiveSpells() const
+{
+	EARLY_RETURN_IF((!HaloPassive->IsActive() || !HaloPassive->GetAsset())
+		&& (!LifePassive->IsActive() || !LifePassive->GetAsset())
+		&& (!ManaPassive->IsActive() || !ManaPassive->GetAsset()))
+
+	EffectAttachComponent->SetWorldRotation(FRotator {});
 }

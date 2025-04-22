@@ -8,12 +8,13 @@
 #include "Util/P16Type.h"
 #include "P16CharacterBase.generated.h"
 
-class UP16DebuffNiagaraComponent;
-class UNiagaraSystem;
-class UP16GameplayAbility;
-class UGameplayEffect;
-class UAttributeSet;
 class UAbilitySystemComponent;
+class UAttributeSet;
+class UGameplayEffect;
+class UNiagaraSystem;
+class UP16DebuffNiagaraComponent;
+class UP16GameplayAbility;
+class UP16PassiveNiagaraComponent;
 
 UCLASS(Abstract)
 class PROJECT16_API AP16CharacterBase : public ACharacter, public IP16CombatInterface
@@ -29,6 +30,7 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void Tick(const float DeltaSeconds) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Interface
@@ -77,6 +79,7 @@ private:
 	void OnRep_Burned(const bool bOldBurned = false) const;
 	UFUNCTION()
 	void OnRep_Stunned(const bool bOldStunned = false) const;
+	void OrientPassiveSpells() const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -99,6 +102,14 @@ protected:
 	TObjectPtr<UP16DebuffNiagaraComponent> BurnDebuff = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP16DebuffNiagaraComponent> StunDebuff = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<USceneComponent> EffectAttachComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP16PassiveNiagaraComponent> HaloPassive = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP16PassiveNiagaraComponent> LifePassive = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP16PassiveNiagaraComponent> ManaPassive = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	EP16CharacterClass CharacterClass = EP16CharacterClass::Warrior;

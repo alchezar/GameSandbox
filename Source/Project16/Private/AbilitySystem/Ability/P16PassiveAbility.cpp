@@ -16,7 +16,7 @@ void UP16PassiveAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle
 
 void UP16PassiveAbility::ReceiveDeactivate(const FGameplayTag& AbilityTag)
 {
-	if (AbilityTags.HasTagExact(AbilityTag))
+	if (GetAssetTags().HasTagExact(AbilityTag))
 	{
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
 	}
