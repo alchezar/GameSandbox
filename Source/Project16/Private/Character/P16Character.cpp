@@ -10,6 +10,7 @@
 #include "Camera/CameraComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Player/P16PlayerController.h"
 #include "Player/P16PlayerState.h"
 #include "UI/HUD/P16HUD.h"
 
@@ -161,6 +162,15 @@ void AP16Character::AddSpellPoints_Implementation(const int32 InSpellPoints)
 void AP16Character::LevelUp_Implementation()
 {
 	Multicast_LevelUpParticles();
+}
+
+void AP16Character::ToggleMagicCircle_Implementation(const bool bOn, UMaterialInterface* DecalMaterial)
+{
+	AP16PlayerController* PlayerController = Cast<AP16PlayerController>(Controller);
+	EARLY_RETURN_IF(!PlayerController)
+
+	PlayerController->ToggleMagicCircle(bOn, DecalMaterial);
+	PlayerController->bShowMouseCursor = !bOn;
 }
 
 void AP16Character::InitAbilityActorInfo()

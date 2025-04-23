@@ -22,6 +22,14 @@ struct FP16TagAbilityLightning
 };
 
 USTRUCT()
+struct FP16TagAbilityArcane
+{
+	GENERATED_BODY()
+
+	FGameplayTag ShardsTag;
+};
+
+USTRUCT()
 struct FP16TagAbilityPassive
 {
 	GENERATED_BODY()
@@ -67,6 +75,7 @@ struct FP16TagAbility
 
 	FP16TagAbilityFire      Fire;
 	FP16TagAbilityLightning Lightning;
+	FP16TagAbilityArcane    Arcane;
 	FP16TagAbilityPassive   Passive;
 	FP16TagAbilityStatus    Status;
 	FP16TagAbilityType      Type;
@@ -157,12 +166,21 @@ struct FP16TagCooldownLightning
 };
 
 USTRUCT(BlueprintType)
+struct FP16TagCooldownArcane
+{
+	GENERATED_BODY()
+
+	FGameplayTag ShardsTag;
+};
+
+USTRUCT(BlueprintType)
 struct FP16TagCooldown
 {
 	GENERATED_BODY()
 
 	FP16TagCooldownFire      Fire;
 	FP16TagCooldownLightning Lightning;
+	FP16TagCooldownArcane    Arcane;
 };
 
 USTRUCT(BlueprintType)

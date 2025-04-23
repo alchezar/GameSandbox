@@ -8,6 +8,7 @@
 #include "GameFramework/PlayerController.h"
 #include "P16PlayerController.generated.h"
 
+class AP16MagicCircle;
 class UNiagaraSystem;
 class UP16DamageTextComponent;
 class AP16Character;
@@ -46,12 +47,15 @@ public:
 
 	UFUNCTION(Client, Unreliable)
 	void Client_ShowDamageNumber(const float InDamage, AActor* Target, const bool bBlockedHit, const bool bCriticalHit);
+	UFUNCTION(BlueprintCallable)
+	void ToggleMagicCircle(const bool bOn, UMaterialInterface* DecalMaterial = nullptr);
 
 protected:
 	void MoveInputCallback(const FInputActionValue& InputValue);
 	void ShiftInputCallback(const FInputActionValue& InputValue, const bool bDown);
 	void CursorTrace();
 	void AutoRun();
+	void UpdateMagicCircle();
 
 	void AbilityInputTagPressed(const FGameplayTag InputTag);
 	void AbilityInputTagReleased(const FGameplayTag InputTag);
@@ -86,6 +90,8 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Damage")
 	TSubclassOf<UP16DamageTextComponent> DamageTextComponentClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Pointer")
+	TSubclassOf<AP16MagicCircle> MagicCircleClass = nullptr;
 
 private:
 	TScriptInterface<IP16InterfaceEnemy> LastTickEnemy = {};
@@ -93,6 +99,8 @@ private:
 	TObjectPtr<UP16AbilitySystemComponent> AbilitySystemComponent = {};
 	UPROPERTY()
 	APawn* ControlledPawn = nullptr;
+	UPROPERTY()
+	TObjectPtr<AP16MagicCircle> MagicCircle = nullptr;
 
 	FHitResult CursorHit         = {};
 	FVector    CachedDestination = {};

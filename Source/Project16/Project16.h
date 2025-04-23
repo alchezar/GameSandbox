@@ -6,14 +6,13 @@
 
 namespace P16
 {
-	///
 	/// @brief Depth values for highlighting on hover in postprocess material.
-	///
 	constexpr int32 CustomDepthRed = 250;
 
-	///
+	/// @brief The number of points for the arcane shards spell.
+	constexpr int32 PointsNum = 12;
+
 	/// @brief Orders for correct widget layout.
-	///
 	namespace ZOrder
 	{
 		constexpr int32 MainOverlay = 0;

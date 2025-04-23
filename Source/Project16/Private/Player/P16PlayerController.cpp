@@ -10,6 +10,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
+#include "Actor/P16MagicCircle.h"
 #include "Component/P16InputComponent.h"
 #include "Components/SplineComponent.h"
 #include "Interface/P16InterfaceEnemy.h"
@@ -51,6 +52,7 @@ void AP16PlayerController::Tick(const float DeltaSeconds)
 
 	CursorTrace();
 	AutoRun();
+	UpdateMagicCircle();
 }
 
 void AP16PlayerController::SetupInputComponent()
@@ -85,6 +87,21 @@ void AP16PlayerController::Client_ShowDamageNumber_Implementation(const float In
 	DamageText->RegisterComponent();
 	DamageText->SetWorldLocation(Target->GetActorLocation() + RandomOffset);
 	DamageText->SetDamageText(InDamage, bBlockedHit, bCriticalHit);
+}
+
+void AP16PlayerController::ToggleMagicCircle(const bool bOn, UMaterialInterface* DecalMaterial)
+{
+	if (MagicCircle)
+	{
+		MagicCircle->Destroy();
+		MagicCircle = nullptr;
+	}
+
+	EARLY_RETURN_IF(!bOn || !MagicCircleClass)
+	MagicCircle = GetWorld()->SpawnActor<AP16MagicCircle>(MagicCircleClass);
+
+	EARLY_RETURN_IF(!MagicCircle || !DecalMaterial)
+	MagicCircle->SetDecalMaterial(DecalMaterial);
 }
 
 void AP16PlayerController::MoveInputCallback(const FInputActionValue& InputValue)
@@ -153,6 +170,13 @@ void AP16PlayerController::AutoRun()
 
 	const FVector Direction = Spline->FindDirectionClosestToWorldLocation(ControlledPawn->GetActorLocation(), ESplineCoordinateSpace::World);
 	ControlledPawn->AddMovementInput(Direction);
+}
+
+void AP16PlayerController::UpdateMagicCircle()
+{
+	EARLY_RETURN_IF(!MagicCircle || !CursorHit.bBlockingHit)
+
+	MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
 }
 
 void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)

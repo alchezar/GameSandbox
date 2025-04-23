@@ -55,6 +55,7 @@ public:
 	virtual void  AddAttributePoints_Implementation(const int32 InAttributePoints) override;
 	virtual void  AddSpellPoints_Implementation(const int32 InSpellPoints) override;
 	virtual void  LevelUp_Implementation() override;
+	virtual void  ToggleMagicCircle_Implementation(const bool bOn, UMaterialInterface* DecalMaterial = nullptr) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super

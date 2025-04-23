@@ -305,6 +305,7 @@ void UP16AttributeSet::HandleDebuff(const FP16EffectProperties& Properties)
 
 	// Apply the effect
 	// New context for debuff GE, not the same as the context of the damage GE.
+	EARLY_RETURN_IF(!Properties.SourceAbilitySystem || !Properties.SourceAvatarActor)
 	FGameplayEffectContextHandle NewContextHandle = Properties.SourceAbilitySystem->MakeEffectContext();
 	NewContextHandle.AddSourceObject(Properties.SourceAvatarActor);
 
