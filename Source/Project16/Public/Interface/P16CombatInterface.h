@@ -72,4 +72,5 @@ public:
 
 	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() = 0;
 	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() = 0;
+	virtual FP16OnRadialDamageSignature&            GetOnRadialDamageDelegate() = 0;
 };

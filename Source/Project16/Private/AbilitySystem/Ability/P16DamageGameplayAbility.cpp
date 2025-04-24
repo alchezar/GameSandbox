@@ -40,7 +40,8 @@ FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClas
 		.DamageType = DamageInfo.Tag,
 		.Debuff = DebuffInfo,
 		.DeathImpulse = DeathImpulse,
-		.Knockback = KnockbackForce
+		.Knockback = KnockbackForce,
+		.RadialParams = RadialDamageParams
 	};
 
 	UpdateDamageEffectParams(TargetActor, DamageEffectParams);

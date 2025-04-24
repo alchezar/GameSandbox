@@ -253,6 +253,21 @@ struct FP16DebuffSpec
 	float Duration    = 0.f;
 
 	TSharedPtr<FGameplayTag> DamageType = {};
+
+	bool NetSerialize(FArchive& Ar, UPackageMap* Map, bool& bOutSuccess)
+	{
+		Ar
+			<< bSuccessful
+			<< Damage
+			<< Frequency
+			<< Duration;
+
+		if (Ar.IsLoading() && !DamageType.IsValid())
+		{
+			DamageType = MakeShared<FGameplayTag>();
+		}
+		return DamageType->NetSerialize(Ar, Map, bOutSuccess);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -266,6 +281,32 @@ struct FP16TrickImpulse
 	float Chance = 100.f;
 	UPROPERTY(BlueprintReadWrite)
 	FVector Velocity = FVector::ZeroVector;
+};
+
+USTRUCT(BlueprintType)
+struct FP16RadialDamageParams
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	bool bRadial = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float InnerRadius = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	float OuterRadius = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	FVector Origin = {};
+
+	friend FArchive& operator<<(FArchive& Ar, FP16RadialDamageParams& DamageParams)
+	{
+		Ar
+			<< DamageParams.bRadial
+			<< DamageParams.InnerRadius
+			<< DamageParams.OuterRadius
+			<< DamageParams.Origin;
+
+		return Ar;
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -293,6 +334,8 @@ struct FP16DamageEffectParams
 	FP16TrickImpulse DeathImpulse = {};
 	UPROPERTY(BlueprintReadWrite)
 	FP16TrickImpulse Knockback = {};
+	UPROPERTY(BlueprintReadWrite)
+	FP16RadialDamageParams RadialParams = {};
 };
 
 struct FP16SelectedAbility

@@ -26,10 +26,11 @@ bool FP16GameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 		RepBits |= (DebuffSpec.bSuccessful)                           << 9;
 		RepBits |= (DeathImpulse != FVector::ZeroVector)              << 10;
 		RepBits |= (KnockbackForce != FVector::ZeroVector)            << 11;
+		RepBits |= (RadialDamageParams.bRadial)                       << 12;
 		// clang-format on
 	}
 
-	Ar.SerializeBits(&RepBits, 12);
+	Ar.SerializeBits(&RepBits, 13);
 
 	if (RepBits & (1 << 0))
 	{
@@ -78,17 +79,7 @@ bool FP16GameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 	}
 	if (RepBits & (1 << 9))
 	{
-		Ar
-			<< DebuffSpec.bSuccessful
-			<< DebuffSpec.Damage
-			<< DebuffSpec.Frequency
-			<< DebuffSpec.Duration;
-
-		if (Ar.IsLoading() && !DebuffSpec.DamageType.IsValid())
-		{
-			DebuffSpec.DamageType = MakeShared<FGameplayTag>();
-		}
-		DebuffSpec.DamageType->NetSerialize(Ar, Map, bOutSuccess);
+		DebuffSpec.NetSerialize(Ar, Map, bOutSuccess);
 	}
 	if (RepBits & (1 << 10))
 	{
@@ -97,6 +88,10 @@ bool FP16GameplayEffectContext::NetSerialize(FArchive& Ar, UPackageMap* Map, boo
 	if (RepBits & (1 << 11))
 	{
 		Ar << KnockbackForce;
+	}
+	if (RepBits & (1 << 12))
+	{
+		Ar << RadialDamageParams;
 	}
 
 	if (Ar.IsLoading())

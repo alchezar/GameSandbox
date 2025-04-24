@@ -62,6 +62,15 @@ void AP16CharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& Ou
 	DOREPLIFETIME(AP16CharacterBase, bBeingShocked);
 }
 
+float AP16CharacterBase::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	const float Damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	OnRadialDamage.Broadcast(Damage);
+
+	return Damage;
+}
+
 void AP16CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();
@@ -148,6 +157,11 @@ FP16OnAbilitySystemRegisteredSignature& AP16CharacterBase::GetOnAbilitySystemReg
 FP16OnDeathSignature& AP16CharacterBase::GetOnDeathDelegate()
 {
 	return OnDeath;
+}
+
+FP16OnRadialDamageSignature& AP16CharacterBase::GetOnRadialDamageDelegate()
+{
+	return OnRadialDamage;
 }
 
 USkeletalMeshComponent* AP16CharacterBase::GetWeapon_Implementation()

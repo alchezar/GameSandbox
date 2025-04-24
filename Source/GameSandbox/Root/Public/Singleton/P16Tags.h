@@ -243,6 +243,7 @@ struct FP16TagEventMontage
 
 	FGameplayTag FireballTag;
 	FGameplayTag ElectrocuteTag;
+	FGameplayTag ShardsTag;
 };
 
 USTRUCT(BlueprintType)

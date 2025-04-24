@@ -20,12 +20,18 @@ class PROJECT16_API UP16AbilitySystemLibrary : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 public:
+	///
+	/// @name Widget controller.
+	///
 	UFUNCTION(BlueprintPure, Category = "C++", meta = (DefaultToSelf = "WorldContextObject"))
 	static UP16OverlayWidgetController* GetOverlayWidgetController(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++", meta = (DefaultToSelf = "WorldContextObject"))
 	static UP16AttributeMenuWidgetController* GetAttributeMenuWidgetController(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++", meta = (DefaultToSelf = "WorldContextObject"))
 	static UP16SpellMenuWidgetController* GetSpellMenuWidgetController(const UObject* WorldContextObject);
+	///
+	/// @name Ability system.
+	///
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level);
 	UFUNCTION(BlueprintCallable, Category = "C++")
@@ -35,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static UP16AbilityInfoDataAsset* GetAbilityInfo(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++")
+	///
+	/// @name Effect context getters.
+	///
 	static bool GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	static bool GetIsCriticalHit(const FGameplayEffectContextHandle& EffectContextHandle);
@@ -46,21 +55,28 @@ public:
 	static FVector GetDeathImpulse(const FGameplayEffectContextHandle& EffectContextHandle);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	static FVector GetKnockbackForce(const FGameplayEffectContextHandle& EffectContextHandle);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static FP16RadialDamageParams GetRadialDamageParams(const FGameplayEffectContextHandle& EffectContextHandle);
+	///
+	/// @name Effect context setters.
+	///
+	// clang-format off
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	static void SetIsBlockedHit(UPARAM(ref)
-		FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked);
+	static void SetIsBlockedHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked);
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	static void SetIsCriticalHit(UPARAM(ref)
-		FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical);
+	static void SetIsCriticalHit(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bNewCritical);
 	UFUNCTION(BlueprintPure, Category = "C++")
-	static void SetDebuffSpec(UPARAM(ref)
-		FGameplayEffectContextHandle& EffectContextHandle, const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType);
+	static void SetDebuffSpec(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const bool bSuccessful, const FP16DebuffInfo& InDebuffInfo, const FGameplayTag& InDamageType);
 	UFUNCTION(BlueprintPure, Category = "C++")
-	static void SetDeathImpulse(UPARAM(ref)
-		FGameplayEffectContextHandle& EffectContextHandle, const FVector& InImpulse);
+	static void SetDeathImpulse(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InImpulse);
 	UFUNCTION(BlueprintPure, Category = "C++")
-	static void SetKnockbackForce(UPARAM(ref)
-		FGameplayEffectContextHandle& EffectContextHandle, const FVector& InForce);
+	static void SetKnockbackForce(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FVector& InForce);
+	UFUNCTION(BlueprintPure, Category = "C++")
+	static void SetRadialDamageParams(UPARAM(ref) FGameplayEffectContextHandle& EffectContextHandle, const FP16RadialDamageParams& RadialDamageParams);
+	// clang-format on
+	///
+	/// @name Gameplay mechanics.
+	///
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static TArray<AActor*> GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin);
 	UFUNCTION(BlueprintPure, Category = "C++")

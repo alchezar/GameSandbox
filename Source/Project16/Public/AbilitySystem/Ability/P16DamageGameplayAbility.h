@@ -47,6 +47,8 @@ protected:
 	FP16DamageInfo DamageInfo;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
 	FP16DebuffInfo DebuffInfo = {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Damage")
+	FP16RadialDamageParams RadialDamageParams = {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Trick")
 	FP16TrickImpulse DeathImpulse = {.Magnitude = 5000.f};

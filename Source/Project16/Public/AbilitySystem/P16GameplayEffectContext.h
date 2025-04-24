@@ -46,6 +46,8 @@ public:
 	FVector GetDeadImpulse() const { return DeathImpulse; };
 	_NODISCARD
 	FVector GetKnockbackForce() const { return KnockbackForce; };
+	_NODISCARD
+	FP16RadialDamageParams GetRadialDamageParams() const { return RadialDamageParams; };
 
 	void SetIsCriticalHit(const bool bNewCriticalHit) { bCriticalHit = bNewCriticalHit; }
 	void SetIsBlockedHit(const bool bNewBlockedHit) { bBlockedHit = bNewBlockedHit; }
@@ -53,6 +55,7 @@ public:
 	void SetDamageType(const TSharedPtr<FGameplayTag>& InDamageType);
 	void SetDeathImpulse(const FVector& NewImpulse) { DeathImpulse = NewImpulse; };
 	void SetKnockbackForce(const FVector& NewForce) { KnockbackForce = NewForce; };
+	void SetRadialDamageParams(const FP16RadialDamageParams& NewRadialDamageParams) { RadialDamageParams = NewRadialDamageParams; };
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -70,6 +73,8 @@ protected:
 	FVector DeathImpulse = FVector::ZeroVector;
 	UPROPERTY()
 	FVector KnockbackForce = FVector::ZeroVector;
+	UPROPERTY()
+	FP16RadialDamageParams RadialDamageParams = {};
 };
 
 /// ----------------------------------------------------------------------------

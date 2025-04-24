@@ -52,6 +52,8 @@ private:
 	void AffectDamage(const FGameplayEffectCustomExecutionParameters& ExecutionParams, const FGameplayEffectSpec& Spec, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Apply resistance to each damage type.
 	void AffectResistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, const FGameplayTag& ResistanceTag, float& OutDamage) const;
+	/// @brief If this is a radial damage - scale the damage down based on the distance from origin.
+	void AffectRadialDistance(const FGameplayEffectCustomExecutionParameters& ExecutionParameters, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Capture the block chance on the target and determine if there was a successful block. If so, half the damage.
 	void AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const;
 	/// @brief Armor penetration ignores a percentage of the target's armor.

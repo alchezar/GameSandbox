@@ -139,6 +139,14 @@ FVector UP16AbilitySystemLibrary::GetKnockbackForce(const FGameplayEffectContext
 	return Context->GetKnockbackForce();
 }
 
+FP16RadialDamageParams UP16AbilitySystemLibrary::GetRadialDamageParams(const FGameplayEffectContextHandle& EffectContextHandle)
+{
+	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_VALUE_IF(!Context, {})
+
+	return Context->GetRadialDamageParams();
+}
+
 void UP16AbilitySystemLibrary::SetIsBlockedHit(FGameplayEffectContextHandle& EffectContextHandle, const bool bNewBlocked)
 {
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
@@ -174,6 +182,14 @@ void UP16AbilitySystemLibrary::SetKnockbackForce(FGameplayEffectContextHandle& E
 	EARLY_RETURN_IF(!Context)
 
 	Context->SetKnockbackForce(InForce);
+}
+
+void UP16AbilitySystemLibrary::SetRadialDamageParams(FGameplayEffectContextHandle& EffectContextHandle, const FP16RadialDamageParams& RadialDamageParams)
+{
+	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(EffectContextHandle.Get());
+	EARLY_RETURN_IF(!Context)
+
+	Context->SetRadialDamageParams(RadialDamageParams);
 }
 
 TArray<AActor*> UP16AbilitySystemLibrary::GetLivePlayersWithinRadius(const UObject* WorldContextObject, const TArray<AActor*> IgnoredActors, const float Radius, const FVector SphereOrigin)
@@ -229,6 +245,7 @@ FGameplayEffectContextHandle UP16AbilitySystemLibrary::ApplyDamageEffect(const F
 	ContextHandle.AddSourceObject(Params.SourceAbilitySystemComponent->GetAvatarActor());
 	SetDeathImpulse(ContextHandle, Params.DeathImpulse.Velocity);
 	SetKnockbackForce(ContextHandle, Params.Knockback.Velocity);
+	SetRadialDamageParams(ContextHandle, Params.RadialParams);
 
 	const FGameplayEffectSpecHandle SpecHandle = Params.TargetAbilitySystemComponent->MakeOutgoingSpec(Params.DamageEffectClass, Params.AbilityLevel, ContextHandle);
 	SpecHandle.Data->SetSetByCallerMagnitude(Params.DamageType, Params.BaseDamage);

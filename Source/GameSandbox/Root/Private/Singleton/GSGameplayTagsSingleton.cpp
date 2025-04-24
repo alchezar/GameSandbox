@@ -93,6 +93,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	// Event tags.
 	Singleton.P16Tags.Event.Montage.FireballTag    = Manager.AddNativeGameplayTag("P16.Event.Montage.Fireball", "Event tag for the fireball montage");
 	Singleton.P16Tags.Event.Montage.ElectrocuteTag = Manager.AddNativeGameplayTag("P16.Event.Montage.Electrocute", "Event tag for the electrocute montage");
+	Singleton.P16Tags.Event.Montage.ShardsTag      = Manager.AddNativeGameplayTag("P16.Event.Montage.Shards", "Event tag for the arcane shards montage");
 
 	// Combat socket tags.
 	Singleton.P16Tags.CombatSocket.WeaponTag    = Manager.AddNativeGameplayTag("P16.CombatSocket.Weapon", "Event tag for the weapon attack montage");

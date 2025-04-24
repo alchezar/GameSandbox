@@ -26,7 +26,8 @@ class PROJECT16_API AP16CharacterBase : public ACharacter, public IP16CombatInte
 	/// ------------------------------------------------------------------------
 public:
 	AP16CharacterBase();
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual void  GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+	virtual float TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -50,6 +51,7 @@ public:
 	virtual EP16CharacterClass                      GetCharacterClass_Implementation() override;
 	virtual FP16OnAbilitySystemRegisteredSignature& GetOnAbilitySystemRegisteredDelegate() override;
 	virtual FP16OnDeathSignature&                   GetOnDeathDelegate() override;
+	virtual FP16OnRadialDamageSignature&            GetOnRadialDamageDelegate() override;
 	virtual USkeletalMeshComponent*                 GetWeapon_Implementation() override;
 	virtual void                                    SetBeingShocked_Implementation(const bool bIsShocked) override;
 
@@ -87,6 +89,7 @@ private:
 public:
 	FP16OnAbilitySystemRegisteredSignature OnAbilitySystemRegistered;
 	FP16OnDeathSignature                   OnDeath;
+	FP16OnRadialDamageSignature            OnRadialDamage;
 
 	UPROPERTY(ReplicatedUsing = "OnRep_Burned", BlueprintReadOnly, Category = "C++")
 	bool bBurned = false;
