@@ -44,7 +44,10 @@ FP16DamageEffectParams UP16DamageGameplayAbility::MakeDamageEffectParamsFromClas
 		.RadialParams = RadialDamageParams
 	};
 
-	UpdateDamageEffectParams(TargetActor, DamageEffectParams);
+	const FVector CauserLocation = RadialDamageParams.bRadial
+		? RadialDamageParams.Origin
+		: GetAbilitySystemComponentFromActorInfo()->GetAvatarActor()->GetActorLocation();
+	UpdateTricksVelocity(CauserLocation, TargetActor, DamageEffectParams);
 
 	return DamageEffectParams;
 }
@@ -54,25 +57,28 @@ float UP16DamageGameplayAbility::GetDamageAtLevel(const int32 InLevel) const
 	return DamageInfo.Damage.GetValueAtLevel(InLevel);
 }
 
-void UP16DamageGameplayAbility::UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams)
+void UP16DamageGameplayAbility::UpdateRadialDamageOrigin(const FVector& NewOrigin)
+{
+	RadialDamageParams.Origin = NewOrigin;
+}
+
+void UP16DamageGameplayAbility::UpdateTricksVelocity(const FVector& CauserLocation, AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams)
 {
 	EARLY_RETURN_IF(!TargetActor)
 
-	const AActor* Avatar   = DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor();
-	const FVector ToTarget = (TargetActor->GetActorLocation() - Avatar->GetActorLocation()).GetSafeNormal();
-
-	constexpr float Angle              = -25.f;
-	const FVector   KnockbackDirection = ToTarget.RotateAngleAxis(Angle, Avatar->GetActorRightVector());
+	const FVector   ToTarget   = (TargetActor->GetActorLocation() - CauserLocation).GetSafeNormal();
+	constexpr float PitchAngle = 25.f;
+	const FVector   Direction  = ToTarget.RotateAngleAxis(PitchAngle, TargetActor->GetActorRightVector());
 
 	// Ability system.
 	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 
 	// Death impulse.
-	DamageEffectParams.DeathImpulse.Velocity = KnockbackDirection * DamageEffectParams.DeathImpulse.Magnitude;
+	DamageEffectParams.DeathImpulse.Velocity = Direction * DamageEffectParams.DeathImpulse.Magnitude;
 
 	// Knockback force.
 	if (DamageEffectParams.Knockback.Chance > FMath::RandRange(0.f, 100.f))
 	{
-		DamageEffectParams.Knockback.Velocity = KnockbackDirection * DamageEffectParams.Knockback.Magnitude;
+		DamageEffectParams.Knockback.Velocity = Direction * DamageEffectParams.Knockback.Magnitude;
 	}
 }

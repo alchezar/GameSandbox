@@ -176,7 +176,21 @@ void AP16PlayerController::UpdateMagicCircle()
 {
 	EARLY_RETURN_IF(!MagicCircle || !CursorHit.bBlockingHit)
 
-	MagicCircle->SetActorLocation(CursorHit.ImpactPoint);
+	// Remove magic circle jitter on hovering the enemies, by ignoring them in additional raycast.
+	FVector MagicCircleLocation = CursorHit.ImpactPoint;
+	if (LastTickEnemy)
+	{
+		FHitResult    IgnoreEnemyHit;
+		const FVector Start     = CursorHit.ImpactPoint;
+		const FVector Direction = (CursorHit.TraceEnd - CursorHit.TraceStart).GetSafeNormal();
+		const FVector End       = Start + Direction * 1000.f;
+		if (GetWorld()->LineTraceSingleByChannel(IgnoreEnemyHit, Start, End, P16::CollisionChannel::Cursor))
+		{
+			MagicCircleLocation = IgnoreEnemyHit.ImpactPoint;
+		}
+	}
+
+	MagicCircle->SetActorLocation(MagicCircleLocation);
 }
 
 void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)

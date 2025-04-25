@@ -8,7 +8,6 @@
 #include "AbilitySystem/P16AttributeSet.h"
 #include "AbilitySystem/Data/P16CharacterClassInfoDataAsset.h"
 #include "Interface/P16CombatInterface.h"
-#include "Kismet/GameplayStatics.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 /// ----------------------------------------------------------------------------
@@ -166,6 +165,7 @@ void UP16ExecCalcDamage::AffectRadialDistance(const FGameplayEffectCustomExecuti
 	const FP16RadialDamageParams RadialDamageParams = UP16AbilitySystemLibrary::GetRadialDamageParams(ContextHandle);
 	EARLY_RETURN_IF(!RadialDamageParams.bRadial)
 
+#if 0
 	// Approach with using `UGameplayStatics::ApplyRadialDamageWithFalloff` method.
 	if (const TScriptInterface<IP16CombatInterface> CombatInterface = ExecutionData.TargetAvatar)
 	{
@@ -185,8 +185,8 @@ void UP16ExecCalcDamage::AffectRadialDistance(const FGameplayEffectCustomExecuti
 			{},
 			ExecutionData.SourceAvatar);
 	}
+#endif
 
-#if 0
 	// My simple approach.
 	const FVector TargetLocation = ExecutionData.TargetAvatar->GetActorLocation();
 	const float   Distance       = (TargetLocation - RadialDamageParams.Origin).Size();
@@ -202,9 +202,8 @@ void UP16ExecCalcDamage::AffectRadialDistance(const FGameplayEffectCustomExecuti
 	}
 	const float Range = RadialDamageParams.OuterRadius - RadialDamageParams.InnerRadius;
 	const float Delta = Distance - RadialDamageParams.InnerRadius;
-	const float Alpha = Delta / FMath::Min(1.f, Range);
+	const float Alpha = 1.f - Delta / FMath::Max(1.f, Range);
 	OutDamage *= Alpha;
-#endif
 }
 
 void UP16ExecCalcDamage::AffectBlockChance(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectContextHandle& ContextHandle, float& OutDamage) const

@@ -25,6 +25,7 @@ namespace P16
 	{
 		inline constexpr ECollisionChannel Projectile = ECC_GameTraceChannel3;
 		inline constexpr ECollisionChannel Weapon     = ECC_GameTraceChannel5;
+		inline constexpr ECollisionChannel Cursor     = ECC_GameTraceChannel9;
 	}
 
 	///

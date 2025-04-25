@@ -118,7 +118,7 @@ void AP16Projectile::ApplyDamageTo(AActor* Target)
 {
 	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor()))
 
-	UP16DamageGameplayAbility::UpdateDamageEffectParams(Target, DamageEffectParams);
+	UP16DamageGameplayAbility::UpdateTricksVelocity(GetActorLocation(), Target, DamageEffectParams);
 	EARLY_RETURN_IF(!DamageEffectParams.TargetAbilitySystemComponent)
 
 	UP16AbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);

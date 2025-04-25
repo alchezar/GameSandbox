@@ -34,8 +34,10 @@ public:
 
 	UFUNCTION(BlueprintPure)
 	float GetDamageAtLevel(const int32 InLevel) const;
+	UFUNCTION(BlueprintCallable)
+	void UpdateRadialDamageOrigin(const FVector& NewOrigin);
 
-	static void UpdateDamageEffectParams(AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams);
+	static void UpdateTricksVelocity(const FVector& CauserLocation, AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

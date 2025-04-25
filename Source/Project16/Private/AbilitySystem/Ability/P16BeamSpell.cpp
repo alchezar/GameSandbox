@@ -24,7 +24,45 @@ FString UP16BeamSpell::GetDescription(const int32 CurrentLevel)
 	const float ManaCost     = GetManaCost(CurrentLevel);
 	const float CooldownTime = GetCooldownTime(CurrentLevel);
 
-	return Super::GetDescription(CurrentLevel);
+	FString Description = FRichString {}
+		// Title.
+		.Add(Title, "ELECTROCUTE")
+		.Gap(Double)
+		// Details.
+		.Add(Small, "Level: ")
+		.Num(Level, CurrentLevel)
+		.Gap(Single)
+		.Add(Small, "Mana cost: ")
+		.Num(Mana, ManaCost)
+		.Gap(Single)
+		.Add(Small, "Cooldown: ")
+		.Num(Cooldown, CooldownTime)
+		.Gap(Double)
+		// Description.
+		.Add(Default, "Emits ")
+		.Get();
+
+	if (CurrentLevel == 1)
+	{
+		Description += FRichString {}
+			.Add(Default, "1 beam ")
+			.Get();
+	}
+	else
+	{
+		Description += FRichString {}
+			.Num(Default, FMath::Min(CurrentLevel, MaxNumTargets))
+			.Add(Default, " beams ")
+			.Get();
+	}
+
+	Description += FRichString {}
+		.Add(Default, "of lightning, connecting with the target, repeatedly causing: ")
+		.Num(Damage, DamageValue)
+		.Add(Default, " lightning damage with a chance to stun.")
+		.Get();
+
+	return Description;
 }
 
 FString UP16BeamSpell::GetDescriptionNextLevel(const int32 CurrentLevel)
@@ -36,7 +74,27 @@ FString UP16BeamSpell::GetDescriptionNextLevel(const int32 CurrentLevel)
 	const float ManaCost     = GetManaCost(NextLevel);
 	const float CooldownCost = GetCooldownTime(NextLevel);
 
-	return Super::GetDescriptionNextLevel(CurrentLevel);
+	return FRichString {}
+		// Title.
+		.Add(Title, "NEXT LEVEL")
+		.Gap(Double)
+		// Details.
+		.Add(Small, "Level: ")
+		.Num(Level, NextLevel)
+		.Gap(Single)
+		.Add(Small, "Mana cost: ")
+		.Num(Mana, ManaCost)
+		.Gap(Single)
+		.Add(Small, "Cooldown: ")
+		.Num(Cooldown, CooldownCost)
+		.Gap(Double)
+		// Description.
+		.Add(Default, "Emits ")
+		.Num(Default, FMath::Min(NextLevel, MaxNumTargets))
+		.Add(Default, " beams of lightning, connecting with the target, repeatedly causing: ")
+		.Num(Damage, DamageValue)
+		.Add(Default, " lightning damage with a chance to stun.")
+		.Get();
 }
 
 void UP16BeamSpell::StoreMouseDataInfo(const FHitResult& HitResult)
