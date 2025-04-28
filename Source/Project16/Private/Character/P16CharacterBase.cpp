@@ -85,18 +85,18 @@ void AP16CharacterBase::Tick(const float DeltaSeconds)
 	OrientPassiveSpells();
 }
 
-FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag)
+FVector AP16CharacterBase::GetCombatSocketLocation_Implementation(const FGameplayTag SocketTag)
 {
 	// Find which mesh has a socket.
 	const USceneComponent* SocketComponent = Weapon;
-	if (!MontageTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket.WeaponTag))
+	if (!SocketTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.CombatSocket.WeaponTag))
 	{
 		SocketComponent = GetMesh();
 	}
 
 	// Get a location of that socket.
-	EARLY_RETURN_VALUE_IF(!SocketComponent || !CombatSocketNameMap.Contains(MontageTag), GetActorLocation());
-	return SocketComponent->GetSocketLocation(CombatSocketNameMap[MontageTag]);
+	EARLY_RETURN_VALUE_IF(!SocketComponent || !CombatSocketNameMap.Contains(SocketTag), GetActorLocation());
+	return SocketComponent->GetSocketLocation(CombatSocketNameMap[SocketTag]);
 }
 
 bool AP16CharacterBase::GetIsDead_Implementation() const

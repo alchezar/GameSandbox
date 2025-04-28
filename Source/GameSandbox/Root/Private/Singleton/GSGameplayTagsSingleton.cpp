@@ -23,6 +23,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Ability.HitReactTag = Manager.AddNativeGameplayTag("P16.Ability.HitReact", "HitReact ability tag");
 
 	Singleton.P16Tags.Ability.Fire.FireballTag            = Manager.AddNativeGameplayTag("P16.Ability.Fire.Fireball", "Fireball ability tag");
+	Singleton.P16Tags.Ability.Fire.FireBlastTag           = Manager.AddNativeGameplayTag("P16.Ability.Fire.FireBlast", "Fire blast ability tag");
 	Singleton.P16Tags.Ability.Lightning.ElectrocuteTag    = Manager.AddNativeGameplayTag("P16.Ability.Lightning.Electrocute", "Electrocute ability tag");
 	Singleton.P16Tags.Ability.Arcane.ShardsTag            = Manager.AddNativeGameplayTag("P16.Ability.Arcane.Shards", "Arcane shards ability tag");
 	Singleton.P16Tags.Ability.Passive.Tag                 = Manager.AddNativeGameplayTag("P16.Ability.Passive", "Passive ability tag");
@@ -65,6 +66,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 
 	// Cooldown tags.
 	Singleton.P16Tags.Cooldown.Fire.FireballTag         = Manager.AddNativeGameplayTag("P16.Cooldown.Fire.Fireball", "Fireball cooldown tag");
+	Singleton.P16Tags.Cooldown.Fire.FireBlastTag        = Manager.AddNativeGameplayTag("P16.Cooldown.Fire.FireBlast", "Fire blast cooldown tag");
 	Singleton.P16Tags.Cooldown.Lightning.ElectrocuteTag = Manager.AddNativeGameplayTag("P16.Cooldown.Lightning.Electrocute", "Electrocute cooldown tag");
 	Singleton.P16Tags.Cooldown.Arcane.ShardsTag         = Manager.AddNativeGameplayTag("P16.Cooldown.Arcane.Shards", "Arcane shards cooldown tag");
 

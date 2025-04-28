@@ -36,18 +36,19 @@ FString UP16Fireball::GetDescription(const int32 CurrentLevel)
 	if (CurrentLevel == 1)
 	{
 		Description += FRichString {}
-			.Add(Default, "a fireball, exploding on impact and dealing: ")
+			.Add(Default, "a fireball")
 			.Get();
 	}
 	else
 	{
 		Description += FRichString {}
 			.Num(Default, FMath::Min(CurrentLevel, MaxNumProjectiles))
-			.Add(Default, " balls of fire, exploding on impact and dealing: ")
+			.Add(Default, " balls of fire")
 			.Get();
 	}
 
 	Description += FRichString {}
+		.Add(Default, ", exploding on impact and dealing: ")
 		.Num(Damage, DamageValue)
 		.Add(Default, " fire damage with a chance to burn.")
 		.Get();

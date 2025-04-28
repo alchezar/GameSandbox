@@ -39,7 +39,7 @@ protected:
 public:
 	virtual UAnimMontage*                           GetHitReactMontage_Implementation() override;
 	virtual void                                    Die(const FVector& DeathImpulse) override;
-	virtual FVector                                 GetCombatSocketLocation_Implementation(const FGameplayTag MontageTag) override;
+	virtual FVector                                 GetCombatSocketLocation_Implementation(const FGameplayTag SocketTag) override;
 	virtual bool                                    GetIsDead_Implementation() const override;
 	virtual bool                                    GetBeingShocked_Implementation() const override;
 	virtual AActor*                                 GetAvatar_Implementation() override;

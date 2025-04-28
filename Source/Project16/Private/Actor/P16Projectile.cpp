@@ -103,27 +103,6 @@ void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* Overlappe
 	}
 }
 
-void AP16Projectile::PlayOnHitEffects() const
-{
-	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound.Get(), GetActorLocation());
-	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect.Get(), GetActorLocation());
-
-	if (LoopingSoundComp)
-	{
-		LoopingSoundComp->Stop();
-	}
-}
-
-void AP16Projectile::ApplyDamageTo(AActor* Target)
-{
-	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor()))
-
-	UP16DamageGameplayAbility::UpdateTricksVelocity(GetActorLocation(), Target, DamageEffectParams);
-	EARLY_RETURN_IF(!DamageEffectParams.TargetAbilitySystemComponent)
-
-	UP16AbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
-}
-
 void AP16Projectile::CustomMove(const float DeltaSeconds)
 {
 	EARLY_RETURN_IF(FMath::IsNearlyZero(DistanceToGround))
@@ -155,4 +134,25 @@ void AP16Projectile::CheckTarget()
 {
 	EARLY_RETURN_IF(ProjectileMovement->HomingTargetComponent.IsValid())
 	Destroy();
+}
+
+void AP16Projectile::PlayOnHitEffects() const
+{
+	UGameplayStatics::PlaySoundAtLocation(this, ImpactSound.Get(), GetActorLocation());
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ImpactEffect.Get(), GetActorLocation());
+
+	if (LoopingSoundComp)
+	{
+		LoopingSoundComp->Stop();
+	}
+}
+
+void AP16Projectile::ApplyDamageTo(AActor* Target)
+{
+	EARLY_RETURN_IF(!UP16AbilitySystemLibrary::GetIsNotFriends(Target, DamageEffectParams.SourceAbilitySystemComponent->GetAvatarActor()))
+
+	UP16DamageGameplayAbility::UpdateTricksVelocity(GetActorLocation(), Target, DamageEffectParams);
+	EARLY_RETURN_IF(!DamageEffectParams.TargetAbilitySystemComponent)
+
+	UP16AbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
 }

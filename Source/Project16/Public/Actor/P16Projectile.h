@@ -38,13 +38,11 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-private:
-	void PlayOnHitEffects() const;
-	void ApplyDamageTo(AActor* Target);
-	void CustomMove(const float DeltaSeconds);
-	void CheckTarget();
+	virtual void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void CustomMove(const float DeltaSeconds);
+	virtual void CheckTarget();
+	void         PlayOnHitEffects() const;
+	void         ApplyDamageTo(AActor* Target);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

@@ -260,7 +260,7 @@ FGameplayEffectContextHandle UP16AbilitySystemLibrary::ApplyDamageEffect(const F
 	return ContextHandle;
 }
 
-TArray<FRotator> UP16AbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count)
+TArray<FRotator> UP16AbilitySystemLibrary::EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, const float SpreadAngle, const float Count)
 {
 	TArray<FRotator> Result;
 	Result.Reserve(Count);
@@ -272,11 +272,12 @@ TArray<FRotator> UP16AbilitySystemLibrary::EvenlySpacedRotators(const FVector& F
 	}
 
 	const FVector SpreadLeftBound  = Forward.RotateAngleAxis(SpreadAngle / -2.f, FVector::UpVector);
-	const float   SpreadDeltaAngle = SpreadAngle / (Count - 1);
+	const int32   Spaces           = FMath::IsNearlyEqual(SpreadAngle, 360.f, 1.f) ? Count : Count - 1;
+	const float   SpreadDeltaAngle = SpreadAngle / Spaces;
 
 	for (int32 Index = 0; Index < Count; ++Index)
 	{
-		Result.Add(SpreadLeftBound.RotateAngleAxis(SpreadDeltaAngle * Index, Axis).Rotation());
+		Result.Add(SpreadLeftBound.RotateAngleAxis(SpreadDeltaAngle * Index, RotationAxis).Rotation());
 	}
 	return Result;
 }

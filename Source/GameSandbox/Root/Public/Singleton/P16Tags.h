@@ -11,6 +11,7 @@ struct FP16TagAbilityFire
 	GENERATED_BODY()
 
 	FGameplayTag FireballTag;
+	FGameplayTag FireBlastTag;
 };
 
 USTRUCT()
@@ -155,6 +156,7 @@ struct FP16TagCooldownFire
 	GENERATED_BODY()
 
 	FGameplayTag FireballTag;
+	FGameplayTag FireBlastTag;
 };
 
 USTRUCT(BlueprintType)

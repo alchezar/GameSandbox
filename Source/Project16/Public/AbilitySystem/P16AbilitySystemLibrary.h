@@ -86,7 +86,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static FGameplayEffectContextHandle ApplyDamageEffect(const FP16DamageEffectParams& Params);
 	UFUNCTION(BlueprintCallable, Category = "C++")
-	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count);
+	static TArray<FRotator> EvenlySpacedRotators(const FVector& Forward, const FVector& RotationAxis, const float SpreadAngle, const float Count);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static TArray<FVector> EvenlySpacedVectors(const FVector& Forward, const FVector& Axis, const float SpreadAngle, const float Count);
 	UFUNCTION(BlueprintCallable, Category = "C++")
