@@ -37,6 +37,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateRadialDamageOrigin(const FVector& NewOrigin);
 
+	static void UpdateRadialDamageOrigin(const FVector& NewOrigin, FP16RadialDamageParams& OutRadialDamageEffectParams);
 	static void UpdateTricksVelocity(const FVector& CauserLocation, AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams);
 
 	/// ------------------------------------------------------------------------

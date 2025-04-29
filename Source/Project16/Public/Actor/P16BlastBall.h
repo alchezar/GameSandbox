@@ -20,14 +20,18 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(const float DeltaTime) override;
+	virtual void Destroyed() override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super
 	/// ------------------------------------------------------------------------
 protected:
 	virtual void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult) override;
-	virtual void CustomMove(const float DeltaSeconds) override;
 	virtual void CheckTarget() override;
+	virtual void PlayOnHitEffects() const override;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void PlayOnHitCue() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Move")

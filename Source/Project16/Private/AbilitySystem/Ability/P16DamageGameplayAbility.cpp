@@ -59,7 +59,12 @@ float UP16DamageGameplayAbility::GetDamageAtLevel(const int32 InLevel) const
 
 void UP16DamageGameplayAbility::UpdateRadialDamageOrigin(const FVector& NewOrigin)
 {
-	RadialDamageParams.Origin = NewOrigin;
+	UpdateRadialDamageOrigin(NewOrigin, RadialDamageParams);
+}
+
+void UP16DamageGameplayAbility::UpdateRadialDamageOrigin(const FVector& NewOrigin, FP16RadialDamageParams& OutRadialDamageEffectParams)
+{
+	OutRadialDamageEffectParams.Origin = NewOrigin;
 }
 
 void UP16DamageGameplayAbility::UpdateTricksVelocity(const FVector& CauserLocation, AActor* TargetActor, FP16DamageEffectParams& DamageEffectParams)
@@ -70,7 +75,7 @@ void UP16DamageGameplayAbility::UpdateTricksVelocity(const FVector& CauserLocati
 	constexpr float PitchAngle = 25.f;
 	const FVector   Direction  = ToTarget.RotateAngleAxis(PitchAngle, TargetActor->GetActorRightVector());
 
-	// Ability system.
+	// Update ability system of the target.
 	DamageEffectParams.TargetAbilitySystemComponent = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
 
 	// Death impulse.

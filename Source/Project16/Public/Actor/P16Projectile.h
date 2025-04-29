@@ -39,9 +39,8 @@ public:
 protected:
 	UFUNCTION()
 	virtual void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	virtual void CustomMove(const float DeltaSeconds);
 	virtual void CheckTarget();
-	void         PlayOnHitEffects() const;
+	virtual void PlayOnHitEffects() const;
 	void         ApplyDamageTo(AActor* Target);
 
 	/// ------------------------------------------------------------------------
@@ -71,18 +70,12 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Projectile")
 	float LifeSpan = 15.f;
 
-	/// @brief Ability to hover projectile above ground.
-	/// @details If > 0, projectile movement component features will be disabled.
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
-	float DistanceToGround = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Movement")
 	bool bHoming = true;
 
-private:
 	UPROPERTY()
 	TObjectPtr<UAudioComponent> LoopingSoundComp = nullptr;
 
+private:
 	FTimerHandle DestroyTimer;
-	FVector      LastTickLocation = FVector::ZeroVector;
-	FVector      ForwardDirection = FVector::ZeroVector;
 };
