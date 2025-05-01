@@ -15,7 +15,8 @@ public class Project16 : ModuleRules
 			"Engine",
 			"InputCore",
 			"EnhancedInput",
-			"GameplayAbilities"
+			"GameplayAbilities",
+			"ModelViewViewModel"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]

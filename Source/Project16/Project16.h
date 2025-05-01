@@ -106,3 +106,14 @@ if (Condition)                                  \
 {                                               \
 	continue;                                   \
 }
+
+/// @brief Warn if the Class is `nullptr` but don't crash the application.
+/// @attention Won't work in shipping and test builds.
+#define IF_VALID_OR_WARN(Class)                                                                      \
+if (!Class && !(UE_BUILD_SHIPPING || UE_BUILD_TEST)) _UNLIKELY                                       \
+{                                                                                                    \
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,                                           \
+		FString::Printf(L"nullptr [%hs] in [%hs] at line [%d]", #Class, __FUNCTION__, __LINE__));    \
+	UE_LOG(LogP16, Warning, L"nullptr [%hs] in [%hs] at line [%d]", #Class, __FUNCTION__, __LINE__); \
+}                                                                                                    \
+else
