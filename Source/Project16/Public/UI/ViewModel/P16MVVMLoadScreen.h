@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MVVMViewModelBase.h"
+#include "Util/P16Util.h"
 
 #include "P16MVVMLoadScreen.generated.h"
 
@@ -23,9 +24,22 @@ public:
 
 	void InitLoadSlots(const int32 Num = 3);
 
+	UFUNCTION(BlueprintCallable)
+	void NewSlotButtonPressed(const int32 SlotIndex, const FString& EnteredName);
+	UFUNCTION(BlueprintCallable)
+	void NewGameButtonPressed(const int32 SlotIndex);
+	UFUNCTION(BlueprintCallable)
+	void SelectSlotButtonPressed(const int32 SlotIndex);
+
+	void LoadData();
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	UPROPERTY(BlueprintAssignable)
+	FP16OnSlotSelectedSignature OnSlotSelected;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++")
 	TSubclassOf<UP16MVVMLoadSlot> LoadSlotViewModelClass = nullptr;

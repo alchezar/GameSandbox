@@ -45,6 +45,14 @@ enum class EP16CharacterClass : uint8
 	Ranger
 };
 
+UENUM()
+enum class EP16SaveSlotStatus : uint8
+{
+	Vacant = 0,
+	Named,
+	Taken
+};
+
 USTRUCT(BlueprintType)
 struct FP16WidgetControllerParams
 {

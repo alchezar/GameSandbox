@@ -31,4 +31,6 @@ void AP16LoadScreenHUD::BeginPlay()
 		LoadScreenWidget->AddToViewport();
 		LoadScreenWidget->BP_InitSlots();
 	}
+
+	LoadScreenViewModel->LoadData();
 }

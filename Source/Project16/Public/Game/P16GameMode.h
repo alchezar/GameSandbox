@@ -6,6 +6,9 @@
 #include "GameFramework/GameModeBase.h"
 #include "P16GameMode.generated.h"
 
+class UP16LoadScreenSaveGame;
+class USaveGame;
+class UP16MVVMLoadSlot;
 class UP16AbilityInfoDataAsset;
 class UP16CharacterClassInfoDataAsset;
 
@@ -21,6 +24,9 @@ public:
 	UP16CharacterClassInfoDataAsset* GetCharacterClassInfo() const { return CharacterClassInfo; }
 	UP16AbilityInfoDataAsset*        GetAbilityIfo() const { return AbilityInfo; }
 
+	void                    SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex);
+	UP16LoadScreenSaveGame* GetSavedSlotData(const FString& SlotName, const int32 SlotIndex) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -29,4 +35,6 @@ protected:
 	TObjectPtr<UP16CharacterClassInfoDataAsset> CharacterClassInfo = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Ability Info")
 	TObjectPtr<UP16AbilityInfoDataAsset> AbilityInfo = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Save Game")
+	TSubclassOf<USaveGame> LoadScreenSaveGameClass = nullptr;
 };

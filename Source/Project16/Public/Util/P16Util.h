@@ -9,6 +9,8 @@
 struct FGameplayAbilitySpec;
 class UP16AbilitySystemComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FP16OnSlotSelectedSignature);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnDeathSignature, AActor*, DeadActor);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnAttributeChangeSignature, float, NewValue);
@@ -22,6 +24,10 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AttributeInfoSignature, const FP
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AbilityInfoSignature, const FP16AbilityInfo&, AbilityInfo);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnWaitForEquipSelectionSignature, const FGameplayTag&, TypeTag);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnSetWidgetSwitcherSignature, const int32, Index);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnEnableSelectSlotButtonSignature, const bool, bEnable);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FP16OnActivatePassiveEffectSignature, const FGameplayTag&, AbilityTag, const bool, bActivate);
 
