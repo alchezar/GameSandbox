@@ -30,6 +30,10 @@ public:
 	void NewGameButtonPressed(const int32 SlotIndex);
 	UFUNCTION(BlueprintCallable)
 	void SelectSlotButtonPressed(const int32 SlotIndex);
+	UFUNCTION(BlueprintCallable)
+	void DeleteSlotButtonPressed();
+	UFUNCTION(BlueprintCallable)
+	void StartButtonPressed();
 
 	void LoadData();
 
@@ -47,4 +51,6 @@ protected:
 private:
 	UPROPERTY()
 	TArray<UP16MVVMLoadSlot*> LoadSlots = {};
+	UPROPERTY()
+	UP16MVVMLoadSlot* SelectedSlot = nullptr;
 };

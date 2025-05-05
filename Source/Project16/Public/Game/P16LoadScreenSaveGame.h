@@ -20,5 +20,9 @@ public:
 	UPROPERTY()
 	FString PlayerName = "Default";
 	UPROPERTY()
+	FString MapName = "Default";
+	UPROPERTY()
 	EP16SaveSlotStatus SlotStatus = EP16SaveSlotStatus::Vacant;
+	UPROPERTY()
+	int32 Level = 1;
 };

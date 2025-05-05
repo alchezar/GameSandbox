@@ -16,19 +16,21 @@ void UP16MVVMLoadScreen::InitLoadSlots(const int32 Num)
 {
 	LoadSlots.Empty(Num);
 
-	for (int32 i = 0; i < Num; i++)
+	for (int32 Index = 0; Index < Num; Index++)
 	{
 		UP16MVVMLoadSlot* LoadSlot = NewObject<UP16MVVMLoadSlot>(this, LoadSlotViewModelClass);
-		LoadSlot->SetLoadSlotName(FString::Printf(L"LoadSlot_%d", i));
+		LoadSlot->SetLoadSlotName(FString::Printf(L"LoadSlot_%d", Index));
+		LoadSlot->SetSlotIndex(Index);
 		LoadSlots.Add(LoadSlot);
 	}
 }
 
 void UP16MVVMLoadScreen::NewSlotButtonPressed(const int32 SlotIndex, const FString& EnteredName)
 {
-	AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
+	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
 	EARLY_RETURN_IF(!GameMode)
 
+	LoadSlots[SlotIndex]->SetMapName(GameMode->GetDefaultMapName());
 	LoadSlots[SlotIndex]->SetPlayerName(EnteredName);
 	LoadSlots[SlotIndex]->SlotStatus = EP16SaveSlotStatus::Taken;
 
@@ -50,7 +52,24 @@ void UP16MVVMLoadScreen::SelectSlotButtonPressed(const int32 SlotIndex)
 		LoadSlots[Index]->OnEnableSelectSlotButton.Broadcast(bEnable);
 	}
 
+	SelectedSlot = LoadSlots[SlotIndex];
 	OnSlotSelected.Broadcast();
+}
+
+void UP16MVVMLoadScreen::DeleteSlotButtonPressed()
+{
+	EARLY_RETURN_IF(!SelectedSlot)
+	AP16GameMode::DeleteSlot(SelectedSlot->GetLoadSlotName(), SelectedSlot->GetSlotIndex());
+	SelectedSlot->ResetSlot();
+	SelectedSlot = nullptr;
+}
+
+void UP16MVVMLoadScreen::StartButtonPressed()
+{
+	AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
+	EARLY_RETURN_IF(!GameMode || !SelectedSlot)
+	GameMode->TravelToMap(SelectedSlot);
+	SelectedSlot = nullptr;
 }
 
 void UP16MVVMLoadScreen::LoadData()
@@ -63,9 +82,6 @@ void UP16MVVMLoadScreen::LoadData()
 		const UP16LoadScreenSaveGame* SaveGame = GameMode->GetSavedSlotData(LoadSlots[Index]->GetLoadSlotName(), Index);
 		CONTINUE_IF(!SaveGame)
 
-		LoadSlots[Index]->SetPlayerName(SaveGame->PlayerName);
-		LoadSlots[Index]->SlotStatus = SaveGame->SlotStatus;
-
-		LoadSlots[Index]->InitSlot();
+		LoadSlots[Index]->LoadSlot(SaveGame);
 	}
 }

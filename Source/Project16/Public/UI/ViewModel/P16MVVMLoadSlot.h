@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "MVVMViewModelBase.h"
+#include "Game/P16LoadScreenSaveGame.h"
 #include "Util/P16Util.h"
 #include "P16MVVMLoadSlot.generated.h"
 
@@ -16,15 +17,21 @@ class PROJECT16_API UP16MVVMLoadSlot : public UMVVMViewModelBase
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
-	FString GetLoadSlotName() const { return LoadSlotName; };
-	int32   GetSlotIndex() const { return SlotIndex; };
+	FString GetLoadSlotName() const { return LoadSlotName; }
+	int32   GetSlotIndex() const { return SlotIndex; }
 	FString GetPlayerName() const { return PlayerName; };
+	FString GetMapName() const { return MapName; };
+	int32 GetPlayerLevel() const { return PlayerLevel; };
 
 	void SetLoadSlotName(const FString& InLoadSlotName);
 	void SetSlotIndex(const int32 InSlotIndex);
 	void SetPlayerName(const FString& InPlayerName);
+	void SetMapName(const FString& InMapName);
+	void SetPlayerLevel(const int32 InPlayerLevel);
 
 	void InitSlot();
+	void ResetSlot();
+	void LoadSlot(const UP16LoadScreenSaveGame* SaveGame);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -44,4 +51,8 @@ protected:
 	int32 SlotIndex = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
 	FString PlayerName = "Default";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
+	FString MapName = "Default";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
+	int32 PlayerLevel = 1;
 };
