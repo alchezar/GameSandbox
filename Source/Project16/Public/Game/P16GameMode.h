@@ -23,6 +23,7 @@ class PROJECT16_API AP16GameMode : public AGameModeBase
 	/// ------------------------------------------------------------------------
 public:
 	AP16GameMode();
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 protected:
 	virtual void BeginPlay() override;
@@ -38,11 +39,17 @@ public:
 	void                    SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex) const;
 	static void             DeleteSlot(const FString& SlotName, const int32 SlotIndex);
 	UP16LoadScreenSaveGame* GetSavedSlotData(const FString& SlotName, const int32 SlotIndex) const;
-	void                    TravelToMap(const UP16MVVMLoadSlot* LoadSlot);;
+	UP16LoadScreenSaveGame* GetInGameSaveData() const;
+	void                    SaveInGameProgress(UP16LoadScreenSaveGame* SaveGame) const;
+	void                    TravelToMap(const UP16MVVMLoadSlot* LoadSlot);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "C++ | Maps")
+	FName DefaultPlayerStartTag = "Default";
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Character Class Defaults")
 	TObjectPtr<UP16CharacterClassInfoDataAsset> CharacterClassInfo = nullptr;

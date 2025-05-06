@@ -56,6 +56,7 @@ public:
 	virtual void  AddSpellPoints_Implementation(const int32 InSpellPoints) override;
 	virtual void  LevelUp_Implementation() override;
 	virtual void  ToggleMagicCircle_Implementation(const bool bOn, UMaterialInterface* DecalMaterial = nullptr) override;
+	virtual void  SaveProgress_Implementation(const FName& CheckpointTag) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name Super

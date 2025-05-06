@@ -2,13 +2,40 @@
 
 #include "Game/P16GameMode.h"
 
+#include "EngineUtils.h"
 #include "Project16.h"
+#include "Game/P16GameInstance.h"
 #include "Game/P16LoadScreenSaveGame.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 #include "UI/ViewModel/P16MVVMLoadSlot.h"
 
 AP16GameMode::AP16GameMode()
 {}
+
+AActor* AP16GameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	const UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_VALUE_IF(!GameInstance, nullptr)
+	const FName PlayerStartTag = GameInstance->PlayerStartTag;
+
+	TArray<APlayerStart*> PlayerStarts;
+	for (TActorIterator<APlayerStart> It {GetWorld()}; It; ++It)
+	{
+		const APlayerStart* PlayerStart = *It;
+		CONTINUE_IF(PlayerStart->PlayerStartTag != PlayerStartTag)
+
+		PlayerStarts.Add(*It);
+	}
+	EARLY_RETURN_VALUE_IF(PlayerStarts.IsEmpty(), nullptr)
+
+	APlayerStart** StartPosition = PlayerStarts.FindByPredicate([PlayerStartTag](const APlayerStart* Start) -> bool
+	{
+		return Start->PlayerStartTag == PlayerStartTag;
+	});
+
+	return StartPosition ? *StartPosition : PlayerStarts[0];
+}
 
 void AP16GameMode::BeginPlay()
 {
@@ -34,10 +61,11 @@ void AP16GameMode::SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 Sl
 	EARLY_RETURN_IF(!SaveGameObject)
 	UP16LoadScreenSaveGame* LoadScreenSaveGame = Cast<UP16LoadScreenSaveGame>(SaveGameObject);
 	EARLY_RETURN_IF(!LoadScreenSaveGame)
-	LoadScreenSaveGame->PlayerName = LoadSlot->GetPlayerName();
-	LoadScreenSaveGame->MapName    = LoadSlot->GetMapName();
-	LoadScreenSaveGame->SlotStatus = EP16SaveSlotStatus::Taken;
-	LoadScreenSaveGame->Level      = LoadSlot->GetPlayerLevel();
+	LoadScreenSaveGame->PlayerName     = LoadSlot->GetPlayerName();
+	LoadScreenSaveGame->MapName        = LoadSlot->GetMapName();
+	LoadScreenSaveGame->SlotStatus     = EP16SaveSlotStatus::Taken;
+	LoadScreenSaveGame->Level          = LoadSlot->GetPlayerLevel();
+	LoadScreenSaveGame->PlayerStartTag = LoadSlot->PlayerStartTag;
 
 	// Save data.
 	UGameplayStatics::SaveGameToSlot(LoadScreenSaveGame, SlotName, SlotIndex);
@@ -56,6 +84,20 @@ UP16LoadScreenSaveGame* AP16GameMode::GetSavedSlotData(const FString& SlotName, 
 		: UGameplayStatics::CreateSaveGameObject(LoadScreenSaveGameClass);
 
 	return Cast<UP16LoadScreenSaveGame>(SaveGameObject);
+}
+
+UP16LoadScreenSaveGame* AP16GameMode::GetInGameSaveData() const
+{
+	const UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	return GetSavedSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
+}
+
+void AP16GameMode::SaveInGameProgress(UP16LoadScreenSaveGame* SaveGame) const
+{
+	UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	GameInstance->PlayerStartTag   = SaveGame->PlayerStartTag;
+
+	UGameplayStatics::SaveGameToSlot(SaveGame, GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
 }
 
 void AP16GameMode::TravelToMap(const UP16MVVMLoadSlot* LoadSlot)

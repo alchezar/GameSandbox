@@ -8,6 +8,8 @@
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
 #include "Camera/CameraComponent.h"
+#include "Game/P16GameMode.h"
+#include "Game/P16LoadScreenSaveGame.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/P16PlayerController.h"
@@ -171,6 +173,18 @@ void AP16Character::ToggleMagicCircle_Implementation(const bool bOn, UMaterialIn
 
 	PlayerController->ToggleMagicCircle(bOn, DecalMaterial);
 	PlayerController->bShowMouseCursor = !bOn;
+}
+
+void AP16Character::SaveProgress_Implementation(const FName& CheckpointTag)
+{
+	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
+	EARLY_RETURN_IF(!GameMode)
+	UP16LoadScreenSaveGame* SaveGame = GameMode->GetInGameSaveData();
+	EARLY_RETURN_IF(!SaveGame)
+
+	SaveGame->PlayerStartTag = CheckpointTag;
+
+	GameMode->SaveInGameProgress(SaveGame);
 }
 
 void AP16Character::InitAbilityActorInfo()

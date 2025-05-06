@@ -25,4 +25,6 @@ public:
 	EP16SaveSlotStatus SlotStatus = EP16SaveSlotStatus::Vacant;
 	UPROPERTY()
 	int32 Level = 1;
+	UPROPERTY()
+	FName PlayerStartTag = "Start";
 };

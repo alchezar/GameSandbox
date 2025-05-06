@@ -3,6 +3,7 @@
 #include "UI/ViewModel/P16MVVMLoadScreen.h"
 
 #include "Project16.h"
+#include "Game/P16GameInstance.h"
 #include "Game/P16GameMode.h"
 #include "Game/P16LoadScreenSaveGame.h"
 #include "UI/ViewModel/P16MVVMLoadSlot.h"
@@ -30,12 +31,11 @@ void UP16MVVMLoadScreen::NewSlotButtonPressed(const int32 SlotIndex, const FStri
 	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
 	EARLY_RETURN_IF(!GameMode)
 
-	LoadSlots[SlotIndex]->SetMapName(GameMode->GetDefaultMapName());
-	LoadSlots[SlotIndex]->SetPlayerName(EnteredName);
-	LoadSlots[SlotIndex]->SlotStatus = EP16SaveSlotStatus::Taken;
+	LoadSlots[SlotIndex]->NewSlot(GameMode, EnteredName);
 
-	GameMode->SaveSlotData(LoadSlots[SlotIndex], SlotIndex);
-	LoadSlots[SlotIndex]->InitSlot();
+	UP16GameInstance* GameInstance = GameMode->GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_IF(!GameInstance)
+	GameInstance->UpdateGameParams(EnteredName, SlotIndex, GameMode->DefaultPlayerStartTag);
 }
 
 void UP16MVVMLoadScreen::NewGameButtonPressed(const int32 SlotIndex)
@@ -68,6 +68,10 @@ void UP16MVVMLoadScreen::StartButtonPressed()
 {
 	AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
 	EARLY_RETURN_IF(!GameMode || !SelectedSlot)
+	UP16GameInstance* GameInstance = GameMode->GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_IF(!GameInstance)
+	GameInstance->UpdateGameParams(SelectedSlot);
+
 	GameMode->TravelToMap(SelectedSlot);
 	SelectedSlot = nullptr;
 }
@@ -82,6 +86,6 @@ void UP16MVVMLoadScreen::LoadData()
 		const UP16LoadScreenSaveGame* SaveGame = GameMode->GetSavedSlotData(LoadSlots[Index]->GetLoadSlotName(), Index);
 		CONTINUE_IF(!SaveGame)
 
-		LoadSlots[Index]->LoadSlot(SaveGame);
+		LoadSlots[Index]->LoadSlotFrom(SaveGame);
 	}
 }
