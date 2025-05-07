@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16AbilitySystemLibrary.generated.h"
 
+class UP16SaveGame;
 class UP16AbilityInfoDataAsset;
 class AP16HUD;
 class UP16SpellMenuWidgetController;
@@ -34,6 +35,8 @@ public:
 	///
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void InitDefaultAttributes(const UObject* WorldContextObject, const EP16CharacterClass CharacterClass, UAbilitySystemComponent* AbilitySystemComponent, const float Level);
+	UFUNCTION(BlueprintCallable, Category = "C++")
+	static void InitDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, UP16SaveGame* SaveGame);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static void GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, const EP16CharacterClass CharacterClass);
 	UFUNCTION(BlueprintCallable, Category = "C++")

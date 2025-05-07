@@ -18,7 +18,10 @@ void UP16OverlayWidgetController::BindCallbacksToDependencies()
 	if (AP16PlayerState* PlayerState = GetAuraPlayerState())
 	{
 		PlayerState->OnXPChanged.AddUObject(this, &ThisClass::OnXPChangedCallback);
-		PlayerState->OnLevelChanged.AddWeakLambda(this, [this](const int32 NewLevel) -> void { OnLevelChanged.Broadcast(NewLevel); });
+		PlayerState->OnLevelChanged.AddWeakLambda(this, [this](const int32 NewLevel, const bool bLevelUp) -> void
+		{
+			OnLevelChanged.Broadcast(NewLevel, bLevelUp);
+		});
 	}
 
 	Params.AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(AttributeSet->GetHealthAttribute())

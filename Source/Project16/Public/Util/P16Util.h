@@ -17,6 +17,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnAttributeChangeSignature, floa
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangeSignature, int32, NewValue);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FP16OnLevelChangeSignature, int32, NewValue, bool, bLevelUp);
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16OnMessageWidgetRowSignature, FP16UIWidgetRow, Row);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP16AttributeInfoSignature, const FP16AttributeInfo&, AttributeInfo);
@@ -38,6 +40,8 @@ DECLARE_MULTICAST_DELEGATE(FP16OnAbilitiesGivenSignature);
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnEffectAppliedSignature, const FGameplayTagContainer& /*AssetTags*/);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnPlayerStatChangedSignature, const int32 /*StatValue*/);
+
+DECLARE_MULTICAST_DELEGATE_TwoParams(FP16OnLevelChangedSignature, const int32 /*Level*/, const bool /*bLevelUp*/);
 
 DECLARE_MULTICAST_DELEGATE_OneParam(FP16OnAbilitySystemRegisteredSignature, UAbilitySystemComponent*);
 

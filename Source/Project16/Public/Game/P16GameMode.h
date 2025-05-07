@@ -7,7 +7,7 @@
 #include "UI/ViewModel/P16MVVMLoadScreen.h"
 #include "P16GameMode.generated.h"
 
-class UP16LoadScreenSaveGame;
+class UP16SaveGame;
 class USaveGame;
 class UP16MVVMLoadSlot;
 class UP16AbilityInfoDataAsset;
@@ -36,12 +36,12 @@ public:
 	UP16AbilityInfoDataAsset*        GetAbilityIfo() const { return AbilityInfo; }
 	const FString&                   GetDefaultMapName() const { return DefaultMapName; }
 
-	void                    SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex) const;
-	static void             DeleteSlot(const FString& SlotName, const int32 SlotIndex);
-	UP16LoadScreenSaveGame* GetSavedSlotData(const FString& SlotName, const int32 SlotIndex) const;
-	UP16LoadScreenSaveGame* GetInGameSaveData() const;
-	void                    SaveInGameProgress(UP16LoadScreenSaveGame* SaveGame) const;
-	void                    TravelToMap(const UP16MVVMLoadSlot* LoadSlot);
+	void          SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex) const;
+	static void   DeleteSlot(const FString& SlotName, const int32 SlotIndex);
+	UP16SaveGame* GetSavedSlotData(const FString& SlotName, const int32 SlotIndex) const;
+	UP16SaveGame* GetInGameSaveData() const;
+	void          SaveInGameProgress(UP16SaveGame* SaveGame) const;
+	void          TravelToMap(const UP16MVVMLoadSlot* LoadSlot);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

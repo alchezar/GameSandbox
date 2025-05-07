@@ -8,6 +8,7 @@
 #include "Interface/P16PlayerInterface.h"
 #include "P16Character.generated.h"
 
+class UP16SaveGame;
 class AP16PlayerState;
 class UNiagaraComponent;
 class UCameraComponent;
@@ -63,6 +64,7 @@ public:
 	/// ------------------------------------------------------------------------
 protected:
 	virtual void InitAbilityActorInfo() override;
+	virtual void InitDefaultAttributes() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

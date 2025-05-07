@@ -49,7 +49,7 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Stat")
 	FP16OnAttributeChangeSignature OnXPPercentChanged;
 	UPROPERTY(BlueprintAssignable, Category = "C++ | Stat")
-	FP16OnPlayerStatChangeSignature OnLevelChanged;
+	FP16OnLevelChangeSignature OnLevelChanged;
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Widget Data")

@@ -37,9 +37,11 @@ public:
 	_NODISCARD
 	UAttributeSet* GetAttributeSet() const;
 	_NODISCARD
-	int32 GetXP() const { return XP; };
+	int32 GetXP() const { return XP; }
+
 	_NODISCARD
-	int32 GetPlayerLevel() const { return Level; };
+	int32 GetPlayerLevel() const { return Level; }
+
 	_NODISCARD
 	int32 GetAttributePoints() const { return AttributePoints; };
 	_NODISCARD
@@ -47,6 +49,8 @@ public:
 
 	void SetXP(const int32 NewXP);
 	void SetLevel(const int32 NewLevel);
+	void SetSpellPoints(const int32 NewSpellPoints);
+	void SetAttributePoints(const int32 NewAttributePoints);
 
 	void AddXP(const int32 DeltaXP);
 	void AddLevel(const int32 DeltaLevel = 1);
@@ -68,7 +72,7 @@ protected:
 	/// ------------------------------------------------------------------------
 public:
 	FP16OnPlayerStatChangedSignature OnXPChanged;
-	FP16OnPlayerStatChangedSignature OnLevelChanged;
+	FP16OnLevelChangedSignature      OnLevelChanged;
 	FP16OnPlayerStatChangedSignature OnAttributePointsChanged;
 	FP16OnPlayerStatChangedSignature OnSpellPointsChanged;
 

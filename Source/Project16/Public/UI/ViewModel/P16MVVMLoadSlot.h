@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "MVVMViewModelBase.h"
 #include "Game/P16GameMode.h"
-#include "Game/P16LoadScreenSaveGame.h"
+#include "Game/P16SaveGame.h"
 #include "Util/P16Util.h"
 #include "P16MVVMLoadSlot.generated.h"
 
@@ -33,7 +33,7 @@ public:
 	void InitSlot();
 	void ResetSlot();
 	void NewSlot(const AP16GameMode* GameMode, const FString& Name);;
-	void LoadSlotFrom(const UP16LoadScreenSaveGame* SaveGame);
+	void LoadSlotFrom(const UP16SaveGame* SaveGame);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

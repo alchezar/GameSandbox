@@ -9,6 +9,7 @@
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16CharacterClassInfoDataAsset.h"
 #include "Game/P16GameMode.h"
+#include "Game/P16SaveGame.h"
 #include "Interface/P16CombatInterface.h"
 #include "Kismet/GameplayStatics.h"
 #include "Player/P16PlayerState.h"
@@ -54,6 +55,28 @@ void UP16AbilitySystemLibrary::InitDefaultAttributes(const UObject* WorldContext
 	ApplyGameplayEffect(AbilitySystemComponent, DefaultInfo.PrimaryAttributes, Level, Avatar);
 	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->SecondaryAttributes, Level, Avatar);
 	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->VitalAttributes, Level, Avatar);
+}
+
+void UP16AbilitySystemLibrary::InitDefaultAttributesFromSaveData(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, UP16SaveGame* SaveGame)
+{
+	EARLY_RETURN_IF(!WorldContextObject)
+	const UP16CharacterClassInfoDataAsset* ClassInfo = GetCharacterClassInfo(WorldContextObject);
+	EARLY_RETURN_IF(!ClassInfo)
+
+	const AActor*                Avatar        = AbilitySystemComponent->GetAvatarActor();
+	FGameplayEffectContextHandle ContextHandle = AbilitySystemComponent->MakeEffectContext();
+	ContextHandle.AddSourceObject(Avatar);
+	const FGameplayEffectSpecHandle SpecHandle = AbilitySystemComponent->MakeOutgoingSpec(ClassInfo->PrimaryAttributesSetByCaller, 1.f, ContextHandle);
+
+	const auto PrimaryAttributeTags = FGSGameplayTagsSingleton::Get().P16Tags.Attribute.Primary;
+	SpecHandle.Data->SetSetByCallerMagnitude(PrimaryAttributeTags.StrengthTag, SaveGame->PlayerObject.Strength);
+	SpecHandle.Data->SetSetByCallerMagnitude(PrimaryAttributeTags.IntelligenceTag, SaveGame->PlayerObject.Intelligence);
+	SpecHandle.Data->SetSetByCallerMagnitude(PrimaryAttributeTags.ResilienceTag, SaveGame->PlayerObject.Resilience);
+	SpecHandle.Data->SetSetByCallerMagnitude(PrimaryAttributeTags.VigorTag, SaveGame->PlayerObject.Vigor);
+
+	AbilitySystemComponent->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data);
+	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->SecondaryAttributes, SaveGame->PlayerObject.Level, Avatar);
+	ApplyGameplayEffect(AbilitySystemComponent, ClassInfo->VitalAttributes, SaveGame->PlayerObject.Level, Avatar);
 }
 
 void UP16AbilitySystemLibrary::GiveStartupAbilities(const UObject* WorldContextObject, UAbilitySystemComponent* AbilitySystemComponent, const EP16CharacterClass CharacterClass)

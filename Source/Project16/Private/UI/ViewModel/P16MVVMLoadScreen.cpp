@@ -5,7 +5,7 @@
 #include "Project16.h"
 #include "Game/P16GameInstance.h"
 #include "Game/P16GameMode.h"
-#include "Game/P16LoadScreenSaveGame.h"
+#include "Game/P16SaveGame.h"
 #include "UI/ViewModel/P16MVVMLoadSlot.h"
 
 UP16MVVMLoadSlot* UP16MVVMLoadScreen::GetLoadSlotViewModel(const int32 Index)
@@ -83,7 +83,7 @@ void UP16MVVMLoadScreen::LoadData()
 
 	for (int32 Index = 0; Index < LoadSlots.Num(); ++Index)
 	{
-		const UP16LoadScreenSaveGame* SaveGame = GameMode->GetSavedSlotData(LoadSlots[Index]->GetLoadSlotName(), Index);
+		const UP16SaveGame* SaveGame = GameMode->GetSavedSlotData(LoadSlots[Index]->GetLoadSlotName(), Index);
 		CONTINUE_IF(!SaveGame)
 
 		LoadSlots[Index]->LoadSlotFrom(SaveGame);

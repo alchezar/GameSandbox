@@ -51,11 +51,15 @@ void UP16MVVMLoadSlot::NewSlot(const AP16GameMode* GameMode, const FString& Name
 	GameMode->SaveSlotData(this, SlotIndex);
 }
 
-void UP16MVVMLoadSlot::LoadSlotFrom(const UP16LoadScreenSaveGame* SaveGame)
+void UP16MVVMLoadSlot::LoadSlotFrom(const UP16SaveGame* SaveGame)
 {
-	SetPlayerName(SaveGame->PlayerName);
-	SetMapName(SaveGame->MapName);
-	SlotStatus     = SaveGame->SlotStatus;
-	PlayerStartTag = SaveGame->PlayerStartTag;
+	const FP16SaveGameObject& SaveGameObject = SaveGame->GameObject;
+	SetPlayerName(SaveGameObject.PlayerName);
+	SetMapName(SaveGameObject.MapName);
+	SlotStatus     = SaveGameObject.SlotStatus;
+	PlayerStartTag = SaveGameObject.PlayerStartTag;
+
+	SetPlayerLevel(SaveGame->PlayerObject.Level);
+
 	InitSlot();
 }

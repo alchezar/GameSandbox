@@ -6,10 +6,11 @@
 #include "NiagaraComponent.h"
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
+#include "AbilitySystem/P16AbilitySystemLibrary.h"
 #include "AbilitySystem/Data/P16LevelUpInfoDataAsset.h"
 #include "Camera/CameraComponent.h"
 #include "Game/P16GameMode.h"
-#include "Game/P16LoadScreenSaveGame.h"
+#include "Game/P16SaveGame.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Player/P16PlayerController.h"
@@ -179,10 +180,12 @@ void AP16Character::SaveProgress_Implementation(const FName& CheckpointTag)
 {
 	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
 	EARLY_RETURN_IF(!GameMode)
-	UP16LoadScreenSaveGame* SaveGame = GameMode->GetInGameSaveData();
+	UP16SaveGame* SaveGame = GameMode->GetInGameSaveData();
 	EARLY_RETURN_IF(!SaveGame)
 
-	SaveGame->PlayerStartTag = CheckpointTag;
+	SaveGame->GameObject.PlayerStartTag = CheckpointTag;
+	SaveGame->GameObject.bFirstLoad     = false;
+	SaveGame->SavePlayerObject(GetPlayerState());
 
 	GameMode->SaveInGameProgress(SaveGame);
 }
@@ -202,6 +205,26 @@ void AP16Character::InitAbilityActorInfo()
 	HUD->InitOverlay({PlayerController, OwnPlayerState, AbilitySystemComponent, AttributeSet});
 
 	Super::InitAbilityActorInfo();
+}
+
+void AP16Character::InitDefaultAttributes() const
+{
+	// The attributes will be loaded from the save game.
+	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
+	EARLY_RETURN_IF(!GameMode)
+	UP16SaveGame* SaveGame = GameMode->GetInGameSaveData();
+	EARLY_RETURN_IF(!SaveGame)
+	SaveGame->LoadPlayerObject(GetPlayerState());
+
+	if (!SaveGame->GameObject.bFirstLoad)
+	{
+		UP16AbilitySystemLibrary::InitDefaultAttributesFromSaveData(this, AbilitySystemComponent, SaveGame);
+		ApplyEffectToSelf(DefaultSecondaryAttributes);
+		ApplyEffectToSelf(DefaultVitalAttributes);
+		return;
+	}
+
+	Super::InitDefaultAttributes();
 }
 
 UAttributeSet* AP16Character::GetAttributeSet() const

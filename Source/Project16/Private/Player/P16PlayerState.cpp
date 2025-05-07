@@ -46,7 +46,19 @@ void AP16PlayerState::SetXP(const int32 NewXP)
 void AP16PlayerState::SetLevel(const int32 NewLevel)
 {
 	Level = NewLevel;
-	OnLevelChanged.Broadcast(Level);
+	OnLevelChanged.Broadcast(Level, false);
+}
+
+void AP16PlayerState::SetSpellPoints(const int32 NewSpellPoints)
+{
+	SpellPoints = NewSpellPoints;
+	OnSpellPointsChanged.Broadcast(SpellPoints);
+}
+
+void AP16PlayerState::SetAttributePoints(const int32 NewAttributePoints)
+{
+	AttributePoints = NewAttributePoints;
+	OnAttributePointsChanged.Broadcast(AttributePoints);
 }
 
 void AP16PlayerState::AddXP(const int32 DeltaXP)
@@ -58,7 +70,7 @@ void AP16PlayerState::AddXP(const int32 DeltaXP)
 void AP16PlayerState::AddLevel(const int32 DeltaLevel)
 {
 	Level += DeltaLevel;
-	OnLevelChanged.Broadcast(Level);
+	OnLevelChanged.Broadcast(Level, true);
 }
 
 inline void AP16PlayerState::AddAttributePoints(const int32 DeltaAttributePoints)
@@ -75,7 +87,7 @@ void AP16PlayerState::AddSpellPoints(const int32 DeltaSpellPoints)
 
 void AP16PlayerState::OnRep_Level(const int32 OldLevel)
 {
-	OnLevelChanged.Broadcast(Level);
+	OnLevelChanged.Broadcast(Level, true);
 }
 
 void AP16PlayerState::OnRep_XP(const int32 OldXP)

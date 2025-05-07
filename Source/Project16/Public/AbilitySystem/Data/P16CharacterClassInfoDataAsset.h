@@ -25,6 +25,8 @@ public:
 	/// ------------------------------------------------------------------------
 public:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Common Class Defaults")
+	TSubclassOf<UGameplayEffect> PrimaryAttributesSetByCaller = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Common Class Defaults")
 	TSubclassOf<UGameplayEffect> SecondaryAttributes = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Common Class Defaults")
 	TSubclassOf<UGameplayEffect> VitalAttributes = nullptr;
