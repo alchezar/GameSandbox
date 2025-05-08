@@ -36,6 +36,7 @@ struct FP16TagAbilityPassive
 	GENERATED_BODY()
 
 	FGameplayTag Tag;
+	FGameplayTag ListenForEventTag;
 	FGameplayTag HaloOfProtectionTag;
 	FGameplayTag LifeSiphonTag;
 	FGameplayTag ManaSiphonTag;

@@ -7,8 +7,11 @@
 #include "Game/P16GameInstance.h"
 #include "Game/P16SaveGame.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interface/P16SaveInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Serialization/ObjectAndNameAsStringProxyArchive.h"
 #include "UI/ViewModel/P16MVVMLoadSlot.h"
+#include "Util/P16Log.h"
 
 AP16GameMode::AP16GameMode()
 {}
@@ -102,4 +105,90 @@ void AP16GameMode::TravelToMap(const UP16MVVMLoadSlot* LoadSlot)
 	EARLY_RETURN_IF(!Maps.Contains(MapName))
 
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, Maps[MapName]);
+}
+
+void AP16GameMode::SaveWorldState(UWorld* InWorld) const
+{
+	FString WorldName = InWorld->GetMapName();
+	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
+
+	UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_IF(!GameInstance)
+
+	UP16SaveGame* SaveGame = GetSavedSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
+	EARLY_RETURN_IF(!SaveGame)
+
+	if (!SaveGame->GetHasSaveMap(WorldName))
+	{
+		FP16SaveMap NewSaveMap;
+		NewSaveMap.AssetName = WorldName;
+		SaveGame->SavedMaps.Add(NewSaveMap);
+	}
+
+	FP16SaveMap SaveMap = SaveGame->GetSaveMapBy(WorldName);
+	SaveMap.SavedActors.Empty();
+	for (TActorIterator<AActor> It {InWorld}; It; ++It)
+	{
+		AActor* Actor = *It;
+		CONTINUE_IF(!Actor || Actor->Implements<UP16SaveInterface>())
+
+		FP16SaveActor SavedActor = {Actor->GetName(), Actor->GetTransform()};
+		FMemoryWriter MemoryWriter {SavedActor.Bytes};
+		SerializeBytes(MemoryWriter, Actor);
+
+		SaveMap.SavedActors.AddUnique(SavedActor);
+	}
+
+	// Replace old save map with the fresh one.
+	for (FP16SaveMap& MapToReplace : SaveGame->SavedMaps)
+	{
+		CONTINUE_IF(MapToReplace.AssetName != WorldName)
+		MapToReplace = SaveMap;
+	}
+
+	UGameplayStatics::SaveGameToSlot(SaveGame, GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
+}
+
+void AP16GameMode::LoadWorldState(UWorld* InWorld) const
+{
+	FString WorldName = InWorld->GetMapName();
+	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
+
+	UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_IF(!GameInstance || UGameplayStatics::DoesSaveGameExist(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex))
+
+	UP16SaveGame* SaveGame = Cast<UP16SaveGame>(UGameplayStatics::LoadGameFromSlot(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex));
+	IF_VALID_OR_WARN(SaveGame) {}
+
+	for (TActorIterator<AActor> It {InWorld}; It; ++It)
+	{
+		AActor* Actor = *It;
+		CONTINUE_IF(!Actor || Actor->Implements<UP16SaveInterface>())
+
+		FP16SaveMap SaveMap = SaveGame->GetSaveMapBy(WorldName);
+		for (const FP16SaveActor& SavedActor : SaveMap.SavedActors)
+		{
+			CONTINUE_IF(SavedActor.Name != Actor->GetFName())
+
+			if (IP16SaveInterface::Execute_GetShouldLoadTransform(Actor))
+			{
+				Actor->SetActorTransform(SavedActor.Transform);
+			}
+
+			FMemoryReader MemoryReader {SavedActor.Bytes};
+			SerializeBytes(MemoryReader, Actor);
+
+			IP16SaveInterface::Execute_LoadActor(Actor);
+		}
+	}
+}
+
+void AP16GameMode::SerializeBytes(FArchive& InArchive, AActor* InActor) const
+{
+	// Pass the array to fill with data from Actor
+	FObjectAndNameAsStringProxyArchive Ar {InArchive, true};
+	// Find only variables with UPROPERTY(SaveGame)
+	Ar.ArIsSaveGame = true;
+	// Convert actors SaveGame UPROPERTY to binary array
+	InActor->Serialize(Ar);
 }

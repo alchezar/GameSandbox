@@ -8,6 +8,7 @@
 #include "AbilitySystem/Ability/P16DamageGameplayAbility.h"
 #include "AbilitySystem/Ability/P16GameplayAbility.h"
 #include "AbilitySystem/Data/P16AbilityInfoDataAsset.h"
+#include "Game/P16SaveGame.h"
 #include "Interface/P16PlayerInterface.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 #include "Util/P16Log.h"
@@ -136,6 +137,29 @@ FP16AbilityDescription UP16AbilitySystemComponent::GetDescription(const FGamepla
 void UP16AbilitySystemComponent::OnAbilityActorInfoSet()
 {
 	OnGameplayEffectAppliedDelegateToSelf.AddUObject(this, &ThisClass::Client_OnEffectAppliedCallback);
+}
+
+void UP16AbilitySystemComponent::AddCharacterAbilitiesFromSaveData(UP16SaveGame* SaveGame)
+{
+	for (const FP16SavedAbility& Data : SaveGame->SavedAbilities)
+	{
+		FGameplayAbilitySpec LoadedAbilitySpec {Data.Ability, Data.Level};
+		LoadedAbilitySpec.GetDynamicSpecSourceTags().AddTag(Data.Slot);
+		LoadedAbilitySpec.GetDynamicSpecSourceTags().AddTag(Data.Status);
+
+		FP16TagAbility AbilityTags = FGSGameplayTagsSingleton::Get().P16Tags.Ability;
+		if (Data.Type == AbilityTags.Type.PassiveTag && Data.Status == AbilityTags.Status.EquippedTag)
+		{
+			GiveAbilityAndActivateOnce(LoadedAbilitySpec);
+		}
+		else
+		{
+			GiveAbility(LoadedAbilitySpec);
+		}
+	}
+
+	bStartupAbilitiesGiven = true;
+	OnAbilitiesGiven.Broadcast();
 }
 
 void UP16AbilitySystemComponent::AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities)

@@ -359,6 +359,25 @@ struct FP16AbilityDescription
 	FString NextLevel    = {};
 };
 
+USTRUCT(BlueprintType)
+struct FP16SavedAbility
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSubclassOf<UGameplayAbility> Ability = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Tag = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Type = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Status = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag Slot = FGameplayTag {};
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	int32 Level;
+};
+
 template <typename T>
 concept RangeComparable = requires(T Min, T Max)
 {

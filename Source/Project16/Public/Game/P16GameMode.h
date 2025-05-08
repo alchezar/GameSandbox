@@ -43,6 +43,10 @@ public:
 	void          SaveInGameProgress(UP16SaveGame* SaveGame) const;
 	void          TravelToMap(const UP16MVVMLoadSlot* LoadSlot);
 
+	void SaveWorldState(UWorld* InWorld) const;
+	void LoadWorldState(UWorld* InWorld) const;
+	void SerializeBytes(FArchive& InArchive, AActor* InActor) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

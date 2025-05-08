@@ -183,10 +183,7 @@ void AP16Character::SaveProgress_Implementation(const FName& CheckpointTag)
 	UP16SaveGame* SaveGame = GameMode->GetInGameSaveData();
 	EARLY_RETURN_IF(!SaveGame)
 
-	SaveGame->GameObject.PlayerStartTag = CheckpointTag;
-	SaveGame->GameObject.bFirstLoad     = false;
-	SaveGame->SavePlayerObject(GetPlayerState());
-
+	SaveGame->SaveProgress(CheckpointTag, this);
 	GameMode->SaveInGameProgress(SaveGame);
 }
 
@@ -212,9 +209,16 @@ void AP16Character::InitDefaultAttributes() const
 	// The attributes will be loaded from the save game.
 	const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
 	EARLY_RETURN_IF(!GameMode)
+	GameMode->LoadWorldState(GetWorld());
+
 	UP16SaveGame* SaveGame = GameMode->GetInGameSaveData();
 	EARLY_RETURN_IF(!SaveGame)
 	SaveGame->LoadPlayerObject(GetPlayerState());
+
+	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(GetAbilitySystemComponent()))
+	{
+		AbilitySystem->AddCharacterAbilitiesFromSaveData(SaveGame);
+	}
 
 	if (!SaveGame->GameObject.bFirstLoad)
 	{

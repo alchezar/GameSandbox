@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interface/P16SaveInterface.h"
 #include "P16PlayerCheckpoint.generated.h"
 
 class USphereComponent;
 
 UCLASS()
-class PROJECT16_API AP16PlayerCheckpoint : public APlayerStart
+class PROJECT16_API AP16PlayerCheckpoint : public APlayerStart, public IP16SaveInterface
 {
 	GENERATED_BODY()
 
@@ -24,6 +25,13 @@ protected:
 	virtual void BeginPlay() override;
 
 	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
+public:
+	virtual bool GetShouldLoadTransform_Implementation() override { return false; };
+	virtual void LoadActor_Implementation() override;
+
+	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
 protected:
@@ -31,6 +39,9 @@ protected:
 	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnCheckpointReached(UMaterialInstanceDynamic* Material);
+
+private:
+	void HandleGlowEffects();
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -40,4 +51,7 @@ protected:
 	TObjectPtr<UStaticMeshComponent> Mesh = nullptr;
 	UPROPERTY(VisibleDefaultsOnly, Category = "C++")
 	TObjectPtr<USphereComponent> Sphere = nullptr;
+
+	UPROPERTY(SaveGame)
+	bool bReached = false;
 };

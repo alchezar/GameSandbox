@@ -6,6 +6,7 @@
 #include "Project16.h"
 #include "AbilitySystem/P16AbilitySystemComponent.h"
 #include "Character/P16CharacterBase.h"
+#include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 
 UP16PassiveNiagaraComponent::UP16PassiveNiagaraComponent()
 {}
@@ -13,6 +14,15 @@ UP16PassiveNiagaraComponent::UP16PassiveNiagaraComponent()
 void UP16PassiveNiagaraComponent::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// On load game, abilities are given before listening to changes, so we need to toggle effect manually.
+	UP16AbilitySystemComponent* AbilitySystemComponent = Cast<UP16AbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(GetOwner()));
+	if (AbilitySystemComponent
+		&& AbilitySystemComponent->GetIsStartupAbilitiesGiven()
+		&& AbilitySystemComponent->GetStatusFromAbilityTag(Tag) == FGSGameplayTagsSingleton::Get().P16Tags.Ability.Status.EquippedTag)
+	{
+		ToggleEffect(true);
+	}
 }
 
 void UP16PassiveNiagaraComponent::ListenToChanges(UAbilitySystemComponent* InAbilitySystem)

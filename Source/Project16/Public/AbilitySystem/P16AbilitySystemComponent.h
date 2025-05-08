@@ -7,6 +7,7 @@
 #include "Util/P16Util.h"
 #include "P16AbilitySystemComponent.generated.h"
 
+class UP16SaveGame;
 class UP16GameplayAbility;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
@@ -50,6 +51,7 @@ public:
 	FP16AbilityDescription GetDescription(const FGameplayTag& AbilityTag);
 
 	void OnAbilityActorInfoSet();
+	void AddCharacterAbilitiesFromSaveData(UP16SaveGame* SaveGame);
 	void AddCharacterAbilities(const TArray<TSubclassOf<UP16GameplayAbility>>& StartupAbilities);
 	void AddCharacterPassiveAbilities(const TArray<TSubclassOf<UGameplayAbility>>& StartupPassiveAbilities);
 	void AbilityInputTagPressed(const FGameplayTag& InputTag);

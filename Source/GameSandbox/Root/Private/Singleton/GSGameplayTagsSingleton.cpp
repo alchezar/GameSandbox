@@ -27,6 +27,7 @@ void FGSGameplayTagsSingleton::InitializeProject16GameplayTags()
 	Singleton.P16Tags.Ability.Lightning.ElectrocuteTag    = Manager.AddNativeGameplayTag("P16.Ability.Lightning.Electrocute", "Electrocute ability tag");
 	Singleton.P16Tags.Ability.Arcane.ShardsTag            = Manager.AddNativeGameplayTag("P16.Ability.Arcane.Shards", "Arcane shards ability tag");
 	Singleton.P16Tags.Ability.Passive.Tag                 = Manager.AddNativeGameplayTag("P16.Ability.Passive", "Passive ability tag");
+	Singleton.P16Tags.Ability.Passive.ListenForEventTag   = Manager.AddNativeGameplayTag("P16.Ability.Passive.ListenForEvent", "Listen for event passive ability tag");
 	Singleton.P16Tags.Ability.Passive.HaloOfProtectionTag = Manager.AddNativeGameplayTag("P16.Ability.Passive.HaloOfProtection", "Halo of protection passive ability tag");
 	Singleton.P16Tags.Ability.Passive.LifeSiphonTag       = Manager.AddNativeGameplayTag("P16.Ability.Passive.LifeSiphon", "Life siphon passive ability tag");
 	Singleton.P16Tags.Ability.Passive.ManaSiphonTag       = Manager.AddNativeGameplayTag("P16.Ability.Passive.ManaSiphon", "Mana siphon passive ability tag");
