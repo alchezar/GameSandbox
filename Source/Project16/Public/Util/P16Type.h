@@ -53,6 +53,14 @@ enum class EP16SaveSlotStatus : uint8
 	Taken
 };
 
+UENUM(BlueprintType)
+enum class EP16TargetingStatus : uint8
+{
+	None = 0,
+	Enemy,
+	MapEntrance
+};
+
 USTRUCT(BlueprintType)
 struct FP16WidgetControllerParams
 {

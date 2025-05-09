@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "P16CharacterBase.h"
+#include "Interface/P16HighlightInterface.h"
 #include "Interface/P16InterfaceEnemy.h"
 #include "Util/P16Util.h"
 #include "P16Enemy.generated.h"
@@ -13,7 +14,7 @@ class UBehaviorTree;
 class UWidgetComponent;
 
 UCLASS()
-class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16InterfaceEnemy
+class PROJECT16_API AP16Enemy : public AP16CharacterBase, public IP16HighlightInterface, public IP16InterfaceEnemy
 {
 	GENERATED_BODY()
 
@@ -32,10 +33,15 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
+	/// @section IP16CombatInterface
 	virtual int32 GetPlayerLevel_Implementation() override;
 	virtual void  Die(const FVector& DeathImpulse) override;
 
-	virtual void    ToggleHighlight(const bool bOn) override;
+	/// @section IP16HighlightInterface
+	virtual void                ToggleHighlight_Implementation(const bool bOn) override;
+	virtual EP16TargetingStatus GetTargetingStatus_Implementation() override { return EP16TargetingStatus::Enemy; };
+
+	/// @section IP16InterfaceEnemy
 	virtual AActor* GetCombatTarget_Implementation() const override;
 	virtual void    SetCombatTarget_Implementation(AActor* InCombatTarget) override;
 

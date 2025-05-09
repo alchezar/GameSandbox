@@ -7,7 +7,9 @@
 namespace P16
 {
 	/// @brief Depth values for highlighting on hover in postprocess material.
-	constexpr int32 CustomDepthRed = 250;
+	constexpr int32 CustomDepthRed    = 250;
+	constexpr int32 CustomDepthBlue   = 251;
+	constexpr int32 CustomDepthYellow = 252;
 
 	/// @brief The number of points for the arcane shards spell.
 	constexpr int32 PointsNum = 12;
@@ -105,6 +107,14 @@ if (Condition) _UNLIKELY                        \
 if (Condition)                                  \
 {                                               \
 	continue;                                   \
+}
+
+#define EARLY_RETURN_WITH_WARN_IF(Condition)                                                                       \
+if (Condition && !(UE_BUILD_SHIPPING || UE_BUILD_TEST)) _UNLIKELY                                                  \
+{                                                                                                                  \
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,                                                         \
+		FString::Printf(L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__));    \
+	UE_LOG(LogP16, Warning, L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__); \
 }
 
 /// @brief Warn if the Class is `nullptr` but don't crash the application.

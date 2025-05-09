@@ -3,6 +3,7 @@
 #include "Player/P16PlayerCheckpoint.h"
 
 #include "Project16.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Game/P16GameMode.h"
 #include "Interface/P16PlayerInterface.h"
@@ -14,6 +15,7 @@ AP16PlayerCheckpoint::AP16PlayerCheckpoint(const FObjectInitializer& ObjectIniti
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("CheckpointStaticMeshComponent");
 	Mesh->SetupAttachment(GetRootComponent());
+	Mesh->SetCustomDepthStencilValue(P16::CustomDepthBlue);
 
 	Sphere = CreateDefaultSubobject<USphereComponent>("SphereOverlapComponent");
 	Sphere->SetupAttachment(GetRootComponent());
@@ -35,6 +37,16 @@ void AP16PlayerCheckpoint::LoadActor_Implementation()
 	{
 		HandleGlowEffects();
 	}
+}
+
+void AP16PlayerCheckpoint::ToggleHighlight_Implementation(const bool bOn)
+{
+	Mesh->SetRenderCustomDepth(bOn);
+}
+
+void AP16PlayerCheckpoint::UpdateDestination_Implementation(FVector& OutDestination)
+{
+	OutDestination = GetCapsuleComponent()->GetComponentLocation();
 }
 
 void AP16PlayerCheckpoint::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

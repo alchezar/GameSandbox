@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerStart.h"
+#include "Interface/P16HighlightInterface.h"
 #include "Interface/P16SaveInterface.h"
 #include "P16PlayerCheckpoint.generated.h"
 
 class USphereComponent;
 
 UCLASS()
-class PROJECT16_API AP16PlayerCheckpoint : public APlayerStart, public IP16SaveInterface
+class PROJECT16_API AP16PlayerCheckpoint : public APlayerStart, public IP16SaveInterface, public IP16HighlightInterface
 {
 	GENERATED_BODY()
 
@@ -28,8 +29,14 @@ protected:
 	/// @name Interface
 	/// ------------------------------------------------------------------------
 public:
+	/// @section IP16SaveInterface
 	virtual bool GetShouldLoadTransform_Implementation() override { return false; };
 	virtual void LoadActor_Implementation() override;
+
+	/// @section IP16HighlightInterface
+	virtual void                ToggleHighlight_Implementation(const bool bOn) override;
+	virtual EP16TargetingStatus GetTargetingStatus_Implementation() override { return EP16TargetingStatus::MapEntrance; };
+	virtual void                UpdateDestination_Implementation(FVector& OutDestination) override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

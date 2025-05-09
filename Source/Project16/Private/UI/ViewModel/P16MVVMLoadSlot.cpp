@@ -34,20 +34,22 @@ void UP16MVVMLoadSlot::InitSlot()
 
 void UP16MVVMLoadSlot::ResetSlot()
 {
-	SetPlayerName("Default");
 	SlotStatus = EP16SaveSlotStatus::Vacant;
+	SetPlayerName("Default");
+	SetPlayerLevel(1);
+
 	InitSlot();
 	OnEnableSelectSlotButton.Broadcast(true);
 }
 
 void UP16MVVMLoadSlot::NewSlot(const AP16GameMode* GameMode, const FString& Name)
 {
-	SetMapName(GameMode->GetDefaultMapName());
-	SetPlayerName(Name);
 	SlotStatus     = EP16SaveSlotStatus::Taken;
 	PlayerStartTag = GameMode->DefaultPlayerStartTag;
-	InitSlot();
+	SetMapName(GameMode->GetDefaultMapName());
+	SetPlayerName(Name);
 
+	InitSlot();
 	GameMode->SaveSlotData(this, SlotIndex);
 }
 
@@ -56,10 +58,9 @@ void UP16MVVMLoadSlot::LoadSlotFrom(const UP16SaveGame* SaveGame)
 	const FP16SaveGameObject& SaveGameObject = SaveGame->GameObject;
 	SetPlayerName(SaveGameObject.PlayerName);
 	SetMapName(SaveGameObject.MapName);
+	SetPlayerLevel(SaveGame->PlayerObject.Level);
 	SlotStatus     = SaveGameObject.SlotStatus;
 	PlayerStartTag = SaveGameObject.PlayerStartTag;
-
-	SetPlayerLevel(SaveGame->PlayerObject.Level);
 
 	InitSlot();
 }

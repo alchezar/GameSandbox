@@ -83,7 +83,7 @@ void AP16Enemy::Die(const FVector& DeathImpulse)
 	Super::Die(DeathImpulse);
 }
 
-void AP16Enemy::ToggleHighlight(const bool bOn)
+void AP16Enemy::ToggleHighlight_Implementation(const bool bOn)
 {
 	GetMesh()->SetRenderCustomDepth(bOn);
 	Weapon->SetRenderCustomDepth(bOn);

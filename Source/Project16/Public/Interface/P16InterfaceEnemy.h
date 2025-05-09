@@ -17,8 +17,6 @@ class PROJECT16_API IP16InterfaceEnemy
 	GENERATED_BODY()
 
 public:
-	virtual void ToggleHighlight(const bool bOn) = 0;
-
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
 	void SetCombatTarget(AActor* InCombatTarget);
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)

@@ -13,7 +13,7 @@
 #include "Actor/P16MagicCircle.h"
 #include "Component/P16InputComponent.h"
 #include "Components/SplineComponent.h"
-#include "Interface/P16InterfaceEnemy.h"
+#include "Interface/P16HighlightInterface.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
 #include "UI/Component/P16DamageTextComponent.h"
 
@@ -128,10 +128,10 @@ void AP16PlayerController::CursorTrace()
 	EARLY_RETURN_IF(!GetAbilitySystemComponent())
 	if (GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.CursorTraceTag))
 	{
-		if (LastTickEnemy)
+		if (LastTickActor)
 		{
-			LastTickEnemy->ToggleHighlight(false);
-			LastTickEnemy = nullptr;
+			IP16HighlightInterface::Execute_ToggleHighlight(LastTickActor, false);
+			LastTickActor = nullptr;
 		}
 		return;
 	}
@@ -141,19 +141,13 @@ void AP16PlayerController::CursorTrace()
 
 	// Do nothing if LastTickEnemy == ThisTickEnemy, no matter they are nullptr or valid.
 	// In other cases, we always want to toggle highlight between the last and this tick enemies.
-	const TScriptInterface<IP16InterfaceEnemy> ThisTickEnemy = CursorHit.GetActor();
-	if (LastTickEnemy != ThisTickEnemy)
+	AActor* ThisTickActor = CursorHit.GetActor();
+	if (LastTickActor != ThisTickActor)
 	{
-		if (LastTickEnemy)
-		{
-			LastTickEnemy->ToggleHighlight(false);
-		}
-		if (ThisTickEnemy)
-		{
-			ThisTickEnemy->ToggleHighlight(true);
-		}
+		ToggleHighlight(LastTickActor, false);
+		ToggleHighlight(ThisTickActor, true);
 	}
-	LastTickEnemy = ThisTickEnemy;
+	LastTickActor = ThisTickActor;
 }
 
 void AP16PlayerController::AutoRun()
@@ -172,13 +166,13 @@ void AP16PlayerController::AutoRun()
 	ControlledPawn->AddMovementInput(Direction);
 }
 
-void AP16PlayerController::UpdateMagicCircle()
+void AP16PlayerController::UpdateMagicCircle() const
 {
 	EARLY_RETURN_IF(!MagicCircle || !CursorHit.bBlockingHit)
 
 	// Remove magic circle jitter on hovering the enemies, by ignoring them in additional raycast.
 	FVector MagicCircleLocation = CursorHit.ImpactPoint;
-	if (LastTickEnemy)
+	if (LastTickActor)
 	{
 		FHitResult    IgnoreEnemyHit;
 		const FVector Start     = CursorHit.ImpactPoint;
@@ -200,9 +194,9 @@ void AP16PlayerController::AbilityInputTagPressed(const FGameplayTag InputTag)
 
 	if (GetIsLMB(InputTag))
 	{
-		bTargeting   = LastTickEnemy != nullptr;
-		bAutoRunning = false;
-		FollowTime   = 0.f;
+		TargetingStatus = GetTargetingStatus(LastTickActor);
+		bAutoRunning    = false;
+		FollowTime      = 0.f;
 	}
 
 	EARLY_RETURN_IF(!GetAbilitySystemComponent())
@@ -215,15 +209,28 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 		|| GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputReleasedTag))
 
 	// Activate ability.
-	if (bTargeting || !GetIsLMB(InputTag))
+	const bool bTargetingEnemy = TargetingStatus == EP16TargetingStatus::Enemy;
+	if (bTargetingEnemy || !GetIsLMB(InputTag))
 	{
 		EARLY_RETURN_IF(!GetAbilitySystemComponent())
 		AbilitySystemComponent->AbilityInputTagReleased(InputTag);
 		return;
 	}
 
-	// Move towards click behavior.
+	// Move towards click (!) behavior.
 	EARLY_RETURN_IF(FollowTime > ClickThreshold || !ControlledPawn)
+
+	// Either replace the click location with the target's destination, or show the click effect.
+	if (LastTickActor && LastTickActor->Implements<UP16HighlightInterface>())
+	{
+		IP16HighlightInterface::Execute_UpdateDestination(LastTickActor, OUT CachedDestination);
+	}
+	else if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputPressedTag))
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagara, CachedDestination);
+	}
+
+	// Convert found navigation path points to smooth spline.
 	UNavigationPath* NavPath = UNavigationSystemV1::FindPathToLocationSynchronously(this, ControlledPawn->GetActorLocation(), CachedDestination);
 	EARLY_RETURN_IF(!NavPath)
 
@@ -234,11 +241,6 @@ void AP16PlayerController::AbilityInputTagReleased(const FGameplayTag InputTag)
 		CachedDestination = PathPoint;
 	}
 	bAutoRunning = !NavPath->PathPoints.IsEmpty();
-
-	if (!GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputPressedTag))
-	{
-		UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ClickNiagara, CachedDestination);
-	}
 }
 
 void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
@@ -247,7 +249,8 @@ void AP16PlayerController::AbilityInputTagHeld(const FGameplayTag InputTag)
 		|| GetAbilitySystemComponent()->HasMatchingGameplayTag(FGSGameplayTagsSingleton::Get().P16Tags.Player.Blocked.InputHeldTag))
 
 	// Activate ability.
-	if (!GetIsLMB(InputTag) || bTargeting || bShiftKeyDown)
+	const bool bTargetingEnemy = TargetingStatus == EP16TargetingStatus::Enemy;
+	if (!GetIsLMB(InputTag) || bTargetingEnemy || bShiftKeyDown)
 	{
 		EARLY_RETURN_IF(!GetAbilitySystemComponent())
 		AbilitySystemComponent->AbilityInputTagHeld(InputTag);
@@ -289,4 +292,16 @@ UP16AbilitySystemComponent* AP16PlayerController::GetAbilitySystemComponent()
 bool AP16PlayerController::GetIsLMB(const FGameplayTag InputTag) const
 {
 	return InputTag.MatchesTagExact(FGSGameplayTagsSingleton::Get().P16Tags.Input.MouseButtonLeftTag);
+}
+
+void AP16PlayerController::ToggleHighlight(AActor* Target, const bool bOn)
+{
+	EARLY_RETURN_IF(!Target || !Target->Implements<UP16HighlightInterface>())
+	IP16HighlightInterface::Execute_ToggleHighlight(Target, bOn);
+}
+
+EP16TargetingStatus AP16PlayerController::GetTargetingStatus(AActor* Target)
+{
+	EARLY_RETURN_VALUE_IF(!Target || !Target->Implements<UP16HighlightInterface>(), EP16TargetingStatus::None)
+	return IP16HighlightInterface::Execute_GetTargetingStatus(Target);
 }

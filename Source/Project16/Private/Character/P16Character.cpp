@@ -16,6 +16,7 @@
 #include "Player/P16PlayerController.h"
 #include "Player/P16PlayerState.h"
 #include "UI/HUD/P16HUD.h"
+#include "Util/P16Log.h"
 
 AP16Character::AP16Character()
 {
@@ -212,7 +213,7 @@ void AP16Character::InitDefaultAttributes() const
 	GameMode->LoadWorldState(GetWorld());
 
 	UP16SaveGame* SaveGame = GameMode->GetInGameSaveData();
-	EARLY_RETURN_IF(!SaveGame)
+	EARLY_RETURN_WITH_WARN_IF(!SaveGame)
 	SaveGame->LoadPlayerObject(GetPlayerState());
 
 	if (UP16AbilitySystemComponent* AbilitySystem = Cast<UP16AbilitySystemComponent>(GetAbilitySystemComponent()))

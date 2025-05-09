@@ -130,7 +130,7 @@ void AP16GameMode::SaveWorldState(UWorld* InWorld) const
 	for (TActorIterator<AActor> It {InWorld}; It; ++It)
 	{
 		AActor* Actor = *It;
-		CONTINUE_IF(!Actor || Actor->Implements<UP16SaveInterface>())
+		CONTINUE_IF(!Actor || !Actor->Implements<UP16SaveInterface>())
 
 		FP16SaveActor SavedActor = {Actor->GetName(), Actor->GetTransform()};
 		FMemoryWriter MemoryWriter {SavedActor.Bytes};
@@ -154,16 +154,16 @@ void AP16GameMode::LoadWorldState(UWorld* InWorld) const
 	FString WorldName = InWorld->GetMapName();
 	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
 
-	UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
-	EARLY_RETURN_IF(!GameInstance || UGameplayStatics::DoesSaveGameExist(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex))
+	const UP16GameInstance* GameInstance = GetGameInstance<UP16GameInstance>();
+	EARLY_RETURN_IF(!GameInstance || !UGameplayStatics::DoesSaveGameExist(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex))
 
-	UP16SaveGame* SaveGame = Cast<UP16SaveGame>(UGameplayStatics::LoadGameFromSlot(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex));
-	IF_VALID_OR_WARN(SaveGame) {}
+	const UP16SaveGame* SaveGame = Cast<UP16SaveGame>(UGameplayStatics::LoadGameFromSlot(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex));
+	EARLY_RETURN_WITH_WARN_IF(!SaveGame)
 
 	for (TActorIterator<AActor> It {InWorld}; It; ++It)
 	{
 		AActor* Actor = *It;
-		CONTINUE_IF(!Actor || Actor->Implements<UP16SaveInterface>())
+		CONTINUE_IF(!Actor || !Actor->Implements<UP16SaveInterface>())
 
 		FP16SaveMap SaveMap = SaveGame->GetSaveMapBy(WorldName);
 		for (const FP16SaveActor& SavedActor : SaveMap.SavedActors)

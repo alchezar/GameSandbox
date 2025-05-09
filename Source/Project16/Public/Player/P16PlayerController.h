@@ -6,16 +6,17 @@
 #include "GameplayTagContainer.h"
 #include "InputActionValue.h"
 #include "GameFramework/PlayerController.h"
+#include "Util/P16Type.h"
 #include "P16PlayerController.generated.h"
 
-class AP16MagicCircle;
-class UNiagaraSystem;
-class UP16DamageTextComponent;
 class AP16Character;
-class IP16InterfaceEnemy;
+class AP16MagicCircle;
+class IP16HighlightInterface;
 class UInputAction;
 class UInputMappingContext;
+class UNiagaraSystem;
 class UP16AbilitySystemComponent;
+class UP16DamageTextComponent;
 class UP16InputConfig;
 class USplineComponent;
 struct FGameplayTag;
@@ -55,7 +56,7 @@ protected:
 	void ShiftInputCallback(const FInputActionValue& InputValue, const bool bDown);
 	void CursorTrace();
 	void AutoRun();
-	void UpdateMagicCircle();
+	void UpdateMagicCircle() const;
 
 	void AbilityInputTagPressed(const FGameplayTag InputTag);
 	void AbilityInputTagReleased(const FGameplayTag InputTag);
@@ -66,6 +67,9 @@ private:
 	UP16AbilitySystemComponent* GetAbilitySystemComponent();
 
 	bool GetIsLMB(const FGameplayTag InputTag) const;
+
+	static void                ToggleHighlight(AActor* Target, const bool bOn);
+	static EP16TargetingStatus GetTargetingStatus(AActor* Target);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -94,7 +98,6 @@ protected:
 	TSubclassOf<AP16MagicCircle> MagicCircleClass = nullptr;
 
 private:
-	TScriptInterface<IP16InterfaceEnemy> LastTickEnemy = {};
 	UPROPERTY()
 	TObjectPtr<UP16AbilitySystemComponent> AbilitySystemComponent = {};
 	UPROPERTY()
@@ -102,11 +105,13 @@ private:
 	UPROPERTY()
 	TObjectPtr<AP16MagicCircle> MagicCircle = nullptr;
 
-	FHitResult CursorHit         = {};
-	FVector    CachedDestination = {};
-	float      FollowTime        = 0.f;
-	float      ClickThreshold    = 0.5f;
-	bool       bAutoRunning      = false;
-	bool       bTargeting        = false;
-	bool       bShiftKeyDown     = false;
+	FHitResult          CursorHit         = {};
+	FVector             CachedDestination = {};
+	float               FollowTime        = 0.f;
+	float               ClickThreshold    = 0.5f;
+	bool                bAutoRunning      = false;
+	bool                bShiftKeyDown     = false;
+	EP16TargetingStatus TargetingStatus   = EP16TargetingStatus::None;
+	UPROPERTY()
+	AActor* LastTickActor = nullptr;
 };
