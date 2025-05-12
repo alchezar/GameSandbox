@@ -22,6 +22,11 @@ void UP16MVVMLoadSlot::SetMapName(const FString& InMapName)
 	UE_MVVM_SET_PROPERTY_VALUE(MapName, InMapName);
 }
 
+void UP16MVVMLoadSlot::SetLevelName(const FString& InLevelName)
+{
+	UE_MVVM_SET_PROPERTY_VALUE(LevelName, InLevelName);
+}
+
 void UP16MVVMLoadSlot::SetPlayerLevel(const int32 InPlayerLevel)
 {
 	UE_MVVM_SET_PROPERTY_VALUE(PlayerLevel, InPlayerLevel);
@@ -58,6 +63,7 @@ void UP16MVVMLoadSlot::LoadSlotFrom(const UP16SaveGame* SaveGame)
 	const FP16SaveGameObject& SaveGameObject = SaveGame->GameObject;
 	SetPlayerName(SaveGameObject.PlayerName);
 	SetMapName(SaveGameObject.MapName);
+	SetLevelName(SaveGameObject.LevelName);
 	SetPlayerLevel(SaveGame->PlayerObject.Level);
 	SlotStatus     = SaveGameObject.SlotStatus;
 	PlayerStartTag = SaveGameObject.PlayerStartTag;

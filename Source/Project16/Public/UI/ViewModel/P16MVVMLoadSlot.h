@@ -22,12 +22,14 @@ public:
 	int32   GetSlotIndex() const { return SlotIndex; }
 	FString GetPlayerName() const { return PlayerName; }
 	FString GetMapName() const { return MapName; };
+	FString GetLevelName() const { return LevelName; };
 	int32   GetPlayerLevel() const { return PlayerLevel; };
 
 	void SetLoadSlotName(const FString& InLoadSlotName);
 	void SetSlotIndex(const int32 InSlotIndex);
 	void SetPlayerName(const FString& InPlayerName);
 	void SetMapName(const FString& InMapName);
+	void SetLevelName(const FString& InLevelName);
 	void SetPlayerLevel(const int32 InPlayerLevel);
 
 	void InitSlot();
@@ -57,6 +59,8 @@ protected:
 	FString PlayerName = "Default";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
 	FString MapName = "Default";
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
+	FString LevelName = "";
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, FieldNotify, Getter, Setter, Category = "C++")
 	int32 PlayerLevel = 1;
 };

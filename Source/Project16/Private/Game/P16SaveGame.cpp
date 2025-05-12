@@ -99,6 +99,7 @@ void UP16SaveGame::LoadGameObject(UP16MVVMLoadSlot* LoadSlot) const
 {
 	LoadSlot->SetPlayerName(GameObject.PlayerName);
 	LoadSlot->SetMapName(GameObject.MapName);
+	LoadSlot->SetLevelName(GameObject.LevelName);
 	LoadSlot->SlotStatus     = GameObject.SlotStatus;
 	LoadSlot->PlayerStartTag = GameObject.PlayerStartTag;
 

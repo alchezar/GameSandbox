@@ -115,6 +115,7 @@ if (Condition && !(UE_BUILD_SHIPPING || UE_BUILD_TEST)) _UNLIKELY               
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,                                                         \
 		FString::Printf(L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__));    \
 	UE_LOG(LogP16, Warning, L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__); \
+	return;                                                                                                        \
 }
 
 /// @brief Warn if the Class is `nullptr` but don't crash the application.

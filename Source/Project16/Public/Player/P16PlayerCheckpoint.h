@@ -35,7 +35,7 @@ public:
 
 	/// @section IP16HighlightInterface
 	virtual void                ToggleHighlight_Implementation(const bool bOn) override;
-	virtual EP16TargetingStatus GetTargetingStatus_Implementation() override { return EP16TargetingStatus::MapEntrance; };
+	virtual EP16TargetingStatus GetTargetingStatus_Implementation() override { return EP16TargetingStatus::SavePoint; };
 	virtual void                UpdateDestination_Implementation(FVector& OutDestination) override;
 
 	/// ------------------------------------------------------------------------
@@ -43,7 +43,7 @@ public:
 	/// ------------------------------------------------------------------------
 protected:
 	UFUNCTION()
-	void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	virtual void OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
 	void OnCheckpointReached(UMaterialInstanceDynamic* Material);
 

@@ -51,8 +51,7 @@ void AP16PlayerCheckpoint::UpdateDestination_Implementation(FVector& OutDestinat
 
 void AP16PlayerCheckpoint::OnSphereBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	EARLY_RETURN_IF(!OtherActor->ActorHasTag("Player"))
-
+	EARLY_RETURN_IF(!OtherActor->Implements<UP16PlayerInterface>())
 	HandleGlowEffects();
 
 	// Save in game progress.

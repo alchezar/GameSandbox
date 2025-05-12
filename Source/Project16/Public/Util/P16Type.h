@@ -58,6 +58,7 @@ enum class EP16TargetingStatus : uint8
 {
 	None = 0,
 	Enemy,
+	SavePoint,
 	MapEntrance
 };
 

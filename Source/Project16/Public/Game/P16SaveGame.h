@@ -24,6 +24,8 @@ struct FP16SaveGameObject
 	UPROPERTY()
 	FString MapName = "Default";
 	UPROPERTY()
+	FString LevelName = "";
+	UPROPERTY()
 	EP16SaveSlotStatus SlotStatus = EP16SaveSlotStatus::Vacant;
 	UPROPERTY()
 	FName PlayerStartTag = "Start";

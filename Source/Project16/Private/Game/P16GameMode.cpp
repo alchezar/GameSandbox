@@ -26,10 +26,9 @@ AActor* AP16GameMode::ChoosePlayerStart_Implementation(AController* Player)
 	for (TActorIterator<APlayerStart> It {GetWorld()}; It; ++It)
 	{
 		const APlayerStart* PlayerStart = *It;
-		CONTINUE_IF(PlayerStart->PlayerStartTag != PlayerStartTag)
-
 		PlayerStarts.Add(*It);
 	}
+
 	EARLY_RETURN_VALUE_IF(PlayerStarts.IsEmpty(), nullptr)
 
 	APlayerStart** StartPosition = PlayerStarts.FindByPredicate([PlayerStartTag](const APlayerStart* Start) -> bool
@@ -48,6 +47,16 @@ void AP16GameMode::BeginPlay()
 	{
 		DefaultMapName = Maps.Array()[0].Key;
 	}
+}
+
+FString AP16GameMode::GetMapNameFromLevelName(const FString& InLevelName) const
+{
+	for (auto Map : Maps)
+	{
+		CONTINUE_IF(Map.Value.ToSoftObjectPath().GetAssetName() != InLevelName)
+		return Map.Key;
+	}
+	return "";
 }
 
 void AP16GameMode::SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex) const
@@ -107,7 +116,7 @@ void AP16GameMode::TravelToMap(const UP16MVVMLoadSlot* LoadSlot)
 	UGameplayStatics::OpenLevelBySoftObjectPtr(this, Maps[MapName]);
 }
 
-void AP16GameMode::SaveWorldState(UWorld* InWorld) const
+void AP16GameMode::SaveWorldState(UWorld* InWorld, const FString& InLevelName) const
 {
 	FString WorldName = InWorld->GetMapName();
 	WorldName.RemoveFromStart(InWorld->StreamingLevelsPrefix);
@@ -117,6 +126,12 @@ void AP16GameMode::SaveWorldState(UWorld* InWorld) const
 
 	UP16SaveGame* SaveGame = GetSavedSlotData(GameInstance->LoadSlotName, GameInstance->LoadSlotIndex);
 	EARLY_RETURN_IF(!SaveGame)
+
+	if (InLevelName != "")
+	{
+		SaveGame->GameObject.LevelName = InLevelName;
+		SaveGame->GameObject.MapName   = GetMapNameFromLevelName(InLevelName);
+	}
 
 	if (!SaveGame->GetHasSaveMap(WorldName))
 	{
