@@ -108,6 +108,23 @@ int32 AP16Character::GetPlayerLevel_Implementation()
 	return OwnPlayerState->GetPlayerLevel();
 }
 
+void AP16Character::Die(const FVector& DeathImpulse)
+{
+	Super::Die(DeathImpulse);
+
+	// Respawn after death.
+	FTimerHandle         DeathTimer;
+	const FTimerDelegate DeathDelegate = FTimerDelegate::CreateWeakLambda(this, [this]() -> void
+	{
+		const AP16GameMode* GameMode = GetWorld()->GetAuthGameMode<AP16GameMode>();
+		EARLY_RETURN_IF(!GameMode)
+
+		GameMode->PlayerDied(GetController());
+	});
+	GetWorld()->GetTimerManager().SetTimer(DeathTimer, DeathDelegate, RespawnTime, false);
+	Camera->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+}
+
 inline int32 AP16Character::GetXP_Implementation() const
 {
 	return OwnPlayerState->GetXP();

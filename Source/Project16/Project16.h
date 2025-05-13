@@ -112,7 +112,7 @@ if (Condition)                                  \
 #define EARLY_RETURN_WITH_WARN_IF(Condition)                                                                       \
 if (Condition && !(UE_BUILD_SHIPPING || UE_BUILD_TEST)) _UNLIKELY                                                  \
 {                                                                                                                  \
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red,                                                         \
+	GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red,                                                        \
 		FString::Printf(L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__));    \
 	UE_LOG(LogP16, Warning, L"Condition [%hs] is true in [%hs] at line [%d]", #Condition, __FUNCTION__, __LINE__); \
 	return;                                                                                                        \

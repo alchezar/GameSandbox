@@ -44,6 +44,7 @@ void UP16SaveGame::SaveGameObject(const UP16MVVMLoadSlot* LoadSlot, const int32 
 	GameObject.SlotIndex      = SlotIndex;
 	GameObject.PlayerName     = LoadSlot->GetPlayerName();
 	GameObject.MapName        = LoadSlot->GetMapName();
+	GameObject.LevelName      = LoadSlot->GetLevelName();
 	GameObject.SlotStatus     = EP16SaveSlotStatus::Taken;
 	GameObject.PlayerStartTag = LoadSlot->PlayerStartTag;
 }

@@ -35,6 +35,7 @@ public:
 	UP16CharacterClassInfoDataAsset* GetCharacterClassInfo() const { return CharacterClassInfo; }
 	UP16AbilityInfoDataAsset*        GetAbilityIfo() const { return AbilityInfo; }
 	const FString&                   GetDefaultMapName() const { return DefaultMapName; }
+	FString                          GetDefaultLevelName() const { return Maps[DefaultMapName].GetAssetName(); };
 	FString                          GetMapNameFromLevelName(const FString& InLevelName) const;
 
 	void          SaveSlotData(const UP16MVVMLoadSlot* LoadSlot, const int32 SlotIndex) const;
@@ -47,6 +48,8 @@ public:
 	void SaveWorldState(UWorld* InWorld, const FString& InLevelName = "") const;
 	void LoadWorldState(UWorld* InWorld) const;
 	void SerializeBytes(FArchive& InArchive, AActor* InActor) const;
+
+	void PlayerDied(const AController* InController) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

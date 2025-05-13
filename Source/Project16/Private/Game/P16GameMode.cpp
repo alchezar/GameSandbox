@@ -6,6 +6,7 @@
 #include "Project16.h"
 #include "Game/P16GameInstance.h"
 #include "Game/P16SaveGame.h"
+#include "GameFramework/Character.h"
 #include "GameFramework/PlayerStart.h"
 #include "Interface/P16SaveInterface.h"
 #include "Kismet/GameplayStatics.h"
@@ -206,4 +207,12 @@ void AP16GameMode::SerializeBytes(FArchive& InArchive, AActor* InActor) const
 	Ar.ArIsSaveGame = true;
 	// Convert actors SaveGame UPROPERTY to binary array
 	InActor->Serialize(Ar);
+}
+
+void AP16GameMode::PlayerDied(const AController* InController) const
+{
+	const UP16SaveGame* SaveGame = GetInGameSaveData();
+	EARLY_RETURN_IF(!SaveGame)
+
+	UGameplayStatics::OpenLevel(InController, *SaveGame->GameObject.LevelName);
 }

@@ -120,6 +120,12 @@ void AP16Enemy::OnStunTagChanged(const FGameplayTag Tag, const int32 Count)
 	AIController->GetBlackboardComponent()->SetValueAsBool("Stunned", bStunned);
 }
 
+void AP16Enemy::SetLevel(const int32 NewLevel)
+{
+	EARLY_RETURN_IF(NewLevel <= 0)
+	Level = NewLevel;
+}
+
 void AP16Enemy::InitHealthBar()
 {
 	// Set the enemy as the widget controller for the health bar.

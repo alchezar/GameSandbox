@@ -83,7 +83,6 @@ void AP16Projectile::OnSphereBeginOverlapCallback(UPrimitiveComponent* Overlappe
 	if (HasAuthority())
 	{
 		ApplyDamageTo(OtherActor);
-		Destroy();
 	}
 }
 
@@ -118,4 +117,5 @@ void AP16Projectile::ApplyDamageTo(AActor* Target)
 	EARLY_RETURN_IF(!DamageEffectParams.TargetAbilitySystemComponent)
 
 	UP16AbilitySystemLibrary::ApplyDamageEffect(DamageEffectParams);
+	Destroy();
 }

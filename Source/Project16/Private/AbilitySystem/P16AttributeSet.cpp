@@ -15,6 +15,7 @@
 #include "Net/UnrealNetwork.h"
 #include "Player/P16PlayerController.h"
 #include "Root/Public/Singleton/GSGameplayTagsSingleton.h"
+#include "Util/P16Log.h"
 
 #define DEFINE_ONREP_GAMEPLAYATTRIBUTE(ClassName, PropertyName)                             \
 void ClassName::OnRep_##PropertyName(const FGameplayAttributeData& Old##PropertyName) const \
@@ -314,6 +315,7 @@ void UP16AttributeSet::HandleDebuff(const FP16EffectProperties& Properties)
 	FP16GameplayEffectContext* Context = StaticCast<FP16GameplayEffectContext*>(MutableSpec->GetContext().Get());
 	Context->SetDamageType(DebuffSpec.DamageType);
 
+	EARLY_RETURN_WITH_WARN_IF(!Properties.TargetAbilitySystem)
 	Properties.TargetAbilitySystem->ApplyGameplayEffectSpecToSelf(*MutableSpec);
 }
 

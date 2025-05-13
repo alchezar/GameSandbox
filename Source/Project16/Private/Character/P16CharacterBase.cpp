@@ -241,6 +241,7 @@ void AP16CharacterBase::Multicast_Die_Implementation(const FVector& DeathImpulse
 		Weapon->AddImpulse(DeathImpulse / 8.f, NAME_None, true);
 	}
 
+	GetMesh()->bPauseAnims = true;
 	GetMesh()->SetSimulatePhysics(true);
 	GetMesh()->SetEnableGravity(true);
 	GetMesh()->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);

@@ -43,6 +43,7 @@ public:
 
 	/// @name IP16CombatInterface
 	virtual int32 GetPlayerLevel_Implementation() override;
+	virtual void  Die(const FVector& DeathImpulse) override;
 
 	/// @name IP16PlayerInterface
 	virtual int32 GetXP_Implementation() const override;
@@ -86,6 +87,9 @@ protected:
 	TObjectPtr<UCameraComponent> Camera = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UNiagaraComponent> LevelUpNiagaraComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Combat")
+	float RespawnTime = 5.f;
 
 private:
 	UPROPERTY()

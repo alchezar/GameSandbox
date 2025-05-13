@@ -52,6 +52,7 @@ void UP16MVVMLoadSlot::NewSlot(const AP16GameMode* GameMode, const FString& Name
 	SlotStatus     = EP16SaveSlotStatus::Taken;
 	PlayerStartTag = GameMode->DefaultPlayerStartTag;
 	SetMapName(GameMode->GetDefaultMapName());
+	SetLevelName(GameMode->GetDefaultLevelName());
 	SetPlayerName(Name);
 
 	InitSlot();

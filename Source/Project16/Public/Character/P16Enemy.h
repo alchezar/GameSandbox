@@ -56,6 +56,9 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
+public:
+	void SetLevel(const int32 NewLevel);
+
 private:
 	void InitHealthBar();
 	void InitHitReact();
