@@ -59,6 +59,10 @@ protected:
 public:
 	void SetLevel(const int32 NewLevel);
 
+protected:
+	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable)
+	void SpawnLoot();
+
 private:
 	void InitHealthBar();
 	void InitHitReact();

@@ -7,6 +7,7 @@
 #include "Util/P16Type.h"
 #include "P16AbilitySystemLibrary.generated.h"
 
+class UP16LootTiersDataAsset;
 class UP16SaveGame;
 class UP16AbilityInfoDataAsset;
 class AP16HUD;
@@ -43,6 +44,8 @@ public:
 	static UP16CharacterClassInfoDataAsset* GetCharacterClassInfo(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	static UP16AbilityInfoDataAsset* GetAbilityInfo(const UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable, Category = "C++", meta = (DefaultToSelf = "WorldContextObject"))
+	static UP16LootTiersDataAsset* GetLootTiersInfo(const UObject* WorldContextObject);
 	UFUNCTION(BlueprintPure, Category = "C++")
 	///
 	/// @name Effect context getters.

@@ -80,6 +80,7 @@ void AP16Enemy::Die(const FVector& DeathImpulse)
 	{
 		AIController->GetBlackboardComponent()->SetValueAsBool("Dead", true);
 	}
+	SpawnLoot();
 	Super::Die(DeathImpulse);
 }
 

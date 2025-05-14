@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystem/Data/P16LootTiersDataAsset.h"
 #include "GameFramework/GameModeBase.h"
 #include "UI/ViewModel/P16MVVMLoadScreen.h"
 #include "P16GameMode.generated.h"
@@ -34,6 +35,7 @@ protected:
 public:
 	UP16CharacterClassInfoDataAsset* GetCharacterClassInfo() const { return CharacterClassInfo; }
 	UP16AbilityInfoDataAsset*        GetAbilityIfo() const { return AbilityInfo; }
+	UP16LootTiersDataAsset*          GetLootTiersIfo() const { return LootTiers; }
 	const FString&                   GetDefaultMapName() const { return DefaultMapName; }
 	FString                          GetDefaultLevelName() const { return Maps[DefaultMapName].GetAssetName(); };
 	FString                          GetMapNameFromLevelName(const FString& InLevelName) const;
@@ -63,6 +65,8 @@ protected:
 	TObjectPtr<UP16CharacterClassInfoDataAsset> CharacterClassInfo = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Ability Info")
 	TObjectPtr<UP16AbilityInfoDataAsset> AbilityInfo = nullptr;
+	UPROPERTY(EditDefaultsOnly, Category = "C++ | Loot")
+	TObjectPtr<UP16LootTiersDataAsset> LootTiers = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Save Game")
 	TSubclassOf<USaveGame> LoadScreenSaveGameClass = nullptr;
 

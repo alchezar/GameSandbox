@@ -58,5 +58,6 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect")
 	bool bAffectEnemies = false;
 
+	UPROPERTY()
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectsMap;
 };

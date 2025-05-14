@@ -387,6 +387,30 @@ struct FP16SavedAbility
 	int32 Level;
 };
 
+USTRUCT(BlueprintType)
+struct FP16LootItem
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TSubclassOf<AActor> LootClass = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	bool bLootLevelOverride = true;
+};
+
+USTRUCT(BlueprintType)
+struct FP16LootItemProbable
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FP16LootItem Item = {};
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float ChanceToSpawn = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 MaxNumberToSpawn = 1;
+};
+
 template <typename T>
 concept RangeComparable = requires(T Min, T Max)
 {

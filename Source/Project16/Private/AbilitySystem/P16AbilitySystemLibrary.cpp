@@ -120,6 +120,15 @@ UP16AbilityInfoDataAsset* UP16AbilitySystemLibrary::GetAbilityInfo(const UObject
 	return GameMode->GetAbilityIfo();
 }
 
+UP16LootTiersDataAsset* UP16AbilitySystemLibrary::GetLootTiersInfo(const UObject* WorldContextObject)
+{
+	EARLY_RETURN_VALUE_IF(!WorldContextObject, nullptr)
+	const AP16GameMode* GameMode = Cast<AP16GameMode>(UGameplayStatics::GetGameMode(WorldContextObject));
+	EARLY_RETURN_VALUE_IF(!GameMode, nullptr)
+
+	return GameMode->GetLootTiersIfo();
+}
+
 bool UP16AbilitySystemLibrary::GetIsBlockedHit(const FGameplayEffectContextHandle& EffectContextHandle)
 {
 	const FP16GameplayEffectContext* Context = StaticCast<const FP16GameplayEffectContext*>(EffectContextHandle.Get());
