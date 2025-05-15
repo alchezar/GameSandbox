@@ -42,7 +42,7 @@ protected:
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UBoxComponent> TriggerVolume = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
 	TArray<AP16SpawnPoint*> Spawners = {};

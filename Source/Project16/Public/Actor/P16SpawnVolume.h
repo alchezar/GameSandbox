@@ -32,6 +32,6 @@ public:
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 protected:
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++")
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++")
 	TObjectPtr<UBoxComponent> SpawnVolume = nullptr;
 };

@@ -32,6 +32,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "C++")
 	void OnEndOverlap(AActor* TargetActor);
 
+	UFUNCTION(BlueprintCallable)
+	void PlayHitGroundSound() const;
+	UFUNCTION(BlueprintCallable)
+	void PlayPickupSound() const;
+
 private:
 	virtual void ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass);
 	virtual void RemoveActiveGameplayEffect(AActor* TargetActor);
@@ -57,6 +62,11 @@ protected:
 	bool bDestroyOnApplication = false;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "C++ | Infinite Effect")
 	bool bAffectEnemies = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
+	TObjectPtr<USoundBase> HitGroundSound = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "C++ | Effect")
+	TObjectPtr<USoundBase> PickupSound = nullptr;
 
 	UPROPERTY()
 	TMap<FActiveGameplayEffectHandle, UAbilitySystemComponent*> ActiveEffectsMap;

@@ -6,6 +6,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffect.h"
 #include "Project16.h"
+#include "Kismet/GameplayStatics.h"
 
 AP16EffectActor::AP16EffectActor()
 {
@@ -44,6 +45,16 @@ void AP16EffectActor::OnEndOverlap(AActor* TargetActor)
 	}
 }
 
+void AP16EffectActor::PlayHitGroundSound() const
+{
+	UGameplayStatics::PlaySound2D(this, HitGroundSound);
+}
+
+void AP16EffectActor::PlayPickupSound() const
+{
+	UGameplayStatics::PlaySound2D(this, PickupSound);
+}
+
 void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf<UGameplayEffect>& InGameplayEffectClass)
 {
 	// Ignore enemies if not allowed.
@@ -67,6 +78,8 @@ void AP16EffectActor::ApplyEffectToTarget(AActor* TargetActor, const TSubclassOf
 	{
 		ActiveEffectsMap.Add(AppliedEffect, TargetAbilityComponent);
 	}
+
+	PlayPickupSound();
 
 	// Destroy not an infinite effect actor on successful apply.
 	if (AppliedEffect.WasSuccessfullyApplied() && !bInfiniteEffect)
