@@ -19,6 +19,7 @@ public class GameSandbox : ModuleRules
 			"AIModule",
 			"FieldSystemEngine",
 			"GeometryCollectionEngine",
+			"GameplayTags"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
@@ -26,6 +27,7 @@ public class GameSandbox : ModuleRules
 			"EnhancedInput",
 			"Slate",
 			"SlateCore",
+			"GameplayAbilities"
 		});
 
 		PublicIncludePaths.AddRange(new[]

@@ -2,9 +2,9 @@
 
 #include "Component/Scene/P12WeaponBarrelComponent.h"
 
-#include "GameSandbox.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Project12.h"
 #include "Actor/Projectile/P12Projectile.h"
 #include "Components/DecalComponent.h"
 #include "Engine/DamageEvents.h"
@@ -50,7 +50,7 @@ void UP12WeaponBarrelComponent::GetLifetimeReplicatedProps(TArray<FLifetimePrope
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	FDoRepLifetimeParams RepParams;
-	RepParams.Condition = COND_SimulatedOnly;
+	RepParams.Condition          = COND_SimulatedOnly;
 	RepParams.RepNotifyCondition = REPNOTIFY_Always;
 	DOREPLIFETIME_WITH_PARAMS(ThisClass, LastShotsInfo, RepParams);
 
@@ -63,7 +63,7 @@ void UP12WeaponBarrelComponent::Shot(const FVector& ShotStart, const FVector& Sh
 	TArray<FP12ShotInfo> ShotInfos;
 	for (int i = 0; i < BulletsPerShot; ++i)
 	{
-		const float HalfAngleRad = FMath::DegreesToRadians(SpreadAngle / 2.f);
+		const float   HalfAngleRad    = FMath::DegreesToRadians(SpreadAngle / 2.f);
 		const FVector SpreadDirection = FMath::VRandCone(ShotDirection, HalfAngleRad);
 
 		// ShotInfos.Add({ShotStart, SpreadDirection});
@@ -94,7 +94,7 @@ void UP12WeaponBarrelComponent::DrawNiagaraTale(const FVector& EndPoint)
 
 void UP12WeaponBarrelComponent::HitScan(const FVector& Start, const FVector& End, const FVector& Direction, FHitResult& Out_HitResult)
 {
-	GetWorld()->LineTraceSingleByChannel(Out_HitResult, Start, End, ECC_BULLET);
+	GetWorld()->LineTraceSingleByChannel(Out_HitResult, Start, End, P12::ECC_Bullet);
 	if (Out_HitResult.bBlockingHit)
 	{
 		ProcessHit(Out_HitResult, Direction);
@@ -147,8 +147,8 @@ void UP12WeaponBarrelComponent::ProcessHit(const FHitResult& HitResult, const FV
 	if (GetOwner()->HasAuthority())
 	{
 		FPointDamageEvent DamageEvent;
-		DamageEvent.HitInfo = HitResult;
-		DamageEvent.ShotDirection = Direction;
+		DamageEvent.HitInfo         = HitResult;
+		DamageEvent.ShotDirection   = Direction;
 		DamageEvent.DamageTypeClass = DamageTypeClass;
 		HitActor->TakeDamage(DamageAmount, DamageEvent, GetOwningController(), GetOwner());
 	}
@@ -165,9 +165,9 @@ void UP12WeaponBarrelComponent::ShotInternal(const TArray<FP12ShotInfo>& ShotsIn
 
 	for (const FP12ShotInfo ShotInfo : ShotsInfo)
 	{
-		const FVector ShotStart = ShotInfo.GetLocation();
+		const FVector ShotStart     = ShotInfo.GetLocation();
 		const FVector ShotDirection = ShotInfo.GetDirection();
-		const FVector ShotEnd = ShotStart + FiringRange * ShotDirection;
+		const FVector ShotEnd       = ShotStart + FiringRange * ShotDirection;
 
 		if (HitRegistrationType == EP12HitRegistrationType::HitScan)
 		{
