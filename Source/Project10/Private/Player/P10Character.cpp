@@ -69,7 +69,7 @@ void AP10Character::Tick(float DeltaTime)
 	{
 		/* If there is no AimOffset in AnimInstance, replace mesh rotation pitch with replicated decompressed RemoteViewPitch. */
 		FRotator NewRot = ArmComponent->GetRelativeRotation();
-		NewRot.Pitch = RemoteViewPitch * 360.f / 256.f;
+		NewRot.Pitch = GetRemoteViewPitch() * 360.f / 256.f;
 		ArmComponent->SetRelativeRotation(NewRot);
 	}
 

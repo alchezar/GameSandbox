@@ -10,7 +10,6 @@
 #include "Component/ARAttributesComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Perception/PawnSensingComponent.h"
 #include "UI/ARDamagePopUp.h"
 #include "UI/ARWorldUserWidget.h"
 
@@ -21,7 +20,9 @@ AARAICharacter::AARAICharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Ignore);
 	GetMesh()->SetGenerateOverlapEvents(true);
 
+#if 0
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+#endif
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	AttributesComp = CreateDefaultSubobject<UARAttributesComponent>("AttributesComponent");
@@ -32,7 +33,9 @@ void AARAICharacter::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+#if 0
 	PawnSensingComp->OnSeePawn.AddDynamic(this, &ThisClass::OnPawnSeen);
+#endif
 
 	if (AttributesComp)
 	{

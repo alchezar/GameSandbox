@@ -8,7 +8,9 @@
 
 class ATargetPoint;
 class UWidgetComponent;
+#if 0
 class UPawnSensingComponent;
+#endif
 
 UENUM(BlueprintType)
 enum class EP10AIGuardState : uint8
@@ -54,8 +56,10 @@ public:
 	FOnStatusChangedSignature OnStatusChanged;
 
 protected:
+#if 0
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensing;
+#endif
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UWidgetComponent* StatusWidget;
 	

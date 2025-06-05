@@ -9,8 +9,10 @@
 class UARDamagePopUp;
 class UARAbilityComponent;
 class UARWorldUserWidget;
-class UPawnSensingComponent;
 class UARAttributesComponent;
+#if 0
+class UPawnSensingComponent;
+#endif
 
 UCLASS()
 class PROJECT06_API AARAICharacter : public ACharacter
@@ -41,8 +43,10 @@ private:
 	void SetTargetActor(AActor* NewTarget);
 
 protected:
+#if 0
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensingComp;
+#endif
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")
 	UARAttributesComponent* AttributesComp;
 	UPROPERTY(EditAnywhere, Category = "C++ | Component")

@@ -8,7 +8,6 @@
 #include "Game/P10GameMode.h"
 #include "Navigation/PathFollowingComponent.h"
 #include "Net/UnrealNetwork.h"
-#include "Perception/PawnSensingComponent.h"
 #include "Player/P10Character.h"
 #include "UI/P10GuardStateWidget.h"
 
@@ -16,7 +15,9 @@ AP10AIGuard::AP10AIGuard()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
+#if 0
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
+#endif
 
 	StatusWidget = CreateDefaultSubobject<UWidgetComponent>("StatusWidgetComponent");
 	StatusWidget->SetupAttachment(RootComponent);
@@ -28,8 +29,10 @@ void AP10AIGuard::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 
+#if 0
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
 	PawnSensing->OnHearNoise.AddDynamic(this, &ThisClass::OnHearNoiseHandle);
+#endif
 }
 
 void AP10AIGuard::BeginPlay()
@@ -79,14 +82,13 @@ void AP10AIGuard::OnHearNoiseHandle(APawn* NoiseInstigator, const FVector& Locat
 	if (GuardState == EP10AIGuardState::Idle)
 	{
 		OriginalRotation = GetActorRotation();
-	}	
+	}
 	ChangeGuardState(EP10AIGuardState::Suspicious);
 	TargetRotation = FRotator(0.f, FRotationMatrix::MakeFromX(Location - GetActorLocation()).Rotator().Yaw, 0.f);
 	/* Instead of using EventTick, start this timer for smooth rotation. */
 	GetWorld()->GetTimerManager().SetTimer(DistractionTimer, this, &ThisClass::OrientGuardHandle, GetWorld()->GetDeltaSeconds(), true);
 	/* Timer to return to original rotation. */
 	GetWorld()->GetTimerManager().SetTimer(ResetTimer, this, &ThisClass::ResetRotationHandle, 5.f, false);
-
 }
 
 void AP10AIGuard::OrientGuardHandle()
@@ -111,7 +113,7 @@ void AP10AIGuard::ResetRotationHandle()
 {
 	/* Change state back to idle. */
 	ChangeGuardState(EP10AIGuardState::Idle);
-	
+
 	TargetRotation = OriginalRotation;
 	/* Instead of using EventTick, start this timer for smooth rotation. */
 	GetWorld()->GetTimerManager().SetTimer(DistractionTimer, this, &ThisClass::OrientGuardHandle, GetWorld()->GetDeltaSeconds(), true);
@@ -120,7 +122,7 @@ void AP10AIGuard::ResetRotationHandle()
 void AP10AIGuard::ChangeGuardState(const EP10AIGuardState NewState)
 {
 	if (GuardState == NewState) return;
-	
+
 	GuardState = NewState;
 	OnStatusChanged.Broadcast(GuardState);
 	OnRep_GuardState();
@@ -133,7 +135,7 @@ void AP10AIGuard::OnRep_GuardState()
 
 void AP10AIGuard::MoveToTarget()
 {
-	if (!bPatrol || Targets.IsEmpty()) return;	
+	if (!bPatrol || Targets.IsEmpty()) return;
 	AAIController* AIController = Cast<AAIController>(Controller);
 	if (!AIController) return;
 
@@ -144,13 +146,13 @@ void AP10AIGuard::MoveToTarget()
 		NextElement = (NextElement + 1) % Targets.Num();
 	}
 	const AActor* NextGoal = Targets[NextElement];
-	CurrentTargetsElement = NextElement;
+	CurrentTargetsElement  = NextElement;
 
 	FAIMoveRequest Request;
 	Request.SetGoalActor(NextGoal);
 	Request.SetAcceptanceRadius(50.f);
 	Request.SetUsePathfinding(true);
 	Request.SetAllowPartialPath(true);
-	
+
 	AIController->MoveTo(Request);
 }
