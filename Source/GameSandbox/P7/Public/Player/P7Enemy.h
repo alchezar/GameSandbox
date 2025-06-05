@@ -11,7 +11,9 @@
 class AP7Soul;
 class AAIController;
 class UP7HealthBarComponent;
+#if 0
 class UPawnSensingComponent;
+#endif
 
 UCLASS()
 class GAMESANDBOX_API AP7Enemy : public AP7BaseCharacter
@@ -52,9 +54,11 @@ private:
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
-	UP7HealthBarComponent* HealthBarComponent;	
+	UP7HealthBarComponent* HealthBarComponent;
+#if 0
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	UPawnSensingComponent* PawnSensing;
+#endif
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Component")
 	TSubclassOf<AP7Soul> SoulClass;
 	UPROPERTY(EditDefaultsOnly, Category = "C++ | Weapon")

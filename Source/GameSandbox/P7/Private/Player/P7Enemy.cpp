@@ -7,7 +7,6 @@
 #include "P7/Public/Component/P7AttributeComponent.h"
 #include "P7/Public/Item/Weapon/P7Weapon.h"
 #include "P7/Public/Widget/Component/P7HealthBarComponent.h"
-#include "Perception/PawnSensingComponent.h"
 #include "P7/Public/Item/P7Soul.h"
 
 AP7Enemy::AP7Enemy()
@@ -18,18 +17,22 @@ AP7Enemy::AP7Enemy()
 	GetMesh()->SetCollisionResponseToChannel(ECC_Camera, ECR_Ignore);
 	HealthBarComponent = CreateDefaultSubobject<UP7HealthBarComponent>("HealthBarWidgetComponent");
 	HealthBarComponent->SetupAttachment(RootComponent);
+#if 0
 	PawnSensing = CreateDefaultSubobject<UPawnSensingComponent>("PawnSensingComponent");
 	PawnSensing->SetPeripheralVisionAngle(45.f);
 	PawnSensing->SightRadius = 4000.f;
+#endif
 }
 
 void AP7Enemy::BeginPlay()
 {
 	Super::BeginPlay();
 	check(HealthBarComponent);
-	check(PawnSensing);
 	check(SoulClass);
+#if 0
+	check(PawnSensing);
 	PawnSensing->OnSeePawn.AddDynamic(this, &ThisClass::OnSeePawnHandle);
+#endif
 	InitializeEnemy();
 }
 
