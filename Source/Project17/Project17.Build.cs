@@ -18,5 +18,7 @@ public class Project17 : ModuleRules
 			"Slate",
 			"SlateCore"
 		});
+
+		PublicIncludePaths.Add("Project17");
 	}
 }
