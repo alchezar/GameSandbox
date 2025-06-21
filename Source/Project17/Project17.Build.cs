@@ -9,6 +9,8 @@ public class Project17 : ModuleRules
 		PublicDependencyModuleNames.AddRange(new[]
 		{
 			"Core",
+			"GameplayTags",
+			"EnhancedInput"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]

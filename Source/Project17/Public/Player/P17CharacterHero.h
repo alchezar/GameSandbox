@@ -6,6 +6,8 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterHero.generated.h"
 
+struct FInputActionValue;
+class UP17DataAsset_InputConfig;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -21,8 +23,17 @@ public:
 	AP17CharacterHero();
 
 protected:
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+protected:
+	void ToggleUseControllerRotation(const bool bStart);
+	void OnMoveCallback(const FInputActionValue& InputActionValue);
+	void OnLookCallback(const FInputActionValue& InputActionValue);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -32,4 +43,7 @@ protected:
 	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
+	TObjectPtr<UP17DataAsset_InputConfig> InputConfig = nullptr;
 };
