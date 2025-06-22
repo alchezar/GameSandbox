@@ -3,11 +3,15 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "P17CharacterBase.generated.h"
 
+class UP17AttributeSet;
+class UP17AbilitySystemComponent;
+
 UCLASS()
-class PROJECT17_API AP17CharacterBase : public ACharacter
+class PROJECT17_API AP17CharacterBase : public ACharacter, public IAbilitySystemInterface
 {
 	GENERATED_BODY()
 
@@ -17,6 +21,31 @@ class PROJECT17_API AP17CharacterBase : public ACharacter
 public:
 	AP17CharacterBase();
 
+	/// @par AActor interface
 protected:
 	virtual void BeginPlay() override;
+
+	/// @par APawn interface
+public:
+	virtual void PossessedBy(AController* NewController) override;
+
+	/// @par IAbilitySystemInterface
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
+	_NODISCARD
+	UP17AttributeSet* GetAttributeSet() const { return AttributeSet; };
+
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
+protected:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17AbilitySystemComponent> AbilitySystemComponent = nullptr;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17AttributeSet> AttributeSet = nullptr;
 };

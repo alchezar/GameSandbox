@@ -10,7 +10,9 @@ public class Project17 : ModuleRules
 		{
 			"Core",
 			"GameplayTags",
-			"EnhancedInput"
+			"EnhancedInput",
+			"GameplayAbilities",
+			"GameplayTasks",
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]

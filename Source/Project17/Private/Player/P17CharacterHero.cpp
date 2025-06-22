@@ -4,11 +4,14 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "Project17.h"
+#include "AbilitySystem/P17AbilitySystemComponent.h"
+#include "AbilitySystem/P17AttributeSet.h"
 #include "Camera/CameraComponent.h"
 #include "Component/Input/P17InputComponent.h"
 #include "Data/P17DataAsset_InputConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Util/P17DebugHelper.h"
 #include "Util/P17GameplayTags.h"
 
 AP17CharacterHero::AP17CharacterHero()
@@ -62,6 +65,23 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
 		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Jump, ETriggerEvent::Started, this, &Super::Jump);
 	}
+}
+
+void AP17CharacterHero::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+
+	WARN_RETURN_IF(!AbilitySystemComponent || !AttributeSet,)
+	P17::Debug::Print(FString::Printf(L"---\n"
+		"AbilitySystemComponent Valid!\n"
+		"Owner: %s\n"
+		"Avatar: %s\n"
+		"---\n"
+		"AttributeSet Valid!\n"
+		"Name: %s",
+		*AbilitySystemComponent->GetOwnerActor()->GetActorLabel(),
+		*AbilitySystemComponent->GetAvatarActor()->GetActorLabel(),
+		*AttributeSet->GetName()));
 }
 
 void AP17CharacterHero::OnConstruction(const FTransform& Transform)
