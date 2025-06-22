@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/P17AnimInstance.h"
+#include "Player/AnimInstance/P17AnimInstance.h"
 
 #include "Project17.h"
 #include "GameFramework/Character.h"
@@ -11,9 +11,9 @@ void UP17AnimInstance::NativeInitializeAnimation()
 	Super::NativeInitializeAnimation();
 
 	Owner = Cast<ACharacter>(TryGetPawnOwner());
-	WARN_RETURN_IF(!Owner,)
+	RETURN_IF(!Owner,)
 	Movement = Owner->GetCharacterMovement();
-	WARN_RETURN_IF(!Movement,)
+	RETURN_IF(!Movement,)
 }
 
 void UP17AnimInstance::NativeUpdateAnimation(const float DeltaSeconds)

@@ -9,13 +9,10 @@
 #include "Data/P17DataAsset_InputConfig.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "Util/P17DebugHelper.h"
 #include "Util/P17GameplayTags.h"
 
 AP17CharacterHero::AP17CharacterHero()
 {
-	P17::Debug::Print("Working!");
-
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
@@ -63,6 +60,7 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// I don't get it why we need custom input component. To have a worse interface?
 		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Move, ETriggerEvent::Triggered, this, &ThisClass::OnMoveCallback);
 		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
+		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Jump, ETriggerEvent::Started, this, &Super::Jump);
 	}
 }
 

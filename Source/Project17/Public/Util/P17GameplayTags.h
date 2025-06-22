@@ -11,4 +11,5 @@ namespace P17::Tags
 	/// ------------------------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Move)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Look)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Jump)
 }
