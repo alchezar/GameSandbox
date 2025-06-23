@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "P17CharacterBase.generated.h"
 
+class UP17Data_StartupBase;
 class UP17AttributeSet;
 class UP17AbilitySystemComponent;
 
@@ -38,6 +39,8 @@ public:
 	/// ------------------------------------------------------------------------
 public:
 	_NODISCARD
+	UP17AbilitySystemComponent* GetNewAbilitySystemComponent() const { return AbilitySystemComponent; };
+	_NODISCARD
 	UP17AttributeSet* GetAttributeSet() const { return AttributeSet; };
 
 	/// ------------------------------------------------------------------------
@@ -48,4 +51,7 @@ protected:
 	TObjectPtr<UP17AbilitySystemComponent> AbilitySystemComponent = nullptr;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP17AttributeSet> AttributeSet = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
+	TSoftObjectPtr<UP17Data_StartupBase> StartupData = nullptr;
 };

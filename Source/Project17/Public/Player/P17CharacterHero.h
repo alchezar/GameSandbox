@@ -7,7 +7,7 @@
 #include "P17CharacterHero.generated.h"
 
 struct FInputActionValue;
-class UP17DataAsset_InputConfig;
+class UP17Data_InputConfig;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -50,5 +50,5 @@ protected:
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
-	TObjectPtr<UP17DataAsset_InputConfig> InputConfig = nullptr;
+	TObjectPtr<UP17Data_InputConfig> InputConfig = nullptr;
 };

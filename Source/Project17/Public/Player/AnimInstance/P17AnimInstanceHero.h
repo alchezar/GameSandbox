@@ -32,6 +32,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Threshold")
 	float FallThreshold = 100.f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Relax")
+	bool bCanRelax = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Relax")
+	float IdleElapsed = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Relax")
+	float RelaxThreshold = 5.f;
+
 private:
 	UPROPERTY()
 	TObjectPtr<AP17CharacterHero> OwnerHero = nullptr;

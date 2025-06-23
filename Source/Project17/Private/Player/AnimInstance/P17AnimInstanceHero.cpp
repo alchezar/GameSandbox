@@ -22,4 +22,15 @@ void UP17AnimInstanceHero::NativeThreadSafeUpdateAnimation(const float DeltaSeco
 	bInAir = Movement->IsFalling();
 	bCrouch = Owner->bIsCrouched;
 	bMoving = Speed > MoveThreshold;
+
+	if (bAcceleration)
+	{
+		IdleElapsed = 0.f;
+		bCanRelax = false;
+	}
+	else
+	{
+		IdleElapsed += DeltaSeconds;
+		bCanRelax = IdleElapsed >= MoveThreshold;
+	}
 }

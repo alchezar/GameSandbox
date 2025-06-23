@@ -20,6 +20,7 @@ void AP17CharacterBase::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 
+	WARN_RETURN_IF(StartupData.IsNull(),);
 	WARN_RETURN_IF(!AbilitySystemComponent,);
 	AbilitySystemComponent->InitAbilityActorInfo(this, this);
 }
