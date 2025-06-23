@@ -5,6 +5,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Project17.h"
 #include "Camera/CameraComponent.h"
+#include "Component/Combat/P17CombatHeroComponent.h"
 #include "Component/Input/P17InputComponent.h"
 #include "Data/P17Data_InputConfig.h"
 #include "Data/P17Data_StartupBase.h"
@@ -35,6 +36,8 @@ AP17CharacterHero::AP17CharacterHero()
 		CharMove->MaxWalkSpeed = 400.f;
 		CharMove->BrakingDecelerationWalking = 2000.f;
 	}
+
+	CombatComponent = CreateDefaultSubobject<UP17CombatHeroComponent>("HeroCombatComponent");
 }
 
 void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -49,7 +52,7 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		auto* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(LocalPlayer);
 		WARN_RETURN_IF(!Subsystem,)
 		WARN_RETURN_IF(!InputConfig,)
-		Subsystem->AddMappingContext(InputConfig->GetInputMappingContext(), 0);
+		Subsystem->AddMappingContext(InputConfig->DefaultContext, 0);
 	}
 
 	UP17InputComponent* MyInputComponent = Cast<UP17InputComponent>(PlayerInputComponent);
@@ -72,7 +75,7 @@ void AP17CharacterHero::PossessedBy(AController* NewController)
 	WARN_RETURN_IF(StartupData.IsNull(),)
 	UP17Data_StartupBase* LoadedData = StartupData.LoadSynchronous();
 	WARN_RETURN_IF(!LoadedData,)
-	LoadedData->GiveToAbilitySystemComponent(GetNewAbilitySystemComponent());
+	LoadedData->GiveToAbilitySystemComponent(GetProjectAbilitySystemComponent());
 }
 
 void AP17CharacterHero::OnConstruction(const FTransform& Transform)

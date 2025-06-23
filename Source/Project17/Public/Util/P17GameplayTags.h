@@ -6,10 +6,13 @@
 
 namespace P17::Tags
 {
-	/// ------------------------------------------------------------------------
-	/// @name Input tags
-	/// ------------------------------------------------------------------------
+	/// @par Input tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Move)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Look)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Jump)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Equip)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Unequip)
+
+	/// @par Player tags.
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_Axe)
 }

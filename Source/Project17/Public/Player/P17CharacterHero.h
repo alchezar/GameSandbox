@@ -6,6 +6,7 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterHero.generated.h"
 
+class UP17CombatHeroComponent;
 struct FInputActionValue;
 class UP17Data_InputConfig;
 class USpringArmComponent;
@@ -35,6 +36,10 @@ protected:
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
+public:
+	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
+	UP17CombatHeroComponent* GetHeroComponent() const { return CombatComponent; };
+
 protected:
 	void ToggleUseControllerRotation(const bool bStart);
 	void OnMoveCallback(const FInputActionValue& InputActionValue);
@@ -48,6 +53,8 @@ protected:
 	TObjectPtr<USpringArmComponent> CameraBoom = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17CombatHeroComponent> CombatComponent = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
 	TObjectPtr<UP17Data_InputConfig> InputConfig = nullptr;

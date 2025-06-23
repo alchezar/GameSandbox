@@ -6,6 +6,9 @@
 #include "Abilities/GameplayAbility.h"
 #include "P17GameplayAbility.generated.h"
 
+class UP17AbilitySystemComponent;
+class UP17CombatPawnComponent;
+
 UENUM(BlueprintType)
 enum class EP17AbilityActivationPolicy : uint8
 {
@@ -25,6 +28,15 @@ public:
 	/// @par UGameplayAbility interface.
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	UP17CombatPawnComponent* GetCombatPawnComponentFromActorInfo() const;
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	UP17AbilitySystemComponent* GetProjectAbilitySystemComponentFromActorInfo() const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

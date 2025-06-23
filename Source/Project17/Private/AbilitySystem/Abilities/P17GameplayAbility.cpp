@@ -4,6 +4,8 @@
 
 #include "AbilitySystemComponent.h"
 #include "Project17.h"
+#include "AbilitySystem/P17AbilitySystemComponent.h"
+#include "Component/Combat/P17CombatPawnComponent.h"
 
 void UP17GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -27,4 +29,14 @@ void UP17GameplayAbility::EndAbility(const FGameplayAbilitySpecHandle Handle, co
 	{
 		ActorInfo->AbilitySystemComponent->ClearAbility(Handle);
 	}
+}
+
+UP17CombatPawnComponent* UP17GameplayAbility::GetCombatPawnComponentFromActorInfo() const
+{
+	return GetAvatarActorFromActorInfo()->FindComponentByClass<UP17CombatPawnComponent>();
+}
+
+UP17AbilitySystemComponent* UP17GameplayAbility::GetProjectAbilitySystemComponentFromActorInfo() const
+{
+	return Cast<UP17AbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent);
 }

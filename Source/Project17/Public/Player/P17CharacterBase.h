@@ -39,7 +39,7 @@ public:
 	/// ------------------------------------------------------------------------
 public:
 	_NODISCARD
-	UP17AbilitySystemComponent* GetNewAbilitySystemComponent() const { return AbilitySystemComponent; };
+	UP17AbilitySystemComponent* GetProjectAbilitySystemComponent() const { return AbilitySystemComponent; };
 	_NODISCARD
 	UP17AttributeSet* GetAttributeSet() const { return AttributeSet; };
 
