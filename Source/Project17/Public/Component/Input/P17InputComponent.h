@@ -21,14 +21,17 @@ class PROJECT17_API UP17InputComponent : public UEnhancedInputComponent
 	/// ------------------------------------------------------------------------
 public:
 	template <typename UserObject, typename CallbackFunc>
-	void BindNativeInputFunction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, ETriggerEvent InTriggerEvent, UserObject* Context, CallbackFunc Callback);
+	void BindNativeInputAction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, ETriggerEvent InTriggerEvent, UserObject* Context, CallbackFunc Callback);
 
 	template <typename UserObject, typename CallbackFunc>
-	void BindAbilityInputFunction(const UP17Data_InputConfig* InInputConfig, UserObject* Context, CallbackFunc PressedCallback, CallbackFunc ReleasedCallback);
+	void BindNativeInputAction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, UserObject* Context, CallbackFunc Callback);
+
+	template <typename UserObject, typename CallbackFunc>
+	void BindAbilityInputAction(const UP17Data_InputConfig* InInputConfig, UserObject* Context, CallbackFunc PressedCallback, CallbackFunc ReleasedCallback);
 };
 
 template <typename UserObject, typename CallbackFunc>
-void UP17InputComponent::BindNativeInputFunction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, ETriggerEvent InTriggerEvent, UserObject* Context, CallbackFunc Callback)
+void UP17InputComponent::BindNativeInputAction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, ETriggerEvent InTriggerEvent, UserObject* Context, CallbackFunc Callback)
 {
 	WARN_RETURN_IF(!InInputConfig,);
 	UInputAction* InputAction = InInputConfig->FindNativeInputAction(InInputTag);
@@ -38,7 +41,19 @@ void UP17InputComponent::BindNativeInputFunction(const UP17Data_InputConfig* InI
 }
 
 template <typename UserObject, typename CallbackFunc>
-void UP17InputComponent::BindAbilityInputFunction(const UP17Data_InputConfig* InInputConfig, UserObject* Context, CallbackFunc PressedCallback, CallbackFunc ReleasedCallback)
+void UP17InputComponent::BindNativeInputAction(const UP17Data_InputConfig* InInputConfig, const FGameplayTag& InInputTag, UserObject* Context, CallbackFunc Callback)
+{
+	WARN_RETURN_IF(!InInputConfig,);
+	UInputAction* InputAction = InInputConfig->FindNativeInputAction(InInputTag);
+	WARN_RETURN_IF(!InputAction,);
+
+	BindAction(InputAction, ETriggerEvent::Started, Context, Callback, true);
+	BindAction(InputAction, ETriggerEvent::Completed, Context, Callback, false);
+	BindAction(InputAction, ETriggerEvent::Canceled, Context, Callback, false);
+}
+
+template <typename UserObject, typename CallbackFunc>
+void UP17InputComponent::BindAbilityInputAction(const UP17Data_InputConfig* InInputConfig, UserObject* Context, CallbackFunc PressedCallback, CallbackFunc ReleasedCallback)
 {
 	WARN_RETURN_IF(!InInputConfig,);
 

@@ -4,6 +4,7 @@
 
 #include "EnhancedInputSubsystems.h"
 #include "Project17.h"
+#include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
 #include "Component/Combat/P17CombatHeroComponent.h"
 #include "Component/Input/P17InputComponent.h"
@@ -58,13 +59,12 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 	UP17InputComponent* MyInputComponent = Cast<UP17InputComponent>(PlayerInputComponent);
 	WARN_UNLESS(PlayerController)
 	{
-		MyInputComponent->BindAction(InputConfig->FindNativeInputAction(P17::Tags::Input_Move), ETriggerEvent::Started, this, &ThisClass::ToggleUseControllerRotation, true);
-		MyInputComponent->BindAction(InputConfig->FindNativeInputAction(P17::Tags::Input_Move), ETriggerEvent::Completed, this, &ThisClass::ToggleUseControllerRotation, false);
-		MyInputComponent->BindAction(InputConfig->FindNativeInputAction(P17::Tags::Input_Move), ETriggerEvent::Canceled, this, &ThisClass::ToggleUseControllerRotation, false);
-		// I don't get it why we need custom input component. To have a worse interface?
-		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Move, ETriggerEvent::Triggered, this, &ThisClass::OnMoveCallback);
-		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
-		MyInputComponent->BindNativeInputFunction(InputConfig, P17::Tags::Input_Jump, ETriggerEvent::Started, this, &Super::Jump);
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, this, &ThisClass::ToggleUseControllerRotation);
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, ETriggerEvent::Triggered, this, &ThisClass::OnMoveCallback);
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Jump, ETriggerEvent::Started, this, &Super::Jump);
+
+		MyInputComponent->BindAbilityInputAction(InputConfig, this, &ThisClass::OnAbilityInputPressedCallback, &ThisClass::OnAbilityInputReleasedCallback);
 	}
 }
 
@@ -139,4 +139,14 @@ void AP17CharacterHero::OnLookCallback(const FInputActionValue& InputActionValue
 
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AP17CharacterHero::OnAbilityInputPressedCallback(const FGameplayTag InInputTag)
+{
+	AbilitySystemComponent->OnAbilityInputPressed(InInputTag);
+}
+
+void AP17CharacterHero::OnAbilityInputReleasedCallback(const FGameplayTag InInputTag)
+{
+	AbilitySystemComponent->OnAbilityInputReleased(InInputTag);
 }

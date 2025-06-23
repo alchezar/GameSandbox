@@ -15,6 +15,7 @@ class PROJECT17_API UP17AbilitySystemComponent : public UAbilitySystemComponent
 public:
 	UP17AbilitySystemComponent();
 
-protected:
-	virtual void BeginPlay() override;
+public:
+	void OnAbilityInputPressed(const FGameplayTag& InInputTag);
+	void OnAbilityInputReleased(const FGameplayTag& InInputTag);
 };

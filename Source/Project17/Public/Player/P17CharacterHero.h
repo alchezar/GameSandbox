@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayTagContainer.h"
 #include "P17CharacterBase.h"
 #include "P17CharacterHero.generated.h"
 
@@ -44,6 +45,8 @@ protected:
 	void ToggleUseControllerRotation(const bool bStart);
 	void OnMoveCallback(const FInputActionValue& InputActionValue);
 	void OnLookCallback(const FInputActionValue& InputActionValue);
+	void OnAbilityInputPressedCallback(const FGameplayTag InInputTag);
+	void OnAbilityInputReleasedCallback(const FGameplayTag InInputTag);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

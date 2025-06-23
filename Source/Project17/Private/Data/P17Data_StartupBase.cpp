@@ -20,7 +20,6 @@ void UP17Data_StartupBase::GrandAbilities(const TArray<TSubclassOf<UP17GameplayA
 	for (const TSubclassOf<UP17GameplayAbility>& Ability : InAbilitiesToGive)
 	{
 		CONTINUE_IF(!Ability)
-
 		InASC->GiveAbility(FGameplayAbilitySpec {Ability, InLevel, INDEX_NONE, InASC->GetAvatarActor()});
 	}
 }
