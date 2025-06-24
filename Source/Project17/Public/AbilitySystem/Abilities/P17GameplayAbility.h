@@ -36,7 +36,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17CombatPawnComponent* GetCombatPawnComponentFromActorInfo() const;
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
-	UP17AbilitySystemComponent* GetProjectAbilitySystemComponentFromActorInfo() const;
+	UP17AbilitySystemComponent* GetHeroAbilitySystemComponentFromActorInfo() const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

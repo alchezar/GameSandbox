@@ -6,11 +6,6 @@
 #include "AbilitySystem/Abilities/P17GameplayAbility.h"
 #include "Project17/Project17.h"
 
-bool FP17HeroAbilitySet::IsValid() const
-{
-	return Tag.IsValid() && Ability;
-}
-
 void UP17Data_StartupHero::GiveToAbilitySystemComponent(UP17AbilitySystemComponent* InASC, const int32 InLevel)
 {
 	Super::GiveToAbilitySystemComponent(InASC, InLevel);
@@ -22,7 +17,7 @@ void UP17Data_StartupHero::GiveToAbilitySystemComponent(UP17AbilitySystemCompone
 		FGameplayAbilitySpec AbilitySpec {AbilitySet.Ability};
 		AbilitySpec.SourceObject = InASC->GetAvatarActor();
 		AbilitySpec.Level = InLevel;
-		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.Tag);
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
 
 		InASC->GiveAbility(AbilitySpec);
 	}

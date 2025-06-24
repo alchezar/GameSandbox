@@ -3,6 +3,7 @@
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 
 #include "Project17.h"
+#include "AbilitySystem/Abilities/P17GameplayAbility.h"
 
 UP17AbilitySystemComponent::UP17AbilitySystemComponent()
 {
@@ -25,3 +26,32 @@ void UP17AbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInp
 
 void UP17AbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InInputTag)
 {}
+
+void UP17AbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel)
+{
+	RETURN_IF(InWeaponAbilities.IsEmpty(),)
+
+	for (const FP17HeroAbilitySet& AbilitySet : InWeaponAbilities)
+	{
+		CONTINUE_IF(!AbilitySet.IsValid())
+
+		FGameplayAbilitySpec AbilitySpec {AbilitySet.Ability, InLevel};
+		AbilitySpec.SourceObject = GetAvatarActor();
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
+
+		OutGrantedAbilitySpecHandles.Add(GiveAbility(AbilitySpec));
+	}
+}
+
+void UP17AbilitySystemComponent::RemoveGrantedHeroWeaponAbilities(TArray<FGameplayAbilitySpecHandle>& InGrantedAbilitySpecHandles)
+{
+	RETURN_IF(InGrantedAbilitySpecHandles.IsEmpty(),)
+
+	for (const FGameplayAbilitySpecHandle& AbilitySpec : InGrantedAbilitySpecHandles)
+	{
+		CONTINUE_IF(!AbilitySpec.IsValid())
+		ClearAbility(AbilitySpec);
+	}
+
+	InGrantedAbilitySpecHandles.Empty();
+}
