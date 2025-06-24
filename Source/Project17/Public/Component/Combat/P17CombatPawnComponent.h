@@ -25,11 +25,14 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Combat")
 	AP17WeaponBase* GetEquippedWeapon() const;
 
+	UFUNCTION(BlueprintCallable, Category = "C++ | Weapon")
+	void SetEquippedWeaponTag(const FGameplayTag InWeaponTag);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
 public:
-	UPROPERTY(BlueprintReadWrite, Category = "C++ | Combat")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "C++ | Combat")
 	FGameplayTag EquippedWeaponTag;
 
 private:

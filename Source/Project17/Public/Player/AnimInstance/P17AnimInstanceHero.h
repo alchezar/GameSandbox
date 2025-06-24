@@ -39,7 +39,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Relax")
 	float RelaxThreshold = 5.f;
 
-private:
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AP17CharacterHero> OwnerHero = nullptr;
 };

@@ -34,3 +34,8 @@ AP17WeaponBase* UP17CombatPawnComponent::GetEquippedWeapon() const
 
 	return GetCarriedWeaponBy(EquippedWeaponTag);
 }
+
+void UP17CombatPawnComponent::SetEquippedWeaponTag(const FGameplayTag InWeaponTag)
+{
+	EquippedWeaponTag = InWeaponTag;
+}

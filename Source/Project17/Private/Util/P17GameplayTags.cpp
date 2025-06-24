@@ -11,4 +11,6 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Unequip, "P17.Input.Unequip")
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_Axe, "P17.Player.Event.Equip.Axe")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
 }
