@@ -2,7 +2,7 @@
 
 #include "Util/P17Types.h"
 
-#include "AbilitySystem/Abilities/P17GameplayAbility.h"
+#include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
 
 bool FP17HeroAbilitySet::IsValid() const
 {

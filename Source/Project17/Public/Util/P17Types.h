@@ -5,8 +5,8 @@
 
 #include "P17Types.generated.h"
 
+class UP17HeroGameplayAbility;
 class UInputMappingContext;
-class UP17GameplayAbility;
 class UP17LinkedAnimLayer;
 
 USTRUCT(BlueprintType)
@@ -17,7 +17,7 @@ struct FP17HeroAbilitySet
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FGameplayTag InputTag = {};
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	TSubclassOf<UP17GameplayAbility> Ability = {};
+	TSubclassOf<UP17HeroGameplayAbility> Ability = {};
 
 public:
 	bool IsValid() const;
