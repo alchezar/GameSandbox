@@ -22,4 +22,6 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
+
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Weapon, "P17.Enemy.Weapon")
 }

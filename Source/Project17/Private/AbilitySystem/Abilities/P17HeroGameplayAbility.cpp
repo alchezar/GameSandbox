@@ -3,8 +3,8 @@
 #include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
 
 #include "Component/Combat/P17CombatHeroComponent.h"
-#include "Player/P17CharacterHero.h"
-#include "Player/P17ControllerHero.h"
+#include "Public/Character/P17CharacterHero.h"
+#include "Public/Controller/P17ControllerHero.h"
 
 AP17CharacterHero* UP17HeroGameplayAbility::GetHeroCharacterFromActorInfo()
 {

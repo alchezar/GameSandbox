@@ -26,4 +26,7 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_Axe)
 
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Status_JumpToFinisher)
+
+	/// @par Enemy tags.
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Weapon)
 }

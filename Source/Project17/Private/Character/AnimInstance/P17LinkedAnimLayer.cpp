@@ -1,8 +1,8 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/AnimInstance/P17LinkedAnimLayer.h"
+#include "Public/Character/AnimInstance/P17LinkedAnimLayer.h"
 
-#include "Player/AnimInstance/P17AnimInstanceHero.h"
+#include "Public/Character/AnimInstance/P17AnimInstanceHero.h"
 
 UP17AnimInstanceHero* UP17LinkedAnimLayer::GetHeroAnimInstance() const
 {

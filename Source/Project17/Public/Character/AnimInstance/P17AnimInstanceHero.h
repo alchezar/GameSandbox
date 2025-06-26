@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Player/AnimInstance/P17AnimInstanceCharacter.h"
+#include "Public/Character/AnimInstance/P17AnimInstanceCharacter.h"
 #include "P17AnimInstanceHero.generated.h"
 
 class AP17CharacterHero;

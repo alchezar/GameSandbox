@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/P17CharacterBase.h"
+#include "Public/Character/P17CharacterBase.h"
 
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
@@ -11,6 +11,10 @@ AP17CharacterBase::AP17CharacterBase()
 	PrimaryActorTick.bCanEverTick = false;
 	PrimaryActorTick.bStartWithTickEnabled = false;
 	GetMesh()->bReceivesDecals = false;
+
+	bUseControllerRotationPitch = false;
+	bUseControllerRotationYaw = false;
+	bUseControllerRotationRoll = false;
 
 	AbilitySystemComponent = CreateDefaultSubobject<UP17AbilitySystemComponent>("AbilitySystemComponent");
 	AttributeSet = CreateDefaultSubobject<UP17AttributeSet>("AttributeSet");

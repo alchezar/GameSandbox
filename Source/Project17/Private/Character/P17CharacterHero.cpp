@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/P17CharacterHero.h"
+#include "Public/Character/P17CharacterHero.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "Project17.h"
@@ -16,10 +16,6 @@
 
 AP17CharacterHero::AP17CharacterHero()
 {
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationYaw = false;
-	bUseControllerRotationRoll = false;
-
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>("SpringArmCameraBoomComponent");
 	CameraBoom->SetupAttachment(GetRootComponent());
 	CameraBoom->TargetArmLength = 200.f;

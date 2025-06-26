@@ -1,10 +1,10 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/AnimInstance/P17AnimInstanceCharacter.h"
+#include "Public/Character/AnimInstance/P17AnimInstanceCharacter.h"
 
 #include "Project17.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Player/P17CharacterBase.h"
+#include "Public/Character/P17CharacterBase.h"
 
 void UP17AnimInstanceCharacter::NativeInitializeAnimation()
 {

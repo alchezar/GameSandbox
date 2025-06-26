@@ -3,7 +3,7 @@
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 
 #include "Project17.h"
-#include "AbilitySystem/Abilities/P17GameplayAbility.h"
+#include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
 
 UP17AbilitySystemComponent::UP17AbilitySystemComponent()
 {

@@ -3,7 +3,7 @@
 #include "Data/P17Data_StartupHero.h"
 
 #include "AbilitySystem/P17AbilitySystemComponent.h"
-#include "AbilitySystem/Abilities/P17GameplayAbility.h"
+#include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
 #include "Project17/Project17.h"
 
 void UP17Data_StartupHero::GiveToAbilitySystemComponent(UP17AbilitySystemComponent* InASC, const int32 InLevel)

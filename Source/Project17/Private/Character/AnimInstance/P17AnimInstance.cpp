@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "Player/AnimInstance/P17AnimInstance.h"
+#include "Public/Character/AnimInstance/P17AnimInstance.h"
 
 #include "Project17.h"
 #include "GameFramework/Character.h"
