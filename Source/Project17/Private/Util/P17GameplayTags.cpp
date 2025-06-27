@@ -23,5 +23,11 @@ namespace P17::Tags
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
 
+	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Light, "P17.Player.SetByCaller.AttackType.Light")
+	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Heavy, "P17.Player.SetByCaller.AttackType.Heavy")
+
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Weapon, "P17.Enemy.Weapon")
+
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Event_Hit_Melee, "P17.Shared.Event.Hit.Melee")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_SetByCaller_Damage_Base, "P17.Shared.SetByCaller.Damage.Base")
 }

@@ -6,7 +6,7 @@
 
 namespace P17::Tags
 {
-	/// @par Input tags
+	/// @par Input tags --------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Move)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Look)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Jump)
@@ -15,7 +15,7 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Attack_Light_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Attack_Heavy_Axe)
 
-	/// @par Player tags.
+	/// @par Player tags -------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Equip_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Unequip_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Attack_Light_Axe)
@@ -26,7 +26,13 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_Axe)
 
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Status_JumpToFinisher)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_SetByCaller_AttackType_Light)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_SetByCaller_AttackType_Heavy)
 
-	/// @par Enemy tags.
+	/// @par Enemy tags --------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Weapon)
+
+	/// @par Shared tags -------------------------------------------------------
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Event_Hit_Melee)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_SetByCaller_Damage_Base)
 }

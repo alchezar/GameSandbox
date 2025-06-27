@@ -26,6 +26,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17CombatHeroComponent* GetHeroCombatComponentFromActorInfo();
 
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	FGameplayEffectSpecHandle MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

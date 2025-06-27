@@ -34,6 +34,11 @@ UAbilitySystemComponent* AP17CharacterBase::GetAbilitySystemComponent() const
 	return AbilitySystemComponent;
 }
 
+UP17CombatPawnComponent* AP17CharacterBase::GetCombatComponent() const
+{
+	return nullptr;
+}
+
 void AP17CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

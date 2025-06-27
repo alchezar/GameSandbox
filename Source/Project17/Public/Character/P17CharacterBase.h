@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
+#include "Interface/P17CombatInterface.h"
 #include "P17CharacterBase.generated.h"
 
 class UP17Data_StartupBase;
@@ -12,7 +13,7 @@ class UP17AttributeSet;
 class UP17AbilitySystemComponent;
 
 UCLASS()
-class PROJECT17_API AP17CharacterBase : public ACharacter, public IAbilitySystemInterface
+class PROJECT17_API AP17CharacterBase : public ACharacter, public IAbilitySystemInterface, public IP17CombatInterface
 {
 	GENERATED_BODY()
 
@@ -22,17 +23,23 @@ class PROJECT17_API AP17CharacterBase : public ACharacter, public IAbilitySystem
 public:
 	AP17CharacterBase();
 
-	/// @par AActor interface
 protected:
+	/// @par AActor interface --------------------------------------------------
 	virtual void BeginPlay() override;
 
-	/// @par APawn interface
 public:
+	/// @par APawn interface ---------------------------------------------------
 	virtual void PossessedBy(AController* NewController) override;
 
-	/// @par IAbilitySystemInterface
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
 public:
+	/// @par IAbilitySystemInterface interface ---------------------------------
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	/// @par IP17CombatInterface interface -------------------------------------
+	virtual UP17CombatPawnComponent* GetCombatComponent() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

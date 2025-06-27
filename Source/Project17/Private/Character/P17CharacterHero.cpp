@@ -74,6 +74,11 @@ void AP17CharacterHero::PossessedBy(AController* NewController)
 	LoadedData->GiveToAbilitySystemComponent(GetProjectAbilitySystemComponent());
 }
 
+UP17CombatPawnComponent* AP17CharacterHero::GetCombatComponent() const
+{
+	return GetHeroComponent();
+}
+
 void AP17CharacterHero::OnConstruction(const FTransform& Transform)
 {
 	Super::OnConstruction(Transform);

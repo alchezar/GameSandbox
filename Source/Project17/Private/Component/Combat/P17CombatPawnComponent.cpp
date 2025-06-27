@@ -12,6 +12,9 @@ void UP17CombatPawnComponent::RegisterSpawnedWeapon(const FGameplayTag InWeaponT
 
 	CarriedWeaponMap.Emplace(InWeaponTag, InWeapon);
 
+	InWeapon->OnWeaponHitTarget.BindUObject(this, &ThisClass::OnHitTargetActorCallback);
+	InWeapon->OnWeaponPulledFromTarget.BindUObject(this, &UP17CombatPawnComponent::OnWeaponPulledFromActorCallback);
+
 	if (bRegisterAsEquipped)
 	{
 		EquippedWeaponTag = InWeaponTag;
@@ -38,4 +41,31 @@ AP17WeaponBase* UP17CombatPawnComponent::GetEquippedWeapon() const
 void UP17CombatPawnComponent::SetEquippedWeaponTag(const FGameplayTag InWeaponTag)
 {
 	EquippedWeaponTag = InWeaponTag;
+}
+
+void UP17CombatPawnComponent::ToggleWeaponCollision(const bool bEnable, const EP17ToggleDamageType InToggleDamageType)
+{
+	if (InToggleDamageType == EP17ToggleDamageType::EquippedWeapon)
+	{
+		const AP17WeaponBase* Weapon = GetEquippedWeapon();
+		WARN_RETURN_IF(!Weapon,)
+		Weapon->ToggleCollision(bEnable);
+	}
+
+	if (!bEnable)
+	{
+		OverlappedActors.Empty();
+	}
+
+	// TODO: Handle body collision boxes
+}
+
+void UP17CombatPawnComponent::OnHitTargetActorCallback(AActor* HitActor)
+{
+	// Overloaded by children (<gi> to find them).
+}
+
+void UP17CombatPawnComponent::OnWeaponPulledFromActorCallback(AActor* PulledActor)
+{
+	// Overloaded by children (<gi> to find them).
 }

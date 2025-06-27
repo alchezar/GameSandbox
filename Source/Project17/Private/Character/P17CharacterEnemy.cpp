@@ -38,6 +38,11 @@ void AP17CharacterEnemy::BeginPlay()
 	Super::BeginPlay();
 }
 
+UP17CombatPawnComponent* AP17CharacterEnemy::GetCombatComponent() const
+{
+	return GetEnemyCombatComponent();
+}
+
 void AP17CharacterEnemy::InitEnemyStartupData() const
 {
 	UP17Data_StartupBase* LoadedData = StartupData.Get();

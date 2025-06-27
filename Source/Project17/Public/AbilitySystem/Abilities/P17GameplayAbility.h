@@ -25,7 +25,7 @@ class PROJECT17_API UP17GameplayAbility : public UGameplayAbility
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
 public:
-	/// @par UGameplayAbility interface.
+	/// @par UGameplayAbility interface ----------------------------------------
 	virtual void OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec) override;
 	virtual void EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled) override;
 

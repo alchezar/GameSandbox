@@ -2,12 +2,27 @@
 
 #pragma once
 #include "GameplayTagContainer.h"
+#include "ScalableFloat.h"
 
 #include "P17Types.generated.h"
 
 class UP17HeroGameplayAbility;
 class UInputMappingContext;
 class UP17LinkedAnimLayer;
+
+UENUM()
+enum class EP17ConfirmTypePin : uint8
+{
+	Yes,
+	No
+};
+
+UENUM()
+enum class EP17ValidTypePin : uint8
+{
+	Valid,
+	Invalid
+};
 
 USTRUCT(BlueprintType)
 struct FP17HeroAbilitySet
@@ -31,9 +46,12 @@ struct FP17WeaponData
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSubclassOf<UP17LinkedAnimLayer> AnimLayer = nullptr;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly);
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<UInputMappingContext> Context = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FP17HeroAbilitySet> Abilities = {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FScalableFloat BaseDamage = {};
 };

@@ -24,15 +24,21 @@ class PROJECT17_API AP17CharacterHero : public AP17CharacterBase
 public:
 	AP17CharacterHero();
 
-	/// @par AActor interface
 protected:
+	/// @par AActor interface --------------------------------------------------
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
 
-	/// @par APawn interface
-protected:
+	/// @par APawn interface ---------------------------------------------------
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 	virtual void PossessedBy(AController* NewController) override;
+
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
+public:
+	/// @par IP17CombatInterface -----------------------------------------------
+	virtual UP17CombatPawnComponent* GetCombatComponent() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
+#include "Interface/P17CombatInterface.h"
 
 UP17AbilitySystemComponent* UP17FunctionLibrary::NativeGetASCFromActor(AActor* InActor)
 {
@@ -21,6 +22,16 @@ bool UP17FunctionLibrary::NativeGetActorHasTag(AActor* InActor, const FGameplayT
 	WARN_RETURN_IF(!ASC, false)
 
 	return ASC->HasMatchingGameplayTag(InTag);
+}
+
+UP17CombatPawnComponent* UP17FunctionLibrary::NativeGetCombatComponentFromActor(AActor* InActor)
+{
+	WARN_RETURN_IF(!InActor, nullptr)
+
+	const TScriptInterface<IP17CombatInterface> CombatInterface = InActor;
+	WARN_RETURN_IF(!CombatInterface, nullptr)
+
+	return CombatInterface->GetCombatComponent();
 }
 
 void UP17FunctionLibrary::AddGameplayTagToActorIfNone(AActor* InActor, const FGameplayTag InTag)
@@ -46,4 +57,11 @@ void UP17FunctionLibrary::BP_GetActorHasTag(AActor* InActor, const FGameplayTag 
 	OutExecs = NativeGetActorHasTag(InActor, InTag)
 		? EP17ConfirmTypePin::Yes
 		: EP17ConfirmTypePin::No;
+}
+
+UP17CombatPawnComponent* UP17FunctionLibrary::BP_GetCombatComponentFromActor(AActor* InActor, EP17ValidTypePin& OutExecs)
+{
+	UP17CombatPawnComponent* CombatComponent = NativeGetCombatComponentFromActor(InActor);
+	OutExecs = CombatComponent ? EP17ValidTypePin::Valid : EP17ValidTypePin::Invalid;
+	return CombatComponent;
 }

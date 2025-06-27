@@ -4,17 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
+#include "P17Types.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "P17FunctionLibrary.generated.h"
 
+class UP17CombatPawnComponent;
 class UP17AbilitySystemComponent;
-
-UENUM()
-enum class EP17ConfirmTypePin : uint8
-{
-	Yes,
-	No
-};
 
 UCLASS()
 class PROJECT17_API UP17FunctionLibrary : public UBlueprintFunctionLibrary
@@ -24,6 +19,7 @@ class PROJECT17_API UP17FunctionLibrary : public UBlueprintFunctionLibrary
 public:
 	static UP17AbilitySystemComponent* NativeGetASCFromActor(AActor* InActor);
 	static bool NativeGetActorHasTag(AActor* InActor, const FGameplayTag InTag);
+	static UP17CombatPawnComponent* NativeGetCombatComponentFromActor(AActor* InActor);
 
 public:
 	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary")
@@ -32,4 +28,6 @@ public:
 	static void RemoveGameplayTagFromActorIfFound(AActor* InActor, const FGameplayTag InTag);
 	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary", meta = (DisplayName = "GetActorHasTag", ExpandEnumAsExecs = "OutExecs"))
 	static void BP_GetActorHasTag(AActor* InActor, const FGameplayTag InTag, EP17ConfirmTypePin& OutExecs);
+	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary", meta = (DisplayName = "GetCombatComponentFromActor", ExpandEnumAsExecs = "OutExecs"))
+	static UP17CombatPawnComponent* BP_GetCombatComponentFromActor(AActor* InActor, EP17ValidTypePin& OutExecs);
 };

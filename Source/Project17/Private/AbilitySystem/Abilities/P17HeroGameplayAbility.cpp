@@ -2,9 +2,11 @@
 
 #include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
 
+#include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Component/Combat/P17CombatHeroComponent.h"
 #include "Public/Character/P17CharacterHero.h"
 #include "Public/Controller/P17ControllerHero.h"
+#include "Util/P17GameplayTags.h"
 
 AP17CharacterHero* UP17HeroGameplayAbility::GetHeroCharacterFromActorInfo()
 {
@@ -34,4 +36,27 @@ UP17CombatHeroComponent* UP17HeroGameplayAbility::GetHeroCombatComponentFromActo
 	}
 
 	return CachedHeroCombatComponent.IsValid() ? CachedHeroCombatComponent.Get() : nullptr;
+}
+
+FGameplayEffectSpecHandle UP17HeroGameplayAbility::MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount)
+{
+	WARN_RETURN_IF(!InEffectClass, {})
+
+	AActor* Avatar = GetAvatarActorFromActorInfo();
+	const UP17AbilitySystemComponent* HeroASC = GetHeroAbilitySystemComponentFromActorInfo();
+	WARN_RETURN_IF(!Avatar || !HeroASC, {})
+
+	FGameplayEffectContextHandle Context = HeroASC->MakeEffectContext();
+	Context.SetAbility(this);
+	Context.AddSourceObject(Avatar);
+	Context.AddInstigator(Avatar, Avatar);
+
+	FGameplayEffectSpecHandle ResultSpec = HeroASC->MakeOutgoingSpec(InEffectClass, GetAbilityLevel(), Context);
+	ResultSpec.Data->SetSetByCallerMagnitude(P17::Tags::Shared_SetByCaller_Damage_Base, InDamage);
+	if (InAttackTag.IsValid())
+	{
+		ResultSpec.Data->SetSetByCallerMagnitude(InAttackTag, InComboCount);
+	}
+
+	return ResultSpec;
 }

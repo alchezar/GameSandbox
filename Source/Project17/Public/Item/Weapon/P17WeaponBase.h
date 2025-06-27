@@ -8,6 +8,8 @@
 
 class UBoxComponent;
 
+DECLARE_DELEGATE_OneParam(FOnTargetHit, AActor*);
+
 UCLASS()
 class PROJECT17_API AP17WeaponBase : public AActor
 {
@@ -26,9 +28,21 @@ public:
 	_NODISCARD
 	UBoxComponent* GetBoxComponent() const { return WeaponCollisionBox; };
 
+	void ToggleCollision(const bool bEnable) const;
+
+protected:
+	UFUNCTION()
+	virtual void OnCollisionBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	virtual void OnCollisionEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
+public:
+	FOnTargetHit OnWeaponHitTarget;
+	FOnTargetHit OnWeaponPulledFromTarget;
+
 protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UStaticMeshComponent> WeaponMesh = nullptr;
