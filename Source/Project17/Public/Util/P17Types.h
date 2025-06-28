@@ -24,6 +24,13 @@ enum class EP17ValidTypePin : uint8
 	Invalid
 };
 
+UENUM()
+enum class EP17SuccessTypePin : uint8
+{
+	Successful,
+	Failed
+};
+
 USTRUCT(BlueprintType)
 struct FP17HeroAbilitySet
 {

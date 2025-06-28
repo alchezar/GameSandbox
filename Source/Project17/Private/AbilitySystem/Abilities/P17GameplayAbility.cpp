@@ -2,6 +2,7 @@
 
 #include "AbilitySystem/Abilities/P17GameplayAbility.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
@@ -39,4 +40,19 @@ UP17CombatPawnComponent* UP17GameplayAbility::GetCombatPawnComponentFromActorInf
 UP17AbilitySystemComponent* UP17GameplayAbility::GetHeroAbilitySystemComponentFromActorInfo() const
 {
 	return Cast<UP17AbilitySystemComponent>(CurrentActorInfo->AbilitySystemComponent);
+}
+
+FActiveGameplayEffectHandle UP17GameplayAbility::NativeApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle) const
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InTarget);
+	WARN_RETURN_IF(!TargetASC, {})
+
+	return GetAbilitySystemComponentFromActorInfo()->ApplyGameplayEffectSpecToTarget(*InSpecHandle.Data, TargetASC);
+}
+
+FActiveGameplayEffectHandle UP17GameplayAbility::BP_ApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle, EP17SuccessTypePin& OutExecs)
+{
+	const FActiveGameplayEffectHandle ActiveHandle = NativeApplyEffectSpecHandleToTarget(InTarget, InSpecHandle);
+	OutExecs = ActiveHandle.WasSuccessfullyApplied() ? EP17SuccessTypePin::Successful : EP17SuccessTypePin::Failed;
+	return ActiveHandle;
 }

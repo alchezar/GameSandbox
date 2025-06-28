@@ -15,5 +15,7 @@ class PROJECT17_API UP17ExecCalcDamage : public UGameplayEffectExecutionCalculat
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
 public:
+	UP17ExecCalcDamage();
+
 	virtual void Execute_Implementation(const FGameplayEffectCustomExecutionParameters& ExecutionParams, FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const override;
 };

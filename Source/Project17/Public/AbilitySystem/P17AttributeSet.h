@@ -24,10 +24,12 @@ class PROJECT17_API UP17AttributeSet : public UAttributeSet
 public:
 	UP17AttributeSet();
 
+	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly, Category = "C++ | Attribute | Health")
 	FGameplayAttributeData HealthCurrent = {};
 	ATTRIBUTE_ACCESSORS(HealthCurrent)
@@ -51,4 +53,10 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "C++ | Attribute | Damage")
 	FGameplayAttributeData PowerDefence = {};
 	ATTRIBUTE_ACCESSORS(PowerDefence)
+
+	/// @par Meta attributes ---------------------------------------------------
+
+	UPROPERTY(BlueprintReadOnly, Category = "C++ | Attribute | Damage")
+	FGameplayAttributeData DamageTaken = {};
+	ATTRIBUTE_ACCESSORS(DamageTaken)
 };

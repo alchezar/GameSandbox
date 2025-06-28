@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Util/P17Types.h"
 #include "P17GameplayAbility.generated.h"
 
 class UP17AbilitySystemComponent;
@@ -37,6 +38,11 @@ public:
 	UP17CombatPawnComponent* GetCombatPawnComponentFromActorInfo() const;
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17AbilitySystemComponent* GetHeroAbilitySystemComponentFromActorInfo() const;
+
+protected:
+	FActiveGameplayEffectHandle NativeApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle) const;
+	UFUNCTION(BlueprintCallable, Category = "C++ | Ability", meta = (DisplayName = "ApplyEffectSpecHandleToTarget", ExpandEnumAsExecs = "OutExecs"))
+	FActiveGameplayEffectHandle BP_ApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle, EP17SuccessTypePin& OutExecs);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
