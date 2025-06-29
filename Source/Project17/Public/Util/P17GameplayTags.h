@@ -39,7 +39,9 @@ namespace P17::Tags
 
 	/// @par Shared tags -------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Ability_Hit_React)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Ability_Death)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Event_Hit_Melee)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Event_Hit_React)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_SetByCaller_Damage_Base)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Status_Dead)
 }

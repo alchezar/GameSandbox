@@ -44,6 +44,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Ability", meta = (DisplayName = "ApplyEffectSpecHandleToTarget", ExpandEnumAsExecs = "OutExecs"))
 	FActiveGameplayEffectHandle BP_ApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle, EP17SuccessTypePin& OutExecs);
 
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	static FName GetMontageSectionAt(const UAnimMontage* InMontage, const int32 InIndex);
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	static FName GetMontageSectionRandom(const UAnimMontage* InMontage);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

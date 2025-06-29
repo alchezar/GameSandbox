@@ -56,3 +56,23 @@ FActiveGameplayEffectHandle UP17GameplayAbility::BP_ApplyEffectSpecHandleToTarge
 	OutExecs = ActiveHandle.WasSuccessfullyApplied() ? EP17SuccessTypePin::Successful : EP17SuccessTypePin::Failed;
 	return ActiveHandle;
 }
+
+FName UP17GameplayAbility::GetMontageSectionAt(const UAnimMontage* InMontage, const int32 InIndex)
+{
+	RETURN_IF(!InMontage || InIndex < 0, NAME_None)
+
+	const int32 SectionsNum = InMontage->GetNumSections();
+	const int32 Index = InIndex % SectionsNum;
+
+	return InMontage->GetSectionName(Index);
+}
+
+FName UP17GameplayAbility::GetMontageSectionRandom(const UAnimMontage* InMontage)
+{
+	RETURN_IF(!InMontage, NAME_None)
+
+	const int32 Last = InMontage->GetNumSections() - 1;
+	const int32 Index = FMath::RandRange(0, Last);
+
+	return InMontage->GetSectionName(Index);
+}

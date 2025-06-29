@@ -3,6 +3,8 @@
 #include "AbilitySystem/P17AttributeSet.h"
 
 #include "GameplayEffectExtension.h"
+#include "Util/P17FunctionLibrary.h"
+#include "Util/P17GameplayTags.h"
 
 UP17AttributeSet::UP17AttributeSet()
 {}
@@ -27,6 +29,9 @@ void UP17AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		SetHealthCurrent(NewHealth);
 
 		// TODO: Notify UI
-		// TODO: Handle death
+		if (FMath::IsNearlyZero(NewHealth))
+		{
+			UP17FunctionLibrary::AddGameplayTagToActorIfNone(Data.Target.GetAvatarActor(), P17::Tags::Shared_Status_Dead);
+		}
 	}
 }

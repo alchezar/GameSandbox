@@ -38,7 +38,7 @@ void UP17FunctionLibrary::AddGameplayTagToActorIfNone(AActor* InActor, const FGa
 {
 	UP17AbilitySystemComponent* ASC = NativeGetASCFromActor(InActor);
 	WARN_RETURN_IF(!ASC,)
-	WARN_RETURN_IF(ASC->HasMatchingGameplayTag(InTag),)
+	RETURN_IF(ASC->HasMatchingGameplayTag(InTag),)
 
 	ASC->AddLooseGameplayTag(InTag);
 }
