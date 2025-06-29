@@ -20,9 +20,12 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Unequip_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Attack_Light_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Attack_Heavy_Axe)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Ability_Hit_Pause)
 
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Event_Equip_Axe)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Event_Unequip_Axe)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Event_Hit_Pause)
+
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Weapon_Axe)
 
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_Status_JumpToFinisher)
@@ -30,9 +33,13 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Player_SetByCaller_AttackType_Heavy)
 
 	/// @par Enemy tags --------------------------------------------------------
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Ability_Melee)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Ability_Range)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Weapon)
 
 	/// @par Shared tags -------------------------------------------------------
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Ability_Hit_React)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Event_Hit_Melee)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Event_Hit_React)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_SetByCaller_Damage_Base)
 }

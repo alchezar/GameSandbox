@@ -15,12 +15,15 @@ void UP17CombatHeroComponent::OnHitTargetActorCallback(AActor* HitActor)
 	Payload.Instigator = GetOwningPawn();
 	Payload.Target = HitActor;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Shared_Event_Hit_Melee, Payload);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Player_Event_Hit_Pause, {});
 }
 
 void UP17CombatHeroComponent::OnWeaponPulledFromActorCallback(AActor* PulledActor)
 {
 	RETURN_IF(!PulledActor || !OverlappedActors.Contains(PulledActor),)
 	OverlappedActors.Remove(PulledActor);
+
+	// UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Player_Event_Hit_Pause, {});
 }
 
 AP17WeaponHero* UP17CombatHeroComponent::GetHeroCarriedWeaponBy(const FGameplayTag InWeaponTag) const
