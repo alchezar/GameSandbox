@@ -6,6 +6,7 @@
 #include "AbilitySystemInterface.h"
 #include "GameFramework/Character.h"
 #include "Interface/P17CombatInterface.h"
+#include "Interface/P17UIInterface.h"
 #include "P17CharacterBase.generated.h"
 
 class UP17Data_StartupBase;
@@ -13,7 +14,10 @@ class UP17AttributeSet;
 class UP17AbilitySystemComponent;
 
 UCLASS()
-class PROJECT17_API AP17CharacterBase : public ACharacter, public IAbilitySystemInterface, public IP17CombatInterface
+class PROJECT17_API AP17CharacterBase : public ACharacter
+	, public IAbilitySystemInterface
+	, public IP17CombatInterface
+	, public IP17UIInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +44,9 @@ public:
 
 	/// @par IP17CombatInterface interface -------------------------------------
 	virtual UP17CombatPawnComponent* GetCombatComponent() const override;
+
+	/// @par IP17UIInterface interface -----------------------------------------
+	virtual UP17UIPawnComponent* GetPawnUIComponent() const override;
 
 	/// ------------------------------------------------------------------------
 	/// @name This

@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "Component/Combat/P17CombatHeroComponent.h"
 #include "Component/Input/P17InputComponent.h"
+#include "Component/UI/P17UIHeroComponent.h"
 #include "Data/P17Data_InputConfig.h"
 #include "Data/P17Data_StartupBase.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -35,6 +36,7 @@ AP17CharacterHero::AP17CharacterHero()
 	}
 
 	CombatComponent = CreateDefaultSubobject<UP17CombatHeroComponent>("HeroCombatComponent");
+	UIComponent = CreateDefaultSubobject<UP17UIHeroComponent>("HeroUIComponent");
 }
 
 void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -76,7 +78,17 @@ void AP17CharacterHero::PossessedBy(AController* NewController)
 
 UP17CombatPawnComponent* AP17CharacterHero::GetCombatComponent() const
 {
-	return GetHeroComponent();
+	return GetHeroCombatComponent();
+}
+
+UP17UIPawnComponent* AP17CharacterHero::GetPawnUIComponent() const
+{
+	return GetUIComponent();
+}
+
+UP17UIHeroComponent* AP17CharacterHero::GetHeroUIComponent() const
+{
+	return GetUIComponent();
 }
 
 void AP17CharacterHero::OnConstruction(const FTransform& Transform)

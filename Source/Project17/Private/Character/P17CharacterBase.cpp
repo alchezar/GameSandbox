@@ -39,6 +39,11 @@ UP17CombatPawnComponent* AP17CharacterBase::GetCombatComponent() const
 	return nullptr;
 }
 
+UP17UIPawnComponent* AP17CharacterBase::GetPawnUIComponent() const
+{
+	return nullptr;
+}
+
 void AP17CharacterBase::BeginPlay()
 {
 	Super::BeginPlay();

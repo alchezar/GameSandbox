@@ -3,6 +3,10 @@
 #include "AbilitySystem/P17AttributeSet.h"
 
 #include "GameplayEffectExtension.h"
+#include "Project17.h"
+#include "Component/UI/P17UIHeroComponent.h"
+#include "Component/UI/P17UIPawnComponent.h"
+#include "Interface/P17UIInterface.h"
 #include "Util/P17FunctionLibrary.h"
 #include "Util/P17GameplayTags.h"
 
@@ -15,11 +19,13 @@ void UP17AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		const float NewHealthCurrent = FMath::Clamp(GetHealthCurrent(), 0.f, GetHealthMax());
 		SetHealthCurrent(NewHealthCurrent);
+		NotifyHealthChange(Data);
 	}
 	if (Data.EvaluatedData.Attribute == GetRageCurrentAttribute())
 	{
 		const float NewRageCurrent = FMath::Clamp(GetRageCurrent(), 0.f, GetRageMax());
 		SetRageCurrent(NewRageCurrent);
+		NotifyRageChange(Data);
 	}
 	if (Data.EvaluatedData.Attribute == GetDamageTakenAttribute())
 	{
@@ -27,11 +33,42 @@ void UP17AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 		const float Damage = GetDamageTaken();
 		const float NewHealth = FMath::Clamp(OldHealth - Damage, 0.f, GetHealthMax());
 		SetHealthCurrent(NewHealth);
+		NotifyHealthChange(Data);
 
-		// TODO: Notify UI
-		if (FMath::IsNearlyZero(NewHealth))
+		if (FMath::IsNearlyZero(GetHealthCurrent()))
 		{
 			UP17FunctionLibrary::AddGameplayTagToActorIfNone(Data.Target.GetAvatarActor(), P17::Tags::Shared_Status_Dead);
 		}
 	}
+}
+
+TWeakInterfacePtr<IP17UIInterface> UP17AttributeSet::GetCachedUIInterface(AActor* InActor)
+{
+	if (!CachedUIInterface.IsValid())
+	{
+		CachedUIInterface = TWeakInterfacePtr<IP17UIInterface> {InActor};
+	}
+	return CachedUIInterface.IsValid() ? CachedUIInterface : nullptr;
+}
+
+void UP17AttributeSet::NotifyRageChange(const FGameplayEffectModCallbackData& Data)
+{
+	const auto UIInterface = GetCachedUIInterface(Data.Target.GetAvatarActor());
+	WARN_RETURN_IF(!UIInterface.IsValid(),)
+	const UP17UIHeroComponent* HeroUIComponent = UIInterface->GetHeroUIComponent();
+	WARN_RETURN_IF(!HeroUIComponent,)
+
+	const float RagePercentage = GetRageCurrent() / GetRageMax();
+	HeroUIComponent->OnRageChanged.Broadcast(RagePercentage);
+}
+
+void UP17AttributeSet::NotifyHealthChange(const FGameplayEffectModCallbackData& Data)
+{
+	const auto UIInterface = GetCachedUIInterface(Data.Target.GetAvatarActor());
+	WARN_RETURN_IF(!UIInterface.IsValid(),)
+	const UP17UIPawnComponent* PawnUIComponent = UIInterface->GetPawnUIComponent();
+	WARN_RETURN_IF(!PawnUIComponent,)
+
+	const float HealthPercentage = GetHealthCurrent() / GetHealthMax();
+	PawnUIComponent->OnHealthChanged.Broadcast(HealthPercentage);
 }

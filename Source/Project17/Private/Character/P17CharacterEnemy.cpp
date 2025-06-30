@@ -3,6 +3,7 @@
 #include "Character/P17CharacterEnemy.h"
 
 #include "Component/Combat/P17CombatEnemyComponent.h"
+#include "Component/UI/P17UIEnemyComponent.h"
 #include "Data/P17Data_StartupBase.h"
 #include "Engine/AssetManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -21,6 +22,7 @@ AP17CharacterEnemy::AP17CharacterEnemy()
 	}
 
 	CombatComponent = CreateDefaultSubobject<UP17CombatEnemyComponent>("EnemyCombatComponent");
+	UIComponent = CreateDefaultSubobject<UP17UIEnemyComponent>("EnemyUIComponent");
 }
 
 void AP17CharacterEnemy::PossessedBy(AController* NewController)
@@ -41,6 +43,16 @@ void AP17CharacterEnemy::BeginPlay()
 UP17CombatPawnComponent* AP17CharacterEnemy::GetCombatComponent() const
 {
 	return GetEnemyCombatComponent();
+}
+
+UP17UIPawnComponent* AP17CharacterEnemy::GetPawnUIComponent() const
+{
+	return GetUIComponent();
+}
+
+UP17UIEnemyComponent* AP17CharacterEnemy::GetEnemyUIComponent() const
+{
+	return GetUIComponent();
 }
 
 void AP17CharacterEnemy::InitEnemyStartupData() const

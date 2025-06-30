@@ -13,6 +13,10 @@ GAMEPLAYATTRIBUTE_VALUE_GETTER(PropertyName)               \
 GAMEPLAYATTRIBUTE_VALUE_SETTER(PropertyName)               \
 GAMEPLAYATTRIBUTE_VALUE_INITTER(PropertyName)
 
+class UP17UIHeroComponent;
+class UP17UIPawnComponent;
+class IP17UIInterface;
+
 UCLASS()
 class PROJECT17_API UP17AttributeSet : public UAttributeSet
 {
@@ -25,6 +29,13 @@ public:
 	UP17AttributeSet();
 
 	virtual void PostGameplayEffectExecute(const FGameplayEffectModCallbackData& Data) override;
+
+private:
+	_NODISCARD
+	TWeakInterfacePtr<IP17UIInterface> GetCachedUIInterface(AActor* InActor);
+
+	void NotifyRageChange(const FGameplayEffectModCallbackData& Data);
+	void NotifyHealthChange(const FGameplayEffectModCallbackData& Data);
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields
@@ -59,4 +70,7 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "C++ | Attribute | Damage")
 	FGameplayAttributeData DamageTaken = {};
 	ATTRIBUTE_ACCESSORS(DamageTaken)
+
+private:
+	TWeakInterfacePtr<IP17UIInterface> CachedUIInterface = nullptr;
 };

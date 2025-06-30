@@ -7,6 +7,7 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterHero.generated.h"
 
+class UP17UIHeroComponent;
 class UP17CombatHeroComponent;
 struct FInputActionValue;
 class UP17Data_InputConfig;
@@ -40,12 +41,18 @@ public:
 	/// @par IP17CombatInterface -----------------------------------------------
 	virtual UP17CombatPawnComponent* GetCombatComponent() const override;
 
+	/// @par IP17UIInterface ---------------------------------------------------
+	virtual UP17UIPawnComponent* GetPawnUIComponent() const override;
+	virtual UP17UIHeroComponent* GetHeroUIComponent() const override;
+
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
 public:
 	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
-	UP17CombatHeroComponent* GetHeroComponent() const { return CombatComponent; };
+	UP17CombatHeroComponent* GetHeroCombatComponent() const { return CombatComponent; };
+	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
+	UP17UIHeroComponent* GetUIComponent() const { return UIComponent; };
 
 protected:
 	void ToggleUseControllerRotation(const bool bStart);
@@ -64,6 +71,8 @@ protected:
 	TObjectPtr<UCameraComponent> FollowCamera = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP17CombatHeroComponent> CombatComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17UIHeroComponent> UIComponent = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
 	TObjectPtr<UP17Data_InputConfig> InputConfig = nullptr;

@@ -20,7 +20,8 @@ public class Project17 : ModuleRules
 			"CoreUObject",
 			"Engine",
 			"Slate",
-			"SlateCore"
+			"SlateCore",
+			"UMG"
 		});
 
 		PublicIncludePaths.Add("Project17");
