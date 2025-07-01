@@ -4,9 +4,11 @@
 
 #include "Component/Combat/P17CombatEnemyComponent.h"
 #include "Component/UI/P17UIEnemyComponent.h"
+#include "Components/WidgetComponent.h"
 #include "Data/P17Data_StartupBase.h"
 #include "Engine/AssetManager.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Widget/P17WidgetBase.h"
 
 AP17CharacterEnemy::AP17CharacterEnemy()
 {
@@ -23,6 +25,8 @@ AP17CharacterEnemy::AP17CharacterEnemy()
 
 	CombatComponent = CreateDefaultSubobject<UP17CombatEnemyComponent>("EnemyCombatComponent");
 	UIComponent = CreateDefaultSubobject<UP17UIEnemyComponent>("EnemyUIComponent");
+	HealthWidgetComponent = CreateDefaultSubobject<UWidgetComponent>("EnemyHealthWidgetComponent");
+	HealthWidgetComponent->SetupAttachment(GetMesh());
 }
 
 void AP17CharacterEnemy::PossessedBy(AController* NewController)
@@ -38,6 +42,13 @@ void AP17CharacterEnemy::PossessedBy(AController* NewController)
 void AP17CharacterEnemy::BeginPlay()
 {
 	Super::BeginPlay();
+
+	UUserWidget* Widget = HealthWidgetComponent->GetUserWidgetObject();
+	WARN_RETURN_IF(!Widget,)
+	UP17WidgetBase* HealthWidget = Cast<UP17WidgetBase>(Widget);
+	WARN_RETURN_IF(!HealthWidget,)
+
+	HealthWidget->InitEnemyCreatedWidget(this);
 }
 
 UP17CombatPawnComponent* AP17CharacterEnemy::GetCombatComponent() const

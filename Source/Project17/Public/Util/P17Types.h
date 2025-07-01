@@ -61,4 +61,7 @@ struct FP17WeaponData
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FScalableFloat BaseDamage = {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> SoftIconTexture = nullptr;
 };

@@ -19,7 +19,7 @@ void UP17WidgetBase::NativeOnInitialized()
 
 void UP17WidgetBase::InitEnemyCreatedWidget(AActor* OwningEnemyActor)
 {
-	const TScriptInterface<IP17UIInterface> UIInterface = GetOwningPlayerPawn();
+	const TScriptInterface<IP17UIInterface> UIInterface = OwningEnemyActor;
 	RETURN_IF(!UIInterface,)
 	UP17UIEnemyComponent* EnemyUIComponent = UIInterface->GetEnemyUIComponent();
 	WARN_RETURN_IF(!EnemyUIComponent,)

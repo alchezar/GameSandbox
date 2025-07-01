@@ -6,6 +6,7 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterEnemy.generated.h"
 
+class UWidgetComponent;
 class UP17UIEnemyComponent;
 class UP17CombatEnemyComponent;
 struct FStreamableHandle;
@@ -56,4 +57,6 @@ protected:
 	TObjectPtr<UP17CombatEnemyComponent> CombatComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP17UIEnemyComponent> UIComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UWidgetComponent> HealthWidgetComponent = nullptr;
 };
