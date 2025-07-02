@@ -13,6 +13,7 @@ public class Project17 : ModuleRules
 			"EnhancedInput",
 			"GameplayAbilities",
 			"GameplayTasks",
+			"AIModule"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new[]
