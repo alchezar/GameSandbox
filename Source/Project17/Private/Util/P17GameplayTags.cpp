@@ -32,6 +32,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Melee, "P17.Enemy.Ability.Melee")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Range, "P17.Enemy.Ability.Range")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Weapon, "P17.Enemy.Weapon")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_Strafing, "P17.Enemy.Status.Strafing")
 
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Ability_Hit_React, "P17.Shared.Ability.Hit.React")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Ability_Death, "P17.Shared.Ability.Death")

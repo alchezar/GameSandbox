@@ -20,4 +20,17 @@ void UP17AnimInstanceCharacter::NativeThreadSafeUpdateAnimation(const float Delt
 
 	Speed = Owner->GetVelocity().Size2D();
 	bAcceleration = Movement->GetCurrentAcceleration().SizeSquared2D() > 0.f;
+	Direction = GetMovementDirectionAngle();
+}
+
+float UP17AnimInstanceCharacter::GetMovementDirectionAngle() const
+{
+	RETURN_IF(Speed < 10.f, 0.f)
+
+	const FVector Vector1 = Owner->GetActorForwardVector();
+	const FVector Vector2 = Owner->GetVelocity().GetSafeNormal2D();
+	const float Angle = FMath::RadiansToDegrees(FMath::Acos(Vector1 | Vector2));
+	const float Sign = FMath::Sign((Vector1 ^ Vector2).Z);
+
+	return Angle * Sign;
 }

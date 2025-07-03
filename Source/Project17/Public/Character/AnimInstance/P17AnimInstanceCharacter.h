@@ -21,6 +21,9 @@ public:
 	virtual void NativeInitializeAnimation() override;
 	virtual void NativeThreadSafeUpdateAnimation(const float DeltaSeconds) override;
 
+protected:
+	float GetMovementDirectionAngle() const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -29,6 +32,8 @@ protected:
 	float Speed = 0.f;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Movement")
 	bool bAcceleration = false;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Movement")
+	float Direction = 0.f;
 
 	UPROPERTY()
 	TObjectPtr<ACharacter> Owner = nullptr;
