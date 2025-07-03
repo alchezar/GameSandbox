@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameplayTagContainer.h"
 #include "Component/P17ExtensionBaseComponent.h"
+#include "Util/P17GameplayTags.h"
 #include "P17CombatPawnComponent.generated.h"
 
 class AP17WeaponBase;
@@ -41,6 +42,8 @@ public:
 protected:
 	virtual void OnHitTargetActorCallback(AActor* HitActor);
 	virtual void OnWeaponPulledFromActorCallback(AActor* PulledActor);
+
+	void SendGameplayEventToActor(AActor* HitActor, const FGameplayTag EventTag = P17::Tags::Shared_Event_Hit_Melee) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

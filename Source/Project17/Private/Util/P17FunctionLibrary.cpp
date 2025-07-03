@@ -4,6 +4,7 @@
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemInterface.h"
+#include "GenericTeamAgentInterface.h"
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Interface/P17CombatInterface.h"
@@ -64,4 +65,14 @@ UP17CombatPawnComponent* UP17FunctionLibrary::BP_GetCombatComponentFromActor(AAc
 	UP17CombatPawnComponent* CombatComponent = NativeGetCombatComponentFromActor(InActor);
 	OutExecs = CombatComponent ? EP17ValidTypePin::Valid : EP17ValidTypePin::Invalid;
 	return CombatComponent;
+}
+
+bool UP17FunctionLibrary::IsTargetHostile(const APawn* InQuery, const APawn* InTarget)
+{
+	RETURN_IF(!InQuery || !InTarget, false);
+	const auto* QueryTeamAgent = InQuery->GetController<IGenericTeamAgentInterface>();
+	const auto* TargetTeamAgent = InTarget->GetController<IGenericTeamAgentInterface>();
+	RETURN_IF(!QueryTeamAgent || !TargetTeamAgent, false);
+
+	return QueryTeamAgent->GetGenericTeamId() != TargetTeamAgent->GetGenericTeamId();
 }

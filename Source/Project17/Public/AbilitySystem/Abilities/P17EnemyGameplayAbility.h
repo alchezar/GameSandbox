@@ -23,6 +23,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17CombatEnemyComponent* GetEnemyCombatComponentFromActorInfo();
 
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	FGameplayEffectSpecHandle MakeEnemyDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const FScalableFloat& InScalableDamage) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

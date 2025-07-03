@@ -38,12 +38,13 @@ UP17CombatHeroComponent* UP17HeroGameplayAbility::GetHeroCombatComponentFromActo
 	return CachedHeroCombatComponent.IsValid() ? CachedHeroCombatComponent.Get() : nullptr;
 }
 
-FGameplayEffectSpecHandle UP17HeroGameplayAbility::MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount)
+// ReSharper disable once CppPassValueParameterByConstReference
+FGameplayEffectSpecHandle UP17HeroGameplayAbility::MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount) const
 {
 	WARN_RETURN_IF(!InEffectClass, {})
 
 	AActor* Avatar = GetAvatarActorFromActorInfo();
-	const UP17AbilitySystemComponent* HeroASC = GetHeroAbilitySystemComponentFromActorInfo();
+	const UP17AbilitySystemComponent* HeroASC = GetProjectAbilitySystemComponentFromActorInfo();
 	WARN_RETURN_IF(!Avatar || !HeroASC, {})
 
 	FGameplayEffectContextHandle Context = HeroASC->MakeEffectContext();

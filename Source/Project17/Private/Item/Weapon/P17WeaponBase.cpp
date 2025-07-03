@@ -4,6 +4,7 @@
 
 #include "Project17.h"
 #include "Components/BoxComponent.h"
+#include "Util/P17FunctionLibrary.h"
 
 AP17WeaponBase::AP17WeaponBase()
 {
@@ -31,25 +32,17 @@ void AP17WeaponBase::ToggleCollision(const bool bEnable) const
 void AP17WeaponBase::OnCollisionBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	const APawn* OwningPawn = GetInstigator<APawn>();
-	WARN_RETURN_IF(!OwningPawn,)
-
 	const APawn* HitPawn = Cast<APawn>(OtherActor);
-	RETURN_IF(!HitPawn || OwningPawn == HitPawn,)
+	RETURN_IF(!UP17FunctionLibrary::IsTargetHostile(OwningPawn, HitPawn),)
 
 	OnWeaponHitTarget.Execute(OtherActor);
-
-	// TODO: Implement hit check for enemy characters.
 }
 
 void AP17WeaponBase::OnCollisionEndOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex)
 {
 	const APawn* OwningPawn = GetInstigator<APawn>();
-	WARN_RETURN_IF(!OwningPawn,)
-
 	const APawn* HitPawn = Cast<APawn>(OtherActor);
-	RETURN_IF(!HitPawn || OwningPawn == HitPawn,)
+	RETURN_IF(!UP17FunctionLibrary::IsTargetHostile(OwningPawn, HitPawn),)
 
 	OnWeaponPulledFromTarget.Execute(OtherActor);
-
-	// TODO: Implement hit check for enemy characters.
 }

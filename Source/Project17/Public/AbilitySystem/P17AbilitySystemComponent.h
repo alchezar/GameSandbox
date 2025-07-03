@@ -27,4 +27,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void RemoveGrantedHeroWeaponAbilities(UPARAM(ref) TArray<FGameplayAbilitySpecHandle>& InGrantedAbilitySpecHandles);
 	// clang-format on
+
+	UFUNCTION(BlueprintCallable)
+	bool TryActivateAbilityByTag(const FGameplayTag AbilityTag);
 };

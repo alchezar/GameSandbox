@@ -37,7 +37,7 @@ public:
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17CombatPawnComponent* GetCombatPawnComponentFromActorInfo() const;
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
-	UP17AbilitySystemComponent* GetHeroAbilitySystemComponentFromActorInfo() const;
+	UP17AbilitySystemComponent* GetProjectAbilitySystemComponentFromActorInfo() const;
 
 protected:
 	FActiveGameplayEffectHandle NativeApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle) const;

@@ -30,4 +30,6 @@ public:
 	static void BP_GetActorHasTag(AActor* InActor, const FGameplayTag InTag, EP17ConfirmTypePin& OutExecs);
 	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary", meta = (DisplayName = "GetCombatComponentFromActor", ExpandEnumAsExecs = "OutExecs"))
 	static UP17CombatPawnComponent* BP_GetCombatComponentFromActor(AActor* InActor, EP17ValidTypePin& OutExecs);
+	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary")
+	static bool IsTargetHostile(const APawn* InQuery, const APawn* InTarget);
 };

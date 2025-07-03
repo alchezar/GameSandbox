@@ -2,6 +2,8 @@
 
 #include "Component/Combat/P17CombatPawnComponent.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Abilities/GameplayAbilityTypes.h"
 #include "Item/Weapon/P17WeaponBase.h"
 #include "Util/P17DebugHelper.h"
 
@@ -68,4 +70,13 @@ void UP17CombatPawnComponent::OnHitTargetActorCallback(AActor* HitActor)
 void UP17CombatPawnComponent::OnWeaponPulledFromActorCallback(AActor* PulledActor)
 {
 	// Overloaded by children (<gi> to find them).
+}
+
+void UP17CombatPawnComponent::SendGameplayEventToActor(AActor* HitActor, const FGameplayTag EventTag) const
+{
+	FGameplayEventData Payload {};
+	Payload.Instigator = GetOwningPawn();
+	Payload.Target = HitActor;
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), EventTag, Payload);
 }

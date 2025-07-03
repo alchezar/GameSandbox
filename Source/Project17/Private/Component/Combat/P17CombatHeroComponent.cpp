@@ -11,10 +11,7 @@ void UP17CombatHeroComponent::OnHitTargetActorCallback(AActor* HitActor)
 	RETURN_IF(!HitActor || OverlappedActors.Contains(HitActor),)
 	OverlappedActors.Add(HitActor);
 
-	FGameplayEventData Payload {};
-	Payload.Instigator = GetOwningPawn();
-	Payload.Target = HitActor;
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Shared_Event_Hit_Melee, Payload);
+	SendGameplayEventToActor(HitActor);
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Player_Event_Hit_Pause, {});
 }
 

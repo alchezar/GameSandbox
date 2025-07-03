@@ -55,3 +55,17 @@ void UP17AbilitySystemComponent::RemoveGrantedHeroWeaponAbilities(TArray<FGamepl
 
 	InGrantedAbilitySpecHandles.Empty();
 }
+
+bool UP17AbilitySystemComponent::TryActivateAbilityByTag(const FGameplayTag AbilityTag)
+{
+	WARN_RETURN_IF(!AbilityTag.IsValid(), false)
+
+	TArray<FGameplayAbilitySpec*> FoundAbilitySpecs;
+	GetActivatableGameplayAbilitySpecsByAllMatchingTags(AbilityTag.GetSingleTagContainer(), FoundAbilitySpecs);
+	RETURN_IF(FoundAbilitySpecs.IsEmpty(), false)
+
+	const FGameplayAbilitySpec* AbilitySpec = FoundAbilitySpecs[0];
+	RETURN_IF(!AbilitySpec || AbilitySpec->IsActive(), false)
+
+	return TryActivateAbility(AbilitySpec->Handle);
+}
