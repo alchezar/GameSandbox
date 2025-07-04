@@ -7,6 +7,7 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterHero.generated.h"
 
+class UMotionWarpingComponent;
 class UP17UIHeroComponent;
 class UP17CombatHeroComponent;
 struct FInputActionValue;
@@ -73,6 +74,8 @@ protected:
 	TObjectPtr<UP17CombatHeroComponent> CombatComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UP17UIHeroComponent> UIComponent = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UMotionWarpingComponent> MotionWarpingComponent = nullptr;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
 	TObjectPtr<UP17Data_InputConfig> InputConfig = nullptr;

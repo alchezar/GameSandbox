@@ -3,6 +3,7 @@
 #include "Public/Character/P17CharacterHero.h"
 
 #include "EnhancedInputSubsystems.h"
+#include "MotionWarpingComponent.h"
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Camera/CameraComponent.h"
@@ -37,6 +38,7 @@ AP17CharacterHero::AP17CharacterHero()
 
 	CombatComponent = CreateDefaultSubobject<UP17CombatHeroComponent>("HeroCombatComponent");
 	UIComponent = CreateDefaultSubobject<UP17UIHeroComponent>("HeroUIComponent");
+	MotionWarpingComponent = CreateDefaultSubobject<UMotionWarpingComponent>("MotionWarpingComponent");
 }
 
 void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
