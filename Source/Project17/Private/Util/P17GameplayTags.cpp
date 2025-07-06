@@ -7,6 +7,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Move, "P17.Input.Move")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Look, "P17.Input.Look")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Jump, "P17.Input.Jump")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Roll, "P17.Input.Roll")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Equip_Axe, "P17.Input.Equip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Unequip_Axe, "P17.Input.Unequip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Attack_Light_Axe, "P17.Input.Attack.Light.Axe")
@@ -17,6 +18,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Attack_Light_Axe, "P17.Player.Ability.Attack.Light.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Attack_Heavy_Axe, "P17.Player.Ability.Attack.Heavy.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Hit_Pause, "P17.Player.Ability.Hit.Pause")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Roll, "P17.Player.Ability.Roll")
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_Axe, "P17.Player.Event.Equip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
@@ -25,6 +27,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Rolling, "P17.Player.Status.Rolling")
 
 	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Light, "P17.Player.SetByCaller.AttackType.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Heavy, "P17.Player.SetByCaller.AttackType.Heavy")
@@ -41,4 +44,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Event_Hit_React, "P17.Shared.Event.Hit.React")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_SetByCaller_Damage_Base, "P17.Shared.SetByCaller.Damage.Base")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_Dead, "P17.Shared.Status.Dead")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_HitReact_Front, "P17.Shared.Status.HitReact.Front")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_HitReact_Back, "P17.Shared.Status.HitReact.Back")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_HitReact_Left, "P17.Shared.Status.HitReact.Left")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_HitReact_Right, "P17.Shared.Status.HitReact.Right")
 }

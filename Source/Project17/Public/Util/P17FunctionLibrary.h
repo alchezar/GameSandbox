@@ -32,4 +32,8 @@ public:
 	static UP17CombatPawnComponent* BP_GetCombatComponentFromActor(AActor* InActor, EP17ValidTypePin& OutExecs);
 	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary")
 	static bool IsTargetHostile(const APawn* InQuery, const APawn* InTarget);
+	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary", meta = (CompactNodeTitle = "Get Value At Level"))
+	static float BP_GetValueAtLevel(const FScalableFloat& InScalableFloat, const int32 InLevel);
+	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary", meta = (CompactNodeTitle = "Compute Hit React Direction Name"))
+	static FName ComputeHitReactDirection(const AActor* InAttacker, const AActor* InVictim);
 };

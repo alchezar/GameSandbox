@@ -76,3 +76,24 @@ bool UP17FunctionLibrary::IsTargetHostile(const APawn* InQuery, const APawn* InT
 
 	return QueryTeamAgent->GetGenericTeamId() != TargetTeamAgent->GetGenericTeamId();
 }
+
+float UP17FunctionLibrary::BP_GetValueAtLevel(const FScalableFloat& InScalableFloat, const int32 InLevel)
+{
+	return InScalableFloat.GetValueAtLevel(InLevel);
+}
+
+FName UP17FunctionLibrary::ComputeHitReactDirection(const AActor* InAttacker, const AActor* InVictim)
+{
+	WARN_RETURN_IF(!InAttacker || !InVictim, "None")
+
+	const FVector VictimForward = InVictim->GetActorForwardVector();
+	const FVector VictimToAttacker = (InAttacker->GetActorLocation() - InVictim->GetActorLocation()).GetSafeNormal2D();
+	const float DotProduct = VictimForward | VictimToAttacker;
+	const float RightSide = FMath::Sign((VictimForward ^ VictimToAttacker).Z);
+
+	// clang-format off
+	return DotProduct > 0.5f ? "Front" :
+		DotProduct < -0.5f ? "Back" :
+		RightSide > 0.f ? "Right" : "Left";
+	// clang-format on
+}

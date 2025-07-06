@@ -62,7 +62,6 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, this, &ThisClass::ToggleUseControllerRotation);
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, ETriggerEvent::Triggered, this, &ThisClass::OnMoveCallback);
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
-		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Jump, ETriggerEvent::Started, this, &Super::Jump);
 
 		MyInputComponent->BindAbilityInputAction(InputConfig, this, &ThisClass::OnAbilityInputPressedCallback, &ThisClass::OnAbilityInputReleasedCallback);
 	}
