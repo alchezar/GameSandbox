@@ -43,7 +43,7 @@ protected:
 	virtual void OnHitTargetActorCallback(AActor* HitActor);
 	virtual void OnWeaponPulledFromActorCallback(AActor* PulledActor);
 
-	void SendGameplayEventToActor(AActor* HitActor, const FGameplayTag EventTag = P17::Tags::Shared_Event_Hit_Melee) const;
+	void SendGameplayEventToActor(AActor* HitActor, AActor* SendTo, const FGameplayTag EventTag = P17::Tags::Shared_Event_Hit_Melee) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

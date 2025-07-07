@@ -36,4 +36,6 @@ public:
 	static float BP_GetValueAtLevel(const FScalableFloat& InScalableFloat, const int32 InLevel);
 	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary", meta = (CompactNodeTitle = "Compute Hit React Direction Name"))
 	static FName ComputeHitReactDirection(const AActor* InAttacker, const AActor* InVictim);
+	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary")
+	static bool IsValidBlock(const AActor* InAttacker, const AActor* InDefender);
 };

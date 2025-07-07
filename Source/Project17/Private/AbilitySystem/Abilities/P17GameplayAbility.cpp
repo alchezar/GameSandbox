@@ -76,3 +76,13 @@ FName UP17GameplayAbility::GetMontageSectionRandom(const UAnimMontage* InMontage
 
 	return InMontage->GetSectionName(Index);
 }
+
+void UP17GameplayAbility::FaceOwnerTo(const AActor* Target) const
+{
+	AActor* Owner = GetAvatarActorFromActorInfo();
+	RETURN_IF(!Owner || !Target,)
+
+	const FRotator NewRotation = (Target->GetActorLocation() - Owner->GetActorLocation())
+		.Rotation();
+	Owner->SetActorRotation(NewRotation);
+}

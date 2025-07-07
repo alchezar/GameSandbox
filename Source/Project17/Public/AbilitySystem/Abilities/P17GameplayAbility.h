@@ -49,6 +49,9 @@ protected:
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	static FName GetMontageSectionRandom(const UAnimMontage* InMontage);
 
+	UFUNCTION(BlueprintCallable, Category = "C++ | Ability")
+	void FaceOwnerTo(const AActor* Target) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

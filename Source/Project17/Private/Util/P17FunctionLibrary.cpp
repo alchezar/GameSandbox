@@ -97,3 +97,9 @@ FName UP17FunctionLibrary::ComputeHitReactDirection(const AActor* InAttacker, co
 		RightSide > 0.f ? "Right" : "Left";
 	// clang-format on
 }
+
+bool UP17FunctionLibrary::IsValidBlock(const AActor* InAttacker, const AActor* InDefender)
+{
+	const float DotProduct = InAttacker->GetActorForwardVector() | InDefender->GetActorForwardVector();
+	return DotProduct < -0.25f;
+}

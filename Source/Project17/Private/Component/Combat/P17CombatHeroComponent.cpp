@@ -11,7 +11,7 @@ void UP17CombatHeroComponent::OnHitTargetActorCallback(AActor* HitActor)
 	RETURN_IF(!HitActor || OverlappedActors.Contains(HitActor),)
 	OverlappedActors.Add(HitActor);
 
-	SendGameplayEventToActor(HitActor);
+	SendGameplayEventToActor(HitActor, GetOwningPawn());
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), P17::Tags::Player_Event_Hit_Pause, {});
 }
 

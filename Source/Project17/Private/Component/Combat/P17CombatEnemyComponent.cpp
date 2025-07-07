@@ -2,28 +2,30 @@
 
 #include "Component/Combat/P17CombatEnemyComponent.h"
 
+#include "Util/P17FunctionLibrary.h"
+
 void UP17CombatEnemyComponent::OnHitTargetActorCallback(AActor* HitActor)
 {
 	RETURN_IF(!HitActor || OverlappedActors.Contains(HitActor),)
-	OverlappedActors.Add(HitActor);
 
-	RETURN_IF(GetIsBlocked(),)
-	SendGameplayEventToActor(HitActor);
+	OverlappedActors.Add(HitActor);
+	RETURN_IF(GetIsBlocked(HitActor),)
+
+	SendGameplayEventToActor(HitActor, GetOwningPawn());
 }
 
-bool UP17CombatEnemyComponent::GetIsBlocked()
+bool UP17CombatEnemyComponent::GetIsBlocked(AActor* HitActor) const
 {
-	bool bValidBlock = false;
-	const bool bPlayerBlocking = false;
-	const bool bUnblockableAttack = true;
+	const bool bPlayerBlocking = UP17FunctionLibrary::NativeGetActorHasTag(HitActor, P17::Tags::Player_Status_Blocking);
+	constexpr bool bUnblockableAttack = false;
 
-	if (bPlayerBlocking && !bUnblockableAttack)
-	{
-		// TODO::Check if the block is valid.
-	}
+	const bool bValidBlock = UP17FunctionLibrary::IsValidBlock(GetOwner(), HitActor)
+		&& bPlayerBlocking
+		&& !bUnblockableAttack;
+
 	if (bValidBlock)
 	{
-		// TODO::Handle successful block.
+		SendGameplayEventToActor(HitActor, HitActor, P17::Tags::Player_Event_Hit_SuccessfulBlock);
 	}
 
 	return bValidBlock;

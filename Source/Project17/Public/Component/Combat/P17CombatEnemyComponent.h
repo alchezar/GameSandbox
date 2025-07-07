@@ -21,5 +21,5 @@ protected:
 	/// @name This
 	/// ------------------------------------------------------------------------
 private:
-	bool GetIsBlocked();
+	bool GetIsBlocked(AActor* HitActor) const;
 };

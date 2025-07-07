@@ -4,6 +4,7 @@
 
 #include "Project17.h"
 #include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
+#include "Util/P17GameplayTags.h"
 
 UP17AbilitySystemComponent::UP17AbilitySystemComponent()
 {
@@ -25,7 +26,16 @@ void UP17AbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInp
 }
 
 void UP17AbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InInputTag)
-{}
+{
+	RETURN_IF(!InInputTag.IsValid() || !InInputTag.MatchesTag(P17::Tags::Input_Hold),)
+
+	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
+	{
+		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InInputTag) || !AbilitySpec.IsActive())
+
+		CancelAbilityHandle(AbilitySpec.Handle);
+	}
+}
 
 void UP17AbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel)
 {

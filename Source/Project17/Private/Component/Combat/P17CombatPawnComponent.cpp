@@ -72,11 +72,11 @@ void UP17CombatPawnComponent::OnWeaponPulledFromActorCallback(AActor* PulledActo
 	// Overloaded by children (<gi> to find them).
 }
 
-void UP17CombatPawnComponent::SendGameplayEventToActor(AActor* HitActor, const FGameplayTag EventTag) const
+void UP17CombatPawnComponent::SendGameplayEventToActor(AActor* HitActor, AActor* SendTo, const FGameplayTag EventTag) const
 {
 	FGameplayEventData Payload {};
 	Payload.Instigator = GetOwningPawn();
 	Payload.Target = HitActor;
 
-	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(GetOwningPawn(), EventTag, Payload);
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(SendTo, EventTag, Payload);
 }
