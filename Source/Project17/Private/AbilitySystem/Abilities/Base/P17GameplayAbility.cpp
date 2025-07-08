@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "AbilitySystem/Abilities/P17GameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17GameplayAbility.h"
 
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
@@ -82,7 +82,6 @@ void UP17GameplayAbility::FaceOwnerTo(const AActor* Target) const
 	AActor* Owner = GetAvatarActorFromActorInfo();
 	RETURN_IF(!Owner || !Target,)
 
-	const FRotator NewRotation = (Target->GetActorLocation() - Owner->GetActorLocation())
-		.Rotation();
+	const FRotator NewRotation = (Target->GetActorLocation() - Owner->GetActorLocation()).Rotation();
 	Owner->SetActorRotation(NewRotation);
 }

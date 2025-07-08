@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17HeroGameplayAbility.h"
 
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Component/Combat/P17CombatHeroComponent.h"
@@ -60,4 +60,17 @@ FGameplayEffectSpecHandle UP17HeroGameplayAbility::MakeHeroDamageEffectSpecHandl
 	}
 
 	return ResultSpec;
+}
+
+void UP17HeroGameplayAbility::FaceControllerTo(const AActor* Target, const float DeltaTime, const float InterpSpeed) const
+{
+	const AActor* Owner = GetAvatarActorFromActorInfo();
+	const TWeakObjectPtr<APlayerController> Controller = CurrentActorInfo->PlayerController;
+	RETURN_IF(!Owner || !Target || !Controller.IsValid(),)
+
+	const FRotator NewRotation = (Target->GetActorLocation() - Owner->GetActorLocation()).Rotation();
+	const FRotator CurrentRotation = Controller->GetControlRotation();
+	const FRotator TargetRotation = FMath::RInterpTo(CurrentRotation, NewRotation, DeltaTime, InterpSpeed);
+
+	Controller->SetControlRotation({CurrentRotation.Pitch, TargetRotation.Yaw, 0.f});
 }

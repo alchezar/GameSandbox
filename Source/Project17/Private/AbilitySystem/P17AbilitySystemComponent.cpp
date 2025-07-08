@@ -3,13 +3,13 @@
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 
 #include "Project17.h"
-#include "AbilitySystem/Abilities/P17HeroGameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17HeroGameplayAbility.h"
 #include "Util/P17GameplayTags.h"
 
 UP17AbilitySystemComponent::UP17AbilitySystemComponent()
 {
-	PrimaryComponentTick.bStartWithTickEnabled = false;
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
+	PrimaryComponentTick.bCanEverTick = true;
 }
 
 void UP17AbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInputTag)
@@ -19,6 +19,13 @@ void UP17AbilitySystemComponent::OnAbilityInputPressed(const FGameplayTag& InInp
 	for (const FGameplayAbilitySpec& AbilitySpec : GetActivatableAbilities())
 	{
 		CONTINUE_IF(!AbilitySpec.GetDynamicSpecSourceTags().HasTagExact(InInputTag))
+
+		// Cancel toggleable ability if active.
+		if (InInputTag.MatchesTag(P17::Tags::Input_Toggle) && AbilitySpec.IsActive())
+		{
+			CancelAbilityHandle(AbilitySpec.Handle);
+			return;
+		}
 
 		// Activate the ability (previously added).
 		TryActivateAbility(AbilitySpec.Handle);

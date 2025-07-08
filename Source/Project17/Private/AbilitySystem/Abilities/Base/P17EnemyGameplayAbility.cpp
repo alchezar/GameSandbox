@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "AbilitySystem/Abilities/P17EnemyGameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17EnemyGameplayAbility.h"
 
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Character/P17CharacterEnemy.h"

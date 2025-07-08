@@ -3,7 +3,7 @@
 #include "Data/P17Data_StartupEnemy.h"
 
 #include "AbilitySystem/P17AbilitySystemComponent.h"
-#include "AbilitySystem/Abilities/P17EnemyGameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17EnemyGameplayAbility.h"
 #include "Project17/Project17.h"
 
 void UP17Data_StartupEnemy::GiveToAbilitySystemComponent(UP17AbilitySystemComponent* InASC, const int32 InLevel)

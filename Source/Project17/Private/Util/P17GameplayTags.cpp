@@ -15,6 +15,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Attack_Heavy_Axe, "P17.Input.Attack.Heavy.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Hold, "P17.Input.Hold")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Hold_Block, "P17.Input.Hold.Block")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle, "P17.Input.Toggle")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle_TargetLock, "P17.Input.Toggle.TargetLock")
 
 	/// @par Player tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Equip_Axe, "P17.Player.Ability.Equip.Axe")
@@ -24,6 +26,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Hit_Pause, "P17.Player.Ability.Hit.Pause")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Roll, "P17.Player.Ability.Roll")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Block, "P17.Player.Ability.Block")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_TargetLock, "P17.Player.Ability.TargetLock")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_Axe, "P17.Player.Event.Equip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Hit_Pause, "P17.Player.Event.Hit.Pause")
@@ -32,6 +35,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Rolling, "P17.Player.Status.Rolling")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Blocking, "P17.Player.Status.Blocking")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Status_TargetLock, "P17.Player.Status.TargetLock")
 	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Light, "P17.Player.SetByCaller.AttackType.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Player_SetByCaller_AttackType_Heavy, "P17.Player.SetByCaller.AttackType.Heavy")
 

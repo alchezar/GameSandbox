@@ -4,7 +4,7 @@
 
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
-#include "AbilitySystem/Abilities/P17GameplayAbility.h"
+#include "AbilitySystem/Abilities/Base/P17GameplayAbility.h"
 
 void UP17Data_StartupBase::GiveToAbilitySystemComponent(UP17AbilitySystemComponent* InASC, const int32 InLevel)
 {
