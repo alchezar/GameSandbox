@@ -59,6 +59,8 @@ protected:
 	void ToggleUseControllerRotation(const bool bStart);
 	void OnMoveCallback(const FInputActionValue& InputActionValue);
 	void OnLookCallback(const FInputActionValue& InputActionValue);
+	void OnSwitchTargetCallback(const FInputActionValue& InputActionValue);
+	void OnTargetSwitchedCallback(const FInputActionValue& InputActionValue);
 	void OnAbilityInputPressedCallback(const FGameplayTag InInputTag);
 	void OnAbilityInputReleasedCallback(const FGameplayTag InInputTag);
 
@@ -79,4 +81,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
 	TObjectPtr<UP17Data_InputConfig> InputConfig = nullptr;
+
+	FVector2D SwitchDirection = {};
 };

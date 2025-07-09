@@ -2,6 +2,7 @@
 
 #include "Public/Character/P17CharacterHero.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "EnhancedInputSubsystems.h"
 #include "MotionWarpingComponent.h"
 #include "Project17.h"
@@ -62,6 +63,9 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, this, &ThisClass::ToggleUseControllerRotation);
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Move, ETriggerEvent::Triggered, this, &ThisClass::OnMoveCallback);
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Look, ETriggerEvent::Triggered, this, &ThisClass::OnLookCallback);
+
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_SwitchTarget, ETriggerEvent::Triggered, this, &ThisClass::OnSwitchTargetCallback);
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_SwitchTarget, ETriggerEvent::Completed, this, &ThisClass::OnTargetSwitchedCallback);
 
 		MyInputComponent->BindAbilityInputAction(InputConfig, this, &ThisClass::OnAbilityInputPressedCallback, &ThisClass::OnAbilityInputReleasedCallback);
 	}
@@ -153,6 +157,21 @@ void AP17CharacterHero::OnLookCallback(const FInputActionValue& InputActionValue
 
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AP17CharacterHero::OnSwitchTargetCallback(const FInputActionValue& InputActionValue)
+{
+	SwitchDirection = InputActionValue.Get<FVector2D>();
+}
+
+void AP17CharacterHero::OnTargetSwitchedCallback(const FInputActionValue& InputActionValue)
+{
+	const FGameplayTag SwitchTag = SwitchDirection.X > 0.f
+		? P17::Tags::Player_Event_SwitchTarget_Right
+		: SwitchDirection.X < 0.f
+		? P17::Tags::Player_Event_SwitchTarget_Left
+		: FGameplayTag::EmptyTag;
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, SwitchTag, {});
 }
 
 void AP17CharacterHero::OnAbilityInputPressedCallback(const FGameplayTag InInputTag)

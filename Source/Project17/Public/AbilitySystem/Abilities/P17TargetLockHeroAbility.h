@@ -8,6 +8,12 @@
 
 class UP17WidgetBase;
 
+struct FP17Neighbours
+{
+	AActor* Left = nullptr;
+	AActor* Right = nullptr;
+};
+
 UCLASS()
 class PROJECT17_API UP17TargetLockHeroAbility : public UP17HeroGameplayAbility
 {
@@ -27,11 +33,14 @@ protected:
 protected:
 	UFUNCTION(BlueprintCallable)
 	void OnTargetLockTick(const float DeltaTime);
+	UFUNCTION(BlueprintCallable)
+	void SwitchTarget(const FGameplayTag& InSwitchDirectionTag);
 
 private:
 	void LockOnTarget();
-	void GetAvailableActorsToLock();
+	void FindAvailableActorsToLock();
 	AActor* GetNearestTarget();
+	FP17Neighbours GetNeighbours();
 
 	void DrawTargetLockWidget();
 	void SetTargetLockWidgetPosition();
@@ -39,6 +48,8 @@ private:
 	void FindWidgetSize();
 
 	void ToggleTargetLockMovement(const bool bOn);
+	void ToggleTargetLockMappingContext(const bool bOn);
+
 	void CancelTargetLock();
 	void CleanUp();
 
@@ -62,6 +73,11 @@ protected:
 	float RotationInterpSpeed = 5.f;
 	UPROPERTY(EditDefaultsOnly, Category = "C++|TargetLock")
 	float MaxWalkSpeed = 150.f;
+	UPROPERTY(EditDefaultsOnly, Category = "C++|TargetLock")
+	FRotator CameraOffset = {};
+
+	UPROPERTY(EditDefaultsOnly, Category = "C++|Input")
+	UInputMappingContext* TargetLockMappingContext = nullptr;
 
 	UPROPERTY()
 	TArray<AActor*> ActorsToLock = {};

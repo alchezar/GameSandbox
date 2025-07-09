@@ -30,7 +30,7 @@ public:
 	FGameplayEffectSpecHandle MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount) const;
 
 protected:
-	void FaceControllerTo(const AActor* Target, const float DeltaTime, const float InterpSpeed) const;
+	void FaceControllerTo(const AActor* Target, const float DeltaTime, const float InterpSpeed, const FRotator& Offset = FRotator::ZeroRotator) const;
 
 	/// ------------------------------------------------------------------------
 	/// @name Fields

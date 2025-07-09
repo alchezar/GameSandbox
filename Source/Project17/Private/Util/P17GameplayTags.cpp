@@ -17,6 +17,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Hold_Block, "P17.Input.Hold.Block")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle, "P17.Input.Toggle")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle_TargetLock, "P17.Input.Toggle.TargetLock")
+	UE_DEFINE_GAMEPLAY_TAG(Input_SwitchTarget, "P17.Input.SwitchTarget")
 
 	/// @par Player tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Equip_Axe, "P17.Player.Ability.Equip.Axe")
@@ -31,6 +32,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Hit_Pause, "P17.Player.Event.Hit.Pause")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Hit_SuccessfulBlock, "P17.Player.Event.Hit.SuccessfulBlock")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Left, "P17.Player.Event.SwitchTarget.Left")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Right, "P17.Player.Event.SwitchTarget.Right")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Rolling, "P17.Player.Status.Rolling")
