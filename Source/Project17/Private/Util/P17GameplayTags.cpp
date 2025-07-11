@@ -54,6 +54,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Ability_Death, "P17.Shared.Ability.Death")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Event_Hit_Melee, "P17.Shared.Event.Hit.Melee")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Event_Hit_React, "P17.Shared.Event.Hit.React")
+	UE_DEFINE_GAMEPLAY_TAG(Shared_Event_Spawn_Projectile, "P17.Shared.Event.Spawn.Projectile")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_SetByCaller_Damage_Base, "P17.Shared.SetByCaller.Damage.Base")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_Dead, "P17.Shared.Status.Dead")
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Status_HitReact_Front, "P17.Shared.Status.HitReact.Front")

@@ -23,7 +23,8 @@ public class Project17 : ModuleRules
 			"Slate",
 			"SlateCore",
 			"UMG",
-			"MotionWarping"
+			"MotionWarping",
+			"Niagara"
 		});
 
 		PublicIncludePaths.Add("Project17");
