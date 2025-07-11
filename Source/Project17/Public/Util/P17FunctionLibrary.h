@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameplayTagContainer.h"
 #include "P17Types.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
@@ -38,4 +39,6 @@ public:
 	static FName ComputeHitReactDirection(const AActor* InAttacker, const AActor* InVictim);
 	UFUNCTION(BlueprintPure, Category = "P17 | FunctionLibrary")
 	static bool IsValidBlock(const AActor* InAttacker, const AActor* InDefender);
+	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary")
+	static bool ApplyGameplayEffectSpecHandle(AActor* InInstigator, AActor* InTarget, const FGameplayEffectSpecHandle InSpecHandle);
 };

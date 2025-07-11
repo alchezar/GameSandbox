@@ -17,7 +17,7 @@ void UP17CombatEnemyComponent::OnHitTargetActorCallback(AActor* HitActor)
 bool UP17CombatEnemyComponent::GetIsBlocked(AActor* HitActor) const
 {
 	const bool bPlayerBlocking = UP17FunctionLibrary::NativeGetActorHasTag(HitActor, P17::Tags::Player_Status_Blocking);
-	constexpr bool bUnblockableAttack = false;
+	const bool bUnblockableAttack = UP17FunctionLibrary::NativeGetActorHasTag(GetOwningPawn(), P17::Tags::Enemy_Status_Unblockable);
 
 	const bool bValidBlock = UP17FunctionLibrary::IsValidBlock(GetOwner(), HitActor)
 		&& bPlayerBlocking

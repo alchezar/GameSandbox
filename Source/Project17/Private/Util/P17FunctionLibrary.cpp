@@ -103,3 +103,13 @@ bool UP17FunctionLibrary::IsValidBlock(const AActor* InAttacker, const AActor* I
 	const float DotProduct = InAttacker->GetActorForwardVector() | InDefender->GetActorForwardVector();
 	return DotProduct < -0.25f;
 }
+
+bool UP17FunctionLibrary::ApplyGameplayEffectSpecHandle(AActor* InInstigator, AActor* InTarget, const FGameplayEffectSpecHandle InSpecHandle)
+{
+	UP17AbilitySystemComponent* SourceASC = NativeGetASCFromActor(InInstigator);
+	UP17AbilitySystemComponent* TargetASC = NativeGetASCFromActor(InTarget);
+	RETURN_IF(!SourceASC || !TargetASC, false)
+
+	const FActiveGameplayEffectHandle ActiveGameplayEffectHandle = SourceASC->ApplyGameplayEffectSpecToTarget(*InSpecHandle.Data, TargetASC);
+	return ActiveGameplayEffectHandle.WasSuccessfullyApplied();
+}

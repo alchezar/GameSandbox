@@ -47,7 +47,7 @@ void AP17ProjectileBase::OnProjectileHitCallback(UPrimitiveComponent* HitCompone
 {
 	BP_OnSpawnProjectileHitFX(Hit.ImpactPoint);
 
-	const APawn* InstigatorPawn = GetInstigator();
+	APawn* InstigatorPawn = GetInstigator();
 	WARN_RETURN_IF(!InstigatorPawn,)
 
 	APawn* HitPawn = Cast<APawn>(OtherActor);
@@ -58,23 +58,34 @@ void AP17ProjectileBase::OnProjectileHitCallback(UPrimitiveComponent* HitCompone
 	}
 
 	const bool bPlayerBlocking = UP17FunctionLibrary::NativeGetActorHasTag(HitPawn, P17::Tags::Player_Status_Blocking);
-	constexpr bool bUnblockableAttack = false;
+	const bool bUnblockableAttack = UP17FunctionLibrary::NativeGetActorHasTag(InstigatorPawn, P17::Tags::Enemy_Status_Unblockable);
 
 	const bool bValidBlock = UP17FunctionLibrary::IsValidBlock(InstigatorPawn, HitPawn)
 		&& bPlayerBlocking
 		&& !bUnblockableAttack;
 
+	FGameplayEventData Payload {};
+	Payload.Instigator = this;
+	Payload.Target = HitPawn;
+
 	if (bValidBlock)
 	{
-		FGameplayEventData Payload {};
-		Payload.Instigator = this;
-		Payload.Target = HitPawn;
 		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(HitPawn, P17::Tags::Player_Event_Hit_SuccessfulBlock, Payload);
 	}
 	else
 	{
-		// TODO: Apply projectile damage.
+		HandleApplyProjectileDamage(HitPawn, Payload);
 	}
 
 	Destroy();
+}
+
+void AP17ProjectileBase::HandleApplyProjectileDamage(APawn* InHitPawn, const FGameplayEventData& InPayload) const
+{
+	WARN_RETURN_IF(!DamageEffectSpecHandle.IsValid(),)
+
+	const bool bApplied = UP17FunctionLibrary::ApplyGameplayEffectSpecHandle(GetInstigator(), InHitPawn, DamageEffectSpecHandle);
+	RETURN_IF(!bApplied,)
+
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(InHitPawn, P17::Tags::Shared_Event_Hit_React, InPayload);
 }

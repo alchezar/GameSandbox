@@ -3,12 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameplayEffectTypes.h"
 #include "GameFramework/Actor.h"
 #include "P17ProjectileBase.generated.h"
 
 class UProjectileMovementComponent;
 class UNiagaraComponent;
 class UBoxComponent;
+struct FGameplayEventData;
 
 UENUM()
 enum class EP17ProjectileDamagePolicy : uint8
@@ -44,6 +46,9 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "On Spawn Projectile Hit FX"))
 	void BP_OnSpawnProjectileHitFX(const FVector& HitLocation);
 
+private:
+	void HandleApplyProjectileDamage(APawn* InHitPawn, const FGameplayEventData& InPayload) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
@@ -57,4 +62,6 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++|Projectile")
 	EP17ProjectileDamagePolicy DamagePolicy = EP17ProjectileDamagePolicy::OnHit;
+	UPROPERTY(BlueprintReadOnly, Category = "C++|Projectile", meta = (ExposeOnSpawn = "true"))
+	FGameplayEffectSpecHandle DamageEffectSpecHandle = {};
 };
