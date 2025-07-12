@@ -49,6 +49,9 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_Strafing, "P17.Enemy.Status.Strafing")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_UnderAttack, "P17.Enemy.Status.UnderAttack")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_Unblockable, "P17.Enemy.Status.Unblockable")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Left, "P17.Enemy.Event.ActiveFist.Left")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Right, "P17.Enemy.Event.ActiveFist.Right")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Both, "P17.Enemy.Event.ActiveFist.Both")
 
 	/// @par Shared tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Ability_Hit_React, "P17.Shared.Ability.Hit.React")

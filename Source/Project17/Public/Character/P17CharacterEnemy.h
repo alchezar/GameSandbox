@@ -6,6 +6,9 @@
 #include "P17CharacterBase.h"
 #include "P17CharacterEnemy.generated.h"
 
+#if 0
+class UBoxComponent;
+#endif
 class UWidgetComponent;
 class UP17UIEnemyComponent;
 class UP17CombatEnemyComponent;
@@ -37,6 +40,12 @@ public:
 	virtual UP17UIPawnComponent* GetPawnUIComponent() const override;
 	virtual UP17UIEnemyComponent* GetEnemyUIComponent() const override;
 
+#if 0
+protected:
+	UFUNCTION()
+	void OnHandOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+#endif
+
 	/// ------------------------------------------------------------------------
 	/// @name This
 	/// ------------------------------------------------------------------------
@@ -45,6 +54,12 @@ public:
 	UP17CombatEnemyComponent* GetEnemyCombatComponent() const { return CombatComponent; };
 	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
 	UP17UIEnemyComponent* GetUIComponent() const { return UIComponent; };
+#if 0
+	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
+	UBoxComponent* GetLeftHandCollision() const { return LeftHandCollision; }
+	UFUNCTION(BlueprintCallable, Category = "C++ | Component")
+	UBoxComponent* GetRightHandCollision() const { return RightHandCollision; }
+#endif
 
 private:
 	void InitEnemyStartupData() const;
@@ -59,4 +74,10 @@ protected:
 	TObjectPtr<UP17UIEnemyComponent> UIComponent = nullptr;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
 	TObjectPtr<UWidgetComponent> HealthWidgetComponent = nullptr;
+#if 0
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UBoxComponent> LeftHandCollision = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UBoxComponent> RightHandCollision = nullptr;
+#endif
 };

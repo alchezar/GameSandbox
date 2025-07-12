@@ -51,6 +51,9 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Status_Strafing)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Status_UnderAttack)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Status_Unblockable)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Left)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Right)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Both)
 
 	/// @par Shared tags -------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Ability_Hit_React)

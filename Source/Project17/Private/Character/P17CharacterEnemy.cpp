@@ -43,12 +43,13 @@ void AP17CharacterEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UUserWidget* Widget = HealthWidgetComponent->GetUserWidgetObject();
-	WARN_RETURN_IF(!Widget,)
-	UP17WidgetBase* HealthWidget = Cast<UP17WidgetBase>(Widget);
-	WARN_RETURN_IF(!HealthWidget,)
+	if (UUserWidget* Widget = HealthWidgetComponent->GetUserWidgetObject())
+	{
+		UP17WidgetBase* HealthWidget = Cast<UP17WidgetBase>(Widget);
+		WARN_RETURN_IF(!HealthWidget,)
 
-	HealthWidget->InitEnemyCreatedWidget(this);
+		HealthWidget->InitEnemyCreatedWidget(this);
+	}
 }
 
 UP17CombatPawnComponent* AP17CharacterEnemy::GetCombatComponent() const
