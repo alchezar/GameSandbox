@@ -45,6 +45,7 @@ namespace P17::Tags
 	/// @par Enemy tags --------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Melee, "P17.Enemy.Ability.Melee")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Range, "P17.Enemy.Ability.Range")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Summon, "P17.Enemy.Ability.Summon")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Weapon, "P17.Enemy.Weapon")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_Strafing, "P17.Enemy.Status.Strafing")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_UnderAttack, "P17.Enemy.Status.UnderAttack")
@@ -52,6 +53,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Left, "P17.Enemy.Event.ActiveFist.Left")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Right, "P17.Enemy.Event.ActiveFist.Right")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_ActiveFist_Both, "P17.Enemy.Event.ActiveFist.Both")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Event_Summon, "P17.Enemy.Event.Summon")
 
 	/// @par Shared tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Shared_Ability_Hit_React, "P17.Shared.Ability.Hit.React")

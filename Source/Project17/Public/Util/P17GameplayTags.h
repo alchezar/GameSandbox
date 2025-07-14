@@ -19,6 +19,7 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Hold_Block)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Toggle)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Toggle_TargetLock)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_Toggle_Rage)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Input_SwitchTarget)
 
 	/// @par Player tags -------------------------------------------------------
@@ -47,6 +48,7 @@ namespace P17::Tags
 	/// @par Enemy tags --------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Ability_Melee)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Ability_Range)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Ability_Summon)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Weapon)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Status_Strafing)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Status_UnderAttack)
@@ -54,6 +56,7 @@ namespace P17::Tags
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Left)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Right)
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_ActiveFist_Both)
+	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Enemy_Event_Summon)
 
 	/// @par Shared tags -------------------------------------------------------
 	PROJECT17_API UE_DECLARE_GAMEPLAY_TAG_EXTERN(Shared_Ability_Hit_React)
