@@ -41,21 +41,28 @@ void AP17ProjectileBase::BeginPlay()
 }
 
 void AP17ProjectileBase::OnProjectileBeginOverlapCallback(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
-{}
+{
+	WARN_RETURN_IF(OtherActor == GetInstigator(),)
+	RETURN_IF(OverlappedActors.Contains(OtherActor),)
+	OverlappedActors.Add(OtherActor);
+	SendDamageTo(OtherActor);
+}
 
 void AP17ProjectileBase::OnProjectileHitCallback(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	WARN_RETURN_IF(OtherActor == GetInstigator(),)
 	BP_OnSpawnProjectileHitFX(Hit.ImpactPoint);
+	SendDamageTo(OtherActor);
+	Destroy();
+}
 
+void AP17ProjectileBase::SendDamageTo(AActor* TargetActor)
+{
 	APawn* InstigatorPawn = GetInstigator();
 	WARN_RETURN_IF(!InstigatorPawn,)
 
-	APawn* HitPawn = Cast<APawn>(OtherActor);
-	if (!HitPawn || !UP17FunctionLibrary::IsTargetHostile(InstigatorPawn, HitPawn))
-	{
-		Destroy();
-		return;
-	}
+	APawn* HitPawn = Cast<APawn>(TargetActor);
+	RETURN_IF(!HitPawn || !UP17FunctionLibrary::IsTargetHostile(InstigatorPawn, HitPawn),)
 
 	const bool bPlayerBlocking = UP17FunctionLibrary::NativeGetActorHasTag(HitPawn, P17::Tags::Player_Status_Blocking);
 	const bool bUnblockableAttack = UP17FunctionLibrary::NativeGetActorHasTag(InstigatorPawn, P17::Tags::Enemy_Status_Unblockable);
@@ -76,8 +83,6 @@ void AP17ProjectileBase::OnProjectileHitCallback(UPrimitiveComponent* HitCompone
 	{
 		HandleApplyProjectileDamage(HitPawn, Payload);
 	}
-
-	Destroy();
 }
 
 void AP17ProjectileBase::HandleApplyProjectileDamage(APawn* InHitPawn, const FGameplayEventData& InPayload) const

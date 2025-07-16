@@ -47,6 +47,7 @@ protected:
 	void BP_OnSpawnProjectileHitFX(const FVector& HitLocation);
 
 private:
+	void SendDamageTo(AActor* TargetActor);
 	void HandleApplyProjectileDamage(APawn* InHitPawn, const FGameplayEventData& InPayload) const;
 
 	/// ------------------------------------------------------------------------
@@ -64,4 +65,8 @@ protected:
 	EP17ProjectileDamagePolicy DamagePolicy = EP17ProjectileDamagePolicy::OnHit;
 	UPROPERTY(BlueprintReadOnly, Category = "C++|Projectile", meta = (ExposeOnSpawn = "true"))
 	FGameplayEffectSpecHandle DamageEffectSpecHandle = {};
+
+private:
+	UPROPERTY()
+	TArray<AActor*> OverlappedActors = {};
 };

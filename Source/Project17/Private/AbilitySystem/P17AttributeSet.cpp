@@ -25,6 +25,7 @@ void UP17AttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallbac
 	{
 		const float NewRageCurrent = FMath::Clamp(GetRageCurrent(), 0.f, GetRageMax());
 		SetRageCurrent(NewRageCurrent);
+		UpdateRageStatusTags(Data);
 		NotifyRageChange(Data);
 	}
 	if (Data.EvaluatedData.Attribute == GetDamageTakenAttribute())
@@ -71,4 +72,22 @@ void UP17AttributeSet::NotifyHealthChange(const FGameplayEffectModCallbackData& 
 
 	const float HealthPercentage = GetHealthCurrent() / GetHealthMax();
 	PawnUIComponent->OnHealthChanged.Broadcast(HealthPercentage);
+}
+
+void UP17AttributeSet::UpdateRageStatusTags(const FGameplayEffectModCallbackData& Data) const
+{
+	AActor* Avatar = Data.Target.GetAvatarActor();
+	if (FMath::IsNearlyEqual(GetRageCurrent(), GetRageMax(), 0.1f))
+	{
+		UP17FunctionLibrary::AddGameplayTagToActorIfNone(Avatar, P17::Tags::Player_Status_Rage_Full);
+	}
+	else if (FMath::IsNearlyZero(GetRageCurrent(), 0.1f))
+	{
+		UP17FunctionLibrary::AddGameplayTagToActorIfNone(Avatar, P17::Tags::Player_Status_Rage_None);
+	}
+	else
+	{
+		UP17FunctionLibrary::RemoveGameplayTagFromActorIfFound(Avatar, P17::Tags::Player_Status_Rage_Full);
+		UP17FunctionLibrary::RemoveGameplayTagFromActorIfFound(Avatar, P17::Tags::Player_Status_Rage_None);
+	}
 }

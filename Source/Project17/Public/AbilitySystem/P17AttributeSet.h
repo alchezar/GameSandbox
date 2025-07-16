@@ -37,6 +37,8 @@ private:
 	void NotifyRageChange(const FGameplayEffectModCallbackData& Data);
 	void NotifyHealthChange(const FGameplayEffectModCallbackData& Data);
 
+	void UpdateRageStatusTags(const FGameplayEffectModCallbackData& Data) const;
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------
