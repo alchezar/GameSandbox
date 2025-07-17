@@ -19,6 +19,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle_TargetLock, "P17.Input.Toggle.TargetLock")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Toggle_Rage, "P17.Input.Toggle.Rage")
 	UE_DEFINE_GAMEPLAY_TAG(Input_SwitchTarget, "P17.Input.SwitchTarget")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Special_Light, "P17.Input.Special.Light")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Special_Heavy, "P17.Input.Special.Heavy")
 
 	/// @par Player tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Equip_Axe, "P17.Player.Ability.Equip.Axe")
@@ -30,6 +32,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Block, "P17.Player.Ability.Block")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_TargetLock, "P17.Player.Ability.TargetLock")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Rage, "P17.Player.Ability.Rage")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Special_Light, "P17.Player.Ability.Special.Light")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Special_Heavy, "P17.Player.Ability.Special.Heavy")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_Axe, "P17.Player.Event.Equip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Hit_Pause, "P17.Player.Event.Hit.Pause")
@@ -38,6 +42,8 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Right, "P17.Player.Event.SwitchTarget.Right")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Rage_Activating, "P17.Player.Event.Rage.Activating")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Light, "P17.Player.Cooldown.Special.Light")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Heavy, "P17.Player.Cooldown.Special.Heavy")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_JumpToFinisher, "P17.Player.Status.JumpToFinisher")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Rolling, "P17.Player.Status.Rolling")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Status_Blocking, "P17.Player.Status.Blocking")

@@ -44,11 +44,22 @@ void UP17AbilitySystemComponent::OnAbilityInputReleased(const FGameplayTag& InIn
 	}
 }
 
-void UP17AbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel)
+void UP17AbilitySystemComponent::GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, const TArray<FP17HeroSpecialAbilitySet>& InSpecialAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel)
 {
 	RETURN_IF(InWeaponAbilities.IsEmpty(),)
 
 	for (const FP17HeroAbilitySet& AbilitySet : InWeaponAbilities)
+	{
+		CONTINUE_IF(!AbilitySet.IsValid())
+
+		FGameplayAbilitySpec AbilitySpec {AbilitySet.Ability, InLevel};
+		AbilitySpec.SourceObject = GetAvatarActor();
+		AbilitySpec.GetDynamicSpecSourceTags().AddTag(AbilitySet.InputTag);
+
+		OutGrantedAbilitySpecHandles.Add(GiveAbility(AbilitySpec));
+	}
+
+	for (const FP17HeroSpecialAbilitySet& AbilitySet : InSpecialAbilities)
 	{
 		CONTINUE_IF(!AbilitySet.IsValid())
 

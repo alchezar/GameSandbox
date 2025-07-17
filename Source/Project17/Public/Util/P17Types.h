@@ -46,6 +46,17 @@ public:
 };
 
 USTRUCT(BlueprintType)
+struct FP17HeroSpecialAbilitySet : public FP17HeroAbilitySet
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	TSoftObjectPtr<UTexture2D> SoftIcon = nullptr;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	FGameplayTag CooldownTag = {};
+};
+
+USTRUCT(BlueprintType)
 struct FP17WeaponData
 {
 	GENERATED_BODY()
@@ -58,6 +69,9 @@ struct FP17WeaponData
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "InputTag"))
 	TArray<FP17HeroAbilitySet> Abilities = {};
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, meta = (TitleProperty = "CooldownTag"))
+	TArray<FP17HeroSpecialAbilitySet> SpecialAbilities = {};
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	FScalableFloat BaseDamage = {};

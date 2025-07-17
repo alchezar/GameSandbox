@@ -20,8 +20,8 @@ public:
 	void OnAbilityInputPressed(const FGameplayTag& InInputTag);
 	void OnAbilityInputReleased(const FGameplayTag& InInputTag);
 
-	UFUNCTION(BlueprintCallable, meta = (ApplyLevel = "1"))
-	void GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel = 1);
+	UFUNCTION(BlueprintCallable, meta = (InLevel = "1"))
+	void GrantHeroWeaponAbilities(const TArray<FP17HeroAbilitySet>& InWeaponAbilities, const TArray<FP17HeroSpecialAbilitySet>& InSpecialAbilities, TArray<FGameplayAbilitySpecHandle>& OutGrantedAbilitySpecHandles, const int32 InLevel = 1);
 
 	// clang-format off
 	UFUNCTION(BlueprintCallable)
