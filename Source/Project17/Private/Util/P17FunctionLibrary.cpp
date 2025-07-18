@@ -8,6 +8,7 @@
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Interface/P17CombatInterface.h"
+#include "Util/Latent/P17CountDownAction.h"
 
 UP17AbilitySystemComponent* UP17FunctionLibrary::NativeGetASCFromActor(AActor* InActor)
 {
@@ -112,4 +113,24 @@ bool UP17FunctionLibrary::ApplyGameplayEffectSpecHandle(AActor* InInstigator, AA
 
 	const FActiveGameplayEffectHandle ActiveGameplayEffectHandle = SourceASC->ApplyGameplayEffectSpecToTarget(*InSpecHandle.Data, TargetASC);
 	return ActiveGameplayEffectHandle.WasSuccessfullyApplied();
+}
+
+void UP17FunctionLibrary::CountDown(const UObject* WorldContextObject, const float TotalTime, const float UpdateInterval, float& OutRemainingTime, const EP17CountDownInput Input, EP17CountDownOutput& Output, FLatentActionInfo LatentInfo)
+{
+	WARN_RETURN_IF(!GEngine,)
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	WARN_RETURN_IF(!World,)
+
+	FLatentActionManager& LatentActionManager = World->GetLatentActionManager();
+	FP17CountDownAction* FoundAction = LatentActionManager.FindExistingAction<FP17CountDownAction>(LatentInfo.CallbackTarget, LatentInfo.UUID);
+
+	if (Input == EP17CountDownInput::Start && !FoundAction)
+	{
+		FP17CountDownAction* NewAction = new FP17CountDownAction {TotalTime, UpdateInterval, OutRemainingTime, Output, LatentInfo};
+		LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, NewAction);
+	}
+	else if (Input == EP17CountDownInput::Cancel && FoundAction)
+	{
+		FoundAction->CancelAction();
+	}
 }

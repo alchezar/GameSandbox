@@ -31,6 +31,21 @@ enum class EP17SuccessTypePin : uint8
 	Failed
 };
 
+UENUM()
+enum class EP17CountDownInput : uint8
+{
+	Start,
+	Cancel
+};
+
+UENUM()
+enum class EP17CountDownOutput : uint8
+{
+	Updated,
+	Completed,
+	Canceled
+};
+
 USTRUCT(BlueprintType)
 struct FP17HeroAbilitySet
 {
@@ -78,4 +93,15 @@ struct FP17WeaponData
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TSoftObjectPtr<UTexture2D> SoftIconTexture = nullptr;
+};
+
+USTRUCT(BlueprintType)
+struct FP17Timespan
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Remaining = 0.f;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	float Duration = 0.f;
 };

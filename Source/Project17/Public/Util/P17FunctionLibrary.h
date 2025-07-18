@@ -41,4 +41,16 @@ public:
 	static bool IsValidBlock(const AActor* InAttacker, const AActor* InDefender);
 	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary")
 	static bool ApplyGameplayEffectSpecHandle(AActor* InInstigator, AActor* InTarget, const FGameplayEffectSpecHandle InSpecHandle);
+
+	UFUNCTION(BlueprintCallable, Category = "P17 | FunctionLibrary", meta = (WorldContext = "WorldContextObject", Latent, LatentInfo = "LatentInfo", ExpandEnumAsExecs = "Input|Output", TotalTime = "1.0", UpdateInterfal = "0.1"))
+	static void CountDown(
+		const UObject* WorldContextObject,
+		const float TotalTime,
+		const float UpdateInterval,
+		float& OutRemainingTime,
+		UPARAM(DisplayName = "In")
+		const EP17CountDownInput Input,
+		UPARAM(DisplayName = "Out")
+		EP17CountDownOutput& Output,
+		FLatentActionInfo LatentInfo);
 };

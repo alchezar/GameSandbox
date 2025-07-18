@@ -62,6 +62,17 @@ FGameplayEffectSpecHandle UP17HeroGameplayAbility::MakeHeroDamageEffectSpecHandl
 	return ResultSpec;
 }
 
+FP17Timespan UP17HeroGameplayAbility::GetAbilityRemainingCooldown(const FGameplayTag InCooldownTag) const
+{
+	WARN_RETURN_IF(!InCooldownTag.IsValid(), {})
+
+	const FGameplayEffectQuery CooldownQuery = FGameplayEffectQuery::MakeQuery_MatchAnyOwningTags(InCooldownTag.GetSingleTagContainer());
+	TArray<TPair<float, float>> Result = GetAbilitySystemComponentFromActorInfo()->GetActiveEffectsTimeRemainingAndDuration(CooldownQuery);
+	RETURN_IF(Result.IsEmpty(), {})
+
+	return {Result[0].Key, Result[0].Value};
+}
+
 void UP17HeroGameplayAbility::FaceControllerTo(const AActor* Target, const float DeltaTime, const float InterpSpeed, const FRotator& Offset) const
 {
 	const AActor* Owner = GetAvatarActorFromActorInfo();
