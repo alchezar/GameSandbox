@@ -7,6 +7,7 @@
 #include "Project17.h"
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Component/Combat/P17CombatPawnComponent.h"
+#include "Util/P17FunctionLibrary.h"
 
 void UP17GameplayAbility::OnGiveAbility(const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilitySpec& Spec)
 {
@@ -55,6 +56,24 @@ FActiveGameplayEffectHandle UP17GameplayAbility::BP_ApplyEffectSpecHandleToTarge
 	const FActiveGameplayEffectHandle ActiveHandle = NativeApplyEffectSpecHandleToTarget(InTarget, InSpecHandle);
 	OutExecs = ActiveHandle.WasSuccessfullyApplied() ? EP17SuccessTypePin::Successful : EP17SuccessTypePin::Failed;
 	return ActiveHandle;
+}
+
+void UP17GameplayAbility::ApplyEffectSpecHandleToHitResults(const FGameplayEffectSpecHandle& InSpecHandle, const TArray<FHitResult>& InHitResults)
+{
+	RETURN_IF(InHitResults.IsEmpty(),)
+	for (const FHitResult& HitResult : InHitResults)
+	{
+		APawn* TargetPawn = Cast<APawn>(HitResult.GetActor());
+		APawn* QueryPawn = Cast<APawn>(GetAvatarActorFromActorInfo());
+		CONTINUE_IF(!UP17FunctionLibrary::IsTargetHostile(QueryPawn, TargetPawn))
+
+		FActiveGameplayEffectHandle ActiveHandle = NativeApplyEffectSpecHandleToTarget(TargetPawn, InSpecHandle);
+		CONTINUE_IF(!ActiveHandle.WasSuccessfullyApplied())
+
+		FGameplayEventData Payload;
+		Payload.Instigator = QueryPawn;
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(TargetPawn, P17::Tags::Shared_Event_Hit_React, MoveTemp(Payload));
+	}
 }
 
 FName UP17GameplayAbility::GetMontageSectionAt(const UAnimMontage* InMontage, const int32 InIndex)

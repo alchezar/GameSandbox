@@ -43,6 +43,8 @@ protected:
 	FActiveGameplayEffectHandle NativeApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle) const;
 	UFUNCTION(BlueprintCallable, Category = "C++ | Ability", meta = (DisplayName = "ApplyEffectSpecHandleToTarget", ExpandEnumAsExecs = "OutExecs"))
 	FActiveGameplayEffectHandle BP_ApplyEffectSpecHandleToTarget(AActor* InTarget, const FGameplayEffectSpecHandle& InSpecHandle, EP17SuccessTypePin& OutExecs);
+	UFUNCTION(BlueprintCallable, Category = "C++ | Ability")
+	void ApplyEffectSpecHandleToHitResults(const FGameplayEffectSpecHandle& InSpecHandle, const TArray<FHitResult>& InHitResults);
 
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	static FName GetMontageSectionAt(const UAnimMontage* InMontage, const int32 InIndex);

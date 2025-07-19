@@ -41,6 +41,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Left, "P17.Player.Event.SwitchTarget.Left")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Right, "P17.Player.Event.SwitchTarget.Right")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Rage_Activating, "P17.Player.Event.Rage.Activating")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Ultimate, "P17.Player.Event.Ultimate")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Light, "P17.Player.Cooldown.Special.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Heavy, "P17.Player.Cooldown.Special.Heavy")
