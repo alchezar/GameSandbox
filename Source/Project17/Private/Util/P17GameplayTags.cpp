@@ -34,6 +34,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Rage, "P17.Player.Ability.Rage")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Special_Light, "P17.Player.Ability.Special.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Special_Heavy, "P17.Player.Ability.Special.Heavy")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Pickup_Stones, "P17.Player.Ability.Pickup.Stones")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Equip_Axe, "P17.Player.Event.Equip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Unequip_Axe, "P17.Player.Event.Unequip.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Hit_Pause, "P17.Player.Event.Hit.Pause")

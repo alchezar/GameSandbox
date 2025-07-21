@@ -1,6 +1,6 @@
 // Copyright © 2025, Ivan Kinder
 
-#include "AbilitySystem/Abilities/P17TargetLockHeroAbility.h"
+#include "AbilitySystem/Abilities/Traceable/P17TargetLockHeroAbility.h"
 
 #include "EnhancedInputSubsystems.h"
 #include "Blueprint/WidgetLayoutLibrary.h"
@@ -9,11 +9,17 @@
 #include "Components/SizeBox.h"
 #include "Controller/P17ControllerHero.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "Kismet/KismetSystemLibrary.h"
 #include "Project17/Project17.h"
 #include "Util/P17FunctionLibrary.h"
 #include "Util/P17GameplayTags.h"
 #include "Widget/P17WidgetBase.h"
+
+UP17TargetLockHeroAbility::UP17TargetLockHeroAbility()
+{
+	TraceDistance = 5000.f;
+	TraceBoxSize = FVector {2000.f, 2000.f, 300.f};
+	TraceChannels = {ObjectTypeQuery3};
+}
 
 void UP17TargetLockHeroAbility::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -81,28 +87,8 @@ void UP17TargetLockHeroAbility::LockOnTarget()
 
 void UP17TargetLockHeroAbility::FindAvailableActorsToLock()
 {
-	const AActor* Avatar = GetAvatarActorFromActorInfo();
-	const FVector Forward = Avatar->GetActorForwardVector();
-	const FVector Start = Avatar->GetActorLocation();
-	const FVector End = Start + Forward * TraceDistance;
-	const EDrawDebugTrace::Type DebugType = bShowDebug ? EDrawDebugTrace::Persistent : EDrawDebugTrace::None;
-
-	TArray<FHitResult> HitResults;
-	UKismetSystemLibrary::BoxTraceMultiForObjects(
-		Avatar,
-		Start,
-		End,
-		TraceBoxSize / 2,
-		Forward.Rotation(),
-		TraceChannels,
-		false,
-		{},
-		DebugType,
-		HitResults,
-		true);
-
 	ActorsToLock.Empty();
-	for (const FHitResult& HitResult : HitResults)
+	for (const FHitResult& HitResult : BoxTrace())
 	{
 		AActor* HitActor = HitResult.GetActor();
 		CONTINUE_IF(!HitActor || HitActor == GetAvatarActorFromActorInfo())

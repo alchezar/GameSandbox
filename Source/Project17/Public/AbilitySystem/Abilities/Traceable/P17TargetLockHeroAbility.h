@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Base/P17HeroGameplayAbility.h"
+#include "P17TraceableAbility.h"
 #include "P17TargetLockHeroAbility.generated.h"
 
 class UP17WidgetBase;
@@ -15,13 +15,16 @@ struct FP17Neighbours
 };
 
 UCLASS()
-class PROJECT17_API UP17TargetLockHeroAbility : public UP17HeroGameplayAbility
+class PROJECT17_API UP17TargetLockHeroAbility : public UP17TraceableAbility
 {
 	GENERATED_BODY()
 
 	/// ------------------------------------------------------------------------
 	/// @name Unreal
 	/// ------------------------------------------------------------------------
+public:
+	UP17TargetLockHeroAbility();
+
 protected:
 	/// @par UGameplayAbility interface ----------------------------------------
 	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
@@ -57,16 +60,6 @@ private:
 	/// @name This
 	/// ------------------------------------------------------------------------
 protected:
-	UPROPERTY(EditDefaultsOnly, Category = "C++|Trace")
-	float TraceDistance = 500.f;
-	UPROPERTY(EditDefaultsOnly, Category = "C++|Trace")
-	FVector TraceBoxSize = FVector {2000.f, 2000.f, 300.f};
-	UPROPERTY(EditDefaultsOnly, Category = "C++|Trace")
-	TArray<TEnumAsByte<EObjectTypeQuery>> TraceChannels = {};
-
-	UPROPERTY(EditDefaultsOnly, Category = "C++|Debug")
-	bool bShowDebug = false;
-
 	UPROPERTY(EditDefaultsOnly, Category = "C++|TargetLock")
 	TSubclassOf<UP17WidgetBase> WidgetClass = nullptr;
 	UPROPERTY(EditDefaultsOnly, Category = "C++|TargetLock")
