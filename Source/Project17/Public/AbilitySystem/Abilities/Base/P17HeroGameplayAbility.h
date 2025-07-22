@@ -6,6 +6,7 @@
 #include "P17GameplayAbility.h"
 #include "P17HeroGameplayAbility.generated.h"
 
+class UP17UIHeroComponent;
 class UP17CombatHeroComponent;
 class AP17ControllerHero;
 class AP17CharacterHero;
@@ -25,6 +26,8 @@ public:
 	AP17ControllerHero* GetHeroControllerFromActorInfo();
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	UP17CombatHeroComponent* GetHeroCombatComponentFromActorInfo();
+	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
+	UP17UIHeroComponent* GetHeroUIComponentFromActorInfo();
 
 	UFUNCTION(BlueprintPure, Category = "C++ | Ability")
 	FGameplayEffectSpecHandle MakeHeroDamageEffectSpecHandle(TSubclassOf<UGameplayEffect> InEffectClass, const float InDamage, const FGameplayTag InAttackTag, const int32 InComboCount) const;
@@ -42,4 +45,5 @@ private:
 	TWeakObjectPtr<AP17CharacterHero> CachedHeroCharacter = nullptr;
 	TWeakObjectPtr<AP17ControllerHero> CachedHeroController = nullptr;
 	TWeakObjectPtr<UP17CombatHeroComponent> CachedHeroCombatComponent = nullptr;
+	TWeakObjectPtr<UP17UIHeroComponent> CachedHeroUIComponent = nullptr;
 };

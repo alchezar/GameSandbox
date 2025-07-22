@@ -4,6 +4,7 @@
 
 #include "AbilitySystem/P17AbilitySystemComponent.h"
 #include "Component/Combat/P17CombatHeroComponent.h"
+#include "Component/UI/P17UIHeroComponent.h"
 #include "Public/Character/P17CharacterHero.h"
 #include "Public/Controller/P17ControllerHero.h"
 #include "Util/P17GameplayTags.h"
@@ -36,6 +37,16 @@ UP17CombatHeroComponent* UP17HeroGameplayAbility::GetHeroCombatComponentFromActo
 	}
 
 	return CachedHeroCombatComponent.IsValid() ? CachedHeroCombatComponent.Get() : nullptr;
+}
+
+UP17UIHeroComponent* UP17HeroGameplayAbility::GetHeroUIComponentFromActorInfo()
+{
+	if (!CachedHeroUIComponent.IsValid())
+	{
+		CachedHeroUIComponent = GetAvatarActorFromActorInfo()->FindComponentByClass<UP17UIHeroComponent>();
+	}
+
+	return CachedHeroUIComponent.IsValid() ? CachedHeroUIComponent.Get() : nullptr;
 }
 
 // ReSharper disable once CppPassValueParameterByConstReference

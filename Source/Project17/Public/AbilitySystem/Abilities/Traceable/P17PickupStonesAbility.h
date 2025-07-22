@@ -31,6 +31,12 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void CollectStones();
 
+	UFUNCTION(BlueprintCallable)
+	void ConsumeStones();
+
+private:
+	void ToggleUI(const bool bOn);
+
 	/// ------------------------------------------------------------------------
 	/// @name Fields
 	/// ------------------------------------------------------------------------

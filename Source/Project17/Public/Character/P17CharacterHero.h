@@ -61,6 +61,7 @@ protected:
 	void OnLookCallback(const FInputActionValue& InputActionValue);
 	void OnSwitchTargetCallback(const FInputActionValue& InputActionValue);
 	void OnTargetSwitchedCallback(const FInputActionValue& InputActionValue);
+	void OnPickupStartedCallback(const FInputActionValue& InputActionValue);
 	void OnAbilityInputPressedCallback(const FGameplayTag InInputTag);
 	void OnAbilityInputReleasedCallback(const FGameplayTag InInputTag);
 

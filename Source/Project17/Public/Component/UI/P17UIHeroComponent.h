@@ -13,6 +13,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FP17OnAbilityIconSlotUpdatedDelegat
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FP17OnAbilityCooldownBeginDelegate, FGameplayTag, AbilityInputTag, float, TotalCooldown, float, RemainingCooldown);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FP17OnStoneInteractedDelegate, bool, bDisplayInputKey);
+
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class PROJECT17_API UP17UIHeroComponent : public UP17UIPawnComponent
 {
@@ -36,4 +38,6 @@ public:
 	FP17OnAbilityIconSlotUpdatedDelegate OnAbilityIconSlotUpdated;
 	UPROPERTY(BlueprintCallable, BlueprintAssignable)
 	FP17OnAbilityCooldownBeginDelegate OnAbilityCooldownBegin;
+	UPROPERTY(BlueprintCallable, BlueprintAssignable)
+	FP17OnStoneInteractedDelegate OnStoneInteracted;
 };

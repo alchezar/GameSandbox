@@ -67,6 +67,8 @@ void AP17CharacterHero::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_SwitchTarget, ETriggerEvent::Triggered, this, &ThisClass::OnSwitchTargetCallback);
 		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_SwitchTarget, ETriggerEvent::Completed, this, &ThisClass::OnTargetSwitchedCallback);
 
+		MyInputComponent->BindNativeInputAction(InputConfig, P17::Tags::Input_Pickup_Stones, ETriggerEvent::Started, this, &ThisClass::OnPickupStartedCallback);
+
 		MyInputComponent->BindAbilityInputAction(InputConfig, this, &ThisClass::OnAbilityInputPressedCallback, &ThisClass::OnAbilityInputReleasedCallback);
 	}
 }
@@ -172,6 +174,11 @@ void AP17CharacterHero::OnTargetSwitchedCallback(const FInputActionValue& InputA
 		? P17::Tags::Player_Event_SwitchTarget_Left
 		: FGameplayTag::EmptyTag;
 	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, SwitchTag, {});
+}
+
+void AP17CharacterHero::OnPickupStartedCallback(const FInputActionValue& InputActionValue)
+{
+	UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, P17::Tags::Player_Event_Consume_Stones, {});
 }
 
 void AP17CharacterHero::OnAbilityInputPressedCallback(const FGameplayTag InInputTag)

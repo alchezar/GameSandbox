@@ -21,6 +21,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Input_SwitchTarget, "P17.Input.SwitchTarget")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Special_Light, "P17.Input.Special.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Input_Special_Heavy, "P17.Input.Special.Heavy")
+	UE_DEFINE_GAMEPLAY_TAG(Input_Pickup_Stones, "P17.Input.Pickup.Stones")
 
 	/// @par Player tags -------------------------------------------------------
 	UE_DEFINE_GAMEPLAY_TAG(Player_Ability_Equip_Axe, "P17.Player.Ability.Equip.Axe")
@@ -43,6 +44,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_SwitchTarget_Right, "P17.Player.Event.SwitchTarget.Right")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Rage_Activating, "P17.Player.Event.Rage.Activating")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Ultimate, "P17.Player.Event.Ultimate")
+	UE_DEFINE_GAMEPLAY_TAG(Player_Event_Consume_Stones, "P17.Player.Event.Consume.Stones")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Weapon_Axe, "P17.Player.Weapon.Axe")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Light, "P17.Player.Cooldown.Special.Light")
 	UE_DEFINE_GAMEPLAY_TAG(Player_Cooldown_Special_Heavy, "P17.Player.Cooldown.Special.Heavy")
@@ -61,6 +63,7 @@ namespace P17::Tags
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Melee, "P17.Enemy.Ability.Melee")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Range, "P17.Enemy.Ability.Range")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Summon, "P17.Enemy.Ability.Summon")
+	UE_DEFINE_GAMEPLAY_TAG(Enemy_Ability_Spawn_Stone, "P17.Enemy.Ability.Spawn.Stone")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Weapon, "P17.Enemy.Weapon")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_Strafing, "P17.Enemy.Status.Strafing")
 	UE_DEFINE_GAMEPLAY_TAG(Enemy_Status_UnderAttack, "P17.Enemy.Status.UnderAttack")
