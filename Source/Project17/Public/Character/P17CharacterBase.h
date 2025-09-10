@@ -1,0 +1,71 @@
+// Copyright © 2025, Ivan Kinder
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "AbilitySystemInterface.h"
+#include "GameFramework/Character.h"
+#include "Interface/P17CombatInterface.h"
+#include "Interface/P17UIInterface.h"
+#include "P17CharacterBase.generated.h"
+
+class UP17Data_StartupBase;
+class UP17AttributeSet;
+class UP17AbilitySystemComponent;
+
+UCLASS()
+class PROJECT17_API AP17CharacterBase : public ACharacter
+	, public IAbilitySystemInterface
+	, public IP17CombatInterface
+	, public IP17UIInterface
+{
+	GENERATED_BODY()
+
+	/// ------------------------------------------------------------------------
+	/// @name Unreal
+	/// ------------------------------------------------------------------------
+public:
+	AP17CharacterBase();
+
+protected:
+	/// @par AActor interface --------------------------------------------------
+	virtual void BeginPlay() override;
+
+public:
+	/// @par APawn interface ---------------------------------------------------
+	virtual void PossessedBy(AController* NewController) override;
+
+	/// ------------------------------------------------------------------------
+	/// @name Interface
+	/// ------------------------------------------------------------------------
+public:
+	/// @par IAbilitySystemInterface interface ---------------------------------
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+
+	/// @par IP17CombatInterface interface -------------------------------------
+	virtual UP17CombatPawnComponent* GetCombatComponent() const override;
+
+	/// @par IP17UIInterface interface -----------------------------------------
+	virtual UP17UIPawnComponent* GetPawnUIComponent() const override;
+
+	/// ------------------------------------------------------------------------
+	/// @name This
+	/// ------------------------------------------------------------------------
+public:
+	_NODISCARD
+	UP17AbilitySystemComponent* GetProjectAbilitySystemComponent() const { return AbilitySystemComponent; };
+	_NODISCARD
+	UP17AttributeSet* GetAttributeSet() const { return AttributeSet; };
+
+	/// ------------------------------------------------------------------------
+	/// @name Fields
+	/// ------------------------------------------------------------------------
+protected:
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17AbilitySystemComponent> AbilitySystemComponent = nullptr;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "C++ | Component")
+	TObjectPtr<UP17AttributeSet> AttributeSet = nullptr;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "C++ | Data")
+	TSoftObjectPtr<UP17Data_StartupBase> StartupData = nullptr;
+};

@@ -1,0 +1,136 @@
+// Copyright © 2025, Ivan Kinder
+
+#include "Util/P17FunctionLibrary.h"
+
+#include "AbilitySystemBlueprintLibrary.h"
+#include "AbilitySystemInterface.h"
+#include "GenericTeamAgentInterface.h"
+#include "Project17.h"
+#include "AbilitySystem/P17AbilitySystemComponent.h"
+#include "Interface/P17CombatInterface.h"
+#include "Util/Latent/P17CountDownAction.h"
+
+UP17AbilitySystemComponent* UP17FunctionLibrary::NativeGetASCFromActor(AActor* InActor)
+{
+	WARN_RETURN_IF(!InActor, nullptr)
+	WARN_RETURN_IF(!InActor->Implements<UAbilitySystemInterface>(), nullptr)
+
+	return Cast<UP17AbilitySystemComponent>(UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(InActor));
+}
+
+bool UP17FunctionLibrary::NativeGetActorHasTag(AActor* InActor, const FGameplayTag InTag)
+{
+	const UP17AbilitySystemComponent* ASC = NativeGetASCFromActor(InActor);
+	WARN_RETURN_IF(!ASC, false)
+
+	return ASC->HasMatchingGameplayTag(InTag);
+}
+
+UP17CombatPawnComponent* UP17FunctionLibrary::NativeGetCombatComponentFromActor(AActor* InActor)
+{
+	WARN_RETURN_IF(!InActor, nullptr)
+
+	const TScriptInterface<IP17CombatInterface> CombatInterface = InActor;
+	WARN_RETURN_IF(!CombatInterface, nullptr)
+
+	return CombatInterface->GetCombatComponent();
+}
+
+void UP17FunctionLibrary::AddGameplayTagToActorIfNone(AActor* InActor, const FGameplayTag InTag)
+{
+	UP17AbilitySystemComponent* ASC = NativeGetASCFromActor(InActor);
+	WARN_RETURN_IF(!ASC,)
+	RETURN_IF(ASC->HasMatchingGameplayTag(InTag),)
+
+	ASC->AddLooseGameplayTag(InTag);
+}
+
+void UP17FunctionLibrary::RemoveGameplayTagFromActorIfFound(AActor* InActor, const FGameplayTag InTag)
+{
+	UP17AbilitySystemComponent* ASC = NativeGetASCFromActor(InActor);
+	WARN_RETURN_IF(!ASC,)
+	RETURN_IF(!ASC->HasMatchingGameplayTag(InTag),)
+
+	ASC->RemoveLooseGameplayTag(InTag);
+}
+
+void UP17FunctionLibrary::BP_GetActorHasTag(AActor* InActor, const FGameplayTag InTag, EP17ConfirmTypePin& OutExecs)
+{
+	OutExecs = NativeGetActorHasTag(InActor, InTag)
+		? EP17ConfirmTypePin::Yes
+		: EP17ConfirmTypePin::No;
+}
+
+UP17CombatPawnComponent* UP17FunctionLibrary::BP_GetCombatComponentFromActor(AActor* InActor, EP17ValidTypePin& OutExecs)
+{
+	UP17CombatPawnComponent* CombatComponent = NativeGetCombatComponentFromActor(InActor);
+	OutExecs = CombatComponent ? EP17ValidTypePin::Valid : EP17ValidTypePin::Invalid;
+	return CombatComponent;
+}
+
+bool UP17FunctionLibrary::IsTargetHostile(const APawn* InQuery, const APawn* InTarget)
+{
+	RETURN_IF(!InQuery || !InTarget, false);
+	const auto* QueryTeamAgent = InQuery->GetController<IGenericTeamAgentInterface>();
+	const auto* TargetTeamAgent = InTarget->GetController<IGenericTeamAgentInterface>();
+	RETURN_IF(!QueryTeamAgent || !TargetTeamAgent, false);
+
+	return QueryTeamAgent->GetGenericTeamId() != TargetTeamAgent->GetGenericTeamId();
+}
+
+float UP17FunctionLibrary::BP_GetValueAtLevel(const FScalableFloat& InScalableFloat, const int32 InLevel)
+{
+	return InScalableFloat.GetValueAtLevel(InLevel);
+}
+
+FName UP17FunctionLibrary::ComputeHitReactDirection(const AActor* InAttacker, const AActor* InVictim)
+{
+	WARN_RETURN_IF(!InAttacker || !InVictim, "None")
+
+	const FVector VictimForward = InVictim->GetActorForwardVector();
+	const FVector VictimToAttacker = (InAttacker->GetActorLocation() - InVictim->GetActorLocation()).GetSafeNormal2D();
+	const float DotProduct = VictimForward | VictimToAttacker;
+	const float RightSide = FMath::Sign((VictimForward ^ VictimToAttacker).Z);
+
+	// clang-format off
+	return DotProduct > 0.5f ? "Front" :
+		DotProduct < -0.5f ? "Back" :
+		RightSide > 0.f ? "Right" : "Left";
+	// clang-format on
+}
+
+bool UP17FunctionLibrary::IsValidBlock(const AActor* InAttacker, const AActor* InDefender)
+{
+	const float DotProduct = InAttacker->GetActorForwardVector() | InDefender->GetActorForwardVector();
+	return DotProduct < -0.25f;
+}
+
+bool UP17FunctionLibrary::ApplyGameplayEffectSpecHandle(AActor* InInstigator, AActor* InTarget, const FGameplayEffectSpecHandle InSpecHandle)
+{
+	UP17AbilitySystemComponent* SourceASC = NativeGetASCFromActor(InInstigator);
+	UP17AbilitySystemComponent* TargetASC = NativeGetASCFromActor(InTarget);
+	RETURN_IF(!SourceASC || !TargetASC, false)
+
+	const FActiveGameplayEffectHandle ActiveGameplayEffectHandle = SourceASC->ApplyGameplayEffectSpecToTarget(*InSpecHandle.Data, TargetASC);
+	return ActiveGameplayEffectHandle.WasSuccessfullyApplied();
+}
+
+void UP17FunctionLibrary::CountDown(const UObject* WorldContextObject, const float TotalTime, const float UpdateInterval, float& OutRemainingTime, const EP17CountDownInput Input, EP17CountDownOutput& Output, FLatentActionInfo LatentInfo)
+{
+	WARN_RETURN_IF(!GEngine,)
+	UWorld* World = GEngine->GetWorldFromContextObject(WorldContextObject, EGetWorldErrorMode::ReturnNull);
+	WARN_RETURN_IF(!World,)
+
+	FLatentActionManager& LatentActionManager = World->GetLatentActionManager();
+	FP17CountDownAction* FoundAction = LatentActionManager.FindExistingAction<FP17CountDownAction>(LatentInfo.CallbackTarget, LatentInfo.UUID);
+
+	if (Input == EP17CountDownInput::Start && !FoundAction)
+	{
+		FP17CountDownAction* NewAction = new FP17CountDownAction {TotalTime, UpdateInterval, OutRemainingTime, Output, LatentInfo};
+		LatentActionManager.AddNewAction(LatentInfo.CallbackTarget, LatentInfo.UUID, NewAction);
+	}
+	else if (Input == EP17CountDownInput::Cancel && FoundAction)
+	{
+		FoundAction->CancelAction();
+	}
+}

@@ -26,7 +26,8 @@ public class GameSandboxEditorTarget : TargetRules
 			"Project13",
 			"Project14",
 			"Project15",
-			"Project16"
+			"Project16",
+			"Project17"
 		});
 	}
 }
